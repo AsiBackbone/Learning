@@ -77,11 +77,40 @@ Constraints
 Explicit Decision Outcome
 ```
 
+### 3. [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md)
+
+Understand how a consequential operation can pause for explicit acknowledgment, resume through a governed boundary, and leave structured evidence explaining the decision path.
+
+Topics include:
+
+- Acknowledgment challenges
+- Actor and operation binding
+- Accepted and rejected responses
+- Expiration and replay considerations
+- Re-evaluation after acknowledgment
+- Acknowledgment versus policy override
+- Decision, acknowledgment, and execution evidence
+- Audit residue versus operational logging
+- Correlation and reason codes
+- Durable persistence boundaries
+- AI acknowledgment workflows
+
+This tutorial expands the lifecycle after a decision:
+
+```text
+Decision
+   ↓
+Acknowledgment when required
+   ↓
+Host-owned continuation
+   ↓
+Audit residue
+```
+
 ## Planned Next Topics
 
 The foundational sequence will continue with:
 
-3. **Acknowledgment and Audit Residue**
 4. **Scoped Capability and Host-Owned Execution**
 5. **Governed AI Tool Gateway**
 

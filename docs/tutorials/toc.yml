@@ -7,6 +7,9 @@
 - name: Policy Context and Explicit Decision Outcomes
   href: policy-context-and-explicit-decision-outcomes.md
 
+- name: Acknowledgment and Audit Residue
+  href: acknowledgment-and-audit-residue.md
+
 - name: ASI Backbone Resources
   expanded: true
   items:

@@ -51,7 +51,7 @@ If you are new to the project, the recommended learning order is:
 2. [**Policy Context and Explicit Decision Outcomes**](../tutorials/policy-context-and-explicit-decision-outcomes.md)  
    Learn how decision inputs and outcomes can be modeled explicitly instead of being scattered across application code.
 
-3. **Acknowledgment and Audit Residue**  
+3. [**Acknowledgment and Audit Residue**](../tutorials/acknowledgment-and-audit-residue.md)  
    Explore how workflows can pause for acknowledgment and preserve structured evidence of a decision.
 
 4. **Scoped Capability and Host-Owned Execution**  
