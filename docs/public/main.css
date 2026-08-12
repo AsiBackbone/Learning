@@ -8,10 +8,3 @@
     .navbar-brand img {
         margin-right: 0.5rem !important;
     }
-
-/* Separate ASI Backbone resource links from section navigation. */
-#toc > ul.nav.level1 > li:last-child {
-    border-top: 1px solid var(--bs-border-color, #dee2e6) !important;
-    margin-top: 1rem !important;
-    padding-top: 1rem !important;
-}
