@@ -1,0 +1,29 @@
+- name: Home
+  href: index.md
+
+- name: Getting Started
+  href: getting-started/
+
+- name: Architecture
+  href: architecture/
+
+- name: Governance
+  href: governance/
+
+- name: ASP.NET Core
+  href: aspnetcore/
+
+- name: Security
+  href: security/
+
+- name: AI Integration
+  href: ai-integration/
+
+- name: Tutorials
+  href: tutorials/
+
+- name: Labs
+  href: labs/
+
+- name: Advanced
+  href: advanced/
