@@ -1,6 +1,9 @@
-- name: Tutorials 
+- name: Tutorials
   href: index.md
-  
+
+- name: Decision Before Execution
+  href: decision-before-execution.md
+
 - name: ASI Backbone Resources
   expanded: true
   items:
@@ -10,5 +13,5 @@
     - name: ASI Backbone Repository
       href: https://github.com/AsiBackbone/AsiBackbone
 
-    - name: .NET Core Application Template
+    - name: .NET Application Template
       href: https://github.com/AsiBackbone/NetCoreApplicationTemplate
