@@ -27,3 +27,15 @@
 
 - name: Advanced
   href: advanced/
+
+
+
+
+- name: ASI Backbone Organization
+  href: https://github.com/AsiBackbone
+
+- name: ASI Backbone Repository
+  href: https://github.com/AsiBackbone/AsiBackbone
+
+- name: .Net Core application template Repository
+  href: https://github.com/AsiBackbone/NetCoreApplicationTemplate
