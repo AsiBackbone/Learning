@@ -302,7 +302,7 @@ Contributions do not need to involve production framework code to be valuable.
 
 A clearer paragraph, a better diagram, or a simpler example can materially improve a learning resource.
 
-See `CONTRIBUTING.md` for contribution guidance as that document is developed.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution guidance as that document is developed.
 
 ## Discussions
 
@@ -329,7 +329,7 @@ Issues should generally be used for concrete repository work, while Discussions 
 
 ## Documentation
 
-The Learning project is intended to use **DocFX** for its published documentation, consistent with the other ASI Backbone organization repositories.
+The Learning project uses **DocFX** for its published documentation, consistent with the other ASI Backbone organization repositories.
 
 The repository Markdown files remain the canonical source material.
 
@@ -371,12 +371,10 @@ Early priorities include:
 4. Capability-Scoped and Host-Owned Execution
 5. An end-to-end governed AI tool gateway tutorial
 6. Initial beginner and intermediate labs
-7. DocFX documentation structure
-8. Contributor and repository governance guidance
 
 ## License
 
-Licensing information will be defined by the repository `LICENSE` file.
+Licensing information is defined by the repository [`LICENSE.txt`](LICENSE.txt) file.
 
 Contributors should ensure that submitted code, diagrams, examples, and written material are compatible with the repository license.
 
