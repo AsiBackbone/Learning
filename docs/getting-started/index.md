@@ -45,7 +45,7 @@ You will encounter several recurring concepts:
 
 If you are new to the project, the recommended learning order is:
 
-1. **Decision Before Execution**  
+1. [**Decision Before Execution**](../tutorials/decision-before-execution.md)  
    Understand why a consequential operation should be represented as proposed intent before it becomes execution.
 
 2. **Policy Context and Explicit Decision Outcomes**  
