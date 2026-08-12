@@ -2,28 +2,28 @@
   href: index.md
 
 - name: Getting Started
-  href: getting-started/
+  href: getting-started/index.md
 
 - name: Architecture
-  href: architecture/
+  href: architecture/index.md
 
 - name: Governance
-  href: governance/
+  href: governance/index.md
 
 - name: ASP.NET Core
-  href: aspnetcore/
+  href: aspnetcore/index.md
 
 - name: Security
-  href: security/
+  href: security/index.md
 
 - name: AI Integration
-  href: ai-integration/
+  href: ai-integration/index.md
 
 - name: Tutorials
-  href: tutorials/
+  href: tutorials/index.md
 
 - name: Labs
-  href: labs/
+  href: labs/index.md
 
 - name: Advanced
-  href: advanced/
+  href: advanced/index.md
