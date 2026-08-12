@@ -44,8 +44,6 @@ Topics include:
 - Tradeoffs and failure modes
 - AI-proposed tool actions
 
-This tutorial establishes the boundary used throughout the rest of the Learning material:
-
 > **A proposed action should become a governed decision before it becomes real-world execution.**
 
 ### 2. [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md)
@@ -65,18 +63,6 @@ Topics include:
 - Context and outcome testing
 - AI policy context
 
-This tutorial expands the middle of the governed-execution flow:
-
-```text
-Intent
-   ↓
-Policy Context
-   ↓
-Constraints
-   ↓
-Explicit Decision Outcome
-```
-
 ### 3. [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md)
 
 Understand how a consequential operation can pause for explicit acknowledgment, resume through a governed boundary, and leave structured evidence explaining the decision path.
@@ -94,18 +80,6 @@ Topics include:
 - Correlation and reason codes
 - Durable persistence boundaries
 - AI acknowledgment workflows
-
-This tutorial expands the lifecycle after a decision:
-
-```text
-Decision
-   ↓
-Acknowledgment when required
-   ↓
-Host-owned continuation
-   ↓
-Audit residue
-```
 
 ### 4. [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md)
 
@@ -126,27 +100,57 @@ Topics include:
 - Host-owned execution
 - AI capability-scoped tool execution
 
-This tutorial expands the transition from governance into execution:
+### 5. [Governed AI Tool Gateway](governed-ai-tool-gateway.md)
+
+Compose the first four patterns into an end-to-end AI-assisted execution gateway where the model may propose an action but the host retains authoritative context and execution authority.
+
+Topics include:
+
+- AI proposal versus authority
+- Host-owned tool registry
+- Proposal and argument validation
+- Authoritative policy context
+- Prompt guidance versus enforcement
+- Explicit governance decisions
+- Human acknowledgment
+- Scoped capability issuance
+- Execution-boundary validation
+- Semantic tool design
+- Secret isolation
+- Egress and destination control
+- Replay versus idempotency
+- Dry-run adoption
+- End-to-end testing and audit continuity
+
+The complete foundational flow is:
 
 ```text
-Decision
+AI proposal
+   ↓
+Host-owned context
+   ↓
+Governance decision
    ↓
 Acknowledgment when required
    ↓
 Scoped capability
    ↓
-Capability validation
+Execution-boundary validation
    ↓
-Host-owned execution
+Host-owned tool execution
+   ↓
+Audit residue
 ```
 
-## Planned Next Topic
+> **The model may propose. The host retains execution authority.**
 
-The foundational sequence concludes with:
+## Foundational Sequence Complete
 
-5. **Governed AI Tool Gateway**
+The five tutorials form the initial governed-execution curriculum.
 
-The final foundational tutorial will compose the first four patterns into one end-to-end AI-assisted execution workflow.
+They are intended to be reused, questioned, simplified, or adapted rather than treated as a mandatory framework adoption path.
+
+Good next steps include hands-on labs, alternative implementations, ASP.NET Core integration examples, AI gateway simulations, and architecture comparisons.
 
 ---
 

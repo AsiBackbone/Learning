@@ -57,10 +57,10 @@ If you are new to the project, the recommended learning order is:
 4. [**Scoped Capability and Host-Owned Execution**](../tutorials/scoped-capability-and-host-owned-execution.md)  
    Understand why approval does not necessarily imply broad or permanent authority, and why the host should retain final execution responsibility.
 
-5. **Governed AI Tool Gateway**  
+5. [**Governed AI Tool Gateway**](../tutorials/governed-ai-tool-gateway.md)  
    Apply the earlier ideas to an AI-assisted workflow in which a model may propose an operation but does not own execution authority.
 
-The tutorials will expand incrementally as the repository develops.
+The five tutorials form the initial foundational learning path. Future tutorials and labs can build on, compare, simplify, or challenge these patterns.
 
 ## The Core Boundary
 
@@ -250,11 +250,9 @@ See the repository contribution guidance for more information:
 
 ## Next Step
 
-When you are ready, continue into the foundational tutorials beginning with [**Decision Before Execution**](../tutorials/decision-before-execution.md).
+When you are ready, begin with [**Decision Before Execution**](../tutorials/decision-before-execution.md) and work through the five foundational tutorials in order.
 
-That pattern establishes the main architectural boundary used throughout the rest of the Learning material:
-
-> A proposed action should become a governed decision before it becomes real-world execution.
+The sequence ends with [**Governed AI Tool Gateway**](../tutorials/governed-ai-tool-gateway.md), which composes the earlier patterns into one end-to-end example.
 
 ---
 
