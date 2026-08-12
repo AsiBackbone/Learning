@@ -1,0 +1,53 @@
+cff-version: 1.2.0
+message: >-
+  If you use this material, please cite it using the metadata
+  from this file.
+title: "ASI Backbone Learning"
+type: dataset
+abstract: >-
+  ASI Backbone Learning is the educational layer of the ASI Backbone
+  organization: a DocFX-published, community-maintained collection of
+  tutorials, labs, and architectural comparisons covering governed
+  execution, secure ASP.NET Core application design, and AI-integration
+  governance patterns. Material connects conceptual explanations to
+  working implementations in the AsiBackbone and NetCoreApplicationTemplate
+  repositories. Learning is an educational and architectural resource; it
+  is not a compliance certification, legal standard, security guarantee,
+  or AI/AGI/ASI implementation.
+authors:
+  - family-names: Cavell
+    given-names: "Christopher D."
+    orcid: "https://orcid.org/0009-0002-2113-0245"
+license: CC-BY-4.0
+repository-code: "https://github.com/AsiBackbone/Learning"
+url: "https://asibackbone.github.io/Learning/"
+keywords:
+  - asi-backbone
+  - dotnet
+  - aspnetcore
+  - software-architecture
+  - governance
+  - decision-flow
+  - policy-as-code
+  - responsible-ai
+  - docfx
+  - tutorial
+  - education
+  - lesson
+references:
+  - type: software
+    title: "ASI Backbone"
+    authors:
+      - family-names: Cavell
+        given-names: "Christopher D."
+        orcid: "https://orcid.org/0009-0002-2113-0245"
+    repository-code: "https://github.com/AsiBackbone/AsiBackbone"
+  - type: software
+    title: ".NET Core Application Template"
+    authors:
+      - family-names: Cavell
+        given-names: "Christopher D."
+        orcid: "https://orcid.org/0009-0002-2113-0245"
+    repository-code: "https://github.com/AsiBackbone/NetCoreApplicationTemplate"
+version: "0.1.0"
+date-released: "2026-08-12"
