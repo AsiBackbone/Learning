@@ -215,23 +215,9 @@ Learning/
 │   ├── aspnetcore/
 │   ├── security/
 │   ├── ai-integration/
-│   └── advanced/
-│
-├── tutorials/
-│   ├── decision-before-execution/
-│   ├── policy-context/
-│   ├── explicit-decision-results/
-│   ├── acknowledgment-workflows/
-│   ├── audit-residue/
-│   ├── capability-tokens/
-│   └── ai-tool-gateway/
-│
-├── labs/
-│   ├── beginner/
-│   ├── intermediate/
-│   └── advanced/
-│
-├── diagrams/
+│   ├── advanced/
+│   ├── tutorials/
+│   └── labs/
 │
 └── community/
     ├── tutorial-ideas.md
