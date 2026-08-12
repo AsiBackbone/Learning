@@ -107,14 +107,46 @@ Host-owned continuation
 Audit residue
 ```
 
-## Planned Next Topics
+### 4. [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md)
 
-The foundational sequence will continue with:
+Understand why an allowed or acknowledged operation should not automatically become broad execution authority and how a short-lived, narrowly scoped capability can preserve a host-controlled execution boundary.
 
-4. **Scoped Capability and Host-Owned Execution**
+Topics include:
+
+- Approval versus authority
+- Least-privilege scopes
+- Subject, operation, and resource binding
+- Audience and gateway binding
+- Time-bounded authority
+- Policy and acknowledgment binding
+- Execution-boundary validation
+- Replay and bounded use
+- Revocation and cancellation
+- Proof and integrity considerations
+- Host-owned execution
+- AI capability-scoped tool execution
+
+This tutorial expands the transition from governance into execution:
+
+```text
+Decision
+   ↓
+Acknowledgment when required
+   ↓
+Scoped capability
+   ↓
+Capability validation
+   ↓
+Host-owned execution
+```
+
+## Planned Next Topic
+
+The foundational sequence concludes with:
+
 5. **Governed AI Tool Gateway**
 
-Each tutorial will build on the earlier concepts while remaining readable independently where practical.
+The final foundational tutorial will compose the first four patterns into one end-to-end AI-assisted execution workflow.
 
 ---
 

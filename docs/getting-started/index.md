@@ -54,7 +54,7 @@ If you are new to the project, the recommended learning order is:
 3. [**Acknowledgment and Audit Residue**](../tutorials/acknowledgment-and-audit-residue.md)  
    Explore how workflows can pause for acknowledgment and preserve structured evidence of a decision.
 
-4. **Scoped Capability and Host-Owned Execution**  
+4. [**Scoped Capability and Host-Owned Execution**](../tutorials/scoped-capability-and-host-owned-execution.md)  
    Understand why approval does not necessarily imply broad or permanent authority, and why the host should retain final execution responsibility.
 
 5. **Governed AI Tool Gateway**  
