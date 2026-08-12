@@ -48,11 +48,39 @@ This tutorial establishes the boundary used throughout the rest of the Learning 
 
 > **A proposed action should become a governed decision before it becomes real-world execution.**
 
+### 2. [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md)
+
+Understand why the facts used to make a governance decision should be represented explicitly and why the result should describe what happens next rather than collapse every decision into a boolean.
+
+Topics include:
+
+- Facts versus policy rules
+- Actor, resource, operation, and environmental context
+- Context snapshots
+- Explicit governance outcomes
+- Stable reason codes
+- Policy identity
+- Decision composition
+- Determinism
+- Context and outcome testing
+- AI policy context
+
+This tutorial expands the middle of the governed-execution flow:
+
+```text
+Intent
+   ↓
+Policy Context
+   ↓
+Constraints
+   ↓
+Explicit Decision Outcome
+```
+
 ## Planned Next Topics
 
 The foundational sequence will continue with:
 
-2. **Policy Context and Explicit Decision Outcomes**
 3. **Acknowledgment and Audit Residue**
 4. **Scoped Capability and Host-Owned Execution**
 5. **Governed AI Tool Gateway**

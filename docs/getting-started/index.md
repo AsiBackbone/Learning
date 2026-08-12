@@ -48,7 +48,7 @@ If you are new to the project, the recommended learning order is:
 1. [**Decision Before Execution**](../tutorials/decision-before-execution.md)  
    Understand why a consequential operation should be represented as proposed intent before it becomes execution.
 
-2. **Policy Context and Explicit Decision Outcomes**  
+2. [**Policy Context and Explicit Decision Outcomes**](../tutorials/policy-context-and-explicit-decision-outcomes.md)  
    Learn how decision inputs and outcomes can be modeled explicitly instead of being scattered across application code.
 
 3. **Acknowledgment and Audit Residue**  
@@ -127,7 +127,7 @@ A .NET governance and policy-control framework that implements patterns such as:
 - Host-owned execution boundaries
 - AI and application governance
 
-### .NET Core Application Template
+### .NET Application Template
 
 [`AsiBackbone/NetCoreApplicationTemplate`](https://github.com/AsiBackbone/NetCoreApplicationTemplate)
 
@@ -250,7 +250,7 @@ See the repository contribution guidance for more information:
 
 ## Next Step
 
-When you are ready, continue into the foundational tutorials beginning with **Decision Before Execution**.
+When you are ready, continue into the foundational tutorials beginning with [**Decision Before Execution**](../tutorials/decision-before-execution.md).
 
 That pattern establishes the main architectural boundary used throughout the rest of the Learning material:
 
