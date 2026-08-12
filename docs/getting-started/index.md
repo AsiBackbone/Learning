@@ -243,10 +243,10 @@ Useful contributions include:
 
 See the repository contribution guidance for more information:
 
-- [`CONTRIBUTING.md`](../../CONTRIBUTING.md)
-- [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md)
-- [`GOVERNANCE.md`](../../GOVERNANCE.md)
-- [`ROADMAP.md`](../../ROADMAP.md)
+- [CONTRIBUTING.md](https://github.com/AsiBackbone/Learning/blob/main/CONTRIBUTING.md)
+- [CODE_OF_CONDUCT.md](https://github.com/AsiBackbone/Learning/blob/main/CODE_OF_CONDUCT.md)
+- [GOVERNANCE.md](https://github.com/AsiBackbone/Learning/blob/main/GOVERNANCE.md)
+- [ROADMAP.md](https://github.com/AsiBackbone/Learning/blob/main/ROADMAP.md)
 
 ## Next Step
 
