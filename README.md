@@ -374,7 +374,18 @@ Early priorities include:
 
 ## License
 
-Licensing information is defined by the repository [`LICENSE.txt`](LICENSE.txt) file.
+ASI Backbone Learning uses component-specific licensing.
+
+Documentation, educational material, and diagrams are licensed under
+**CC BY 4.0**.
+
+Executable sample code under `samples/` is licensed under the
+**MIT License**.
+
+Source-code snippets embedded in documentation are additionally
+available under the MIT License unless otherwise noted.
+
+See [LICENSING.md](LICENSING.md) for the complete licensing policy.
 
 Contributors should ensure that submitted code, diagrams, examples, and written material are compatible with the repository license.
 

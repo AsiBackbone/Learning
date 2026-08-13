@@ -14,6 +14,10 @@ abstract: >-
   repositories. Learning is an educational and architectural resource; it
   is not a compliance certification, legal standard, security guarantee,
   or AI/AGI/ASI implementation.
+
+  Documentation and educational material are licensed under CC BY 4.0.
+  Executable sample code included with the repository is licensed under
+  the MIT License. See LICENSING.md for component-specific licensing terms.
 authors:
   - family-names: Cavell
     given-names: "Christopher D."

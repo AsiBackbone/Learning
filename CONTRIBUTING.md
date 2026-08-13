@@ -480,15 +480,17 @@ Never include:
 
 in tutorial examples, commits, Issues, Discussions, or pull requests.
 
-## Licensing
+## Contribution Licensing
 
-By contributing to this repository, you agree that your contributions may be distributed under the repository's MIT License.
+Contributions are accepted under the license applicable to the
+material being modified:
 
-Only contribute material that you have the right to submit.
+- Documentation and educational content: CC BY 4.0
+- Executable sample code: MIT
+- Code snippets included in documentation: additionally available under MIT
 
-Do not copy code, documentation, diagrams, or other content from sources whose licenses are incompatible with this repository.
-
-When adapting material from another open-source project, preserve any attribution or licensing requirements that apply.
+Contributors must have the right to submit contributed material under
+the applicable license.
 
 ## Code of Conduct
 
