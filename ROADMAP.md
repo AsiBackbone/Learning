@@ -382,7 +382,7 @@ Quality and refinement now matter more than adding another foundational tutorial
 * [x] Preserve host-owned execution.
 * [x] Discuss failure modes and tradeoffs.
 * [x] Pair with executable companion sample.
-* [ ] Pair with beginner lab.
+* [x] Pair with beginner lab.
 * [ ] Strengthen links to working implementation references.
 
 ## Tutorial 2 — Policy Context and Explicit Decision Outcomes
@@ -536,7 +536,7 @@ rather than immediately invoking real external systems.
 
 ## Status
 
-**Next major learning layer**
+**In progress — first beginner lab established**
 
 Tutorials explain.
 
@@ -568,7 +568,7 @@ Discussion / Solution
 
 Potential initial labs:
 
-* [ ] Separate intent from execution.
+* [x] Separate intent from execution.
 * [ ] Replace boolean authorization with explicit decision outcomes.
 * [ ] Build a small policy-context model.
 * [ ] Add structured reason codes.

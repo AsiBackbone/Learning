@@ -778,7 +778,8 @@ and examines how the facts and outcomes of a governance decision can be represen
 - [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see the proposal-versus-execution boundary composed around AI-proposed tool calls.
 - [Decision Before Execution sample](../../samples/decision-before-execution/README.md) — run the framework-neutral companion and observe that blocked decisions never invoke the executor.
 - [Executable Samples](https://github.com/AsiBackbone/Learning/tree/main/samples) — explore the broader companion-sample area.
-- [Hands-On Labs](../labs/index.md) — move from explanation into architectural practice and critique.
+- [Decision Before Execution lab](../labs/decision-before-execution.md) — break, repair, and extend the decision-to-execution boundary yourself.
+- [Hands-On Labs](../labs/index.md) — explore the broader practice and reasoning layer.
 
 ---
 

@@ -87,6 +87,7 @@ Useful experiments include:
 ## Related Material
 
 - [Decision Before Execution tutorial](../../docs/tutorials/decision-before-execution.md)
+- [Decision Before Execution beginner lab](../../docs/labs/decision-before-execution.md)
 - [Policy Context and Explicit Decision Outcomes](../../docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
 - [AsiBackbone working implementation](https://github.com/AsiBackbone/AsiBackbone)
 

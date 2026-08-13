@@ -1,6 +1,13 @@
 - name: Labs 
   href: index.md
 
+- name: Beginner Labs
+  expanded: true
+  items:
+    - name: Decision Before Execution
+      href: decision-before-execution.md
+
+
 - name: ASI Backbone Resources
   expanded: true
   items:

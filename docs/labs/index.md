@@ -24,11 +24,26 @@ Working Repository
 
 ## Current Status
 
-The lab navigation foundation is established, while individual hands-on labs are still being developed.
+The lab navigation foundation is established, and the first beginner hands-on lab is now available.
 
-As labs are published, they will appear in this section.
+Additional labs will appear in this section as the foundational learning path becomes increasingly interactive.
 
-In the meantime, the surrounding learning surfaces provide the preparation and reference material for future exercises.
+The initial lab pairs the Decision Before Execution tutorial with its executable companion sample and asks the learner to break, repair, and extend the execution boundary.
+
+## Available Labs
+
+### Decision Before Execution
+
+[Decision Before Execution](decision-before-execution.md)
+
+**Difficulty:** Beginner
+
+Break the execution boundary deliberately, observe why correct decision values are insufficient when the host ignores them, repair the boundary, and add a new policy constraint without moving governance logic into the executor.
+
+Related material:
+
+- [Decision Before Execution tutorial](../tutorials/decision-before-execution.md)
+- [Decision Before Execution sample](../../samples/decision-before-execution/README.md)
 
 ## Start with the Tutorials
 
@@ -46,7 +61,7 @@ Topics include:
 
 ## Study the Executable Samples
 
-The executable sample area is intended to provide small runnable demonstrations corresponding to the tutorial concepts.
+The executable sample area provides small runnable demonstrations corresponding to the tutorial concepts.
 
 [Browse Executable Samples](https://github.com/AsiBackbone/Learning/tree/main/samples)
 
