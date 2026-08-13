@@ -415,7 +415,7 @@ Escalate
 * [x] Distinguish operational logging from governance evidence.
 * [x] Pair with executable companion sample.
 * [x] Pair with intermediate lab.
-* [ ] Strengthen links to working implementation references.
+* [x] Strengthen links to working implementation references.
 
 ## Tutorial 4 — Scoped Capability and Host-Owned Execution
 

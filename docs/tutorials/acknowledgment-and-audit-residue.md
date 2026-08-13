@@ -1152,18 +1152,45 @@ An acknowledgment step is useful only if it represents a real decision boundary.
 
 This tutorial is framework-neutral, but the working `AsiBackbone` repository contains richer versions of these concepts.
 
-Useful references include:
+### Working Implementation Map
 
-- [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) — a framework-neutral request containing handshake identity, actor, operation, reason, required acknowledgment code/text, risk information, correlation, trace, and policy identity.
-- [`LiabilityHandshakeAcknowledgment`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeAcknowledgment.cs) — an explicit accepted or rejected response linked to the handshake and actor.
-- [`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs) — structured governance evidence including actor, operation, outcome, reason codes, correlation/trace data, policy identity, decision-stage data, and optional observability metadata.
-- [`DefaultAsiBackboneAcknowledgmentChallengeService`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Handshakes/DefaultAsiBackboneAcknowledgmentChallengeService.cs) — ASP.NET Core integration for acknowledgment challenge handling.
-- [`Dynamic Liability Handshake`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/dynamic-liability-handshake.md) — fuller documentation of the handshake pattern.
-- [`Durable Audit Outbox Persistence`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/durable-audit-outbox-persistence.md) — production-oriented persistence and delivery considerations for audit evidence.
+The Learning example keeps acknowledgment and audit residue in one small workflow so the lifecycle is easy to observe. The production framework separates handshake records, ASP.NET Core challenge handling, lifecycle evidence, persistence-ready records, and storage contracts into distinct surfaces.
 
-The production framework carries considerably more metadata than the teaching model because it supports broader integration, persistence, observability, and governance scenarios.
+| Tutorial concept | Working implementation | What to inspect |
+| --- | --- | --- |
+| Decision-derived acknowledgment request | [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) | `FromDecision` carries the decision's reason, correlation ID, trace ID, policy version, and policy hash into a framework-neutral handshake request. |
+| Accepted or rejected actor response | [`LiabilityHandshakeAcknowledgment`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeAcknowledgment.cs) | The separate acknowledgment record preserves handshake identity, responding actor, acknowledgment code, accepted/rejected state, timestamp, and correlation metadata without becoming execution authority. |
+| ASP.NET Core challenge boundary | [`DefaultAsiBackboneAcknowledgmentChallengeService`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Handshakes/DefaultAsiBackboneAcknowledgmentChallengeService.cs) | How an `AcknowledgmentRequired` decision becomes a host-facing challenge and how response handshake IDs and acknowledgment codes are checked before an acknowledgment record is produced. |
+| Challenge behavior under tests | [`AsiBackboneAcknowledgmentChallengeServiceTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.AspNetCore.Tests/Handshakes/AsiBackboneAcknowledgmentChallengeServiceTests.cs) | Executable examples for challenge creation, accepted and rejected responses, mismatch handling, correlation, trace, and policy metadata. |
+| Structured governance evidence | [`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs) | The richer evidence model for actor, operation, outcome, reason codes, correlation/trace data, decision stage, policy identity, and optional observability fields. |
+| Append-style lifecycle evidence | [`AuditResidueLifecycleEvent`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidueLifecycleEvent.cs) and [`AuditResidueLifecycleStage`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidueLifecycleStage.cs) | How acknowledgment, capability, gateway, and emission progress can be represented as separate correlated events without rewriting the original decision residue. |
+| Lifecycle behavior under tests | [`AuditResidueLifecycleEventTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Audit/AuditResidueLifecycleEventTests.cs) | Stable lifecycle-stage sequencing, required correlation, and tests showing that later progress can be recorded without mutating the original residue. |
+| Persistence-ready audit record | [`AuditLedgerRecord`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditLedgerRecord.cs) | The persistence-oriented projection that adds recording time, handshake and acknowledgment references, optional hash/signature metadata, and other durable-record fields. |
+| Host-owned audit persistence | [`IAsiBackboneAuditLedgerStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/IAsiBackboneAuditLedgerStore.cs) | The provider-neutral append and query contract for durable host-owned audit ledger storage. |
+| Audit model and persistence tests | [`AuditLedgerRecordTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Audit/AuditLedgerRecordTests.cs) and [`IAsiBackboneAuditLedgerStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Audit/IAsiBackboneAuditLedgerStoreTests.cs) | Executable coverage for persistence-ready records and the audit ledger storage contract. |
 
-Learning keeps the example smaller so the lifecycle remains visible.
+### Follow the Acknowledgment and Evidence Path
+
+For a code-first inspection, follow these references in order:
+
+1. [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) — begin where an acknowledgment-required governance decision is projected into an explicit responsibility-handshake request.
+2. [`LiabilityHandshakeAcknowledgment`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeAcknowledgment.cs) — inspect the separate accepted/rejected actor response.
+3. [`DefaultAsiBackboneAcknowledgmentChallengeService`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Handshakes/DefaultAsiBackboneAcknowledgmentChallengeService.cs) — see one host-integration boundary for challenge creation and response handling.
+4. [`AsiBackboneAcknowledgmentChallengeServiceTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.AspNetCore.Tests/Handshakes/AsiBackboneAcknowledgmentChallengeServiceTests.cs) — compare the integration behavior with executable challenge and mismatch scenarios.
+5. [`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs) — inspect the evidence object that can retain outcome, reason, correlation, trace, policy, and stage information.
+6. [`AuditResidueLifecycleEvent`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidueLifecycleEvent.cs) and [`AuditResidueLifecycleStage`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidueLifecycleStage.cs) — follow how later acknowledgment and execution progress remains separate from the original decision record.
+7. [`AuditLedgerRecord`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditLedgerRecord.cs) and [`IAsiBackboneAuditLedgerStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/IAsiBackboneAuditLedgerStore.cs) — continue from in-memory evidence shape into persistence-ready records and host-owned durable storage.
+
+For architectural explanation rather than source code, see:
+
+- [Dynamic Liability Handshake](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/dynamic-liability-handshake.md) — documents the broader acknowledgment/responsibility-handshake lifecycle and explicitly keeps execution policy host-owned.
+- [Durable Audit and Outbox Persistence](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/durable-audit-outbox-persistence.md) — explains why local durable evidence should precede optional downstream emission and distinguishes append-style audit evidence from outbox delivery state.
+- [Safe Audit and Telemetry Data Guidance](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/safe-audit-telemetry-data.md) — connects the tutorial's evidence-minimization guidance to production-oriented metadata hygiene.
+- [Signed Audit and Outbox Records](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/signed-audit-and-outbox-records.md) — shows the implemented signing seams while preserving the important distinction between signing and stronger immutability or tamper-evidence claims.
+
+The production framework carries considerably more metadata and persistence/signing seams than the teaching model because it supports broader integration, observability, and governance scenarios. The Learning records are teaching-specific shapes rather than copies of framework production types.
+
+The important mapping is architectural: **an acknowledgment records a bounded response, the host decides whether continuation is valid, and correlated evidence records the lifecycle without collapsing decision, acknowledgment, persistence, and execution into one event.**
 
 ## Apply the Pattern to AI
 
