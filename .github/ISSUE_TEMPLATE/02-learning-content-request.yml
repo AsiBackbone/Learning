@@ -1,0 +1,100 @@
+name: Learning content request
+description: Request a tutorial, sample, lab, diagram, or other educational material.
+title: "[Learning]: "
+labels:
+  - documentation
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for a concrete learning-material request.
+
+        For open-ended architecture questions, competing approaches, or early-stage
+        brainstorming, an organization Discussion may be a better starting point.
+
+  - type: dropdown
+    id: content-type
+    attributes:
+      label: Requested content type
+      options:
+        - Tutorial
+        - Executable sample
+        - Hands-on lab
+        - Diagram
+        - Getting Started material
+        - Architecture explanation
+        - Working repository walkthrough
+        - Alternative-pattern comparison
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Learning problem
+      description: What should a learner understand, recognize, or be able to do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Why this would be useful
+      description: Explain the learning gap or recurring source of confusion this would address.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Suggested difficulty
+      options:
+        - Beginner
+        - Intermediate
+        - Advanced
+        - Mixed
+        - Unsure
+    validations:
+      required: false
+
+  - type: textarea
+    id: concepts
+    attributes:
+      label: Concepts or architectural boundaries to cover
+      description: List the main ideas the material should demonstrate.
+    validations:
+      required: false
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Related Learning or implementation material
+      description: Link related tutorials, samples, AsiBackbone files, NetCoreApplicationTemplate files, ADRs, or documentation when useful.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: classification
+    attributes:
+      label: Pattern classification
+      options:
+        - General learning material
+        - Canonical pattern
+        - Alternative pattern
+        - Comparison of multiple approaches
+        - Unsure
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing Issues and current Learning material for this topic.
+          required: true
+        - label: This request is concrete enough to track as work rather than only an open-ended architecture question.
+          required: true
+          

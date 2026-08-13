@@ -1,0 +1,96 @@
+name: Repository or architecture improvement
+description: Propose a concrete improvement to Learning content, structure, samples, or educational architecture.
+title: "[Improvement]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for a concrete, actionable improvement.
+
+        Broader design debates and exploratory architecture questions are welcome
+        in Discussions before they become implementation work.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Improvement area
+      options:
+        - Tutorial structure
+        - Sample architecture
+        - Lab design
+        - Documentation navigation
+        - Repository organization
+        - CI or validation
+        - Accessibility
+        - Cross-repository references
+        - Canonical architecture pattern
+        - Alternative architecture pattern
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-state
+    attributes:
+      label: Current limitation
+      description: Describe the current behavior, structure, or learning limitation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed improvement
+      description: Describe the change you would like to see.
+    validations:
+      required: true
+
+  - type: textarea
+    id: learning-value
+    attributes:
+      label: Learning value
+      description: What would readers understand or do better after this change?
+    validations:
+      required: true
+
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Tradeoffs or alternatives
+      description: Note known costs, alternative approaches, or reasons not to adopt the proposal.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: classification
+    attributes:
+      label: Pattern classification
+      options:
+        - General repository improvement
+        - Canonical pattern
+        - Alternative pattern
+        - Experimental
+        - Unsure
+    validations:
+      required: false
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Related material
+      description: Add links to related Issues, Discussions, tutorials, samples, or implementation repositories.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing Issues and Discussions for similar proposals.
+          required: true
+        - label: I have described this as an architectural or educational proposal rather than a universal requirement.
+          required: true
+          

@@ -1,0 +1,107 @@
+name: Bug or defect report
+description: Report broken, incorrect, or unexpected behavior in Learning repository material.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve ASI Backbone Learning.
+
+        Use this form for concrete defects in documentation, tutorials, samples,
+        labs, DocFX output, workflows, links, or repository configuration.
+
+        **Security-sensitive reports do not belong in public Issues.**
+        If the report includes exploit details, secrets, private data, or a
+        practical vulnerability, use the repository's private vulnerability
+        reporting path instead.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      description: Select the area most directly affected.
+      options:
+        - Documentation or tutorial
+        - Executable sample
+        - Lab or exercise
+        - DocFX site, navigation, or publishing
+        - GitHub Actions or repository automation
+        - Link or cross-repository reference
+        - Repository configuration or metadata
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Affected file, page, or link
+      description: Provide the repository path or documentation URL when known.
+      placeholder: docs/tutorials/example.md or https://...
+    validations:
+      required: false
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe what is broken, incorrect, misleading, or unexpected.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce or observe
+      description: Provide the smallest useful reproduction or observation steps.
+      placeholder: |
+        1. Open or run ...
+        2. Navigate to ...
+        3. Observe ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior or content
+      description: What should happen or what should the material say instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior or content
+      description: What happens now?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment details
+      description: Include relevant .NET SDK, OS, browser, DocFX, or tooling details when applicable.
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add sanitized logs, screenshots, related Issues, or useful context.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing Issues to avoid creating a duplicate.
+          required: true
+        - label: I removed secrets, private data, credentials, and other sensitive information.
+          required: true
+          
