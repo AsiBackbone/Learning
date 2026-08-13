@@ -3,7 +3,7 @@
 **Learning objective:** Practice preserving an explicit decision boundary so that blocked operations cannot reach a host-owned executor.
 
 **Difficulty:** Beginner  
-**Prerequisites:** Complete the [Decision Before Execution tutorial](../tutorials/decision-before-execution.md) and run the [Decision Before Execution sample](../../samples/decision-before-execution/README.md).
+**Prerequisites:** Complete the [Decision Before Execution tutorial](../tutorials/decision-before-execution.md) and run the [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md).
 
 This lab builds directly on the first foundational tutorial and its executable companion sample.
 
@@ -338,7 +338,7 @@ Use `git status` before restoring anything so that you understand which local ch
 ## Related Content
 
 - [Decision Before Execution tutorial](../tutorials/decision-before-execution.md) — review the architectural reasoning behind the lab.
-- [Decision Before Execution sample](../../samples/decision-before-execution/README.md) — return to the known executable baseline.
+- [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md) — return to the known executable baseline.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — continue into richer policy facts and structured outcomes.
 - [Foundational Tutorial Index](../tutorials/index.md) — view the complete foundational learning path.
 - [AsiBackbone working implementation](https://github.com/AsiBackbone/AsiBackbone) — inspect fuller governance and decision-flow implementations.

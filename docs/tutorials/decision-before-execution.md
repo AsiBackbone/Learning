@@ -776,7 +776,7 @@ and examines how the facts and outcomes of a governance decision can be represen
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — continue into explicit policy facts, constraints, and structured outcomes.
 - [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — follow the decision lifecycle into acknowledgment and evidence.
 - [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see the proposal-versus-execution boundary composed around AI-proposed tool calls.
-- [Decision Before Execution sample](../../samples/decision-before-execution/README.md) — run the framework-neutral companion and observe that blocked decisions never invoke the executor.
+- [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md) — run the framework-neutral companion and observe that blocked decisions never invoke the executor.
 - [Executable Samples](https://github.com/AsiBackbone/Learning/tree/main/samples) — explore the broader companion-sample area.
 - [Decision Before Execution lab](../labs/decision-before-execution.md) — break, repair, and extend the decision-to-execution boundary yourself.
 - [Hands-On Labs](../labs/index.md) — explore the broader practice and reasoning layer.

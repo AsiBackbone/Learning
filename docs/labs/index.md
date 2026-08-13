@@ -43,7 +43,7 @@ Break the execution boundary deliberately, observe why correct decision values a
 Related material:
 
 - [Decision Before Execution tutorial](../tutorials/decision-before-execution.md)
-- [Decision Before Execution sample](../../samples/decision-before-execution/README.md)
+- [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md)
 
 ## Start with the Tutorials
 
