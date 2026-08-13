@@ -311,6 +311,66 @@ Avoid unnecessary promotional language.
 
 Prefer statements that explain what a pattern **does** over statements that declare it universally superior.
 
+## Building Documentation Locally
+
+The Learning documentation site is generated with **DocFX**.
+
+The repository pins the DocFX version through `.config/dotnet-tools.json`, so contributors should use the repository-local .NET tool manifest rather than relying on a separately installed global DocFX version.
+
+To match the repository's documentation-validation workflow as closely as practical, use the **.NET 10 SDK**.
+
+From the repository root, restore the pinned tools:
+
+```bash
+dotnet tool restore
+```
+
+Build the documentation using the same strict validation used by CI:
+
+```bash
+dotnet tool run docfx docs/docfx.json --warningsAsErrors
+```
+
+A successful build generates the static documentation site under:
+
+```text
+docs/_site/
+```
+
+Warnings are treated as errors intentionally. Contributors should resolve DocFX warnings rather than relying on CI to accept a locally warning-producing build.
+
+## Preview the Documentation Locally
+
+After building the site, start the DocFX local server with:
+
+```bash
+dotnet tool run docfx serve docs/_site
+```
+
+Then open:
+
+```text
+http://localhost:8080
+```
+
+Stop the local server with `Ctrl+C`.
+
+For a combined build-and-preview workflow, you may also run:
+
+```bash
+dotnet tool run docfx docs/docfx.json --warningsAsErrors --serve
+```
+
+When documentation content, navigation, links, diagrams, or DocFX configuration changes, review the rendered site locally when practical before opening a pull request.
+
+Before submitting documentation changes, rerun:
+
+```bash
+dotnet tool run docfx docs/docfx.json --warningsAsErrors
+```
+
+This is the closest local equivalent to the repository's required **Build DocFX documentation** validation check.
+
 ## Diagrams
 
 Diagrams are encouraged when they make an architectural boundary or sequence easier to understand.

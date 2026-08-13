@@ -325,6 +325,8 @@ The Learning project uses **DocFX** for its published documentation, consistent 
 
 The repository Markdown files remain the canonical source material.
 
+For local build, validation, and preview instructions, see [Building Documentation Locally](CONTRIBUTING.md#building-documentation-locally).
+
 As the project develops, the documentation site is expected to provide a more structured learning experience while GitHub remains the primary collaboration and contribution surface.
 
 ## Scope and Boundaries
