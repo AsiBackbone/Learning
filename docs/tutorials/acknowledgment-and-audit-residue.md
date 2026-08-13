@@ -1326,6 +1326,7 @@ This continues the same principle established throughout Learning:
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — revisit the explicit decision inputs and outcomes that can lead to an acknowledgment requirement.
 - [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — continue from acknowledgment into narrow, short-lived execution authority.
 - [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see acknowledgment, capability, execution, and audit residue composed around AI-proposed actions.
+- [Acknowledgment and Audit Residue sample](https://github.com/AsiBackbone/Learning/blob/main/samples/acknowledgment-and-audit-residue/README.md) — run the companion workflow and observe bound acknowledgment, re-evaluation, correlation, and distinct evidence stages.
 - [Executable Samples](https://github.com/AsiBackbone/Learning/tree/main/samples) — explore runnable companion material as the sample set develops.
 - [Hands-On Labs](../labs/index.md) — practice acknowledgment, evidence, and governed-continuation boundaries through hands-on exercises.
 

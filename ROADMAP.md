@@ -413,7 +413,7 @@ Escalate
 * [x] Explain decision lineage and audit residue.
 * [x] Address reason codes, correlation, and policy identity.
 * [x] Distinguish operational logging from governance evidence.
-* [ ] Pair with executable companion sample.
+* [x] Pair with executable companion sample.
 * [ ] Pair with intermediate lab.
 * [ ] Strengthen links to working implementation references.
 
@@ -483,7 +483,7 @@ They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicati
 
 * [x] Decision Before Execution sample.
 * [x] Policy Context and Explicit Decision Outcomes sample.
-* [ ] Acknowledgment and Audit Residue sample.
+* [x] Acknowledgment and Audit Residue sample.
 * [ ] Scoped Capability and Host-Owned Execution sample.
 * [ ] Governed AI Tool Gateway sample.
 

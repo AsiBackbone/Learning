@@ -8,9 +8,9 @@ It is intended to contain intentionally small .NET examples that complement the 
 
 ## Current Status
 
-**Sample foundation established — two executable companion samples available.**
+**Sample foundation established — three executable companion samples available.**
 
-The `samples/` area defines the structure, expectations, and design principles for executable examples and now includes runnable companion projects for the first two foundational tutorials.
+The `samples/` area defines the structure, expectations, and design principles for executable examples and now includes runnable companion projects for the first three foundational tutorials.
 
 Individual sample projects will continue to be added incrementally as the foundational tutorials are paired with runnable implementations.
 
@@ -154,9 +154,13 @@ Related tutorial:
 
 [Acknowledgment and Audit Residue](../docs/tutorials/acknowledgment-and-audit-residue.md)
 
-The sample is expected to demonstrate a workflow that can pause for explicit acknowledgment while preserving evidence of the governed path.
+Executable companion:
 
-The distinction should remain visible:
+[Acknowledgment and Audit Residue sample](acknowledgment-and-audit-residue/README.md)
+
+The sample demonstrates a workflow that can pause for explicit acknowledgment while preserving evidence of the governed path.
+
+The distinction remains visible:
 
 ```text
 Acknowledgment
@@ -166,7 +170,7 @@ Authorization
 Execution Authority
 ```
 
-Possible sample concerns include:
+The sample makes these concerns visible:
 
 * Acknowledgment identity
 * Actor binding
