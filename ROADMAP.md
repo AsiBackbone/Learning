@@ -383,7 +383,7 @@ Quality and refinement now matter more than adding another foundational tutorial
 * [x] Discuss failure modes and tradeoffs.
 * [x] Pair with executable companion sample.
 * [x] Pair with beginner lab.
-* [ ] Strengthen links to working implementation references.
+* [x] Strengthen links to working implementation references.
 
 ## Tutorial 2 — Policy Context and Explicit Decision Outcomes
 

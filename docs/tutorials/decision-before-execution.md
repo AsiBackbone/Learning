@@ -666,19 +666,70 @@ A full governance pipeline may be unnecessary for:
 
 Learning should make architectures easier to reason about, not larger by default.
 
-## Relationship to AsiBackbone
+## Working Implementation References
 
-This tutorial is framework-neutral, but the working `AsiBackbone` repository implements fuller versions of the same separation.
+This tutorial is deliberately framework-neutral. The working `AsiBackbone` repository implements fuller versions of the same boundaries with richer policy composition, decision metadata, tests, and ASP.NET Core integration.
 
-Useful implementation references include:
+Use these references as an implementation map rather than as required dependencies for understanding the pattern.
 
-- [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — structured governance outcomes, reason data, correlation information, policy version/hash, and execution-oriented helpers.
-- [`DefaultAsiBackbonePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultAsiBackbonePolicyEvaluator.cs) — constraint evaluation and decision composition without performing the host operation.
-- [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) — examples of policy behavior exercised through tests.
+### Concept-to-Implementation Map
+
+| Tutorial concept | Working reference | What to inspect |
+| --- | --- | --- |
+| Explicit governance decision | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) and [`GovernanceDecisionOutcome`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs) | Compare the tutorial's small decision record and outcome enum with the framework's fuller decision model and outcome vocabulary. |
+| Context and constraint evaluation | [`DefaultAsiBackbonePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultAsiBackbonePolicyEvaluator.cs) | Inspect how the working framework evaluates policy and composes governance decisions without turning the evaluator into the host operation itself. |
+| Decision behavior under tests | [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) | Follow concrete tests that exercise the evaluator and verify decision behavior through the policy pipeline. |
+| Intent through execution | [Intent-to-Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) | Compare the tutorial's Request -> Intent -> Context -> Decision -> Execution flow with the fuller documented lifecycle. |
+| Host-owned execution | [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/host-owned-execution-enforcement.md) | Examine the framework guidance for keeping execution authority with the host after governance evaluation. |
+| Concrete ASP.NET Core host | [`SampleGovernanceController`](https://github.com/AsiBackbone/AsiBackbone/blob/main/samples/PlainAspNetCoreHost/SampleGovernanceController.cs) | See a working host consume governance behavior in an ASP.NET Core application rather than treating the evaluator as the side-effect owner. |
+| ASP.NET Core enforcement layer | [`AsiBackboneEndpointGovernanceMiddleware`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Endpoints/AsiBackboneEndpointGovernanceMiddleware.cs) and [`AsiBackboneEndpointGovernanceTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.AspNetCore.Tests/Endpoints/AsiBackboneEndpointGovernanceTests.cs) | Inspect one concrete request-pipeline enforcement boundary together with the tests that exercise it. |
+
+### Suggested Reading Order
+
+If you are moving from this tutorial into the production-oriented repository, a useful progression is:
+
+```text
+GovernanceDecision + GovernanceDecisionOutcome
+        |
+        v
+DefaultAsiBackbonePolicyEvaluator
+        |
+        v
+PolicyEvaluatorEndToEndTests
+        |
+        v
+Intent-to-Execution Pattern
+        |
+        v
+Host-Owned Execution Enforcement
+        |
+        v
+Plain ASP.NET Core host + endpoint governance middleware
+```
 
 The production framework is intentionally richer than the teaching example.
 
-The teaching example exists to expose the boundary with as little machinery as possible.
+The purpose of these links is not to turn the Learning tutorial into package documentation. They let you move from a deliberately small architectural specimen to the fuller implementation and observe where additional production concerns enter the design.
+
+The core boundary should still be recognizable:
+
+```text
+Proposed operation
+   |
+   v
+Governance evaluation
+   |
+   v
+Explicit decision
+   |
+   v
+Host enforcement
+   |
+   v
+Execution only when permitted
+```
+
+No single implementation file defines the entire architecture. Read the decision model, evaluator, tests, host guidance, and integration layer together.
 
 ## Apply the Pattern to AI
 

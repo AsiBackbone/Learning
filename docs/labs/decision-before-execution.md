@@ -341,7 +341,10 @@ Use `git status` before restoring anything so that you understand which local ch
 - [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md) — return to the known executable baseline.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — continue into richer policy facts and structured outcomes.
 - [Foundational Tutorial Index](../tutorials/index.md) — view the complete foundational learning path.
-- [AsiBackbone working implementation](https://github.com/AsiBackbone/AsiBackbone) — inspect fuller governance and decision-flow implementations.
+- [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) - compare your lab behavior with fuller evaluator tests.
+- [Intent-to-Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) - follow the complete documented lifecycle from proposal toward execution.
+- [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/host-owned-execution-enforcement.md) - examine the fuller execution-authority boundary.
+- [`AsiBackboneEndpointGovernanceMiddleware`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Endpoints/AsiBackboneEndpointGovernanceMiddleware.cs) - inspect a concrete ASP.NET Core enforcement layer.
 
 ---
 
