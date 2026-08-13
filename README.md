@@ -131,9 +131,9 @@ This keeps the material problem-first rather than product-first.
 
 A tutorial should remain useful even to someone who never installs AsiBackbone or uses NetCoreApplicationTemplate.
 
-## Initial Learning Areas
+## Foundational Learning Areas
 
-The first tutorials are expected to focus on foundational architectural patterns such as:
+The first tutorials are focused on foundational architectural patterns such as:
 
 ### Decision Before Execution
 

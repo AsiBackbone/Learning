@@ -412,8 +412,6 @@ When contributing documentation:
 - Use descriptive headings and meaningful link text.
 - Keep heading levels logically structured rather than choosing them
   only for visual appearance.
-- Use tables for genuinely tabular information rather than page
-  only for visual appearance.
 - Use tables for genuinely tabular information rather than page layout,
   and keep table structures as simple as practical.
 - Ensure code examples and architectural flows remain understandable

@@ -1,6 +1,6 @@
 # ASI Backbone Learning Samples
 
-This directory contains executable sample code supporting the tutorials and architectural material in **ASI Backbone Learning**.
+This directory is reserved for / will contain executable sample code supporting the tutorials and architectural material in **ASI Backbone Learning**.
 
 The samples are intentionally small.
 

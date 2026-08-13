@@ -2,7 +2,7 @@
   "title": "ASI Backbone Learning",
   "version": "0.1.0",
   "upload_type": "lesson",
-  "description": "ASI Backbone Learning is the educational layer of the ASI Backbone organization: a DocFX-published, community-maintained collection of tutorials, labs, and architectural comparisons covering governed execution, secure ASP.NET Core application design, and AI-integration governance patterns. Material connects conceptual explanations to working implementations in the AsiBackbone and NetCoreApplicationTemplate repositories. Learning is an educational and architectural resource; it is not a compliance certification, legal standard, security guarantee, or AI/AGI/ASI implementation. Documentation and educational material are licensed under CC BY 4.0. Executable sample code included with the repository is licensed under the MIT License. See LICENSING.md for component-specific licensing terms.",
+  "description": "ASI Backbone Learning is the educational layer of the ASI Backbone organization: a DocFX-published, community-maintained collection of tutorials, and architectural comparisons covering governed execution, secure ASP.NET Core application design, and AI-integration governance patterns. Material connects conceptual explanations to working implementations in the AsiBackbone and NetCoreApplicationTemplate repositories. Learning is an educational and architectural resource; it is not a compliance certification, legal standard, security guarantee, or AI/AGI/ASI implementation. Documentation and educational material are licensed under CC BY 4.0. Executable sample code included with the repository is licensed under the MIT License. See LICENSING.md for component-specific licensing terms.",
   "creators": [
     {
       "name": "Cavell, Christopher D.",

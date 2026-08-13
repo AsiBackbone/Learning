@@ -28,6 +28,18 @@ A tutorial should remain useful even if you never install the `AsiBackbone` pack
 
 ## Foundational Tutorials
 
+### Learning Path at a Glance
+
+| Tutorial | Difficulty | Prerequisites |
+| --- | --- | --- |
+| [Decision Before Execution](decision-before-execution.md) | Beginner | None |
+| [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) | Beginner | Tutorial 1 |
+| [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) | Intermediate | Tutorials 1–2 |
+| [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) | Intermediate | Tutorials 1–3 |
+| [Governed AI Tool Gateway](governed-ai-tool-gateway.md) | Intermediate | Tutorials 1–4 |
+
+Difficulty reflects the conceptual complexity of the learning material rather than the production-readiness of the demonstrated patterns.
+
 ### 1. [Decision Before Execution](decision-before-execution.md)
 
 Understand why a consequential operation should be represented as proposed intent, evaluated, and converted into an explicit decision before the host performs the real-world action.
@@ -45,18 +57,6 @@ Topics include:
 - AI-proposed tool actions
 
 > **A proposed action should become a governed decision before it becomes real-world execution.**
-
-### Learning Path at a Glance
-
-| Tutorial | Difficulty | Prerequisites |
-| --- | --- | --- |
-| [Decision Before Execution](decision-before-execution.md) | Beginner | None |
-| [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) | Beginner | Tutorial 1 |
-| [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) | Intermediate | Tutorials 1–2 |
-| [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) | Intermediate | Tutorials 1–3 |
-| [Governed AI Tool Gateway](governed-ai-tool-gateway.md) | Intermediate | Tutorials 1–4 |
-
-Difficulty reflects the conceptual complexity of the learning material rather than the production-readiness of the demonstrated patterns.
 
 ### 2. [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md)
 
