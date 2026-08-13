@@ -22,8 +22,11 @@
 - name: Tutorials
   href: tutorials/index.md
 
+- name: Executable Samples
+  href: https://github.com/AsiBackbone/Learning/tree/main/samples
+
 - name: Labs
   href: labs/index.md
-
+  
 - name: Advanced
   href: advanced/index.md

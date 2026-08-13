@@ -26,7 +26,7 @@ Runnable sample
 Tests
    ↓
 Working repository implementation
-````
+```
 
 Each sample should remain focused enough that the architectural lesson is easy to see.
 
@@ -34,6 +34,25 @@ Production-oriented complexity belongs primarily in the working implementation r
 
 * [AsiBackbone](https://github.com/AsiBackbone/AsiBackbone)
 * [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)
+
+## Learning Navigation
+
+The sample area sits between architectural explanation and hands-on practice:
+
+- [Foundational Tutorials](../docs/tutorials/index.md) — understand the architectural reasoning.
+- [Hands-On Labs](../docs/labs/index.md) — apply and critique the patterns.
+- [AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) — inspect the fuller governance implementation.
+- [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) — inspect the fuller ASP.NET Core reference architecture.
+
+```text
+Tutorial
+   ↓
+Sample
+   ↓
+Lab
+   ↓
+Working Repository
+```
 
 ## Foundational Samples
 

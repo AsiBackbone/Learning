@@ -144,6 +144,32 @@ Audit residue
 
 > **The model may propose. The host retains execution authority.**
 
+## Continue Beyond the Tutorials
+
+The tutorials are the explanation layer of the Learning repository.
+
+The broader learning path is:
+
+```text
+Tutorial
+   ↓
+Executable Sample
+   ↓
+Hands-On Lab
+   ↓
+Working Repository
+```
+
+After studying a tutorial:
+
+* [Browse the executable sample area](https://github.com/AsiBackbone/Learning/tree/main/samples) for runnable companion implementations as they are added.
+* [Browse Labs](../labs/index.md) for hands-on exercises and architecture challenges as they are published.
+* [Explore AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) for fuller governance and policy-control implementations.
+* [Explore NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) for a fuller ASP.NET Core reference architecture.
+
+The teaching material is intentionally smaller than the working repositories. Use the larger implementations to see how similar ideas behave when more production concerns are present.
+
+
 ## Foundational Sequence Complete
 
 The five tutorials form the initial governed-execution curriculum.

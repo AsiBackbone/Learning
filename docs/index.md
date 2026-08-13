@@ -78,6 +78,14 @@ Follow focused, problem-first lessons that move from a common implementation thr
 
 [Browse Tutorials →](tutorials/index.md)
 
+### Executable Samples
+
+Move from architectural explanation toward runnable demonstrations of the same boundaries.
+
+The `samples/` area contains the companion-code structure for the Learning repository. As the sample set develops, it will provide intentionally small .NET implementations corresponding to the foundational tutorials.
+
+[Browse Executable Samples →](https://github.com/AsiBackbone/Learning/tree/main/samples)
+
 ### Labs
 
 Move from reading to reasoning with hands-on exercises, incomplete implementations, architecture critiques, policy scenarios, and design challenges.
