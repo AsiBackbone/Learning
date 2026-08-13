@@ -228,6 +228,7 @@ Useful experiments include:
 ## Related Material
 
 - [Acknowledgment and Audit Residue tutorial](../../docs/tutorials/acknowledgment-and-audit-residue.md)
+- [Acknowledgment and Audit Residue intermediate lab](../../docs/labs/acknowledgment-and-audit-residue.md)
 - [Policy Context and Explicit Decision Outcomes sample](../policy-context-and-explicit-decision-outcomes/README.md)
 - [Scoped Capability and Host-Owned Execution](../../docs/tutorials/scoped-capability-and-host-owned-execution.md)
 - [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) - compare the teaching challenge with the fuller working handshake request.

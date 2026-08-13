@@ -10,6 +10,13 @@
       href: policy-context-and-explicit-decision-outcomes.md
 
 
+- name: Intermediate Labs
+  expanded: true
+  items:
+    - name: Acknowledgment and Audit Residue
+      href: acknowledgment-and-audit-residue.md
+
+
 - name: ASI Backbone Resources
   expanded: true
   items:

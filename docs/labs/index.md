@@ -24,11 +24,11 @@ Working Repository
 
 ## Current Status
 
-The lab navigation foundation is established, and the first two beginner hands-on labs are now available.
+The lab navigation foundation is established, with two beginner labs and the first intermediate lab now available.
 
 Additional labs will appear in this section as the foundational learning path becomes increasingly interactive.
 
-The initial labs pair the first two foundational tutorials with executable companion samples and ask learners to modify, challenge, and extend the demonstrated governance boundaries.
+The current labs pair the first three foundational tutorials with executable companion samples and ask learners to modify, challenge, and extend the demonstrated governance boundaries.
 
 ## Available Labs
 
@@ -57,6 +57,19 @@ Related material:
 
 - [Policy Context and Explicit Decision Outcomes tutorial](../tutorials/policy-context-and-explicit-decision-outcomes.md)
 - [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md)
+
+### Acknowledgment and Audit Residue
+
+[Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md)
+
+**Difficulty:** Intermediate
+
+Break the acknowledgment boundary deliberately, add another response-binding failure, expose replay as a state problem, preserve correlated evidence behind an in-memory store, and distinguish an allowed decision from a failed execution.
+
+Related material:
+
+- [Acknowledgment and Audit Residue tutorial](../tutorials/acknowledgment-and-audit-residue.md)
+- [Acknowledgment and Audit Residue sample](https://github.com/AsiBackbone/Learning/blob/main/samples/acknowledgment-and-audit-residue/README.md)
 
 ## Start with the Tutorials
 

@@ -414,7 +414,7 @@ Escalate
 * [x] Address reason codes, correlation, and policy identity.
 * [x] Distinguish operational logging from governance evidence.
 * [x] Pair with executable companion sample.
-* [ ] Pair with intermediate lab.
+* [x] Pair with intermediate lab.
 * [ ] Strengthen links to working implementation references.
 
 ## Tutorial 4 — Scoped Capability and Host-Owned Execution
@@ -536,7 +536,7 @@ rather than immediately invoking real external systems.
 
 ## Status
 
-**In progress — two beginner labs established**
+**In progress — two beginner labs and one intermediate lab established**
 
 Tutorials explain.
 
@@ -577,8 +577,8 @@ Potential initial labs:
 
 ## Intermediate Labs
 
-* [ ] Add acknowledgment to a consequential workflow.
-* [ ] Preserve an audit receipt.
+* [x] Add acknowledgment to a consequential workflow.
+* [x] Preserve an audit receipt.
 * [ ] Introduce capability-scoped execution.
 * [ ] Build a governed API operation.
 * [ ] Refactor scattered governance logic into a decision pipeline.
