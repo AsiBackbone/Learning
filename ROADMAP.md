@@ -403,7 +403,7 @@ Escalate
 
 * [x] Pair with executable companion sample.
 * [x] Pair with learner exercise.
-* [ ] Strengthen links to working implementation references.
+* [x] Strengthen links to working implementation references.
 
 ## Tutorial 3 — Acknowledgment and Audit Residue
 
