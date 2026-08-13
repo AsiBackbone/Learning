@@ -2,6 +2,9 @@
 
 **Learning objective:** Understand why a consequential operation should be represented as proposed intent, evaluated, and converted into an explicit decision before the host performs the real-world action.
 
+**Difficulty:** Beginner  
+**Prerequisites:** None. Familiarity with basic application request/response flows is helpful but not required.
+
 This is the first foundational tutorial in ASI Backbone Learning.
 
 The pattern is deliberately broader than the `AsiBackbone` package. You can use the same separation in a small application, an API gateway, an administrative workflow, a background process, or an AI-assisted tool system.
