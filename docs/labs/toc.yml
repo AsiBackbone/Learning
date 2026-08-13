@@ -6,6 +6,8 @@
   items:
     - name: Decision Before Execution
       href: decision-before-execution.md
+    - name: Policy Context and Explicit Decision Outcomes
+      href: policy-context-and-explicit-decision-outcomes.md
 
 
 - name: ASI Backbone Resources

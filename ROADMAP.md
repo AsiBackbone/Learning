@@ -402,7 +402,7 @@ Escalate
 ```
 
 * [x] Pair with executable companion sample.
-* [ ] Pair with learner exercise.
+* [x] Pair with learner exercise.
 * [ ] Strengthen links to working implementation references.
 
 ## Tutorial 3 — Acknowledgment and Audit Residue
@@ -536,7 +536,7 @@ rather than immediately invoking real external systems.
 
 ## Status
 
-**In progress — first beginner lab established**
+**In progress — two beginner labs established**
 
 Tutorials explain.
 
@@ -569,9 +569,9 @@ Discussion / Solution
 Potential initial labs:
 
 * [x] Separate intent from execution.
-* [ ] Replace boolean authorization with explicit decision outcomes.
-* [ ] Build a small policy-context model.
-* [ ] Add structured reason codes.
+* [x] Replace boolean authorization with explicit decision outcomes.
+* [x] Build a small policy-context model.
+* [x] Add structured reason codes.
 * [ ] Identify a hidden execution side effect.
 * [ ] Identify middleware ordering problems.
 

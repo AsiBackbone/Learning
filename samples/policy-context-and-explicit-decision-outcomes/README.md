@@ -146,6 +146,7 @@ Useful experiments include:
 ## Related Material
 
 - [Policy Context and Explicit Decision Outcomes tutorial](../../docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
+- [Policy Context and Explicit Decision Outcomes learner exercise](../../docs/labs/policy-context-and-explicit-decision-outcomes.md)
 - [Decision Before Execution sample](../decision-before-execution/README.md)
 - [Acknowledgment and Audit Residue](../../docs/tutorials/acknowledgment-and-audit-residue.md)
 - [`GovernanceDecisionOutcome`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs) - compare the teaching outcome vocabulary with the working framework.

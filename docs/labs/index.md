@@ -24,11 +24,11 @@ Working Repository
 
 ## Current Status
 
-The lab navigation foundation is established, and the first beginner hands-on lab is now available.
+The lab navigation foundation is established, and the first two beginner hands-on labs are now available.
 
 Additional labs will appear in this section as the foundational learning path becomes increasingly interactive.
 
-The initial lab pairs the Decision Before Execution tutorial with its executable companion sample and asks the learner to break, repair, and extend the execution boundary.
+The initial labs pair the first two foundational tutorials with executable companion samples and ask learners to modify, challenge, and extend the demonstrated governance boundaries.
 
 ## Available Labs
 
@@ -44,6 +44,19 @@ Related material:
 
 - [Decision Before Execution tutorial](../tutorials/decision-before-execution.md)
 - [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md)
+
+### Policy Context and Explicit Decision Outcomes
+
+[Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md)
+
+**Difficulty:** Beginner
+
+Collapse structured decisions back to a boolean to observe the information loss, extend the explicit policy context, add a stable reason-coded rule, and make rule precedence observable and testable.
+
+Related material:
+
+- [Policy Context and Explicit Decision Outcomes tutorial](../tutorials/policy-context-and-explicit-decision-outcomes.md)
+- [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md)
 
 ## Start with the Tutorials
 
