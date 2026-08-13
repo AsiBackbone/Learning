@@ -256,7 +256,7 @@ See [LICENSING.md](LICENSING.md) for the complete licensing policy.
 
 ## Status
 
-**Substantially established**
+**Complete**
 
 ## Completed Foundation
 
