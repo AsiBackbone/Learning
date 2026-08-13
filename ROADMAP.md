@@ -279,10 +279,10 @@ See [LICENSING.md](LICENSING.md) for the complete licensing policy.
 * [x] Add `community/contributors.md`.
 * [x] Add `SECURITY.md`.
 * [x] Add repository topics.
+* [x] Review repository rules or branch protection.
 
 ## Remaining Repository Work
 
-* [ ] Review repository rules or branch protection.
 * [ ] Add Issue templates.
 * [ ] Add pull request template.
 * [ ] Add or refine contributor labels.
