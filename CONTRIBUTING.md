@@ -73,7 +73,7 @@ Use **Issues** for concrete work such as:
 - DocFX problems
 - Clearly scoped enhancements
 
-Use **Discussions** for broader or exploratory topics such as:
+Use [**ASI Backbone Organization Discussions**](https://github.com/orgs/AsiBackbone/discussions) for broader or exploratory topics such as:
 
 - Architecture questions
 - Tutorial proposals
@@ -508,7 +508,7 @@ The project may recognize contributors through Git history, release notes, contr
 
 ## Questions
 
-If you are unsure whether an idea belongs in the repository, start a Discussion.
+If you are unsure whether an idea belongs in the repository, start an [ASI Backbone Organization Discussion](https://github.com/orgs/AsiBackbone/discussions).
 
 If you have identified a concrete problem, open an Issue.
 

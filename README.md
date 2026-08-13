@@ -306,24 +306,16 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution guidance as that docum
 
 ## Discussions
 
-Architecture questions, tutorial proposals, design alternatives, and broader technical discussion are encouraged through the ASI Backbone organization Discussions area.
+Architecture questions, tutorial proposals, design alternatives, and broader technical discussion are encouraged through [ASI Backbone Organization Discussions](https://github.com/orgs/AsiBackbone/discussions).
 
-A useful community cycle is:
+Use Discussions for exploratory topics such as:
 
-```text
-Question
-   ↓
-Discussion
-   ↓
-Experiment or competing approaches
-   ↓
-Tutorial or documentation contribution
-   ↓
-Working example
-   ↓
-Feedback
-   ↺
-```
+- Architecture questions
+- Tutorial and lab proposals
+- Alternative patterns
+- Design debates
+- Cross-repository integration ideas
+- Community learning topics
 
 Issues should generally be used for concrete repository work, while Discussions are better suited to open architectural questions and exploratory topics.
 

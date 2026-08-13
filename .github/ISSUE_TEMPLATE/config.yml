@@ -1,0 +1,6 @@
+blank_issues_enabled: true
+
+contact_links:
+  - name: ASI Backbone Organization Discussions
+    url: https://github.com/orgs/AsiBackbone/discussions
+    about: Ask architecture questions, propose learning topics, compare patterns, and discuss broader ideas across the ASI Backbone organization.

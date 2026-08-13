@@ -283,11 +283,11 @@ See [LICENSING.md](LICENSING.md) for the complete licensing policy.
 * [x] Add Issue templates.
 * [x] Add pull request template.
 * [x] Add or refine contributor labels.
+* [x] Improve direct linking to organization Discussions.
+* [x] Add contribution pathways for tutorial, lab, sample, and alternative-pattern proposals.
 
-## Remaining Repository Work
+## Ongoing Maintenance
 
-* [ ] Improve direct linking to organization Discussions.
-* [ ] Add contribution pathways for tutorial, lab, sample, and alternative-pattern proposals.
 * [ ] Review repository metadata periodically as the project matures.
 
 ## Contributor Label Taxonomy

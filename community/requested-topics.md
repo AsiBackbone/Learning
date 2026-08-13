@@ -8,7 +8,7 @@ If a topic repeatedly appears in Issues or Discussions, that is a strong signal 
 
 ## How to Request a Topic
 
-For a new topic request, prefer opening a GitHub Discussion when the subject is exploratory, architectural, or likely to benefit from community input.
+For a new topic request, prefer opening an [ASI Backbone Organization Discussion](https://github.com/orgs/AsiBackbone/discussions) when the subject is exploratory, architectural, or likely to benefit from community input.
 
 Use an Issue when the requested work is already concrete and well scoped.
 
