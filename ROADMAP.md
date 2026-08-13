@@ -282,36 +282,46 @@ See [LICENSING.md](LICENSING.md) for the complete licensing policy.
 * [x] Review repository rules or branch protection.
 * [x] Add Issue templates.
 * [x] Add pull request template.
+* [x] Add or refine contributor labels.
 
 ## Remaining Repository Work
 
-* [ ] Add or refine contributor labels.
 * [ ] Improve direct linking to organization Discussions.
 * [ ] Add contribution pathways for tutorial, lab, sample, and alternative-pattern proposals.
 * [ ] Review repository metadata periodically as the project matures.
 
-## Suggested Labels
+## Contributor Label Taxonomy
 
-Potential labels include:
+Repository labels should remain composable rather than encoding every possible combination as a separate label.
 
-* `good first tutorial`
-* `good first sample`
-* `documentation`
+For example:
+
+```
+good first issue + tutorial
+good first issue + sample
+help wanted + lab
+question + tutorial
+alternative pattern + advanced
+```
+
+Learning-specific labels include:
+
 * `tutorial`
 * `sample`
 * `lab`
 * `diagram`
-* `example wanted`
-* `architecture question`
-* `alternative pattern`
 * `canonical pattern`
+* `alternative pattern`
 * `experimental`
+* `example wanted`
+* `needs explanation`
 * `beginner`
 * `intermediate`
 * `advanced`
-* `needs explanation`
-* `community contribution`
-* `help wanted`
+
+These complement GitHub's standard workflow labels such as `bug`, `documentation`, `enhancement`, `good first issue`, `help wanted`, and `question`.
+
+The intent is to make Issues discoverable by **content area, architectural classification, difficulty, and contribution opportunity** without creating redundant compound labels.
 
 ---
 
