@@ -346,10 +346,10 @@ The intent is to make Issues discoverable by **content area, architectural class
 * [x] Publish the documentation through GitHub Pages.
 * [x] Keep Markdown files readable independently of the generated site.
 * [x] Add or improve local documentation build instructions.
+* [x] Add automated link validation where practical.
 
 ## Remaining Improvements
 
-* [ ] Add automated link validation where practical.
 * [ ] Add documentation build status to the repository README if useful.
 * [ ] Improve cross-navigation between tutorials, samples, labs, and working repositories.
 * [ ] Add related-content links to tutorial pages.

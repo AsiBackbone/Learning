@@ -1,0 +1,25 @@
+verbose = "info"
+no_progress = true
+
+max_retries = 2
+timeout = 20
+retry_wait_time = 2
+
+max_concurrency = 8
+host_concurrency = 2
+
+# Treat rate limiting as inconclusive rather than a broken link.
+accept = ["200..=299", "429"]
+
+# Do not attempt to validate localhost/private addresses used in
+# local-development documentation.
+exclude_all_private = true
+
+# Email-address validation is outside the scope of documentation links.
+include_mail = false
+
+exclude = [
+  # Private vulnerability reporting is intentionally conditional and may
+  # return 404 to automated or unauthenticated link checkers.
+  '^https://github\.com/AsiBackbone/Learning/security/advisories/new$'
+]
