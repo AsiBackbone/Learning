@@ -390,6 +390,54 @@ Mermaid is preferred when practical because diagrams remain reviewable as text.
 
 Image-based diagrams are also acceptable when they provide clear value.
 
+## Accessibility
+
+Accessibility is part of documentation quality.
+
+As the Learning repository adds diagrams, images, tables, media, custom
+styling, and interactive content, contributors should preserve an
+equivalent learning path for readers who use assistive technology,
+keyboard navigation, zoom, high-contrast settings, or other
+accessibility features.
+
+When contributing documentation:
+
+- Provide meaningful alternative text for informative images.
+- Use empty alternative text only for images that are truly decorative.
+- Accompany important diagrams with surrounding prose that explains the
+  sequence, relationships, boundaries, or conclusions being illustrated.
+- Do not rely on color, shape, position, or animation alone to
+  communicate meaning.
+- Prefer ordinary text over images of text when practical.
+- Use descriptive headings and meaningful link text.
+- Keep heading levels logically structured rather than choosing them
+  only for visual appearance.
+- Use tables for genuinely tabular information rather than page
+  only for visual appearance.
+- Use tables for genuinely tabular information rather than page layout,
+  and keep table structures as simple as practical.
+- Ensure code examples and architectural flows remain understandable
+  without depending on syntax color or visual position alone.
+- Review custom colors and styling for adequate contrast.
+- Review custom layouts at increased zoom and narrow viewport widths.
+- Check both light and dark presentation when custom styling is
+  introduced and both modes are supported.
+- Ensure custom interactive content can be operated with a keyboard,
+  preserves visible focus, and does not trap keyboard focus.
+- Provide appropriate captions, transcripts, or equivalent alternatives
+  if audio or video content is introduced.
+
+Mermaid and text-based diagrams remain useful because their source is
+reviewable as text, but diagram source should not be treated as a
+substitute for a clear prose explanation.
+
+A reader who cannot perceive a diagram should still be able to
+understand the architectural lesson from the surrounding material.
+
+For substantial new diagrams, media, interactive components, or theme
+customizations, additional automated or manual accessibility testing
+may be appropriate.
+
 ## Links to Working Repositories
 
 When a tutorial maps to an existing implementation, link directly to the most relevant file, folder, documentation page, or ADR.

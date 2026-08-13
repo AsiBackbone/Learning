@@ -28,6 +28,8 @@
 - [ ] Relevant tests pass where applicable.
 - [ ] Important architectural invariants are covered by tests where appropriate.
 - [ ] Diagram or navigation changes were reviewed in rendered form where applicable.
+- [ ] Accessibility was reviewed for new or changed diagrams, images, tables, custom styling, media, or interactive content where applicable.
+- [ ] Important visual information has an equivalent text explanation and does not rely on color alone where applicable.
 - [ ] Not applicable.
 
 ### Validation Notes

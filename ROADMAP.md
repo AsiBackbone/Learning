@@ -329,7 +329,7 @@ The intent is to make Issues discoverable by **content area, architectural class
 
 ## Status
 
-**Core DocFX foundation established**
+**Complete — baseline documentation platform established**
 
 ## Completed
 
@@ -351,10 +351,11 @@ The intent is to make Issues discoverable by **content area, architectural class
 * [x] Improve cross-navigation between tutorials, samples, labs, and working repositories.
 * [x] Add related-content links to tutorial pages.
 * [x] Add difficulty and prerequisite metadata where useful.
+* [x] Review accessibility as diagrams and richer content are added.
 
-## Remaining Improvements
+## Ongoing Maintenance
 
-* [ ] Review accessibility as diagrams and richer content are added.
+* [ ] Re-review accessibility when substantial new diagrams, media, interactive content, or theme customizations are introduced.
 
 ## Documentation Goal
 
