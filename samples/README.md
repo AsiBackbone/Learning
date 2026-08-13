@@ -8,11 +8,11 @@ It is intended to contain intentionally small .NET examples that complement the 
 
 ## Current Status
 
-**Sample foundation established — executable companion projects are forthcoming.**
+**Sample foundation established — first executable companion sample available.**
 
-The `samples/` area currently defines the structure, expectations, and design principles for future executable examples.
+The `samples/` area defines the structure, expectations, and design principles for executable examples and now includes the first runnable companion project.
 
-Individual sample projects will be added incrementally as the foundational tutorials are paired with runnable implementations.
+Individual sample projects will continue to be added incrementally as the foundational tutorials are paired with runnable implementations.
 
 For the current learning material, begin with the:
 
@@ -95,6 +95,10 @@ The initial executable sample set is intended to follow the five foundational tu
 Related tutorial:
 
 [Decision Before Execution](../docs/tutorials/decision-before-execution.md)
+
+Executable companion:
+
+[Decision Before Execution sample](decision-before-execution/README.md)
 
 The sample is expected to demonstrate a flow such as:
 

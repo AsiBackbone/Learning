@@ -381,7 +381,7 @@ Quality and refinement now matter more than adding another foundational tutorial
 * [x] Model explicit decision outcomes.
 * [x] Preserve host-owned execution.
 * [x] Discuss failure modes and tradeoffs.
-* [ ] Pair with executable companion sample.
+* [x] Pair with executable companion sample.
 * [ ] Pair with beginner lab.
 * [ ] Strengthen links to working implementation references.
 
@@ -481,7 +481,7 @@ They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicati
 
 ## Foundational Sample Set
 
-* [ ] Decision Before Execution sample.
+* [x] Decision Before Execution sample.
 * [ ] Policy Context and Explicit Decision Outcomes sample.
 * [ ] Acknowledgment and Audit Residue sample.
 * [ ] Scoped Capability and Host-Owned Execution sample.

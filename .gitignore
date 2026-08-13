@@ -1,2 +1,7 @@
+
 # DocFX generated site
 docs/_site/
+
+# .NET build output
+**/bin/
+**/obj/
