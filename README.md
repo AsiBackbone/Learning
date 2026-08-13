@@ -304,7 +304,7 @@ Contributions do not need to involve production framework code to be valuable.
 
 A clearer paragraph, a better diagram, or a simpler example can materially improve a learning resource.
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution guidance as that document is developed.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution guidance.
 
 ## Discussions
 

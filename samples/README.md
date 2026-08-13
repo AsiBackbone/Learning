@@ -1,48 +1,57 @@
 # ASI Backbone Learning Samples
 
-This directory is reserved for / will contain executable sample code supporting the tutorials and architectural material in **ASI Backbone Learning**.
+The `samples/` directory is the executable companion-code area for **ASI Backbone Learning**.
 
-The samples are intentionally small.
-
-Their purpose is not to reproduce the full `AsiBackbone` framework or `NetCoreApplicationTemplate`. Instead, they provide runnable implementations of the architectural boundaries discussed throughout the Learning repository.
+It is intended to contain intentionally small .NET examples that complement the architectural tutorials and make important system boundaries observable through runnable code and tests.
 
 > **Read it. Run it. Question it. Improve it.**
+
+## Current Status
+
+**Sample foundation established — executable companion projects are forthcoming.**
+
+The `samples/` area currently defines the structure, expectations, and design principles for future executable examples.
+
+Individual sample projects will be added incrementally as the foundational tutorials are paired with runnable implementations.
+
+For the current learning material, begin with the:
+
+- [Foundational Tutorials](../docs/tutorials/index.md)
+- [Getting Started guide](../docs/getting-started/index.md)
+- [Hands-On Labs](../docs/labs/index.md)
 
 ## Purpose
 
 The documentation explains architectural reasoning.
 
-The samples demonstrate that reasoning in executable .NET code.
+The samples will provide executable demonstrations of that reasoning.
 
-A typical relationship is:
+The intended progression is:
 
 ```text
 Learning Tutorial
    ↓
-Minimal code examples
+Minimal Embedded Example
    ↓
-Runnable sample
+Runnable Sample
    ↓
 Tests
    ↓
-Working repository implementation
+Hands-On Lab
+   ↓
+Working Repository Implementation
 ```
 
-Each sample should remain focused enough that the architectural lesson is easy to see.
+Samples should make architectural boundaries easier to observe without reproducing the complexity of a production application.
 
-Production-oriented complexity belongs primarily in the working implementation repositories:
+Production-oriented implementations remain primarily in:
 
 * [AsiBackbone](https://github.com/AsiBackbone/AsiBackbone)
 * [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)
 
 ## Learning Navigation
 
-The sample area sits between architectural explanation and hands-on practice:
-
-- [Foundational Tutorials](../docs/tutorials/index.md) — understand the architectural reasoning.
-- [Hands-On Labs](../docs/labs/index.md) — apply and critique the patterns.
-- [AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) — inspect the fuller governance implementation.
-- [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) — inspect the fuller ASP.NET Core reference architecture.
+The sample area sits between explanation and hands-on practice:
 
 ```text
 Tutorial
@@ -54,13 +63,40 @@ Lab
 Working Repository
 ```
 
-## Foundational Samples
+### Tutorials
 
-The initial sample set follows the five foundational tutorials.
+[Browse Foundational Tutorials](../docs/tutorials/index.md)
+
+Tutorials explain the architectural problem, common failure modes, proposed pattern, tradeoffs, and implementation references.
+
+### Samples
+
+Samples will demonstrate selected tutorial concepts through small executable projects and tests.
+
+### Labs
+
+[Browse Hands-On Labs](../docs/labs/index.md)
+
+Labs are intended to require the learner to modify, critique, repair, extend, or reason about an architecture.
+
+### Working Repositories
+
+Use the organization's implementation repositories to examine similar ideas under broader production concerns:
+
+* [AsiBackbone](https://github.com/AsiBackbone/AsiBackbone)
+* [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)
+
+## Planned Foundational Sample Set
+
+The initial executable sample set is intended to follow the five foundational tutorials.
 
 ### Decision Before Execution
 
-Demonstrates the separation between:
+Related tutorial:
+
+[Decision Before Execution](../docs/tutorials/decision-before-execution.md)
+
+The sample is expected to demonstrate a flow such as:
 
 ```text
 Request
@@ -76,53 +112,72 @@ Execution Boundary
 Host Operation
 ```
 
-The important invariant is that a blocked decision never reaches the executor.
-
-Related tutorial:
-
-[Decision Before Execution](../docs/tutorials/decision-before-execution.md)
-
-### Policy Context and Explicit Decision Outcomes
-
-Demonstrates how the facts used for governance evaluation can be represented explicitly rather than scattered throughout application code.
-
-Example outcomes include:
+An important invariant will be:
 
 ```text
-Allow
-Deny
-Defer
-Require Acknowledgment
-Escalate
+Denied Decision
+   ↓
+Executor Invocation Count = 0
 ```
+
+The lesson is that evaluating a proposed operation should remain distinct from performing it.
+
+### Policy Context and Explicit Decision Outcomes
 
 Related tutorial:
 
 [Policy Context and Explicit Decision Outcomes](../docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
 
-### Acknowledgment and Audit Residue
-
-Demonstrates how a consequential workflow can pause for explicit acknowledgment while preserving structured evidence of the governed path.
-
-The sample should preserve the distinction:
+The sample is expected to demonstrate explicit decision inputs and outcomes such as:
 
 ```text
-Acknowledgment
-≠
-Authorization
-≠
-Execution Authority
+Allow
+Deny
+Defer
+RequireAcknowledgment
+Escalate
 ```
+
+It should make information such as actor, resource, operation, and environment visible rather than hiding policy inputs throughout application code.
+
+### Acknowledgment and Audit Residue
 
 Related tutorial:
 
 [Acknowledgment and Audit Residue](../docs/tutorials/acknowledgment-and-audit-residue.md)
 
+The sample is expected to demonstrate a workflow that can pause for explicit acknowledgment while preserving evidence of the governed path.
+
+The distinction should remain visible:
+
+```text
+Acknowledgment
+   ≠
+Authorization
+   ≠
+Execution Authority
+```
+
+Possible sample concerns include:
+
+* Acknowledgment identity
+* Actor binding
+* Operation binding
+* Expiration
+* Re-evaluation
+* Reason codes
+* Correlation
+* Audit residue
+
 ### Scoped Capability and Host-Owned Execution
 
-Demonstrates how an allowed operation can produce narrow, short-lived execution authority without granting broad or permanent permission.
+Related tutorial:
 
-The sample should preserve bindings such as:
+[Scoped Capability and Host-Owned Execution](../docs/tutorials/scoped-capability-and-host-owned-execution.md)
+
+The sample is expected to demonstrate narrow, temporary execution authority rather than broad standing permission.
+
+Possible capability bindings include:
 
 * Actor
 * Operation
@@ -133,45 +188,67 @@ The sample should preserve bindings such as:
 * Expiration
 * Intended use
 
-Related tutorial:
-
-[Scoped Capability and Host-Owned Execution](../docs/tutorials/scoped-capability-and-host-owned-execution.md)
-
-### Governed AI Tool Gateway
-
-Composes the earlier patterns into an AI-assisted execution boundary.
-
-The central rule is:
-
-> **The model may propose. The host retains execution authority.**
-
-A typical sample flow is:
+An important invariant may be:
 
 ```text
-User request
+Expired Capability
    ↓
-AI proposes tool action
-   ↓
-Host validates proposal
-   ↓
-Host constructs authoritative context
-   ↓
-Governance decision
-   ↓
-Acknowledgment when required
-   ↓
-Scoped capability
-   ↓
-Execution-boundary validation
-   ↓
-Host-owned tool execution
-   ↓
-Audit residue
+Execution Blocked
 ```
+
+Another may be:
+
+```text
+Resource Changed After Approval
+   ↓
+Capability Validation Fails
+```
+
+### Governed AI Tool Gateway
 
 Related tutorial:
 
 [Governed AI Tool Gateway](../docs/tutorials/governed-ai-tool-gateway.md)
+
+The sample is expected to compose the earlier concepts into an AI-assisted execution boundary.
+
+The central rule remains:
+
+> **The model may propose. The host retains execution authority.**
+
+A representative flow may be:
+
+```text
+User Request
+   ↓
+AI Proposes Tool Action
+   ↓
+Host Validates Proposal
+   ↓
+Host Builds Authoritative Context
+   ↓
+Governance Decision
+   ↓
+Acknowledgment when required
+   ↓
+Scoped Capability
+   ↓
+Execution-Boundary Validation
+   ↓
+Host-Owned Tool Execution
+   ↓
+Audit Residue
+```
+
+An important invariant may be:
+
+```text
+AI Proposes Unknown Tool
+   ↓
+Host Rejects Proposal
+   ↓
+No Execution
+```
 
 ## Sample Design Principles
 
@@ -179,61 +256,147 @@ Samples should optimize for **learning value**, not production completeness.
 
 ### Keep Samples Small
 
-Avoid introducing infrastructure or abstractions that are not necessary to demonstrate the architectural lesson.
+Include only the abstractions and infrastructure necessary to demonstrate the lesson.
+
+A sample should make the important boundary easier to see, not bury it beneath production scaffolding.
 
 ### Keep Side Effects Visible
 
 Governance evaluation should not silently perform the operation it evaluates.
 
-The transition from decision to execution should remain explicit and testable.
+The transition from decision to execution should remain explicit.
 
-### Prefer Framework-Neutral Concepts
+Prefer:
 
-Where practical, samples should demonstrate the underlying architectural pattern without requiring the `AsiBackbone` package.
+```text
+Evaluate
+   ↓
+Decision
+   ↓
+Execution Boundary
+   ↓
+Execute
+```
 
-The working framework can then be referenced as a fuller implementation.
+over:
+
+```text
+Evaluate
+   ↓
+Hidden Side Effect
+```
+
+### Prefer Framework-Neutral Concepts Where Practical
+
+A sample does not need to depend on the `AsiBackbone` package simply because the corresponding architectural concept also exists there.
+
+Where practical, samples should teach the underlying pattern first.
+
+The working implementation repository can then demonstrate how the pattern appears within a fuller framework.
 
 ### Test Architectural Invariants
 
-Tests should verify behavioral boundaries rather than only object values.
+Tests should demonstrate meaningful behavior rather than only object construction.
 
 Examples include:
 
 ```text
-Denied decision
+Denied Decision
    ↓
-Executor invocation count = 0
+Executor Invocation Count = 0
 ```
 
 ```text
-Expired capability
+Expired Capability
    ↓
-Execution blocked
+Execution Blocked
 ```
 
 ```text
-Changed resource after approval
+Changed Resource
    ↓
-Capability validation fails
+Capability Rejected
 ```
 
 ```text
-AI proposes unknown tool
+Unknown AI Tool
    ↓
-Host rejects proposal
+Proposal Rejected
    ↓
-No execution
+No Execution
+```
+
+These tests help make the architectural contract executable.
+
+### Prefer Deterministic Local Behavior
+
+Samples should be easy to run without external infrastructure where practical.
+
+Prefer:
+
+* In-memory state
+* Fakes
+* Mocks
+* Simulated external systems
+* Dry-run execution
+* Deterministic test data
+
+Avoid requiring production services merely to demonstrate an architectural idea.
+
+### Use Fictional Data
+
+Samples should use fictional or placeholder identities, resources, destinations, policy names, and credentials.
+
+Do not include:
+
+* Real credentials
+* Real secrets
+* Real access tokens
+* Real personal information
+* Production connection strings
+
+### Keep Secrets Host-Owned
+
+For AI-related examples, a model or proposal generator should not require infrastructure credentials merely because it proposes an operation.
+
+Prefer:
+
+```text
+Model
+   ↓
+Proposal
+
+Host
+   ↓
+Validation
+   ↓
+Policy
+   ↓
+Credentials
+   ↓
+Execution
 ```
 
 ### Do Not Hide Policy in Prompt Text
 
-For AI-related samples, prompt instructions and tool descriptions may guide model behavior, but they are not execution controls.
+Prompt instructions may influence AI behavior.
 
-Host-side validation and policy remain authoritative.
+They should not be treated as the authoritative execution boundary.
+
+For example:
+
+```text
+Prompt:
+"Do not delete protected records."
+```
+
+may guide the model.
+
+A host-side rule that prevents a protected resource from reaching the executor is the stronger control boundary.
 
 ### Prefer Narrow Semantic Operations
 
-Prefer:
+Prefer operations such as:
 
 ```text
 notification.send
@@ -241,7 +404,7 @@ account.disable
 case.archive
 ```
 
-over broad interfaces such as:
+over broad primitives such as:
 
 ```text
 execute_shell
@@ -249,111 +412,120 @@ run_sql
 invoke_arbitrary_method
 ```
 
-unless the broader interface is specifically the subject of the lesson.
+unless the broad primitive itself is the subject of the lesson.
 
-### Keep Secrets Host-Owned
+Narrow operations make validation, governance, testing, and audit behavior easier to reason about.
 
-Sample AI models or proposal generators should not require infrastructure credentials merely because they propose an operation.
+## Dry-Run First
 
-The host-owned execution component should retain responsibility for external credentials and side effects.
+Samples involving consequential operations should generally begin without performing real external side effects.
 
-## Building the Samples
+A useful initial flow is:
 
-The sample projects are intended to build with the .NET SDK.
+```text
+Governance Decision
+   ↓
+Capability Validation
+   ↓
+WouldExecute = true
+```
 
-From the repository root, restore dependencies using:
+rather than immediately performing:
+
+```text
+Send Real Email
+Delete Real Resource
+Modify Real Infrastructure
+```
+
+Dry-run behavior makes the execution boundary observable while reducing unnecessary setup and risk.
+
+## Intended Build Experience
+
+Once executable projects are added, the sample set is intended to support standard .NET CLI workflows.
+
+The target repository-level experience is:
 
 ```bash
 dotnet restore
-```
-
-Build the sample solution using:
-
-```bash
 dotnet build
-```
-
-Run tests using:
-
-```bash
 dotnet test
 ```
 
-As the sample collection develops, more specific commands may be documented here for the sample solution or individual projects.
-
-## Running Individual Samples
-
-Each sample directory should contain its own `README.md` when additional setup or execution instructions are necessary.
-
-A sample may be runnable using:
+Individual samples may also support commands such as:
 
 ```bash
 dotnet run --project <sample-project>
 ```
 
-or tested using:
+The exact commands will be documented when the executable sample solution and projects are introduced.
 
-```bash
-dotnet test <test-project>
-```
+Until then, the commands above describe the **intended sample-development workflow**, not a guarantee that the current `samples/` directory contains runnable projects.
 
-Prefer deterministic local demonstrations where practical.
+## Per-Sample Documentation
 
-Examples involving external systems should use simulation, mocks, fakes, or dry-run behavior by default.
+Each sample should include its own `README.md` when setup, execution, or interpretation requires additional explanation.
 
-## Dry-Run First
+A sample README should normally identify:
 
-Samples involving consequential operations should generally begin without real external side effects.
+* Learning objective
+* Related tutorial
+* Difficulty
+* Prerequisites
+* Architectural boundary being demonstrated
+* Project structure
+* How to run the sample
+* How to run its tests
+* Expected behavior
+* Important invariants
+* Tradeoffs
+* What the sample intentionally omits
+* Links to fuller working implementations
 
-For example:
+## Relationship to Tutorials
+
+A tutorial explains the architectural reasoning.
+
+A sample should make selected portions of that reasoning executable.
+
+The relationship should remain bidirectional:
 
 ```text
-Governance decision
-   ↓
-Capability validation
-   ↓
-WouldExecute = true
+Tutorial
+   ↕
+Sample
 ```
 
-instead of immediately:
+Each sample should link to its related tutorial.
 
-```text
-Governance decision
-   ↓
-Send real email
-Delete real resource
-Modify real infrastructure
-```
-
-This keeps the learning boundary observable without requiring production credentials or introducing unnecessary risk.
+Each tutorial should link to its executable sample once that sample exists.
 
 ## Relationship to Labs
 
-Samples and labs serve different purposes.
+Samples and labs serve different learning purposes.
 
-### Samples
+### Samples Demonstrate
 
-Samples provide:
+A sample should provide:
 
-* Runnable reference implementations
-* Small demonstrations
-* Tests
-* Known architectural patterns
-* Working examples corresponding to tutorials
+* A known implementation
+* Runnable behavior
+* Focused tests
+* Observable architectural boundaries
 
-### Labs
+### Labs Challenge
 
-Labs may provide:
+A lab may instead provide:
 
-* Incomplete implementations
-* Deliberately weak architectures
+* Missing behavior
 * Failing tests
-* Design challenges
-* Policy exercises
-* Security-boundary problems
-* Architecture critique tasks
+* A deliberately weak architecture
+* A policy-design exercise
+* A security-boundary problem
+* A design to critique
+* Multiple possible solutions
 
-A useful progression is:
+The intended progression is:
 
 ```text
 Tutorial
@@ -362,7 +534,7 @@ Sample
    ↓
 Lab
    ↓
-Alternative implementation
+Alternative Implementation
 ```
 
 Tutorials explain.
@@ -373,9 +545,9 @@ Labs require the learner to decide.
 
 ## Relationship to the Working Repositories
 
-The samples are teaching artifacts.
+Samples are teaching artifacts.
 
-They should not duplicate the full implementation documentation of the primary ASI Backbone organization repositories.
+They should not duplicate the complete implementation documentation of the organization's working repositories.
 
 ### AsiBackbone
 
@@ -384,53 +556,56 @@ They should not duplicate the full implementation documentation of the primary A
 Provides fuller governance and policy-control implementations, including areas such as:
 
 * Policy evaluation
-* Structured governance decisions
+* Structured decisions
 * Acknowledgment workflows
 * Audit residue
-* Capability grants
-* Execution-boundary guidance
+* Capability boundaries
+* Host-owned execution
 * AI governance scenarios
 
 ### NetCoreApplicationTemplate
 
 [AsiBackbone/NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)
 
-Provides a fuller ASP.NET Core reference architecture demonstrating areas such as:
+Provides a fuller ASP.NET Core reference architecture demonstrating:
 
 * Middleware organization
 * Structured logging
-* Secure defaults
+* Security defaults
 * Error handling
 * Rate limiting
 * Authentication-ready design
 * Data-access patterns
 * Operational application structure
+* Architecture Decision Records
 
-The samples in this directory should remain smaller than those repositories by design.
+Learning samples should remain smaller than these repositories by design.
 
 ## Licensing
 
-Executable sample code under this directory is licensed under the **MIT License** unless otherwise noted.
+ASI Backbone Learning uses component-specific licensing.
 
-This differs from the documentation and educational material in the Learning repository, which is licensed under **Creative Commons Attribution 4.0 International (CC BY 4.0)**.
+Executable source code and sample projects added under `samples/` are licensed under the **MIT License** unless otherwise noted.
 
-The general licensing structure is:
+Documentation and educational material elsewhere in the repository are licensed under **Creative Commons Attribution 4.0 International (CC BY 4.0)**.
+
+The intended licensing boundary is:
 
 ```text
 docs/**
 community/**
-educational material
+repository educational material
 diagrams and exercises
         ↓
 CC BY 4.0
 
 samples/**
-executable sample projects
+executable sample code
         ↓
 MIT
 ```
 
-Code snippets embedded in documentation are additionally available under the MIT License unless otherwise noted.
+Source-code snippets embedded in documentation are additionally available under the MIT License unless otherwise noted.
 
 See:
 
@@ -442,7 +617,7 @@ for the complete component-specific licensing policy.
 
 ## Contributing Samples
 
-Contributions are welcome.
+Sample contributions are welcome as executable companion projects are introduced.
 
 Good sample contributions should:
 
@@ -451,22 +626,23 @@ Good sample contributions should:
 * Compile successfully.
 * Include tests when behavior is important to the lesson.
 * Avoid unnecessary dependencies.
+* Prefer deterministic local behavior.
 * Use fictional or placeholder data.
-* Avoid real credentials, tokens, secrets, or personal information.
+* Avoid credentials, secrets, tokens, and personal information.
 * Explain important tradeoffs.
-* Preserve clear execution and trust boundaries.
-* Link back to the relevant tutorial.
-* Identify alternative approaches when useful.
+* Preserve explicit execution and trust boundaries.
+* Link to the relevant tutorial.
+* Identify alternative approaches where useful.
 
-Executable code contributed under `samples/` is expected to be compatible with the MIT License.
+Executable code contributed under `samples/` should be compatible with the MIT License.
 
-See [`CONTRIBUTING.md`](../CONTRIBUTING.md) for broader contribution guidance.
+See [`CONTRIBUTING.md`](../CONTRIBUTING.md) for the repository's broader contribution guidance.
 
 ## Scope and Boundaries
 
-These samples are educational artifacts.
+Future samples in this directory will be educational artifacts.
 
-They are not:
+They should not be interpreted as:
 
 * Production applications
 * Security guarantees
@@ -476,16 +652,18 @@ They are not:
 * AGI or ASI implementations
 * Autonomous-agent runtimes
 * Robotics controllers
-* Substitutes for application-specific threat modeling
-* Substitutes for security review
+* Complete production threat models
+* Substitutes for application-specific security review
 
-A pattern demonstrated successfully in a sample still requires production engineering appropriate to the system in which it is used.
+A pattern that behaves correctly in a small sample still requires production engineering appropriate to the environment in which it is adopted.
 
-## Learning Principle
+## Next Step
 
-The objective is not to copy these samples unchanged.
+The next development step for this directory is to establish the first buildable companion sample and repository-level sample solution structure.
 
-The objective is to understand why the boundaries exist well enough to decide whether they belong in your own architecture.
+Until then, use the [Foundational Tutorials](../docs/tutorials/index.md) as the primary learning path and the working repositories for fuller implementation examples.
+
+---
 
 > **Read it. Run it. Question it. Improve it.**
 

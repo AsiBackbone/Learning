@@ -76,7 +76,7 @@ Explores narrow, short-lived execution authority and validation at the execution
 
 Composes the earlier ideas into an AI-assisted workflow while preserving host-owned execution authority.
 
-### Governance Is Not Compliance Certification
+## Governance Is Not Compliance Certification
 
 The patterns explored here may support systems with governance, security, accountability, or audit requirements.
 
