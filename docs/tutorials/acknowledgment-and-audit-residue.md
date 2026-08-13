@@ -1317,6 +1317,15 @@ This continues the same principle established throughout Learning:
 
 > **Approval should not silently become broad or permanent authority.**
 
+## Related Content
+
+- [Foundational Tutorial Index](index.md) — view the complete five-tutorial learning path.
+- [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — revisit the explicit decision inputs and outcomes that can lead to an acknowledgment requirement.
+- [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — continue from acknowledgment into narrow, short-lived execution authority.
+- [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see acknowledgment, capability, execution, and audit residue composed around AI-proposed actions.
+- [Executable Samples](https://github.com/AsiBackbone/Learning/tree/main/samples) — explore runnable companion material as the sample set develops.
+- [Hands-On Labs](../labs/index.md) — practice acknowledgment, evidence, and governed-continuation boundaries through hands-on exercises.
+
 ---
 
 > **Read it. Run it. Question it. Improve it.**

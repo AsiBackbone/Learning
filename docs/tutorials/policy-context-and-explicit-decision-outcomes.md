@@ -1188,6 +1188,16 @@ Audit residue
 
 It will examine how a consequential operation can pause for explicit acknowledgment and how structured evidence can preserve what happened without confusing governance evidence with ordinary application logging.
 
+## Related Content
+
+- [Foundational Tutorial Index](index.md) — view the complete five-tutorial governed-execution learning path.
+- [Decision Before Execution](decision-before-execution.md) — revisit the separation between proposed intent, governance decisions, and host-owned execution.
+- [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — continue from explicit decision outcomes into acknowledgment, re-evaluation, correlation, and governance evidence.
+- [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — follow allowed or acknowledged decisions into narrowly scoped execution authority.
+- [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see authoritative host context and explicit decision outcomes applied to AI-proposed tool actions.
+- [Executable Samples](https://github.com/AsiBackbone/Learning/tree/main/samples) — explore runnable companion material as the sample set develops.
+- [Hands-On Labs](../labs/index.md) — practice constructing policy context, defining decision outcomes, and reasoning about governance boundaries.
+
 ---
 
 > **Read it. Run it. Question it. Improve it.**

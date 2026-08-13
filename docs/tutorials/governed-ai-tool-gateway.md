@@ -1753,6 +1753,16 @@ After the foundational sequence, good next steps include:
 
 Learning is intended to make those tradeoffs visible rather than prescribe one universal implementation.
 
+## Related Content
+
+- [Foundational Tutorial Index](index.md) — revisit the complete governed-execution learning path and its five architectural stages.
+- [Decision Before Execution](decision-before-execution.md) — revisit the foundational separation between proposed intent and real-world side effects.
+- [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — review how the host constructs authoritative context and produces explicit governance outcomes.
+- [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — explore responsibility boundaries, re-evaluation, correlation, and evidence across consequential workflows.
+- [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — examine narrow execution authority, capability bindings, replay considerations, and execution-boundary validation.
+- [Executable Samples](https://github.com/AsiBackbone/Learning/tree/main/samples) — move from the conceptual gateway into runnable demonstrations as companion samples are published.
+- [Hands-On Labs](../labs/index.md) — practice governing consequential operations, identifying weak trust boundaries, and critiquing execution architectures.
+
 ---
 
 > **Read it. Run it. Question it. Improve it.**

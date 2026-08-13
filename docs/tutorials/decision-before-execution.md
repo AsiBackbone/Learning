@@ -767,6 +767,15 @@ Decision
 
 and examines how the facts and outcomes of a governance decision can be represented explicitly rather than scattered through application code.
 
+## Related Content
+
+- [Foundational Tutorial Index](index.md) — view the complete five-tutorial learning path.
+- [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — continue into explicit policy facts, constraints, and structured outcomes.
+- [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — follow the decision lifecycle into acknowledgment and evidence.
+- [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see the proposal-versus-execution boundary composed around AI-proposed tool calls.
+- [Executable Samples](https://github.com/AsiBackbone/Learning/tree/main/samples) — explore runnable companion material as the sample set develops.
+- [Hands-On Labs](../labs/index.md) — move from explanation into architectural practice and critique.
+
 ---
 
 > **Read it. Run it. Question it. Improve it.**

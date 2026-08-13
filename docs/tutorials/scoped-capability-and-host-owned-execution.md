@@ -1516,6 +1516,16 @@ The fifth tutorial is therefore not a new architectural primitive.
 
 It is the first full composition of the primitives established so far.
 
+## Related Content
+
+- [Foundational Tutorial Index](index.md) — view the complete five-tutorial governed-execution learning path.
+- [Decision Before Execution](decision-before-execution.md) — revisit the foundational boundary between a proposed operation, a governance decision, and the host-owned side effect.
+- [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — review the responsibility and evidence boundaries that may precede issuance of execution authority.
+- [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — revisit the policy facts, outcome semantics, and policy identity that justify a scoped capability.
+- [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see scoped capabilities used as part of a complete AI-proposed, host-governed execution path.
+- [Executable Samples](https://github.com/AsiBackbone/Learning/tree/main/samples) — explore runnable companion material as capability-focused samples are published.
+- [Hands-On Labs](../labs/index.md) — practice capability narrowing, binding validation, replay reasoning, and host-owned execution boundaries.
+
 ---
 
 > **Read it. Run it. Question it. Improve it.**
