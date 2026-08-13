@@ -281,10 +281,10 @@ See [LICENSING.md](LICENSING.md) for the complete licensing policy.
 * [x] Add repository topics.
 * [x] Review repository rules or branch protection.
 * [x] Add Issue templates.
+* [x] Add pull request template.
 
 ## Remaining Repository Work
 
-* [ ] Add pull request template.
 * [ ] Add or refine contributor labels.
 * [ ] Improve direct linking to organization Discussions.
 * [ ] Add contribution pathways for tutorial, lab, sample, and alternative-pattern proposals.
