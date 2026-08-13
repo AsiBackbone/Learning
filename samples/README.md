@@ -8,9 +8,9 @@ It is intended to contain intentionally small .NET examples that complement the 
 
 ## Current Status
 
-**Sample foundation established — first executable companion sample available.**
+**Sample foundation established — two executable companion samples available.**
 
-The `samples/` area defines the structure, expectations, and design principles for executable examples and now includes the first runnable companion project.
+The `samples/` area defines the structure, expectations, and design principles for executable examples and now includes runnable companion projects for the first two foundational tutorials.
 
 Individual sample projects will continue to be added incrementally as the foundational tutorials are paired with runnable implementations.
 
@@ -100,7 +100,7 @@ Executable companion:
 
 [Decision Before Execution sample](decision-before-execution/README.md)
 
-The sample is expected to demonstrate a flow such as:
+The sample demonstrates a flow such as:
 
 ```text
 Request
@@ -132,7 +132,11 @@ Related tutorial:
 
 [Policy Context and Explicit Decision Outcomes](../docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
 
-The sample is expected to demonstrate explicit decision inputs and outcomes such as:
+Executable companion:
+
+[Policy Context and Explicit Decision Outcomes sample](policy-context-and-explicit-decision-outcomes/README.md)
+
+The sample demonstrates explicit decision inputs and outcomes such as:
 
 ```text
 Allow
@@ -446,9 +450,13 @@ Dry-run behavior makes the execution boundary observable while reducing unnecess
 
 ## Intended Build Experience
 
-Once executable projects are added, the sample set is intended to support standard .NET CLI workflows.
+Individual executable samples support standard .NET CLI workflows such as:
 
-The target repository-level experience is:
+```bash
+dotnet run --project <sample-project>
+```
+
+The target repository-level experience remains:
 
 ```bash
 dotnet restore
@@ -456,15 +464,7 @@ dotnet build
 dotnet test
 ```
 
-Individual samples may also support commands such as:
-
-```bash
-dotnet run --project <sample-project>
-```
-
-The exact commands will be documented when the executable sample solution and projects are introduced.
-
-Until then, the commands above describe the **intended sample-development workflow**, not a guarantee that the current `samples/` directory contains runnable projects.
+Repository-level restore, build, and test across a shared sample solution are still planned under the executable-sample infrastructure work. Each current sample documents its runnable project command in its own README.
 
 ## Per-Sample Documentation
 
@@ -663,9 +663,9 @@ A pattern that behaves correctly in a small sample still requires production eng
 
 ## Next Step
 
-The next development step for this directory is to establish the first buildable companion sample and repository-level sample solution structure.
+The next development steps are to continue pairing the remaining foundational tutorials with executable samples and establish the repository-level sample solution, build, test, and CI structure.
 
-Until then, use the [Foundational Tutorials](../docs/tutorials/index.md) as the primary learning path and the working repositories for fuller implementation examples.
+Use the [Foundational Tutorials](../docs/tutorials/index.md) as the primary learning path and the working repositories for fuller implementation examples.
 
 ---
 

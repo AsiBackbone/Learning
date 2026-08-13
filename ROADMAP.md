@@ -401,7 +401,7 @@ RequireAcknowledgment
 Escalate
 ```
 
-* [ ] Pair with executable companion sample.
+* [x] Pair with executable companion sample.
 * [ ] Pair with learner exercise.
 * [ ] Strengthen links to working implementation references.
 
@@ -482,7 +482,7 @@ They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicati
 ## Foundational Sample Set
 
 * [x] Decision Before Execution sample.
-* [ ] Policy Context and Explicit Decision Outcomes sample.
+* [x] Policy Context and Explicit Decision Outcomes sample.
 * [ ] Acknowledgment and Audit Residue sample.
 * [ ] Scoped Capability and Host-Owned Execution sample.
 * [ ] Governed AI Tool Gateway sample.
