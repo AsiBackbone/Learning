@@ -357,20 +357,31 @@ Production systems remain responsible for their own authentication, authorizatio
 
 ## Project Status
 
-**Living project — early development**
+**Active development — foundational learning path established**
 
-The repository is expected to grow incrementally.
+ASI Backbone Learning has moved beyond its initial repository scaffolding and now provides a foundational tutorial sequence covering the core governed-execution model:
 
-The initial goal is not to publish a large textbook all at once. Instead, the project will begin with a small number of focused, high-quality architectural lessons and expand through practical use, feedback, and community contribution.
+1. [Decision Before Execution](docs/tutorials/decision-before-execution.md)
+2. [Policy Context and Explicit Decision Outcomes](docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
+3. [Acknowledgment and Audit Residue](docs/tutorials/acknowledgment-and-audit-residue.md)
+4. [Scoped Capability and Host-Owned Execution](docs/tutorials/scoped-capability-and-host-owned-execution.md)
+5. [Governed AI Tool Gateway](docs/tutorials/governed-ai-tool-gateway.md)
 
-Early priorities include:
+Together, these tutorials establish the initial learning path from proposed intent through policy evaluation, acknowledgment, scoped authority, host-owned execution, and durable audit residue.
 
-1. Decision Before Execution
-2. Policy Context and Explicit Decision Outcomes
-3. Acknowledgment and Audit Residue
-4. Capability-Scoped and Host-Owned Execution
-5. An end-to-end governed AI tool gateway tutorial
-6. Initial beginner and intermediate labs
+The repository also includes its DocFX documentation foundation, contribution and governance guidance, and a dedicated `samples/` area for executable companion code.
+
+Current development is shifting from establishing the conceptual foundation toward making the material more runnable, interactive, and extensible. Near-term work includes:
+
+* Executable companion samples paired with tutorials.
+* Beginner and intermediate hands-on labs.
+* Additional ASP.NET Core, security, governance, and AI-integration material.
+* Stronger links between teaching examples and working implementations in `AsiBackbone` and `NetCoreApplicationTemplate`.
+* Alternative patterns, tradeoff analysis, and community-contributed examples.
+
+This remains a living educational project. Material may evolve as the implementation repositories mature, better teaching approaches emerge, and community feedback identifies new questions or gaps.
+
+See [ROADMAP.md](ROADMAP.md) for planned work and longer-term direction.
 
 ## License
 

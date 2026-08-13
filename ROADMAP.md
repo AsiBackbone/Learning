@@ -8,68 +8,27 @@ This roadmap describes the intended direction of the Learning repository.
 
 It is not a fixed release contract. Priorities may change as the repository develops, contributors identify better learning paths, implementation repositories evolve, or community feedback reveals more useful areas to explore.
 
-The project should grow deliberately:
+The project should continue to grow deliberately:
 
-> **Start with a small number of strong lessons, connect them to working implementations, then expand through use and contribution.**
+> **Start with strong architectural lessons, make them runnable, turn them into exercises, connect them to working implementations, and improve them through use and contribution.**
 
-## Guiding Goals
+---
 
-The Learning repository should become:
+# Current Project Status
 
-- A clear entry point into the ASI Backbone organization.
-- A practical learning resource rather than a product manual.
-- A bridge between architectural reasoning and working .NET implementations.
-- A place where canonical and alternative architectural patterns can be compared.
-- A source of minimal examples that expose architectural boundaries clearly.
-- A home for hands-on labs and experiments.
-- A community contribution surface that is easier to enter than the core implementation repositories.
-- A durable record of lessons learned from the evolution of `AsiBackbone` and `NetCoreApplicationTemplate`.
+**Active development — foundational learning path established**
 
-## Relationship to the Other Repositories
+The repository has moved beyond its initial scaffolding phase.
 
-The three primary organization repositories serve different roles:
+The initial five-tutorial learning path is now established:
 
-```text
-AsiBackbone/Learning
-    |
-    | teaches concepts, patterns, tradeoffs, and minimal examples
-    |
-    +------> AsiBackbone/AsiBackbone
-    |        governance and policy-control implementation
-    |
-    +------> AsiBackbone/NetCoreApplicationTemplate
-             ASP.NET Core reference architecture implementation
-```
+1. [Decision Before Execution](docs/tutorials/decision-before-execution.md)
+2. [Policy Context and Explicit Decision Outcomes](docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
+3. [Acknowledgment and Audit Residue](docs/tutorials/acknowledgment-and-audit-residue.md)
+4. [Scoped Capability and Host-Owned Execution](docs/tutorials/scoped-capability-and-host-owned-execution.md)
+5. [Governed AI Tool Gateway](docs/tutorials/governed-ai-tool-gateway.md)
 
-Learning should explain and connect.
-
-It should not duplicate the complete technical documentation of the implementation repositories.
-
-## Roadmap Principles
-
-### Problem First
-
-Tutorials should begin with the problem being solved rather than with a package API.
-
-### Small Examples
-
-Teaching examples should remain intentionally smaller than production implementations.
-
-### Working References
-
-Where possible, lessons should point to real implementation files, ADRs, tests, or documentation in the working repositories.
-
-### Explicit Tradeoffs
-
-Material should explain benefits, costs, alternatives, failure modes, and cases where a pattern may not be appropriate.
-
-### Community Evolution
-
-The roadmap should remain open to contribution, criticism, and alternative approaches.
-
-### Clear Boundaries
-
-The repository should preserve the distinction between:
+Together, these tutorials establish the foundational governed-execution sequence:
 
 ```text
 Intent
@@ -89,194 +48,339 @@ Host-owned execution
 Audit residue
 ```
 
-For AI-related material, the core teaching boundary remains:
+The current development emphasis is shifting toward:
+
+```text
+Tutorial
+   ↓
+Runnable Sample
+   ↓
+Tests
+   ↓
+Hands-On Lab
+   ↓
+Alternative Approaches
+   ↓
+Working Repository References
+```
+
+The next major objective is therefore not simply to add more written material.
+
+It is to make the existing learning path increasingly **runnable, testable, interactive, and connected to real implementations**.
+
+---
+
+# Guiding Goals
+
+The Learning repository should become:
+
+* A clear educational entry point into the ASI Backbone organization.
+* A practical learning resource rather than a product manual.
+* A bridge between architectural reasoning and working .NET implementations.
+* A source of intentionally small executable examples.
+* A home for hands-on architectural labs and experiments.
+* A place where canonical and alternative patterns can be compared.
+* A community contribution surface that is easier to enter than the core implementation repositories.
+* A durable record of lessons learned from the evolution of `AsiBackbone` and `NetCoreApplicationTemplate`.
+* A resource that remains valuable even to developers who never adopt an ASI Backbone package.
+
+---
+
+# Relationship to the Other Repositories
+
+The three primary organization repositories serve different roles:
+
+```text
+AsiBackbone/Learning
+    |
+    | teaches concepts, patterns, tradeoffs,
+    | samples, labs, and architectural reasoning
+    |
+    +------> AsiBackbone/AsiBackbone
+    |        governance and policy-control implementation
+    |
+    +------> AsiBackbone/NetCoreApplicationTemplate
+             ASP.NET Core reference architecture implementation
+```
+
+Learning should **explain and connect**.
+
+It should not duplicate the complete technical documentation of either implementation repository.
+
+A Learning tutorial should expose the architectural idea clearly.
+
+A sample should demonstrate the idea with minimal executable code.
+
+A lab should require the learner to reason about the idea.
+
+The working repositories should show how similar ideas appear in more complete software.
+
+---
+
+# Roadmap Principles
+
+## Problem First
+
+Learning material should begin with the problem being solved rather than with a package API.
+
+The preferred progression remains:
+
+```text
+Problem
+   ↓
+Common or naive implementation
+   ↓
+Failure mode or limitation
+   ↓
+Architectural pattern
+   ↓
+Minimal teaching example
+   ↓
+Tradeoffs and alternatives
+   ↓
+Working implementation reference
+```
+
+## Small Examples
+
+Teaching examples should remain intentionally smaller than production implementations.
+
+Complexity should be introduced only when it contributes directly to the lesson.
+
+## Runnable Where Practical
+
+Conceptual material should increasingly be paired with executable examples.
+
+Readers should be able to move from:
+
+> “I understand the idea.”
+
+to:
+
+> “I can run the idea and observe the boundary.”
+
+## Test Architectural Invariants
+
+Tests should demonstrate architectural behavior rather than merely object construction.
+
+For example:
+
+```text
+Denied decision
+   ↓
+Executor invocation count = 0
+```
+
+```text
+Expired capability
+   ↓
+Execution blocked
+```
+
+```text
+AI proposes an unknown tool
+   ↓
+Host rejects proposal
+   ↓
+No execution occurs
+```
+
+## Working References
+
+Where useful, tutorials and samples should point to real implementation files, tests, ADRs, or documentation in:
+
+* `AsiBackbone/AsiBackbone`
+* `AsiBackbone/NetCoreApplicationTemplate`
+
+## Explicit Tradeoffs
+
+Material should explain:
+
+* Benefits
+* Costs
+* Failure modes
+* Alternatives
+* Operational assumptions
+* Cases where a simpler architecture may be preferable
+* Cases where the demonstrated pattern should not be used
+
+## Clear Boundaries
+
+For AI-related material, the central teaching boundary remains:
 
 > **The model may propose. The host retains execution authority.**
 
+Prompt instructions, tool descriptions, and model behavior may influence proposals.
+
+They do not replace host-side policy, validation, authorization, or execution controls.
+
+## Canonical Does Not Mean Universal
+
+A canonical pattern represents an approach aligned with one or more current ASI Backbone organization implementations.
+
+It does not mean that the approach is universally correct.
+
+Alternative architectures are welcome when they are technically grounded and their tradeoffs are explained.
+
+## Community Evolution
+
+Questions, corrections, experiments, disagreements, and alternative implementations should influence future material.
+
+Repeated confusion is evidence that a lesson may need improvement.
+
+## Licensing Clarity
+
+The repository intentionally uses component-specific licensing:
+
+```text
+Documentation
+Educational material
+Community material
+Diagrams and exercises
+        ↓
+CC BY 4.0
+
+Executable sample code
+under samples/
+        ↓
+MIT
+```
+
+Source-code snippets embedded in documentation are additionally available under the MIT License unless otherwise noted.
+
+See [LICENSING.md](LICENSING.md) for the complete licensing policy.
+
 ---
 
-# Phase 1 — Foundation
+# Milestone 1 — Repository and Publication Foundation
 
-## Goal
+## Status
 
-Establish the repository as a usable, navigable, contribution-ready learning project.
+**Substantially established**
 
-## Repository Foundation
+## Completed Foundation
 
-- [x] Create root `README.md`.
-- [x] Add MIT `LICENSE`.
-- [x] Add `CODE_OF_CONDUCT.md`.
-- [x] Add `CONTRIBUTING.md`.
-- [x] Add `GOVERNANCE.md`.
-- [x] Add `ROADMAP.md`.
-- [ ] Add `SECURITY.md`.
-- [ ] Add repository description and topics.
-- [ ] Configure branch protection or repository rules as appropriate.
-- [ ] Add Issue templates.
-- [ ] Add pull request template.
-- [ ] Add Discussions links and contribution guidance.
-- [ ] Add initial contributor labels.
+* [x] Create root `README.md`.
+* [x] Add `CODE_OF_CONDUCT.md`.
+* [x] Add `CONTRIBUTING.md`.
+* [x] Add `GOVERNANCE.md`.
+* [x] Add `ROADMAP.md`.
+* [x] Establish component-specific licensing.
+* [x] Add CC BY 4.0 licensing for documentation and educational material.
+* [x] Add MIT licensing for executable sample code.
+* [x] Add `LICENSING.md`.
+* [x] Add `LICENSES/` license references.
+* [x] Add `CITATION.cff`.
+* [x] Add Zenodo metadata.
+* [x] Add repository description.
+* [x] Establish `community/`.
+* [x] Add `community/tutorial-ideas.md`.
+* [x] Add `community/requested-topics.md`.
+* [x] Add `community/contributors.md`.
+
+## Remaining Repository Work
+
+* [ ] Add `SECURITY.md`.
+* [ ] Add repository topics.
+* [ ] Review repository rules or branch protection.
+* [ ] Add Issue templates.
+* [ ] Add pull request template.
+* [ ] Add or refine contributor labels.
+* [ ] Improve direct linking to organization Discussions.
+* [ ] Add contribution pathways for tutorial, lab, sample, and alternative-pattern proposals.
+* [ ] Review repository metadata periodically as the project matures.
 
 ## Suggested Labels
 
-Possible repository labels include:
+Potential labels include:
 
-- `good first tutorial`
-- `documentation`
-- `tutorial`
-- `lab`
-- `diagram`
-- `example wanted`
-- `architecture question`
-- `alternative pattern`
-- `canonical pattern`
-- `experimental`
-- `beginner`
-- `intermediate`
-- `advanced`
-- `needs explanation`
-- `community contribution`
-- `help wanted`
-
-## Initial Repository Structure
-
-Target structure:
-
-```text
-Learning/
-│
-├── README.md
-├── CONTRIBUTING.md
-├── CODE_OF_CONDUCT.md
-├── GOVERNANCE.md
-├── ROADMAP.md
-├── SECURITY.md
-│
-├── docs/
-│   ├── getting-started/
-│   ├── architecture/
-│   ├── governance/
-│   ├── aspnetcore/
-│   ├── security/
-│   ├── ai-integration/
-│   └── advanced/
-│
-├── tutorials/
-│   ├── decision-before-execution/
-│   ├── policy-context/
-│   ├── explicit-decision-results/
-│   ├── acknowledgment-workflows/
-│   ├── audit-residue/
-│   ├── capability-tokens/
-│   └── ai-tool-gateway/
-│
-├── labs/
-│   ├── beginner/
-│   ├── intermediate/
-│   └── advanced/
-│
-├── diagrams/
-│
-└── community/
-    ├── tutorial-ideas.md
-    ├── requested-topics.md
-    └── contributors.md
-```
-
-The structure may evolve when actual content reveals a better organization.
+* `good first tutorial`
+* `good first sample`
+* `documentation`
+* `tutorial`
+* `sample`
+* `lab`
+* `diagram`
+* `example wanted`
+* `architecture question`
+* `alternative pattern`
+* `canonical pattern`
+* `experimental`
+* `beginner`
+* `intermediate`
+* `advanced`
+* `needs explanation`
+* `community contribution`
+* `help wanted`
 
 ---
 
-# Phase 2 — DocFX Documentation Foundation
+# Milestone 2 — Documentation Platform
 
-## Goal
+## Status
 
-Create a consistent published documentation experience similar to the other ASI Backbone organization repositories.
+**Core DocFX foundation established**
 
-## Planned Work
+## Completed
 
-- [ ] Add DocFX tooling configuration.
-- [ ] Add `docs/docfx.json`.
-- [ ] Add documentation index.
-- [ ] Add table-of-contents files.
-- [ ] Add navigation for tutorials and labs.
-- [ ] Add organization and repository links.
-- [ ] Add local documentation build instructions.
-- [ ] Add GitHub Actions documentation build validation.
-- [ ] Add GitHub Pages publishing workflow.
-- [ ] Add link validation where practical.
-- [ ] Add documentation build status to the repository README.
+* [x] Add DocFX tooling configuration.
+* [x] Add `docs/docfx.json`.
+* [x] Add documentation home page.
+* [x] Add Getting Started content.
+* [x] Add table-of-contents files.
+* [x] Add tutorial navigation.
+* [x] Add lab navigation foundation.
+* [x] Add documentation build validation.
+* [x] Treat DocFX warnings as build failures.
+* [x] Add GitHub Pages publishing workflow.
+* [x] Publish the documentation through GitHub Pages.
+* [x] Keep Markdown files readable independently of the generated site.
+
+## Remaining Improvements
+
+* [ ] Add or improve local documentation build instructions.
+* [ ] Add automated link validation where practical.
+* [ ] Add documentation build status to the repository README if useful.
+* [ ] Improve cross-navigation between tutorials, samples, labs, and working repositories.
+* [ ] Add related-content links to tutorial pages.
+* [ ] Add difficulty and prerequisite metadata where useful.
+* [ ] Review accessibility as diagrams and richer content are added.
 
 ## Documentation Goal
 
-The published site should provide a guided learning path while GitHub remains the primary source-control and collaboration surface.
+The documentation site should provide a guided learning experience while GitHub remains the primary source-control and collaboration surface.
 
-The Markdown files in the repository should remain readable and useful without requiring the published site.
+The repository Markdown remains canonical.
 
 ---
 
-# Phase 3 — Core Architecture Tutorials
+# Milestone 3 — Foundational Architecture Learning Path
 
-## Goal
+## Status
 
-Publish a small, coherent set of foundational tutorials before expanding broadly.
+**Initial five-tutorial sequence established**
 
-Quality is more important than tutorial count.
+Quality and refinement now matter more than adding another foundational tutorial merely to increase tutorial count.
 
 ## Tutorial 1 — Decision Before Execution
 
-### Learning Objective
-
-Understand why consequential execution should be separated from the request that proposes it.
-
-### Planned Topics
-
-- Intent versus execution.
-- Why authorization alone may not describe the entire decision.
-- Policy and contextual evaluation.
-- Explicit decision results.
-- Host-owned execution.
-- Audit evidence.
-
-### Minimal Flow
-
-```text
-Request
-   ↓
-Intent
-   ↓
-Governance Decision
-   ↓
-Execution Boundary
-   ↓
-Host Operation
-```
-
-- [ ] Problem statement.
-- [ ] Naive implementation.
-- [ ] Failure modes.
-- [ ] Minimal C# example.
-- [ ] Sequence diagram.
-- [ ] Tradeoff analysis.
-- [ ] Link to working `AsiBackbone` implementation.
-- [ ] Beginner lab.
+* [x] Publish foundational tutorial.
+* [x] Explain intent versus execution.
+* [x] Show policy/context evaluation.
+* [x] Model explicit decision outcomes.
+* [x] Preserve host-owned execution.
+* [x] Discuss failure modes and tradeoffs.
+* [ ] Pair with executable companion sample.
+* [ ] Pair with beginner lab.
+* [ ] Strengthen links to working implementation references.
 
 ## Tutorial 2 — Policy Context and Explicit Decision Outcomes
 
-### Learning Objective
-
-Understand why the facts used to make a governance decision should be represented explicitly.
-
-### Planned Topics
-
-- Policy context.
-- Actor and resource information.
-- Operation metadata.
-- Environmental context.
-- Structured reason codes.
-- Explicit outcomes.
-
-Expected outcomes include:
+* [x] Publish foundational tutorial.
+* [x] Explain explicit policy context.
+* [x] Model actor, resource, operation, and environment information.
+* [x] Demonstrate structured decision results.
+* [x] Cover meaningful outcomes:
 
 ```text
 Allow
@@ -286,220 +390,154 @@ RequireAcknowledgment
 Escalate
 ```
 
-- [ ] Context model example.
-- [ ] Decision result example.
-- [ ] Policy evaluation example.
-- [ ] Diagram.
-- [ ] Tests.
-- [ ] Link to working implementation.
+* [ ] Pair with executable companion sample.
+* [ ] Pair with learner exercise.
+* [ ] Strengthen links to working implementation references.
 
 ## Tutorial 3 — Acknowledgment and Audit Residue
 
-### Learning Objective
-
-Understand how a consequential operation can pause for acknowledgment while preserving evidence of what occurred.
-
-### Planned Topics
-
-- Acknowledgment as a governance boundary.
-- Human responsibility.
-- Decision lineage.
-- Reason codes.
-- Correlation identifiers.
-- Policy versioning.
-- Audit residue.
-- Difference between logging and governance evidence.
-
-- [ ] Minimal acknowledgment workflow.
-- [ ] Audit receipt model.
-- [ ] Sequence diagram.
-- [ ] Failure-mode examples.
-- [ ] Link to working implementation.
-- [ ] Intermediate lab.
+* [x] Publish foundational tutorial.
+* [x] Explain acknowledgment as a governance boundary.
+* [x] Preserve distinction between acknowledgment and authorization.
+* [x] Explain decision lineage and audit residue.
+* [x] Address reason codes, correlation, and policy identity.
+* [x] Distinguish operational logging from governance evidence.
+* [ ] Pair with executable companion sample.
+* [ ] Pair with intermediate lab.
+* [ ] Strengthen links to working implementation references.
 
 ## Tutorial 4 — Scoped Capability and Host-Owned Execution
 
-### Learning Objective
+* [x] Publish foundational tutorial.
+* [x] Explain narrow execution authority.
+* [x] Address short-lived capabilities.
+* [x] Cover actor, operation, resource, audience, and expiration bindings.
+* [x] Preserve host-owned execution.
+* [x] Discuss replay and validation boundaries.
+* [ ] Pair with executable companion sample.
+* [ ] Add capability-focused lab.
+* [ ] Strengthen links to working implementation references.
 
-Understand why approval does not necessarily imply broad or permanent execution authority.
+## Tutorial 5 — Governed AI Tool Gateway
 
-### Planned Topics
-
-- Scoped capability.
-- Short-lived authority.
-- Operation binding.
-- Resource binding.
-- Replay considerations.
-- Validation boundaries.
-- Host responsibility.
-
-- [ ] Capability model example.
-- [ ] Validation example.
-- [ ] Execution-boundary example.
-- [ ] Threat considerations.
-- [ ] Link to working implementation.
+* [x] Publish end-to-end tutorial.
+* [x] Separate AI inference from execution authority.
+* [x] Model tool proposals.
+* [x] Build authoritative host-side context.
+* [x] Apply explicit governance decisions.
+* [x] Include acknowledgment boundaries.
+* [x] Include scoped authority.
+* [x] Preserve host-owned execution.
+* [x] Address tool allowlists and argument validation.
+* [x] Discuss audit residue and failure handling.
+* [ ] Pair with executable companion sample.
+* [ ] Add end-to-end lab.
+* [ ] Expand threat-model exercises.
 
 ---
 
-# Phase 4 — Governed AI Tool Gateway
+# Milestone 4 — Executable Companion Samples
+
+## Status
+
+**Current major development focus**
+
+The `samples/` area has been established.
+
+The next step is to turn the foundational tutorials into intentionally small runnable .NET demonstrations.
 
 ## Goal
 
-Create the first end-to-end tutorial showing how governance patterns can be applied to AI-assisted execution.
+Each foundational tutorial should eventually have a companion sample where executable code materially improves understanding.
 
-## Tutorial — Building a Governed AI Tool Gateway in ASP.NET Core
-
-### Core Principle
-
-> **The model may propose. The host retains execution authority.**
-
-### Planned Flow
+The intended relationship is:
 
 ```text
-User request
+Tutorial
    ↓
-AI proposes tool action
+Minimal embedded example
    ↓
-Host constructs policy context
+Runnable sample
    ↓
-Governance evaluation
+Tests
    ↓
-Allow / Deny / Defer / Acknowledge / Escalate
-   ↓
-Optional scoped capability
-   ↓
-Host validates authority
-   ↓
-Host invokes tool
-   ↓
-Audit residue
+Working repository implementation
 ```
 
-### Planned Topics
+Samples are teaching artifacts.
 
-- Distinguishing AI inference from execution authority.
-- Tool proposal modeling.
-- Policy context.
-- Explicit decision outcomes.
-- Human acknowledgment.
-- Capability-scoped execution.
-- Tool allowlists.
-- Argument validation.
-- Logging versus audit residue.
-- Failure handling.
-- Least authority.
-- Host-side safety boundaries.
+They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicationTemplate` implementations.
 
-### Deliverables
+## Foundational Sample Set
 
-- [ ] Architecture overview.
-- [ ] Mermaid sequence diagram.
-- [ ] Minimal ASP.NET Core sample.
-- [ ] Mock AI/tool interface.
-- [ ] Policy evaluation example.
-- [ ] Acknowledgment flow.
-- [ ] Capability validation example.
-- [ ] Audit example.
-- [ ] Tests.
-- [ ] Threat-model notes.
-- [ ] Lab exercise.
-- [ ] Links to relevant `AsiBackbone` implementation.
+* [ ] Decision Before Execution sample.
+* [ ] Policy Context and Explicit Decision Outcomes sample.
+* [ ] Acknowledgment and Audit Residue sample.
+* [ ] Scoped Capability and Host-Owned Execution sample.
+* [ ] Governed AI Tool Gateway sample.
 
----
+## Sample Infrastructure
 
-# Phase 5 — ASP.NET Core Architecture Learning
+* [ ] Establish buildable sample solution structure.
+* [ ] Ensure repository-level `dotnet restore` works for samples.
+* [ ] Ensure repository-level `dotnet build` works for samples.
+* [ ] Ensure repository-level `dotnet test` works for samples.
+* [ ] Add sample build validation to CI.
+* [ ] Add tests for architectural invariants.
+* [ ] Add per-sample README files where setup or explanation is needed.
+* [ ] Cross-link each sample to its tutorial.
+* [ ] Cross-link each tutorial to its sample.
+* [ ] Link samples to fuller working repository implementations where useful.
 
-## Goal
+## Sample Design Standard
 
-Use `NetCoreApplicationTemplate` as a working reference specimen for broader application architecture lessons.
+Samples should:
 
-## Planned Learning Areas
+* Remain intentionally small.
+* Keep side effects visible.
+* Separate policy evaluation from execution.
+* Prefer framework-neutral concepts where practical.
+* Use fictional or placeholder data.
+* Avoid real credentials.
+* Prefer deterministic local behavior.
+* Use mocks, fakes, simulation, or dry-run behavior for external operations.
+* Test important architectural boundaries.
+* Avoid broad execution primitives unless they are specifically the lesson.
+* Keep external secrets and infrastructure authority host-owned.
 
-### Middleware Ordering
+## Dry-Run Principle
 
-- [ ] Why middleware order changes behavior.
-- [ ] Exception handling boundaries.
-- [ ] Authentication and authorization placement.
-- [ ] Security header placement.
-- [ ] Request logging.
-- [ ] Rate limiting.
-- [ ] Reverse proxy considerations.
+Consequential examples should generally begin with:
 
-### Secure Defaults
+```text
+Governance Decision
+   ↓
+Capability Validation
+   ↓
+WouldExecute = true
+```
 
-- [ ] Secure-by-default configuration.
-- [ ] Explicit opt-in versus implicit exposure.
-- [ ] Configuration validation.
-- [ ] Environment-specific behavior.
-- [ ] Secrets handling.
-
-### Structured Logging
-
-- [ ] Events versus strings.
-- [ ] Correlation.
-- [ ] Operational diagnostics.
-- [ ] Avoiding sensitive-data leakage.
-- [ ] Distinguishing operational logs from audit records.
-
-### Error Handling
-
-- [ ] Centralized exception handling.
-- [ ] Problem Details.
-- [ ] Information disclosure.
-- [ ] Status-code handling.
-- [ ] Observability considerations.
-
-### Data Access
-
-- [ ] EF Core boundaries.
-- [ ] Persistence abstractions.
-- [ ] Transaction reasoning.
-- [ ] Interceptors and cross-cutting behavior.
-- [ ] Local versus production storage choices.
-
-### Architecture Decision Records
-
-- [ ] Why ADRs matter.
-- [ ] How to write an ADR.
-- [ ] How to revisit a decision.
-- [ ] How ADRs connect implementation to learning material.
+rather than immediately invoking real external systems.
 
 ---
 
-# Phase 6 — Hands-On Labs
+# Milestone 5 — Hands-On Labs
+
+## Status
+
+**Next major learning layer**
+
+Tutorials explain.
+
+Samples demonstrate.
+
+Labs should require the learner to decide.
 
 ## Goal
 
-Move beyond reading and require learners to make architectural decisions.
+Move learners from architectural recognition to architectural reasoning.
 
-## Beginner Labs
-
-- [ ] Separate intent from execution.
-- [ ] Replace boolean authorization with explicit decision outcomes.
-- [ ] Build a small policy-context model.
-- [ ] Add structured reason codes.
-- [ ] Identify middleware ordering problems.
-
-## Intermediate Labs
-
-- [ ] Add acknowledgment to a consequential workflow.
-- [ ] Preserve an audit receipt.
-- [ ] Introduce capability-scoped execution.
-- [ ] Build a simple governed API operation.
-- [ ] Refactor scattered governance logic into a decision pipeline.
-
-## Advanced Labs
-
-- [ ] Govern an AI tool call.
-- [ ] Design a replay-resistant capability workflow.
-- [ ] Compare two competing policy architectures.
-- [ ] Threat-model a governed execution gateway.
-- [ ] Design a regional or tenant-specific policy layer.
-- [ ] Analyze a deliberately flawed high-consequence workflow.
-
-## Lab Design Standard
-
-Each lab should identify:
+A lab should generally follow:
 
 ```text
 Learning Objective
@@ -515,9 +553,116 @@ Validation
 Discussion / Solution
 ```
 
+## Beginner Labs
+
+Potential initial labs:
+
+* [ ] Separate intent from execution.
+* [ ] Replace boolean authorization with explicit decision outcomes.
+* [ ] Build a small policy-context model.
+* [ ] Add structured reason codes.
+* [ ] Identify a hidden execution side effect.
+* [ ] Identify middleware ordering problems.
+
+## Intermediate Labs
+
+* [ ] Add acknowledgment to a consequential workflow.
+* [ ] Preserve an audit receipt.
+* [ ] Introduce capability-scoped execution.
+* [ ] Build a governed API operation.
+* [ ] Refactor scattered governance logic into a decision pipeline.
+* [ ] Detect stale or mismatched execution authority.
+* [ ] Add policy-version evidence to a decision path.
+
+## Advanced Labs
+
+* [ ] Govern an AI tool call.
+* [ ] Design a replay-resistant capability workflow.
+* [ ] Compare competing policy architectures.
+* [ ] Threat-model a governed execution gateway.
+* [ ] Design a regional or tenant-specific policy layer.
+* [ ] Analyze a deliberately flawed high-consequence workflow.
+* [ ] Design safe degraded-mode behavior.
+* [ ] Critique an architecture where an AI agent owns both proposal and execution authority.
+
+## Lab Quality Standard
+
+Each lab should provide enough information to solve the problem without dictating a single implementation unnecessarily.
+
+Where multiple valid solutions exist, the discussion should explain the tradeoffs rather than present one answer as universally correct.
+
 ---
 
-# Phase 7 — Security and Trust Architecture
+# Milestone 6 — ASP.NET Core Architecture Learning
+
+## Goal
+
+Use `NetCoreApplicationTemplate` as a working reference specimen for broader application-architecture lessons.
+
+These materials should remain useful independently of that repository.
+
+## Middleware Ordering
+
+Planned topics include:
+
+* [ ] Why middleware order changes behavior.
+* [ ] Exception handling boundaries.
+* [ ] Authentication placement.
+* [ ] Authorization placement.
+* [ ] Security-header placement.
+* [ ] Request logging.
+* [ ] Rate limiting.
+* [ ] Reverse-proxy considerations.
+* [ ] Failure modes caused by incorrect ordering.
+
+## Secure Defaults
+
+* [ ] Secure-by-default configuration.
+* [ ] Explicit opt-in versus implicit exposure.
+* [ ] Configuration validation.
+* [ ] Environment-specific behavior.
+* [ ] Secrets handling.
+* [ ] Safer failure defaults.
+* [ ] Configuration ownership boundaries.
+
+## Structured Logging
+
+* [ ] Events versus strings.
+* [ ] Correlation.
+* [ ] Operational diagnostics.
+* [ ] Avoiding sensitive-data leakage.
+* [ ] Logging boundaries.
+* [ ] Distinguishing operational logs from audit records.
+
+## Error Handling
+
+* [ ] Centralized exception handling.
+* [ ] Problem Details.
+* [ ] Information disclosure.
+* [ ] Status-code handling.
+* [ ] Observability considerations.
+* [ ] Safe failure behavior.
+
+## Data Access
+
+* [ ] EF Core boundaries.
+* [ ] Persistence abstractions.
+* [ ] Transaction reasoning.
+* [ ] Interceptors and cross-cutting behavior.
+* [ ] Local versus production storage choices.
+* [ ] Data-access failure boundaries.
+
+## Architecture Decision Records
+
+* [ ] Why ADRs matter.
+* [ ] How to write an ADR.
+* [ ] How to revisit a decision.
+* [ ] How ADRs preserve architectural reasoning.
+* [ ] How ADRs connect implementation repositories to Learning material.
+
+---
+
+# Milestone 7 — Security and Trust Architecture
 
 ## Goal
 
@@ -525,93 +670,197 @@ Teach security as an architectural property rather than a collection of isolated
 
 ## Planned Topics
 
-- [ ] Trust boundaries.
-- [ ] Least privilege.
-- [ ] Capability-based authority.
-- [ ] Authentication versus governance.
-- [ ] Authorization versus policy evaluation.
-- [ ] Replay protection.
-- [ ] Signing and verification concepts.
-- [ ] Key custody boundaries.
-- [ ] Tamper-evident records.
-- [ ] Secure logging.
-- [ ] Secret handling.
-- [ ] Dependency integrity.
-- [ ] Supply-chain provenance.
-- [ ] GitHub Actions SHA pinning.
-- [ ] SBOM concepts.
-- [ ] Security failure modes.
+* [ ] Trust boundaries.
+* [ ] Least privilege.
+* [ ] Capability-based authority.
+* [ ] Authentication versus governance.
+* [ ] Authorization versus policy evaluation.
+* [ ] Replay protection.
+* [ ] Signing and verification concepts.
+* [ ] Key custody boundaries.
+* [ ] Tamper-evident records.
+* [ ] Secure logging.
+* [ ] Secret handling.
+* [ ] Dependency integrity.
+* [ ] Supply-chain provenance.
+* [ ] GitHub Actions SHA pinning.
+* [ ] SBOM concepts.
+* [ ] Fail-open versus fail-closed behavior.
+* [ ] Security failure modes.
+* [ ] Threat modeling as architecture reasoning.
 
-These tutorials should clearly distinguish educational examples from production security guarantees.
+Educational security examples should clearly distinguish demonstrated patterns from production security guarantees.
 
 ---
 
-# Phase 8 — Governance and Policy Architecture
+# Milestone 8 — Governance and Policy Architecture
 
 ## Goal
 
-Expand the conceptual vocabulary around policy-governed systems.
+Expand the conceptual vocabulary around policy-governed systems after the foundational learning path is well supported by samples and labs.
 
 ## Planned Topics
 
-- [ ] Policy pipeline design.
-- [ ] Constraint composition.
-- [ ] Policy precedence.
-- [ ] Policy versioning.
-- [ ] Regional policy overlays.
-- [ ] Tenant-specific policy.
-- [ ] Risk-based decisions.
-- [ ] Human-in-the-loop workflows.
-- [ ] Escalation patterns.
-- [ ] Decision provenance.
-- [ ] Policy failure behavior.
-- [ ] Degraded-mode decisions.
-- [ ] Deterministic versus probabilistic policy inputs.
-- [ ] Policy testing.
+* [ ] Policy pipeline design.
+* [ ] Constraint composition.
+* [ ] Policy precedence.
+* [ ] Policy versioning.
+* [ ] Policy identity and hashing.
+* [ ] Regional policy overlays.
+* [ ] Tenant-specific policy.
+* [ ] Risk-based decisions.
+* [ ] Human-in-the-loop workflows.
+* [ ] Escalation patterns.
+* [ ] Decision provenance.
+* [ ] Policy failure behavior.
+* [ ] Degraded-mode decisions.
+* [ ] Deterministic versus probabilistic policy inputs.
+* [ ] Policy testing.
+* [ ] Policy simulation.
+* [ ] Policy rollout and rollback reasoning.
+* [ ] Separation between policy decision and operational execution.
 
 ---
 
-# Phase 9 — Architecture Comparisons
+# Milestone 9 — Expanded AI Integration
 
 ## Goal
 
-Help readers understand where demonstrated patterns fit relative to other approaches.
+Build beyond the initial Governed AI Tool Gateway without turning Learning into an autonomous-agent framework.
 
-Potential comparison areas may include:
+## Planned Topics
 
-- [ ] Traditional role-based authorization.
-- [ ] Claims-based authorization.
-- [ ] Policy-based authorization.
-- [ ] Capability-based security.
-- [ ] API gateways.
-- [ ] Service meshes.
-- [ ] Workflow engines.
-- [ ] Policy engines.
-- [ ] Agent/tool authorization models.
-- [ ] Human approval systems.
-- [ ] Event-sourced audit approaches.
+* [ ] Tool proposal schemas.
+* [ ] Tool allowlists.
+* [ ] Argument validation.
+* [ ] Host-side context reconstruction.
+* [ ] Model-provided context versus authoritative context.
+* [ ] Capability-scoped tool execution.
+* [ ] Multi-tool workflows.
+* [ ] Human acknowledgment for consequential actions.
+* [ ] Handling model uncertainty.
+* [ ] AI proposal rejection and recovery.
+* [ ] Tool execution receipts.
+* [ ] Prompt injection versus execution controls.
+* [ ] Credential ownership.
+* [ ] Agent memory and governance boundaries.
+* [ ] Multi-agent proposal flows.
+* [ ] Agent-to-agent governed execution as experimental material.
 
-Comparisons should avoid framing other architectures as competitors merely because they solve adjacent problems.
+The central rule remains:
 
-The objective is to clarify boundaries and tradeoffs.
+> **The model may propose. The host retains execution authority.**
 
 ---
 
-# Phase 10 — Community Learning Loop
+# Milestone 10 — Architecture Comparisons and Alternative Patterns
 
 ## Goal
 
-Allow community questions and contributions to influence what is taught next.
+Help readers understand where demonstrated patterns fit relative to established and adjacent architectural approaches.
 
-## Planned Community Artifacts
+Potential comparison areas include:
 
-- [ ] `community/tutorial-ideas.md`
-- [ ] `community/requested-topics.md`
-- [ ] `community/contributors.md`
-- [ ] Architecture question template.
-- [ ] Tutorial proposal template.
-- [ ] Lab proposal template.
-- [ ] Alternative-pattern proposal guidance.
+* [ ] Traditional role-based authorization.
+* [ ] Claims-based authorization.
+* [ ] Policy-based authorization.
+* [ ] Capability-based security.
+* [ ] API gateways.
+* [ ] Service meshes.
+* [ ] Workflow engines.
+* [ ] Policy engines.
+* [ ] Agent/tool authorization models.
+* [ ] Human approval systems.
+* [ ] Event-sourced audit approaches.
+* [ ] Command/query separation.
+* [ ] Zero-trust architecture.
+* [ ] Rules engines.
+* [ ] Distributed policy enforcement.
+
+Comparisons should not frame adjacent architectures as competitors simply because they solve related problems.
+
+The objective is to clarify:
+
+```text
+What problem does this pattern solve?
+
+What does it not solve?
+
+Where do responsibilities overlap?
+
+Where are the trust boundaries different?
+
+What are the operational tradeoffs?
+```
+
+---
+
+# Milestone 11 — Reference Architecture Case Studies
+
+## Goal
+
+Show how multiple patterns interact in realistic scenarios without turning Learning into another production framework.
+
+Potential case studies include:
+
+* [ ] Governed administrative operation.
+* [ ] Sensitive-data access decision.
+* [ ] Deployment approval gateway.
+* [ ] Infrastructure change gate.
+* [ ] AI-assisted API operation.
+* [ ] Governed AI tool gateway.
+* [ ] Multi-tenant policy evaluation.
+* [ ] Human acknowledgment workflow.
+* [ ] Capability-scoped background operation.
+* [ ] Regional policy overlay.
+* [ ] Simulated robotics-command governance boundary.
+
+Each case study should separate:
+
+```text
+Architecture
+Implementation
+Operational responsibility
+Security responsibility
+Governance responsibility
+Execution responsibility
+```
+
+Case studies should prefer simulated or dry-run consequential operations unless real integration materially contributes to the lesson.
+
+---
+
+# Milestone 12 — Community Learning Loop
+
+## Status
+
+**Community foundation established; participation model still developing**
+
+## Existing Community Artifacts
+
+* [x] `community/tutorial-ideas.md`
+* [x] `community/requested-topics.md`
+* [x] `community/contributors.md`
+* [x] Contribution guidance.
+* [x] Governance guidance.
+
+## Future Community Work
+
+* [ ] Architecture-question template.
+* [ ] Tutorial-proposal template.
+* [ ] Sample-proposal guidance.
+* [ ] Lab-proposal template.
+* [ ] Alternative-pattern proposal guidance.
+* [ ] `good first tutorial` issues.
+* [ ] `good first sample` issues.
+* [ ] Documentation-only starter issues.
+* [ ] Diagram contribution opportunities.
+* [ ] Lab review contributors.
+* [ ] Topic-specific reviewers.
+* [ ] Contributor recognition.
+* [ ] Community-authored alternative patterns.
+* [ ] Additional maintainers if sustained contribution creates a practical need.
+* [ ] Translation support if demand emerges.
 
 ## Learning Feedback Cycle
 
@@ -624,6 +873,8 @@ Experiment or competing approaches
    ↓
 Tutorial
    ↓
+Sample
+   ↓
 Lab
    ↓
 Working implementation reference
@@ -632,87 +883,70 @@ Feedback
    ↺
 ```
 
-Useful community questions should be candidates for future documentation.
+Useful community questions should become candidates for future documentation.
 
-Repeated misunderstandings are signals that existing explanations should improve.
-
----
-
-# Phase 11 — Reference Architecture Case Studies
-
-## Goal
-
-Show how multiple patterns interact in realistic systems without turning the Learning repository into another production framework.
-
-Potential case studies include:
-
-- [ ] Governed administrative operation.
-- [ ] Sensitive-data access decision.
-- [ ] Deployment approval gateway.
-- [ ] Infrastructure change gate.
-- [ ] AI-assisted API operation.
-- [ ] AI tool gateway.
-- [ ] Multi-tenant policy evaluation.
-- [ ] Human acknowledgment workflow.
-- [ ] Capability-scoped background operation.
-- [ ] Simulated robotics-command governance boundary.
-
-Each case study should separate:
-
-```text
-Architecture
-Implementation
-Operational responsibility
-Security responsibility
-Governance responsibility
-```
+Repeated misunderstandings should trigger refinement of existing material before automatically creating new material.
 
 ---
 
-# Phase 12 — Advanced and Experimental Material
+# Milestone 13 — Advanced and Experimental Material
 
 ## Goal
 
-Provide a clearly labeled area for ideas that are useful to explore but should not yet be presented as established guidance.
+Provide a clearly labeled area for ideas that are worth exploring but should not yet be presented as established guidance.
 
 Possible subjects include:
 
-- [ ] Distributed governance.
-- [ ] Multi-region policy coordination.
-- [ ] Durable decision ledgers.
-- [ ] Cryptographic audit chains.
-- [ ] External policy providers.
-- [ ] Policy simulation.
-- [ ] Governance telemetry.
-- [ ] Decision explainability.
-- [ ] Adaptive risk context.
-- [ ] Robotics gateway patterns.
-- [ ] Agent-to-agent governed execution.
-- [ ] Cross-system capability exchange.
+* [ ] Distributed governance.
+* [ ] Multi-region policy coordination.
+* [ ] Durable decision ledgers.
+* [ ] Cryptographic audit chains.
+* [ ] External policy providers.
+* [ ] Policy simulation.
+* [ ] Governance telemetry.
+* [ ] Decision explainability.
+* [ ] Adaptive risk context.
+* [ ] Robotics gateway patterns.
+* [ ] Agent-to-agent governed execution.
+* [ ] Cross-system capability exchange.
+* [ ] Federated governance models.
+* [ ] Distributed acknowledgment workflows.
+* [ ] Governance under partial system failure.
 
-Experimental material should clearly state assumptions, uncertainties, and unresolved questions.
+Experimental material should clearly state:
+
+* Assumptions
+* Unknowns
+* Failure modes
+* Security concerns
+* Operational constraints
+* What has and has not been implemented
+* What evidence would strengthen or weaken the proposed approach
 
 ---
 
 # Documentation Quality Goals
 
-As the repository grows, documentation should increasingly provide:
+As the repository grows, learning material should increasingly provide:
 
-- [ ] Consistent tutorial structure.
-- [ ] Learning objectives.
-- [ ] Difficulty indicators.
-- [ ] Prerequisites.
-- [ ] Estimated scope rather than artificial completion times.
-- [ ] Diagrams.
-- [ ] Runnable examples.
-- [ ] Tests.
-- [ ] Tradeoff sections.
-- [ ] "When not to use this" guidance.
-- [ ] Links to implementation repositories.
-- [ ] Links to relevant ADRs.
-- [ ] Related tutorials.
-- [ ] Suggested labs.
-- [ ] Clear canonical/alternative/experimental status where relevant.
+* [x] Clear learning objectives in foundational tutorials.
+* [x] Architectural diagrams or flows where useful.
+* [x] Tradeoff discussion in foundational material.
+* [x] Scope and boundary language.
+* [ ] Consistent tutorial metadata.
+* [ ] Difficulty indicators.
+* [ ] Prerequisites.
+* [ ] Estimated scope rather than artificial completion times.
+* [ ] Runnable companion samples.
+* [ ] Executable tests.
+* [ ] Consistent "When not to use this" guidance.
+* [ ] Stronger links to implementation repositories.
+* [ ] Links to relevant ADRs.
+* [ ] Related-tutorial links.
+* [ ] Suggested labs.
+* [ ] Clear canonical, alternative, or experimental status where relevant.
+* [ ] Accessibility review for diagrams and visual material.
+* [ ] Periodic technical review as .NET and implementation repositories evolve.
 
 ---
 
@@ -720,140 +954,176 @@ As the repository grows, documentation should increasingly provide:
 
 Automation should support quality without making contribution unnecessarily difficult.
 
-Potential automation includes:
+## Established
 
-- [ ] Markdown validation.
-- [ ] Link checking.
-- [ ] DocFX build validation.
-- [ ] Example build validation.
-- [ ] Test execution.
-- [ ] Dependency updates.
-- [ ] Secret scanning.
-- [ ] Code scanning where applicable.
-- [ ] GitHub Actions dependency pinning.
-- [ ] Pull request validation.
-- [ ] GitHub Pages deployment.
-- [ ] Documentation artifact generation.
+* [x] DocFX build validation.
+* [x] Treat documentation warnings as errors.
+* [x] GitHub Pages deployment.
+* [x] SHA-pinned GitHub Actions in documentation workflows.
 
-Automation should be introduced when it provides meaningful protection or reduces maintenance burden.
+## Planned
 
----
+* [ ] Markdown validation where it adds value beyond DocFX.
+* [ ] Automated link checking.
+* [ ] Sample restore validation.
+* [ ] Sample build validation.
+* [ ] Sample test execution.
+* [ ] Dependency updates.
+* [ ] Secret scanning review.
+* [ ] Code scanning where executable code justifies it.
+* [ ] Pull request validation.
+* [ ] Documentation artifact validation.
+* [ ] License-boundary validation where practical.
 
-# Contribution Growth Goals
-
-As participation develops, the project may introduce:
-
-- [ ] `good first tutorial` issues.
-- [ ] Documentation-only starter issues.
-- [ ] Diagram contribution opportunities.
-- [ ] Lab review contributors.
-- [ ] Topic-specific reviewers.
-- [ ] Additional maintainers.
-- [ ] Contributor recognition.
-- [ ] Community-authored alternative patterns.
-- [ ] Translation support if demand emerges.
-
-Governance should evolve only when sustained participation creates a practical need.
+Automation should be introduced when it provides meaningful protection, prevents documentation drift, or reduces maintenance burden.
 
 ---
 
-# What Is Not Currently a Roadmap Goal
+# Citation and Archival Goals
 
-The Learning repository is not currently intended to become:
+The Learning repository includes citation and archival metadata so that significant versions can be referenced consistently.
 
-- A replacement for `AsiBackbone`.
-- A replacement for `NetCoreApplicationTemplate`.
-- A general-purpose .NET framework.
-- A package distribution repository.
-- An AI model host.
-- An autonomous-agent runtime.
-- A compliance product.
-- A certification program.
-- A production robotics controller.
-- A repository that attempts to prove the broader theoretical ASI Backbone or Eden Hypothesis framework.
+## Established
 
-Its purpose is narrower:
+* [x] Add `CITATION.cff`.
+* [x] Add Zenodo metadata.
+* [x] Establish component-specific licensing metadata.
 
-> **Teach architectural reasoning through patterns, examples, working references, experiments, and community discussion.**
+## Future Work
+
+* [ ] Keep citation metadata synchronized with repository releases.
+* [ ] Keep Zenodo metadata synchronized with project identity and licensing.
+* [ ] Establish a sensible release cadence before treating every documentation change as an archival milestone.
+* [ ] Preserve versioned snapshots when the project reaches meaningful educational milestones.
+* [ ] Document how readers should cite archived releases once versioned records are available.
+
+Archival infrastructure should support the learning resource.
+
+It should not force the project into unnecessary release ceremony.
 
 ---
 
 # Near-Term Priorities
 
-The highest-priority work after repository setup is:
+The highest-priority work now is:
 
-1. Establish the DocFX documentation structure.
-2. Publish **Decision Before Execution**.
-3. Publish **Policy Context and Explicit Decision Outcomes**.
-4. Publish **Acknowledgment and Audit Residue**.
-5. Publish **Scoped Capability and Host-Owned Execution**.
-6. Build the first end-to-end **Governed AI Tool Gateway** tutorial.
-7. Add at least one beginner and one intermediate lab.
-8. Connect tutorials directly to relevant files and ADRs in the working repositories.
-9. Establish Issue, Discussion, and pull request contribution pathways.
-10. Use early community feedback to determine the next tutorial areas.
+1. Build the first executable companion sample for **Decision Before Execution**.
+2. Establish a reusable sample solution and test structure.
+3. Add companion samples for the remaining foundational tutorials.
+4. Add CI validation for executable samples.
+5. Create the first beginner hands-on lab.
+6. Create the first intermediate hands-on lab.
+7. Strengthen tutorial → sample → implementation cross-links.
+8. Add `SECURITY.md`.
+9. Add repository topics, contribution templates, and repository collaboration refinements.
+10. Add automated link validation where practical.
+11. Begin the first ASP.NET Core or security-focused learning material after the foundational sample/lab path is usable.
+12. Use community feedback to determine which deeper architecture topics deserve priority.
+
+The short-term emphasis should remain:
+
+> **Depth before breadth.**
+
+A strong tutorial with a runnable sample, meaningful tests, a useful lab, and clear implementation references is more valuable than several disconnected pages of new material.
 
 ---
 
 # Measuring Progress
 
-Progress should not be measured only by repository size or package adoption.
+Progress should not be measured only by repository size, package adoption, stars, or raw page count.
 
 Useful signals include:
 
-- Tutorials completed.
-- Labs completed.
-- Examples that compile and remain current.
-- Documentation build health.
-- Community Issues and Discussions.
-- Pull requests from outside maintainers.
-- Corrections prompted by readers.
-- Architectural questions converted into tutorials.
-- Patterns reused outside the ASI Backbone repositories.
-- Links or references from other projects.
-- Contributors who begin with documentation and later participate in implementation repositories.
+* Foundational tutorials remaining technically current.
+* Companion samples that compile.
+* Tests that preserve architectural invariants.
+* Labs that can be completed without hidden assumptions.
+* Documentation build health.
+* Working links between Learning and implementation repositories.
+* Corrections prompted by readers.
+* Questions converted into improved explanations.
+* Architectural discussions converted into tutorials or labs.
+* Alternative patterns contributed and reviewed.
+* Patterns reused outside ASI Backbone repositories.
+* Community Issues and Discussions.
+* External pull requests.
+* Contributors who begin with documentation or samples and later participate elsewhere in the organization.
 
-The Learning repository succeeds when it helps people reason more clearly about architecture.
+The Learning repository succeeds when it helps people reason more clearly about software architecture.
+
+---
+
+# What Is Not Currently a Roadmap Goal
+
+The Learning repository is not intended to become:
+
+* A replacement for `AsiBackbone`.
+* A replacement for `NetCoreApplicationTemplate`.
+* A general-purpose .NET framework.
+* A competing governance runtime.
+* An AI model host.
+* An autonomous-agent platform.
+* An AGI or ASI implementation.
+* A compliance product.
+* A certification program.
+* A security guarantee.
+* A production robotics controller.
+* A repository that attempts to prove the broader theoretical ASI Backbone or Eden Hypothesis framework.
+
+Its purpose is narrower:
+
+> **Teach architectural reasoning through patterns, examples, samples, labs, working references, experiments, and community discussion.**
 
 ---
 
 # Long-Term Direction
 
-Over time, the Learning repository may become the primary educational entry point into the ASI Backbone organization.
+Over time, Learning may become the primary educational entry point into the ASI Backbone organization.
 
-A mature ecosystem could look like:
+A mature learning ecosystem could look like:
 
 ```text
                     ASI Backbone Organization
                              |
-             +---------------+---------------+
-             |                               |
-             v                               v
-      Learning Repository              Discussions
-     education + examples          questions + debate
-             |                               |
-             +---------------+---------------+
-                             |
-                             v
-                  Architectural Patterns
-                             |
-                +------------+------------+
-                |                         |
-                v                         v
-        AsiBackbone              NetCoreApplicationTemplate
-   governance implementation      application architecture
-                |                         |
-                +------------+------------+
-                             |
-                             v
-                    Community Feedback
-                             |
-                             +-------> Learning
+              +--------------+--------------+
+              |                             |
+              v                             v
+        Learning Repository             Discussions
+      education + examples          questions + debate
+              |
+              v
+          Tutorials
+              |
+              v
+           Samples
+              |
+              v
+             Labs
+              |
+              v
+     Architectural Patterns
+              |
+       +------+------+
+       |             |
+       v             v
+ AsiBackbone   NetCoreApplicationTemplate
+ governance       application
+ implementation   architecture
+       |             |
+       +------+------+
+              |
+              v
+      Practical Experience
+              |
+              v
+      Community Feedback
+              |
+              +-----------> Learning
 ```
 
 The intended cycle is:
 
-> **Theory becomes pattern. Pattern becomes example. Example meets implementation. Implementation produces experience. Experience improves the lesson.**
+> **Theory becomes pattern. Pattern becomes tutorial. Tutorial becomes sample. Sample becomes exercise. Exercise meets implementation. Implementation produces experience. Experience improves the lesson.**
 
 ---
 
@@ -861,7 +1131,9 @@ The intended cycle is:
 
 This roadmap is intentionally living.
 
-Items may be added, reordered, split, merged, deferred, or removed as the project develops.
+Items may be added, reordered, split, merged, deferred, completed, or removed as the project develops.
+
+Completion of a roadmap item does not mean the subject is permanently finished. Tutorials, samples, labs, and guidance may require revision as .NET, security practices, AI integration patterns, and the implementation repositories evolve.
 
 Changes should continue to serve the central principle:
 
