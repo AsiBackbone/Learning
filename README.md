@@ -1,5 +1,7 @@
 # ASI Backbone Learning
 
+[![Documentation Validation](https://github.com/AsiBackbone/Learning/actions/workflows/docs-validation.yml/badge.svg?branch=main)](https://github.com/AsiBackbone/Learning/actions/workflows/docs-validation.yml)
+
 A community-maintained living tutorial for practical .NET architecture, governed execution, policy-driven systems, secure application design, AI integration, and related architectural patterns.
 
 `AsiBackbone/Learning` is the educational layer of the ASI Backbone organization.
