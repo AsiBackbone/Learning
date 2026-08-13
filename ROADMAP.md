@@ -349,10 +349,10 @@ The intent is to make Issues discoverable by **content area, architectural class
 * [x] Add automated link validation where practical.
 * [x] Add documentation build status to the repository README if useful.
 * [x] Improve cross-navigation between tutorials, samples, labs, and working repositories.
+* [x] Add related-content links to tutorial pages.
 
 ## Remaining Improvements
 
-* [ ] Add related-content links to tutorial pages.
 * [ ] Add difficulty and prerequisite metadata where useful.
 * [ ] Review accessibility as diagrams and richer content are added.
 
