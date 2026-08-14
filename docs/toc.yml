@@ -30,3 +30,14 @@
   
 - name: Advanced
   href: advanced/index.md
+
+- name: ASI Backbone Resources
+  items:
+    - name: ASI Backbone Organization
+      href: https://github.com/AsiBackbone
+
+    - name: ASI Backbone Repository
+      href: https://github.com/AsiBackbone/AsiBackbone
+
+    - name: .NET Application Template
+      href: https://github.com/AsiBackbone/NetCoreApplicationTemplate

@@ -8,6 +8,8 @@ It means that the problem usually contains more interacting boundaries, assumpti
 
 > **Complexity should be earned by the problem, not introduced by habit.**
 
+> **Section status:** This page is currently the advanced-material overview. Dedicated advanced articles are planned as the curriculum expands; begin with the [Foundational Tutorials](../tutorials/index.md) and [Hands-On Labs](../labs/index.md).
+
 ## Before Continuing
 
 Readers should generally be familiar with the foundational tutorial sequence:

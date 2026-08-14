@@ -24,16 +24,3 @@
   items:
     - name: Governed AI Tool Gateway
       href: governed-ai-tool-gateway.md
-
-
-- name: ASI Backbone Resources
-  expanded: true
-  items:
-    - name: ASI Backbone Organization
-      href: https://github.com/AsiBackbone
-
-    - name: ASI Backbone Repository
-      href: https://github.com/AsiBackbone/AsiBackbone
-
-    - name: .NET Core Application Template
-      href: https://github.com/AsiBackbone/NetCoreApplicationTemplate

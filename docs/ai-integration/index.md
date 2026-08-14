@@ -8,6 +8,8 @@ The central principle is:
 
 This separation allows AI inference to participate in an application workflow without treating model output as authorization, policy, or execution authority.
 
+> **Section status:** This page is currently the AI integration overview. The foundational AI tutorial is published under [Tutorials](../tutorials/index.md); additional focused section pages are planned.
+
 ## Proposal Is Not Execution
 
 An AI system may produce a tool call, function call, workflow request, or other proposed operation.

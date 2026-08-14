@@ -6,6 +6,8 @@ The focus is not on teaching every ASP.NET Core feature.
 
 Instead, this section examines how application structure can make security, governance, execution boundaries, and operational behavior easier to understand and maintain.
 
+> **Section status:** This page is currently an overview. Focused ASP.NET Core tutorials and examples are planned; start with the [Foundational Tutorials](../tutorials/index.md) for the current learning path.
+
 ## Architectural Areas
 
 Future material in this section may examine topics such as:

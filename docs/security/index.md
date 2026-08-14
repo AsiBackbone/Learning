@@ -4,6 +4,8 @@ The Security section examines architectural boundaries that can reduce accidenta
 
 Security in ASI Backbone Learning is approached as an architectural responsibility rather than a single feature or package.
 
+> **Section status:** This page is currently an overview. Focused security tutorials and examples are planned; start with the [Foundational Tutorials](../tutorials/index.md) for the current learning path.
+
 > **A secure boundary should remain visible when the system is under pressure.**
 
 ## Security Themes
