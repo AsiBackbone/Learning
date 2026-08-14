@@ -425,8 +425,8 @@ Escalate
 * [x] Cover actor, operation, resource, audience, and expiration bindings.
 * [x] Preserve host-owned execution.
 * [x] Discuss replay and validation boundaries.
-* [ ] Pair with executable companion sample. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
-* [ ] Add capability-focused lab. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
+* [x] Pair with executable companion sample. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
+* [x] Add capability-focused lab. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [ ] Strengthen links to working implementation references.
 
 ## Tutorial 5 — Governed AI Tool Gateway
@@ -484,7 +484,7 @@ They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicati
 * [x] Decision Before Execution sample.
 * [x] Policy Context and Explicit Decision Outcomes sample.
 * [x] Acknowledgment and Audit Residue sample.
-* [ ] Scoped Capability and Host-Owned Execution sample. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
+* [x] Scoped Capability and Host-Owned Execution sample. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [ ] Governed AI Tool Gateway sample. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 
 ## Sample Infrastructure
@@ -536,7 +536,7 @@ rather than immediately invoking real external systems.
 
 ## Status
 
-**In progress — two beginner labs and one intermediate lab established**
+**In progress — two beginner labs and two intermediate labs established**
 
 Tutorials explain.
 
@@ -579,10 +579,10 @@ Potential initial labs:
 
 * [x] Add acknowledgment to a consequential workflow.
 * [x] Preserve an audit receipt.
-* [ ] Introduce capability-scoped execution. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
+* [x] Introduce capability-scoped execution. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [ ] Build a governed API operation.
 * [ ] Refactor scattered governance logic into a decision pipeline.
-* [ ] Detect stale or mismatched execution authority. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
+* [x] Detect stale or mismatched execution authority. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [ ] Add policy-version evidence to a decision path.
 
 ## Advanced Labs

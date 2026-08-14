@@ -8,9 +8,9 @@ It is intended to contain intentionally small .NET examples that complement the 
 
 ## Current Status
 
-**Sample foundation established — three executable companion samples and focused invariant tests available.**
+**Sample foundation established — four executable companion samples and focused invariant tests available.**
 
-The `samples/` area defines the structure, expectations, and design principles for executable examples and now includes runnable companion projects plus sibling xUnit test projects for the first three foundational tutorials.
+The `samples/` area defines the structure, expectations, and design principles for executable examples and now includes runnable companion projects plus sibling xUnit test projects for the first four foundational tutorials.
 
 Individual sample projects will continue to be added incrementally as the foundational tutorials are paired with runnable implementations.
 
@@ -187,20 +187,25 @@ Related tutorial:
 
 [Scoped Capability and Host-Owned Execution](../docs/tutorials/scoped-capability-and-host-owned-execution.md)
 
-The sample is expected to demonstrate narrow, temporary execution authority rather than broad standing permission.
+Executable companion:
 
-Possible capability bindings include:
+[Scoped Capability and Host-Owned Execution sample](scoped-capability-and-host-owned-execution/README.md)
+
+The sample demonstrates narrow, temporary execution authority rather than broad standing permission.
+
+The sample makes these capability bindings visible:
 
 * Actor
 * Operation
 * Resource
+* Resource state version
 * Audience
 * Policy version
 * Acknowledgment reference
 * Expiration
 * Intended use
 
-An important invariant may be:
+An important invariant is:
 
 ```text
 Expired Capability
@@ -208,7 +213,7 @@ Expired Capability
 Execution Blocked
 ```
 
-Another may be:
+Another is:
 
 ```text
 Resource Changed After Approval
@@ -681,7 +686,7 @@ A pattern that behaves correctly in a small sample still requires production eng
 
 ## Next Step
 
-The next development steps are to continue pairing the remaining foundational tutorials with executable samples and add focused tests for architectural invariants.
+The next development step is to pair the final foundational tutorial with an executable sample and lab while continuing to expand focused invariant coverage where it improves learning value.
 
 Use the [Foundational Tutorials](../docs/tutorials/index.md) as the primary learning path and the working repositories for fuller implementation examples.
 
