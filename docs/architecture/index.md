@@ -62,6 +62,16 @@ Future material in this section may examine questions such as:
 * Which architectural concerns belong in the host rather than a framework?
 * When is a governance pipeline unnecessary complexity?
 
+## Alternative Patterns
+
+Architecture should be compared against viable alternatives rather than presented as a single prescribed design.
+
+Start with:
+
+* [When ASP.NET Core Authorization Is Enough](when-aspnet-core-authorization-is-enough.md) — compares the governed-execution model with ASP.NET Core policies, requirements, handlers, and resource-based authorization, including cases where the built-in authorization model is the simpler and better choice.
+
+The purpose of these comparisons is not to make adjacent approaches compete. It is to make their different responsibilities, trust boundaries, and operational costs visible.
+
 ## Working Architecture References
 
 Learning uses the organization's implementation repositories as architectural specimens:

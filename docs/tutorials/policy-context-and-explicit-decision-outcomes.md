@@ -1223,6 +1223,7 @@ It will examine how a consequential operation can pause for explicit acknowledgm
 
 - [Foundational Tutorial Index](index.md) — view the complete five-tutorial governed-execution learning path.
 - [Decision Before Execution](decision-before-execution.md) — revisit the separation between proposed intent, governance decisions, and host-owned execution.
+- [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md) — compare this richer decision model with built-in ASP.NET Core policies, requirements, handlers, and resource-based authorization, including cases where the simpler authorization model is the better choice.
 - [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — continue from explicit decision outcomes into acknowledgment, re-evaluation, correlation, and governance evidence.
 - [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — follow allowed or acknowledged decisions into narrowly scoped execution authority.
 - [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see authoritative host context and explicit decision outcomes applied to AI-proposed tool actions.
