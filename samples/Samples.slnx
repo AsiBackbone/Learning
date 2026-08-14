@@ -1,5 +1,8 @@
 <Solution>
   <Project Path="acknowledgment-and-audit-residue/AcknowledgmentAndAuditResidue/AcknowledgmentAndAuditResidue.csproj" />
+  <Project Path="acknowledgment-and-audit-residue/AcknowledgmentAndAuditResidue.Tests/AcknowledgmentAndAuditResidue.Tests.csproj" />
   <Project Path="decision-before-execution/DecisionBeforeExecution/DecisionBeforeExecution.csproj" />
+  <Project Path="decision-before-execution/DecisionBeforeExecution.Tests/DecisionBeforeExecution.Tests.csproj" />
   <Project Path="policy-context-and-explicit-decision-outcomes/PolicyContextAndExplicitDecisionOutcomes/PolicyContextAndExplicitDecisionOutcomes.csproj" />
+  <Project Path="policy-context-and-explicit-decision-outcomes/PolicyContextAndExplicitDecisionOutcomes.Tests/PolicyContextAndExplicitDecisionOutcomes.Tests.csproj" />
 </Solution>

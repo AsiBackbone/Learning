@@ -48,6 +48,16 @@ From the repository root:
 dotnet run --project samples/policy-context-and-explicit-decision-outcomes/PolicyContextAndExplicitDecisionOutcomes/PolicyContextAndExplicitDecisionOutcomes.csproj
 ```
 
+## Run the Tests
+
+From the repository root:
+
+```bash
+dotnet test samples/policy-context-and-explicit-decision-outcomes/PolicyContextAndExplicitDecisionOutcomes.Tests/PolicyContextAndExplicitDecisionOutcomes.Tests.csproj
+```
+
+The focused xUnit tests verify representative structured outcomes and confirm that denied, deferred, and acknowledgment-required decisions remain non-proceeding host instructions.
+
 The sample evaluates seven deterministic scenarios:
 
 | Scenario | Expected outcome | Expected reason code |
@@ -62,7 +72,7 @@ The sample evaluates seven deterministic scenarios:
 
 For each scenario, the program prints the explicit context fields, the governance outcome, the stable reason code, and the next step the host would take.
 
-The program verifies each scenario against its expected outcome and reason code, and fails if the policy returns a different result. This makes the decision matrix executable without introducing a separate test project before the repository-level sample test structure is established.
+The runtime program verifies each scenario against its expected outcome and reason code, while the companion test project provides structured invariant checks that participate in repository-level `dotnet test` execution.
 
 ## What to Observe
 
