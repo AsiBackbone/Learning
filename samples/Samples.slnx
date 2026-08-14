@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="acknowledgment-and-audit-residue/AcknowledgmentAndAuditResidue/AcknowledgmentAndAuditResidue.csproj" />
+  <Project Path="decision-before-execution/DecisionBeforeExecution/DecisionBeforeExecution.csproj" />
+  <Project Path="policy-context-and-explicit-decision-outcomes/PolicyContextAndExplicitDecisionOutcomes/PolicyContextAndExplicitDecisionOutcomes.csproj" />
+</Solution>

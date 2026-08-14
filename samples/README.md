@@ -460,15 +460,25 @@ Individual executable samples support standard .NET CLI workflows such as:
 dotnet run --project <sample-project>
 ```
 
-The target repository-level experience remains:
+The shared sample solution is [`Samples.slnx`](Samples.slnx).
+
+From the repository root, restore, build, and test all executable samples with:
 
 ```bash
-dotnet restore
-dotnet build
-dotnet test
+dotnet restore samples/Samples.slnx
+dotnet build samples/Samples.slnx --no-restore
+dotnet test samples/Samples.slnx --no-build
 ```
 
-Repository-level restore, build, and test across a shared sample solution are still planned under the executable-sample infrastructure work. Each current sample documents its runnable project command in its own README.
+From the `samples/` directory, the equivalent commands are:
+
+```bash
+dotnet restore Samples.slnx
+dotnet build Samples.slnx --no-restore
+dotnet test Samples.slnx --no-build
+```
+
+Common compiler settings are centralized in [`Directory.Build.props`](Directory.Build.props), so sample projects share the same target framework, nullable configuration, implicit-usings setting, and warnings-as-errors behavior.
 
 ## Per-Sample Documentation
 
@@ -667,7 +677,7 @@ A pattern that behaves correctly in a small sample still requires production eng
 
 ## Next Step
 
-The next development steps are to continue pairing the remaining foundational tutorials with executable samples and establish the repository-level sample solution, build, test, and CI structure.
+The next development steps are to continue pairing the remaining foundational tutorials with executable samples and add focused tests for architectural invariants.
 
 Use the [Foundational Tutorials](../docs/tutorials/index.md) as the primary learning path and the working repositories for fuller implementation examples.
 
