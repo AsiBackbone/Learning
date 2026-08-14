@@ -1228,7 +1228,7 @@ It will examine how a consequential operation can pause for explicit acknowledgm
 - [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see authoritative host context and explicit decision outcomes applied to AI-proposed tool actions.
 - [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md) — run the companion decision matrix and observe explicit context snapshots, structured reason codes, and host-controlled next-step semantics.
 - [Policy Context and Explicit Decision Outcomes learner exercise](../labs/policy-context-and-explicit-decision-outcomes.md) — modify the sample to explore boolean information loss, context evolution, structured reasons, and rule precedence.
-- [Executable Samples](https://github.com/AsiBackbone/Learning/tree/main/samples) — explore runnable companion material as the sample set develops.
+- [Executable Samples](../samples/index.md) — explore the published companion-sample guide before following a canonical sample README.
 - [Hands-On Labs](../labs/index.md) — practice constructing policy context, defining decision outcomes, and reasoning about governance boundaries.
 
 ---

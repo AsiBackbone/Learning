@@ -495,9 +495,9 @@ They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicati
 * [x] Ensure repository-level `dotnet test` works for samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
 * [x] Add sample build validation to CI. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
 * [x] Add tests for architectural invariants. ([#2](https://github.com/AsiBackbone/Learning/issues/2))
-* [ ] Add per-sample README files where setup or explanation is needed. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
-* [ ] Cross-link each sample to its tutorial. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
-* [ ] Cross-link each tutorial to its sample. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
+* [x] Add per-sample README files where setup or explanation is needed. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
+* [x] Cross-link each sample to its tutorial. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
+* [x] Cross-link each tutorial to its sample. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
 * [ ] Link samples to fuller working repository implementations where useful.
 
 ## Sample Design Standard

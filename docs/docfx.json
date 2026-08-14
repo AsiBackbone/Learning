@@ -12,6 +12,7 @@
           "getting-started/**/*.md",
           "governance/**/*.md",
           "labs/**/*.md",
+          "samples/**/*.md",
           "security/**/*.md",
           "tutorials/**/*.md"
         ]

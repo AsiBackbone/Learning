@@ -174,7 +174,7 @@ Working Repository
 
 After studying a tutorial:
 
-* [Browse the executable sample area](https://github.com/AsiBackbone/Learning/tree/main/samples) for runnable companion implementations as they are added.
+* [Browse Executable Samples](../samples/index.md) for the published sample guide, run commands, architectural invariants, and links to the canonical companion READMEs.
 * [Browse Labs](../labs/index.md) for hands-on exercises and architecture challenges as they are published.
 * [Explore AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) for fuller governance and policy-control implementations.
 * [Explore NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) for a fuller ASP.NET Core reference architecture.
