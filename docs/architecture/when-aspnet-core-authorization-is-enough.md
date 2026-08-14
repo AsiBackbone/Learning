@@ -434,6 +434,8 @@ An application can build those semantics around authorization.
 
 Once it does, however, that additional lifecycle is application architecture layered beside the authorization system.
 
+⚠️ Anti‑Pattern: Workflow Logic Hidden Inside Authorization
+
 ```csharp
 public sealed class DisableAccountHandler
     : AuthorizationHandler<DisableAccountRequirement, Account>
