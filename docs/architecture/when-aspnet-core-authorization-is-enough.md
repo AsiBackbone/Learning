@@ -49,7 +49,9 @@ The difference matters because architecture should match the problem being solve
 │    resource?"                 │
 └───────────────┬──────────────┘
                 │
-                │ Authorized / Denied
+                ├── Denied ──→ Reject / End
+                │
+                │ Authorized 
                 ▼
 ┌──────────────────────────────┐
 │   Governance / Workflow       │
