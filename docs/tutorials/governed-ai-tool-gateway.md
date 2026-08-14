@@ -1744,7 +1744,7 @@ The AI gateway simply makes the boundary especially visible because the proposer
 
 After the foundational sequence, good next steps include:
 
-- Build a hands-on lab around the five-stage curriculum.
+- Complete the [Governed AI Tool Gateway advanced lab](../labs/governed-ai-tool-gateway.md) to break and threat-model the five-stage curriculum.
 - Compare this architecture with simpler authorization-only designs.
 - Model an alternative pattern without AsiBackbone.
 - Apply the pattern to an ASP.NET Core endpoint.
@@ -1763,8 +1763,8 @@ Learning is intended to make those tradeoffs visible rather than prescribe one u
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — review how the host constructs authoritative context and produces explicit governance outcomes.
 - [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — explore responsibility boundaries, re-evaluation, correlation, and evidence across consequential workflows.
 - [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — examine narrow execution authority, capability bindings, replay considerations, and execution-boundary validation.
-- [Executable Samples](https://github.com/AsiBackbone/Learning/tree/main/samples) — move from the conceptual gateway into runnable demonstrations as companion samples are published.
-- [Hands-On Labs](../labs/index.md) — practice governing consequential operations, identifying weak trust boundaries, and critiquing execution architectures.
+- [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) — run the capstone with a simulated proposal generator, host-built context, acknowledgment, scoped capability, dry-run execution, and invariant tests.
+- [Governed AI Tool Gateway advanced lab](../labs/governed-ai-tool-gateway.md) — deliberately weaken and repair the gateway, then threat-model its trust boundaries.
 
 ---
 

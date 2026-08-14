@@ -441,9 +441,9 @@ Escalate
 * [x] Preserve host-owned execution.
 * [x] Address tool allowlists and argument validation.
 * [x] Discuss audit residue and failure handling.
-* [ ] Pair with executable companion sample. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
-* [ ] Add end-to-end lab. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
-* [ ] Expand threat-model exercises.
+* [x] Pair with executable companion sample. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
+* [x] Add end-to-end lab. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
+* [x] Expand threat-model exercises. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 
 ---
 
@@ -451,11 +451,11 @@ Escalate
 
 ## Status
 
-**Current major development focus**
+**Foundational sample set complete — ongoing refinement**
 
-The `samples/` area has been established.
+The `samples/` area now contains executable companions for all five foundational tutorials, including focused invariant tests and the Governed AI Tool Gateway capstone.
 
-The next step is to turn the foundational tutorials into intentionally small runnable .NET demonstrations.
+Future work should refine coverage, improve cross-links, and add samples for new learning areas only where runnable code materially improves understanding.
 
 ## Goal
 
@@ -485,7 +485,7 @@ They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicati
 * [x] Policy Context and Explicit Decision Outcomes sample.
 * [x] Acknowledgment and Audit Residue sample.
 * [x] Scoped Capability and Host-Owned Execution sample. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
-* [ ] Governed AI Tool Gateway sample. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
+* [x] Governed AI Tool Gateway sample. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 
 ## Sample Infrastructure
 
@@ -536,7 +536,7 @@ rather than immediately invoking real external systems.
 
 ## Status
 
-**In progress — two beginner labs and two intermediate labs established**
+**In progress — two beginner labs, two intermediate labs, and one advanced capstone lab established**
 
 Tutorials explain.
 
@@ -587,10 +587,10 @@ Potential initial labs:
 
 ## Advanced Labs
 
-* [ ] Govern an AI tool call. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
+* [x] Govern an AI tool call. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 * [ ] Design a replay-resistant capability workflow.
 * [ ] Compare competing policy architectures.
-* [ ] Threat-model a governed execution gateway. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
+* [x] Threat-model a governed execution gateway. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 * [ ] Design a regional or tenant-specific policy layer.
 * [ ] Analyze a deliberately flawed high-consequence workflow.
 * [ ] Design safe degraded-mode behavior.

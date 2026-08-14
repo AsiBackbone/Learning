@@ -8,11 +8,11 @@ It is intended to contain intentionally small .NET examples that complement the 
 
 ## Current Status
 
-**Sample foundation established — four executable companion samples and focused invariant tests available.**
+**Foundational sample set established — five executable companion samples and focused invariant tests available.**
 
-The `samples/` area defines the structure, expectations, and design principles for executable examples and now includes runnable companion projects plus sibling xUnit test projects for the first four foundational tutorials.
+The `samples/` area now pairs all five foundational tutorials with runnable companion projects and sibling xUnit test projects, culminating in the Governed AI Tool Gateway capstone.
 
-Individual sample projects will continue to be added incrementally as the foundational tutorials are paired with runnable implementations.
+Future sample work can focus on refinement, additional invariants, alternative patterns, and new learning areas rather than filling a gap in the foundational sequence.
 
 For the current learning material, begin with the:
 
@@ -86,9 +86,9 @@ Use the organization's implementation repositories to examine similar ideas unde
 * [AsiBackbone](https://github.com/AsiBackbone/AsiBackbone)
 * [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)
 
-## Planned Foundational Sample Set
+## Foundational Sample Set
 
-The initial executable sample set is intended to follow the five foundational tutorials.
+The executable sample set follows the five foundational tutorials.
 
 ### Decision Before Execution
 
@@ -227,13 +227,17 @@ Related tutorial:
 
 [Governed AI Tool Gateway](../docs/tutorials/governed-ai-tool-gateway.md)
 
-The sample is expected to compose the earlier concepts into an AI-assisted execution boundary.
+Executable companion:
+
+[Governed AI Tool Gateway sample](governed-ai-tool-gateway/README.md)
+
+The sample composes the earlier concepts into an AI-assisted execution boundary using a local simulated proposal generator and dry-run host-owned handler.
 
 The central rule remains:
 
 > **The model may propose. The host retains execution authority.**
 
-A representative flow may be:
+The sample demonstrates:
 
 ```text
 User Request
@@ -252,12 +256,12 @@ Scoped Capability
    ↓
 Execution-Boundary Validation
    ↓
-Host-Owned Tool Execution
+Host-Owned Dry-Run Tool Execution
    ↓
 Audit Residue
 ```
 
-An important invariant may be:
+Important invariants include:
 
 ```text
 AI Proposes Unknown Tool
@@ -265,6 +269,16 @@ AI Proposes Unknown Tool
 Host Rejects Proposal
    ↓
 No Execution
+```
+
+and:
+
+```text
+Model Claims External Destination Is Internal
+   ↓
+Host Rebuilds Authoritative Classification
+   ↓
+AcknowledgmentRequired
 ```
 
 ## Sample Design Principles
@@ -686,7 +700,7 @@ A pattern that behaves correctly in a small sample still requires production eng
 
 ## Next Step
 
-The next development step is to pair the final foundational tutorial with an executable sample and lab while continuing to expand focused invariant coverage where it improves learning value.
+The five foundational tutorials now have executable companion samples, and the capstone AI gateway is paired with an advanced lab. The next development step is to refine invariant coverage, strengthen implementation links, and expand into alternative and deeper architecture topics where they add learning value.
 
 Use the [Foundational Tutorials](../docs/tutorials/index.md) as the primary learning path and the working repositories for fuller implementation examples.
 

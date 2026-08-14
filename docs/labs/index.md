@@ -24,11 +24,11 @@ Working Repository
 
 ## Current Status
 
-The lab navigation foundation is established, with two beginner labs and two intermediate labs now available.
+The lab navigation foundation is established, with two beginner labs, two intermediate labs, and one advanced capstone lab now available.
 
-Additional labs will appear in this section as the foundational learning path becomes increasingly interactive.
+Additional labs will appear in this section as the learning path expands into deeper architecture, security, and AI-governance topics.
 
-The current labs pair the first four foundational tutorials with executable companion samples and ask learners to modify, challenge, and extend the demonstrated governance boundaries.
+The current labs pair all five foundational tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated governance boundaries.
 
 ## Available Labs
 
@@ -83,6 +83,19 @@ Related material:
 
 - [Scoped Capability and Host-Owned Execution tutorial](../tutorials/scoped-capability-and-host-owned-execution.md)
 - [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/README.md#scoped-capability-and-host-owned-execution)
+
+### Governed AI Tool Gateway
+
+[Governed AI Tool Gateway](governed-ai-tool-gateway.md)
+
+**Difficulty:** Advanced
+
+Compose the foundational patterns into one AI-assisted execution boundary, deliberately weaken proposal, context, acknowledgment, capability, replay, prompt, credential, and failure-mode controls, then threat-model the complete gateway.
+
+Related material:
+
+- [Governed AI Tool Gateway tutorial](../tutorials/governed-ai-tool-gateway.md)
+- [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md)
 
 ## Start with the Tutorials
 
