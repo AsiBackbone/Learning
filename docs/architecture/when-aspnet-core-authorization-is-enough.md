@@ -36,6 +36,42 @@ Those questions overlap, but they are not identical.
 
 The difference matters because architecture should match the problem being solved.
 
+```text
+┌──────────────────────────────┐
+│        Authentication         │
+└───────────────┬──────────────┘
+                │
+                ▼
+┌──────────────────────────────┐
+│   ASP.NET Core Authorization  │
+│   "May this actor perform     │
+│    this operation on this     │
+│    resource?"                 │
+└───────────────┬──────────────┘
+                │
+                │ Authorized / Denied
+                ▼
+┌──────────────────────────────┐
+│   Governance / Workflow       │
+│   "What should happen next    │
+│    with this proposed         │
+│    consequential operation?"  │
+│                              │
+│   Outcomes may include:       │
+│     • Allow                   │
+│     • Deny                    │
+│     • Defer                   │
+│     • AcknowledgmentRequired  │
+│     • EscalationRecommended   │
+└───────────────┬──────────────┘
+                │
+                ▼
+┌──────────────────────────────┐
+│      Host-Owned Execution     │
+│   (Immediate or deferred)     │
+└──────────────────────────────┘
+```
+
 ## What ASP.NET Core Authorization Already Provides
 
 ASP.NET Core supports:
@@ -395,6 +431,53 @@ EscalationRecommended
 An application can build those semantics around authorization.
 
 Once it does, however, that additional lifecycle is application architecture layered beside the authorization system.
+
+```csharp
+public sealed class DisableAccountHandler
+    : AuthorizationHandler<DisableAccountRequirement, Account>
+{
+    protected override Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
+        DisableAccountRequirement requirement,
+        Account resource)
+    {
+        // 1. Correct: basic access control
+        if (!context.User.IsInRole("Administrator"))
+        {
+            context.Fail(new AuthorizationFailureReason(
+                this, "Administrator role required."));
+            return Task.CompletedTask;
+        }
+
+        // 2. ❌ Incorrect: workflow state disguised as authorization
+        if (resource.IsUnderMaintenanceHold)
+        {
+            context.Fail(new AuthorizationFailureReason(
+                this, "Deferred: maintenance hold."));
+            return Task.CompletedTask;
+        }
+
+        // 3. ❌ Incorrect: escalation logic inside authorization
+        if (resource.IsHighlySensitive)
+        {
+            context.Fail(new AuthorizationFailureReason(
+                this, "EscalationRecommended: requires senior approval."));
+            return Task.CompletedTask;
+        }
+
+        // 4. ❌ Incorrect: acknowledgment logic inside authorization
+        if (!context.User.HasClaim("AcknowledgedRisk", "true"))
+        {
+            context.Fail(new AuthorizationFailureReason(
+                this, "AcknowledgmentRequired: user must confirm risk."));
+            return Task.CompletedTask;
+        }
+
+        context.Succeed(requirement);
+        return Task.CompletedTask;
+    }
+}
+```
 
 ## The Hybrid Pattern Is Often the Best Answer
 
