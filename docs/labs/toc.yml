@@ -19,6 +19,13 @@
       href: scoped-capability-and-host-owned-execution.md
 
 
+- name: Advanced Labs
+  expanded: true
+  items:
+    - name: Governed AI Tool Gateway
+      href: governed-ai-tool-gateway.md
+
+
 - name: ASI Backbone Resources
   expanded: true
   items:
