@@ -1,6 +1,7 @@
 # ASI Backbone Learning
 
 [![Documentation Validation](https://github.com/AsiBackbone/Learning/actions/workflows/docs-validation.yml/badge.svg?branch=main)](https://github.com/AsiBackbone/Learning/actions/workflows/docs-validation.yml)
+[![Samples Validation](https://github.com/AsiBackbone/Learning/actions/workflows/samples-validation.yml/badge.svg?branch=main)](https://github.com/AsiBackbone/Learning/actions/workflows/samples-validation.yml)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://asibackbone.github.io/Learning/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21923997.svg)](https://doi.org/10.5281/zenodo.21923997)
 
@@ -199,9 +200,9 @@ A useful design rule is:
 
 > **The model may propose. The host retains execution authority.**
 
-## Proposed Repository Structure
+## Repository Structure
 
-The repository is expected to evolve, but an initial structure may resemble:
+The repository structure resembles:
 
 ```text
 Learning/
@@ -222,6 +223,9 @@ Learning/
 │   ├── advanced/
 │   ├── tutorials/
 │   └── labs/
+│
+├── samples/
+│   └── Samples.slnx
 │
 └── community/
     ├── tutorial-ideas.md
@@ -373,13 +377,14 @@ Together, these tutorials establish the initial learning path from proposed inte
 
 The repository also includes its DocFX documentation foundation, contribution and governance guidance, and a dedicated `samples/` area for executable companion code.
 
-Current development is shifting from establishing the conceptual foundation toward making the material more runnable, interactive, and extensible. Near-term work includes:
+**Active development — foundational tutorial, sample, test, and lab path established**
 
-* Executable companion samples paired with tutorials.
-* Beginner and intermediate hands-on labs.
-* Additional ASP.NET Core, security, governance, and AI-integration material.
-* Stronger links between teaching examples and working implementations in `AsiBackbone` and `NetCoreApplicationTemplate`.
-* Alternative patterns, tradeoff analysis, and community-contributed examples.
+* all five foundational tutorials have runnable companion samples;
+* the samples have focused architectural-invariant tests;
+* all five foundational topics now have learner exercises/labs;
+* DocFX has a published executable-samples path;
+* the first alternative-pattern comparison has been published;
+* current development has shifted toward implementation references, deeper labs, ASP.NET Core architecture, security/trust architecture, and governance material.
 
 This remains a living educational project. Material may evolve as the implementation repositories mature, better teaching approaches emerge, and community feedback identifies new questions or gaps.
 
