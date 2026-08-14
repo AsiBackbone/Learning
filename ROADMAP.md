@@ -16,11 +16,13 @@ The project should continue to grow deliberately:
 
 # Current Project Status
 
-**Active development — foundational learning path established**
+**Active development — foundational tutorial/sample/test/lab path established**
 
 The repository has moved beyond its initial scaffolding phase.
 
-The initial five-tutorial learning path is now established:
+The initial five-tutorial learning path is now established, and the foundational
+sequence is supported by runnable companion samples, focused invariant tests,
+and tutorial-aligned learner exercises or labs.
 
 1. [Decision Before Execution](docs/tutorials/decision-before-execution.md)
 2. [Policy Context and Explicit Decision Outcomes](docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
@@ -48,25 +50,28 @@ Host-owned execution
 Audit residue
 ```
 
-The current development emphasis is shifting toward:
+The current development emphasis is now:
 
 ```text
-Tutorial
+Established Foundation
    ↓
-Runnable Sample
+Working Implementation References
    ↓
-Tests
+Deeper Diagnostic / Tradeoff Labs
    ↓
-Hands-On Lab
+ASP.NET Core Architecture
    ↓
-Alternative Approaches
+Security and Trust Architecture
    ↓
-Working Repository References
+Governance and Advanced Material
 ```
 
-The next major objective is therefore not simply to add more written material.
+The next major objective is therefore not to rebuild the foundation or simply add
+more written material.
 
-It is to make the existing learning path increasingly **runnable, testable, interactive, and connected to real implementations**.
+It is to deepen the established path, strengthen its connection to real
+implementations, and begin the next architecture subjects without sacrificing
+cohesion.
 
 ---
 
@@ -369,7 +374,7 @@ The repository Markdown remains canonical.
 
 ## Status
 
-**Initial five-tutorial sequence established**
+**Foundational five-tutorial sequence established — targeted reference refinement remains**
 
 Quality and refinement now matter more than adding another foundational tutorial merely to increase tutorial count.
 
@@ -427,7 +432,7 @@ Escalate
 * [x] Discuss replay and validation boundaries.
 * [x] Pair with executable companion sample. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [x] Add capability-focused lab. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
-* [ ] Strengthen links to working implementation references.
+* [ ] Strengthen links to working implementation references. ([#18](https://github.com/AsiBackbone/Learning/issues/18))
 
 ## Tutorial 5 — Governed AI Tool Gateway
 
@@ -451,7 +456,7 @@ Escalate
 
 ## Status
 
-**Foundational sample set complete — ongoing refinement**
+**Foundational sample set complete — implementation linking and ongoing refinement remain**
 
 The `samples/` area now contains executable companions for all five foundational tutorials, including focused invariant tests and the Governed AI Tool Gateway capstone.
 
@@ -498,7 +503,7 @@ They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicati
 * [x] Add per-sample README files where setup or explanation is needed. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
 * [x] Cross-link each sample to its tutorial. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
 * [x] Cross-link each tutorial to its sample. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
-* [ ] Link samples to fuller working repository implementations where useful.
+* [ ] Link samples to fuller working repository implementations where useful. ([#18](https://github.com/AsiBackbone/Learning/issues/18))
 
 ## Sample Design Standard
 
@@ -536,7 +541,11 @@ rather than immediately invoking real external systems.
 
 ## Status
 
-**In progress — two beginner labs, two intermediate labs, and one advanced capstone lab established**
+**Foundational tutorial-aligned lab path established — additional labs in progress**
+
+Each foundational tutorial now has a learner exercise or lab. Remaining work
+should deepen failure analysis, policy/version evidence, replay resistance,
+degraded-mode reasoning, and broader ASP.NET Core and security scenarios.
 
 Tutorials explain.
 
@@ -766,6 +775,10 @@ The central rule remains:
 
 # Milestone 10 — Architecture Comparisons and Alternative Patterns
 
+## Status
+
+**Started — first alternative-pattern comparison published** ([#7](https://github.com/AsiBackbone/Learning/issues/7))
+
 ## Goal
 
 Help readers understand where demonstrated patterns fit relative to established and adjacent architectural approaches.
@@ -854,6 +867,7 @@ Case studies should prefer simulated or dry-run consequential operations unless 
 * [x] `community/contributors.md`
 * [x] Contribution guidance.
 * [x] Governance guidance.
+* [x] Quick-start contribution path in `CONTRIBUTING.md`. ([#8](https://github.com/AsiBackbone/Learning/issues/8))
 
 ## Future Community Work
 
@@ -944,17 +958,17 @@ As the repository grows, learning material should increasingly provide:
 * [x] Architectural diagrams or flows where useful.
 * [x] Tradeoff discussion in foundational material.
 * [x] Scope and boundary language.
-* [ ] Consistent tutorial metadata.
-* [ ] Difficulty indicators.
-* [ ] Prerequisites.
+* [x] Consistent tutorial metadata.
+* [x] Difficulty indicators.
+* [x] Prerequisites.
 * [ ] Estimated scope rather than artificial completion times.
-* [ ] Runnable companion samples.
+* [x] Runnable companion samples.
 * [x] Executable tests. ([#2](https://github.com/AsiBackbone/Learning/issues/2))
 * [ ] Consistent "When not to use this" guidance.
 * [ ] Stronger links to implementation repositories.
 * [ ] Links to relevant ADRs.
-* [ ] Related-tutorial links.
-* [ ] Suggested labs.
+* [x] Related-tutorial links.
+* [x] Suggested labs.
 * [ ] Clear canonical, alternative, or experimental status where relevant.
 * [ ] Accessibility review for diagrams and visual material.
 * [ ] Periodic technical review as .NET and implementation repositories evolve.
@@ -971,14 +985,14 @@ Automation should support quality without making contribution unnecessarily diff
 * [x] Treat documentation warnings as errors.
 * [x] GitHub Pages deployment.
 * [x] SHA-pinned GitHub Actions in documentation workflows.
+* [x] Automated link checking.
+* [x] Sample restore validation. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [x] Sample build validation. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [x] Sample test execution. ([#1](https://github.com/AsiBackbone/Learning/issues/1), [#2](https://github.com/AsiBackbone/Learning/issues/2))
 
 ## Planned
 
 * [ ] Markdown validation where it adds value beyond DocFX.
-* [ ] Automated link checking.
-* [x] Sample restore validation. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
-* [x] Sample build validation. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
-* [x] Sample test execution. ([#1](https://github.com/AsiBackbone/Learning/issues/1), [#2](https://github.com/AsiBackbone/Learning/issues/2))
 * [ ] Dependency updates.
 * [ ] Secret scanning review.
 * [ ] Code scanning where executable code justifies it.
@@ -1018,18 +1032,25 @@ It should not force the project into unnecessary release ceremony.
 
 The highest-priority work now is:
 
-1. Build the first executable companion sample for **Decision Before Execution**.
-2. Establish a reusable sample solution and test structure. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
-3. Add companion samples for the remaining foundational tutorials.
-4. Add CI validation for executable samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
-5. Create the first beginner hands-on lab.
-6. Create the first intermediate hands-on lab.
-7. Strengthen tutorial → sample → implementation cross-links.
-8. Add `SECURITY.md`.
-9. Add repository topics, contribution templates, and repository collaboration refinements.
-10. Add automated link validation where practical.
-11. Begin the first ASP.NET Core or security-focused learning material after the foundational sample/lab path is usable.
-12. Use community feedback to determine which deeper architecture topics deserve priority.
+1. Strengthen Tutorial 4 and its companion sample with carefully selected working
+   implementation references. ([#18](https://github.com/AsiBackbone/Learning/issues/18))
+2. Add the next beginner lab around identifying and removing a hidden execution
+   side effect. ([#19](https://github.com/AsiBackbone/Learning/issues/19))
+3. Begin the broader ASP.NET Core learning path with middleware ordering and
+   observable failure behavior. ([#20](https://github.com/AsiBackbone/Learning/issues/20))
+4. Begin the Security and Trust Architecture path with trust boundaries and least
+   privilege as architectural concepts. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
+5. Continue strengthening tutorial → sample → lab → working implementation links
+   where the reference materially improves understanding.
+6. Expand architecture comparisons beyond the first ASP.NET Core authorization
+   comparison, preserving honest cases where simpler or adjacent patterns win.
+7. Add deeper intermediate and advanced labs around governed API operations,
+   policy-version evidence, replay resistance, regional/tenant policy, and safe
+   degraded-mode behavior.
+8. Begin Governance and Policy Architecture material after the first ASP.NET Core
+   and security bridge lessons are usable.
+9. Use community feedback and implementation changes to decide which advanced or
+   experimental subjects deserve promotion into the main learning path.
 
 The short-term emphasis should remain:
 
