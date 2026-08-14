@@ -82,9 +82,9 @@ Follow focused, problem-first lessons that move from a common implementation thr
 
 Move from architectural explanation toward runnable demonstrations of the same boundaries.
 
-The `samples/` area contains the companion-code structure for the Learning repository. As the sample set develops, it will provide intentionally small .NET implementations corresponding to the foundational tutorials.
+The foundational sample set now contains five intentionally small .NET companion implementations, one for each foundational tutorial, with focused tests that make the architectural invariants observable.
 
-[Browse Executable Samples →](https://github.com/AsiBackbone/Learning/tree/main/samples)
+[Browse Executable Samples →](samples/index.md)
 
 ### Labs
 

@@ -82,7 +82,7 @@ Break expiration and resource-freshness checks deliberately, observe how stale a
 Related material:
 
 - [Scoped Capability and Host-Owned Execution tutorial](../tutorials/scoped-capability-and-host-owned-execution.md)
-- [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/README.md#scoped-capability-and-host-owned-execution)
+- [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/scoped-capability-and-host-owned-execution/README.md)
 
 ### Governed AI Tool Gateway
 
@@ -115,7 +115,7 @@ Topics include:
 
 The executable sample area provides small runnable demonstrations corresponding to the tutorial concepts.
 
-[Browse Executable Samples](https://github.com/AsiBackbone/Learning/tree/main/samples)
+[Browse Executable Samples](../samples/index.md)
 
 Samples demonstrate known behavior.
 

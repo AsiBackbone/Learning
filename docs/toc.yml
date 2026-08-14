@@ -23,7 +23,7 @@
   href: tutorials/index.md
 
 - name: Executable Samples
-  href: https://github.com/AsiBackbone/Learning/tree/main/samples
+  href: samples/index.md
 
 - name: Labs
   href: labs/index.md
