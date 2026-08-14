@@ -6,6 +6,22 @@ This repository is intended to be a community-maintained living tutorial for pra
 
 Contributions do not need to be large to be useful. A clearer explanation, corrected example, improved diagram, new lab, alternative implementation, or well-reasoned architecture critique can all materially improve the project.
 
+## Quick Contribution
+
+For a typo, broken link, or narrow wording fix, the contribution path is intentionally short:
+
+1. Edit the affected file directly on GitHub or in a short-lived branch.
+2. Open a focused pull request describing the correction.
+3. Let the automated checks run:
+   - **Documentation Validation (`docs-validation`)** builds the DocFX site with warnings treated as errors.
+   - **Link Validation (`link-validation`)** checks Markdown links for broken or invalid targets.
+   - **Sample Validation (`samples-validation`)** restores, builds, and tests the executable samples; it runs on every pull request.
+4. Address review comments if needed. Once the checks and review are satisfied, the change can be merged.
+
+Documentation and educational contributions are accepted under **CC BY 4.0**; executable sample projects and source files under `samples/` are accepted under the **MIT License**. See [LICENSING.md](LICENSING.md) for component-specific details.
+
+For larger contributions such as tutorials, samples, labs, diagrams, new architectural patterns, or substantial restructuring, continue with [Before You Start](#before-you-start) and the detailed guidance below.
+
 ## Project Philosophy
 
 A core principle of this repository is:
