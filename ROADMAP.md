@@ -774,7 +774,7 @@ Potential comparison areas include:
 
 * [ ] Traditional role-based authorization. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
 * [ ] Claims-based authorization. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
-* [ ] Policy-based authorization. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
+* [x] Policy-based authorization — [When ASP.NET Core Authorization Is Enough](docs/architecture/when-aspnet-core-authorization-is-enough.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7))
 * [ ] Capability-based security. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
 * [ ] API gateways.
 * [ ] Service meshes.

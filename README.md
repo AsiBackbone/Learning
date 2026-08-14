@@ -279,6 +279,10 @@ A documented community-supported approach that solves the same problem different
 
 Alternative approaches are welcome when they are clearly explained, technically grounded, and presented with their tradeoffs.
 
+The first published alternative-pattern comparison is:
+
+* [When ASP.NET Core Authorization Is Enough](docs/architecture/when-aspnet-core-authorization-is-enough.md)
+
 Architectural disagreement can be educational.
 
 ## Contribution

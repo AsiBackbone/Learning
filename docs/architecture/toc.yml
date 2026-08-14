@@ -1,6 +1,9 @@
 - name: Architecture
   href: index.md
 
+- name: When ASP.NET Core Authorization Is Enough
+  href: when-aspnet-core-authorization-is-enough.md
+
 - name: ASI Backbone Resources
   expanded: true
   items:
