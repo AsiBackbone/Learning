@@ -325,7 +325,7 @@ The intent is to make Issues discoverable by **content area, architectural class
 
 ---
 
-# Milestone 2 — Documentation Platform
+# Milestone 2 — Documentation Platform ([#5](https://github.com/AsiBackbone/Learning/issues/5))
 
 ## Status
 
@@ -425,8 +425,8 @@ Escalate
 * [x] Cover actor, operation, resource, audience, and expiration bindings.
 * [x] Preserve host-owned execution.
 * [x] Discuss replay and validation boundaries.
-* [ ] Pair with executable companion sample.
-* [ ] Add capability-focused lab.
+* [ ] Pair with executable companion sample. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
+* [ ] Add capability-focused lab. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [ ] Strengthen links to working implementation references.
 
 ## Tutorial 5 — Governed AI Tool Gateway
@@ -441,8 +441,8 @@ Escalate
 * [x] Preserve host-owned execution.
 * [x] Address tool allowlists and argument validation.
 * [x] Discuss audit residue and failure handling.
-* [ ] Pair with executable companion sample.
-* [ ] Add end-to-end lab.
+* [ ] Pair with executable companion sample. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
+* [ ] Add end-to-end lab. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 * [ ] Expand threat-model exercises.
 
 ---
@@ -484,20 +484,20 @@ They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicati
 * [x] Decision Before Execution sample.
 * [x] Policy Context and Explicit Decision Outcomes sample.
 * [x] Acknowledgment and Audit Residue sample.
-* [ ] Scoped Capability and Host-Owned Execution sample.
-* [ ] Governed AI Tool Gateway sample.
+* [ ] Scoped Capability and Host-Owned Execution sample. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
+* [ ] Governed AI Tool Gateway sample. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 
 ## Sample Infrastructure
 
-* [ ] Establish buildable sample solution structure.
-* [ ] Ensure repository-level `dotnet restore` works for samples.
-* [ ] Ensure repository-level `dotnet build` works for samples.
-* [ ] Ensure repository-level `dotnet test` works for samples.
-* [ ] Add sample build validation to CI.
-* [ ] Add tests for architectural invariants.
-* [ ] Add per-sample README files where setup or explanation is needed.
-* [ ] Cross-link each sample to its tutorial.
-* [ ] Cross-link each tutorial to its sample.
+* [ ] Establish buildable sample solution structure. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [ ] Ensure repository-level `dotnet restore` works for samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [ ] Ensure repository-level `dotnet build` works for samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [ ] Ensure repository-level `dotnet test` works for samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [ ] Add sample build validation to CI. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [ ] Add tests for architectural invariants. ([#2](https://github.com/AsiBackbone/Learning/issues/2))
+* [ ] Add per-sample README files where setup or explanation is needed. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
+* [ ] Cross-link each sample to its tutorial. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
+* [ ] Cross-link each tutorial to its sample. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
 * [ ] Link samples to fuller working repository implementations where useful.
 
 ## Sample Design Standard
@@ -579,18 +579,18 @@ Potential initial labs:
 
 * [x] Add acknowledgment to a consequential workflow.
 * [x] Preserve an audit receipt.
-* [ ] Introduce capability-scoped execution.
+* [ ] Introduce capability-scoped execution. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [ ] Build a governed API operation.
 * [ ] Refactor scattered governance logic into a decision pipeline.
-* [ ] Detect stale or mismatched execution authority.
+* [ ] Detect stale or mismatched execution authority. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [ ] Add policy-version evidence to a decision path.
 
 ## Advanced Labs
 
-* [ ] Govern an AI tool call.
+* [ ] Govern an AI tool call. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 * [ ] Design a replay-resistant capability workflow.
 * [ ] Compare competing policy architectures.
-* [ ] Threat-model a governed execution gateway.
+* [ ] Threat-model a governed execution gateway. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 * [ ] Design a regional or tenant-specific policy layer.
 * [ ] Analyze a deliberately flawed high-consequence workflow.
 * [ ] Design safe degraded-mode behavior.
@@ -604,7 +604,7 @@ Where multiple valid solutions exist, the discussion should explain the tradeoff
 
 ---
 
-# Milestone 6 — ASP.NET Core Architecture Learning
+# Milestone 6 — ASP.NET Core Architecture Learning ([#5](https://github.com/AsiBackbone/Learning/issues/5))
 
 ## Goal
 
@@ -673,7 +673,7 @@ Planned topics include:
 
 ---
 
-# Milestone 7 — Security and Trust Architecture
+# Milestone 7 — Security and Trust Architecture ([#5](https://github.com/AsiBackbone/Learning/issues/5))
 
 ## Goal
 
@@ -704,7 +704,7 @@ Educational security examples should clearly distinguish demonstrated patterns f
 
 ---
 
-# Milestone 8 — Governance and Policy Architecture
+# Milestone 8 — Governance and Policy Architecture 
 
 ## Goal
 
@@ -733,7 +733,7 @@ Expand the conceptual vocabulary around policy-governed systems after the founda
 
 ---
 
-# Milestone 9 — Expanded AI Integration
+# Milestone 9 — Expanded AI Integration ([#5](https://github.com/AsiBackbone/Learning/issues/5))
 
 ## Goal
 
@@ -772,21 +772,21 @@ Help readers understand where demonstrated patterns fit relative to established 
 
 Potential comparison areas include:
 
-* [ ] Traditional role-based authorization.
-* [ ] Claims-based authorization.
-* [ ] Policy-based authorization.
-* [ ] Capability-based security.
+* [ ] Traditional role-based authorization. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
+* [ ] Claims-based authorization. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
+* [ ] Policy-based authorization. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
+* [ ] Capability-based security. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
 * [ ] API gateways.
 * [ ] Service meshes.
 * [ ] Workflow engines.
-* [ ] Policy engines.
+* [ ] Policy engines. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
 * [ ] Agent/tool authorization models.
 * [ ] Human approval systems.
 * [ ] Event-sourced audit approaches.
 * [ ] Command/query separation.
 * [ ] Zero-trust architecture.
-* [ ] Rules engines.
-* [ ] Distributed policy enforcement.
+* [ ] Rules engines. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
+* [ ] Distributed policy enforcement. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
 
 Comparisons should not frame adjacent architectures as competitors simply because they solve related problems.
 
@@ -862,14 +862,14 @@ Case studies should prefer simulated or dry-run consequential operations unless 
 * [ ] Sample-proposal guidance.
 * [ ] Lab-proposal template.
 * [ ] Alternative-pattern proposal guidance.
-* [ ] `good first tutorial` issues.
-* [ ] `good first sample` issues.
-* [ ] Documentation-only starter issues.
-* [ ] Diagram contribution opportunities.
+* [ ] `good first tutorial` issues. ([#8](https://github.com/AsiBackbone/Learning/issues/8))
+* [ ] `good first sample` issues. ([#8](https://github.com/AsiBackbone/Learning/issues/8))
+* [ ] Documentation-only starter issues. ([#8](https://github.com/AsiBackbone/Learning/issues/8))
+* [ ] Diagram contribution opportunities. ([#8](https://github.com/AsiBackbone/Learning/issues/8))
 * [ ] Lab review contributors.
 * [ ] Topic-specific reviewers.
 * [ ] Contributor recognition.
-* [ ] Community-authored alternative patterns.
+* [ ] Community-authored alternative patterns. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
 * [ ] Additional maintainers if sustained contribution creates a practical need.
 * [ ] Translation support if demand emerges.
 
@@ -900,7 +900,7 @@ Repeated misunderstandings should trigger refinement of existing material before
 
 ---
 
-# Milestone 13 — Advanced and Experimental Material
+# Milestone 13 — Advanced and Experimental Material ([#5](https://github.com/AsiBackbone/Learning/issues/5))
 
 ## Goal
 
@@ -949,7 +949,7 @@ As the repository grows, learning material should increasingly provide:
 * [ ] Prerequisites.
 * [ ] Estimated scope rather than artificial completion times.
 * [ ] Runnable companion samples.
-* [ ] Executable tests.
+* [ ] Executable tests. ([#2](https://github.com/AsiBackbone/Learning/issues/2))
 * [ ] Consistent "When not to use this" guidance.
 * [ ] Stronger links to implementation repositories.
 * [ ] Links to relevant ADRs.
@@ -976,9 +976,9 @@ Automation should support quality without making contribution unnecessarily diff
 
 * [ ] Markdown validation where it adds value beyond DocFX.
 * [ ] Automated link checking.
-* [ ] Sample restore validation.
-* [ ] Sample build validation.
-* [ ] Sample test execution.
+* [ ] Sample restore validation. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [ ] Sample build validation. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [ ] Sample test execution. ([#1](https://github.com/AsiBackbone/Learning/issues/1), [#2](https://github.com/AsiBackbone/Learning/issues/2))
 * [ ] Dependency updates.
 * [ ] Secret scanning review.
 * [ ] Code scanning where executable code justifies it.
@@ -1019,9 +1019,9 @@ It should not force the project into unnecessary release ceremony.
 The highest-priority work now is:
 
 1. Build the first executable companion sample for **Decision Before Execution**.
-2. Establish a reusable sample solution and test structure.
+2. Establish a reusable sample solution and test structure. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
 3. Add companion samples for the remaining foundational tutorials.
-4. Add CI validation for executable samples.
+4. Add CI validation for executable samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
 5. Create the first beginner hands-on lab.
 6. Create the first intermediate hands-on lab.
 7. Strengthen tutorial → sample → implementation cross-links.
