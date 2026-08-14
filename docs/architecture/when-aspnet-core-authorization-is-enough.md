@@ -451,7 +451,7 @@ public sealed class DisableAccountHandler
             return Task.CompletedTask;
         }
 
-        // 2. ❌ Incorrect: workflow state disguised as authorization
+        // 2. ❌ Wrong boundary: operational deferral encoded as authorization failure
         if (resource.IsUnderMaintenanceHold)
         {
             context.Fail(new AuthorizationFailureReason(
@@ -459,7 +459,7 @@ public sealed class DisableAccountHandler
             return Task.CompletedTask;
         }
 
-        // 3. ❌ Incorrect: escalation logic inside authorization
+        // 3. ❌ Wrong boundary: escalation workflow encoded as authorization failure
         if (resource.IsHighlySensitive)
         {
             context.Fail(new AuthorizationFailureReason(
@@ -467,7 +467,7 @@ public sealed class DisableAccountHandler
             return Task.CompletedTask;
         }
 
-        // 4. ❌ Incorrect: acknowledgment logic inside authorization
+        // 4. ❌ Wrong boundary: acknowledgment lifecycle encoded as authorization failure
         if (!context.User.HasClaim("AcknowledgedRisk", "true"))
         {
             context.Fail(new AuthorizationFailureReason(
