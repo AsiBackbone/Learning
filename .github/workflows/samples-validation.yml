@@ -1,0 +1,63 @@
+name: Sample Validation
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'samples/**'
+      - '.github/workflows/samples-validation.yml'
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'samples/**'
+      - '.github/workflows/samples-validation.yml'
+
+# Deny all GitHub token permissions by default.
+permissions: {}
+
+concurrency:
+  group: samples-validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  validate-samples:
+    name: Restore, build, and test samples
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Display .NET information
+        run: dotnet --info
+
+      - name: Restore samples
+        working-directory: samples
+        run: dotnet restore Samples.slnx
+
+      - name: Build samples
+        working-directory: samples
+        run: dotnet build Samples.slnx --no-restore
+
+      - name: Test samples
+        working-directory: samples
+        run: dotnet test Samples.slnx --no-build

@@ -489,11 +489,11 @@ They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicati
 
 ## Sample Infrastructure
 
-* [ ] Establish buildable sample solution structure. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
-* [ ] Ensure repository-level `dotnet restore` works for samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
-* [ ] Ensure repository-level `dotnet build` works for samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
-* [ ] Ensure repository-level `dotnet test` works for samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
-* [ ] Add sample build validation to CI. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [x] Establish buildable sample solution structure. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [x] Ensure repository-level `dotnet restore` works for samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [x] Ensure repository-level `dotnet build` works for samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [x] Ensure repository-level `dotnet test` works for samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [x] Add sample build validation to CI. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
 * [ ] Add tests for architectural invariants. ([#2](https://github.com/AsiBackbone/Learning/issues/2))
 * [ ] Add per-sample README files where setup or explanation is needed. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
 * [ ] Cross-link each sample to its tutorial. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
@@ -976,8 +976,8 @@ Automation should support quality without making contribution unnecessarily diff
 
 * [ ] Markdown validation where it adds value beyond DocFX.
 * [ ] Automated link checking.
-* [ ] Sample restore validation. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
-* [ ] Sample build validation. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [x] Sample restore validation. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
+* [x] Sample build validation. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
 * [ ] Sample test execution. ([#1](https://github.com/AsiBackbone/Learning/issues/1), [#2](https://github.com/AsiBackbone/Learning/issues/2))
 * [ ] Dependency updates.
 * [ ] Secret scanning review.
