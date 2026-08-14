@@ -1526,7 +1526,7 @@ It is the first full composition of the primitives established so far.
 - [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — review the responsibility and evidence boundaries that may precede issuance of execution authority.
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — revisit the policy facts, outcome semantics, and policy identity that justify a scoped capability.
 - [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see scoped capabilities used as part of a complete AI-proposed, host-governed execution path.
-- [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/scoped-capability-and-host-owned-execution/README.md) — run the capability issuance and execution-boundary validation pattern.
+- [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/README.md#scoped-capability-and-host-owned-execution) — run the capability issuance and execution-boundary validation pattern.
 - [Scoped Capability and Host-Owned Execution lab](../labs/scoped-capability-and-host-owned-execution.md) — break expiration, resource-freshness, and scope boundaries, then repair them.
 
 ---
