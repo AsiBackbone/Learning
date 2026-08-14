@@ -24,11 +24,11 @@ Working Repository
 
 ## Current Status
 
-The lab navigation foundation is established, with two beginner labs and the first intermediate lab now available.
+The lab navigation foundation is established, with two beginner labs and two intermediate labs now available.
 
 Additional labs will appear in this section as the foundational learning path becomes increasingly interactive.
 
-The current labs pair the first three foundational tutorials with executable companion samples and ask learners to modify, challenge, and extend the demonstrated governance boundaries.
+The current labs pair the first four foundational tutorials with executable companion samples and ask learners to modify, challenge, and extend the demonstrated governance boundaries.
 
 ## Available Labs
 
@@ -70,6 +70,19 @@ Related material:
 
 - [Acknowledgment and Audit Residue tutorial](../tutorials/acknowledgment-and-audit-residue.md)
 - [Acknowledgment and Audit Residue sample](https://github.com/AsiBackbone/Learning/blob/main/samples/acknowledgment-and-audit-residue/README.md)
+
+### Scoped Capability and Host-Owned Execution
+
+[Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md)
+
+**Difficulty:** Intermediate
+
+Break expiration and resource-freshness checks deliberately, observe how stale authority can reach execution, restore narrow execution-boundary validation, and extend the sample with additional binding and replay exercises.
+
+Related material:
+
+- [Scoped Capability and Host-Owned Execution tutorial](../tutorials/scoped-capability-and-host-owned-execution.md)
+- [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/scoped-capability-and-host-owned-execution/README.md)
 
 ## Start with the Tutorials
 

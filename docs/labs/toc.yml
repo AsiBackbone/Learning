@@ -15,6 +15,8 @@
   items:
     - name: Acknowledgment and Audit Residue
       href: acknowledgment-and-audit-residue.md
+    - name: Scoped Capability and Host-Owned Execution
+      href: scoped-capability-and-host-owned-execution.md
 
 
 - name: ASI Backbone Resources
