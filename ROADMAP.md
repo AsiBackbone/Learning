@@ -494,7 +494,7 @@ They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicati
 * [x] Ensure repository-level `dotnet build` works for samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
 * [x] Ensure repository-level `dotnet test` works for samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
 * [x] Add sample build validation to CI. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
-* [ ] Add tests for architectural invariants. ([#2](https://github.com/AsiBackbone/Learning/issues/2))
+* [x] Add tests for architectural invariants. ([#2](https://github.com/AsiBackbone/Learning/issues/2))
 * [ ] Add per-sample README files where setup or explanation is needed. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
 * [ ] Cross-link each sample to its tutorial. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
 * [ ] Cross-link each tutorial to its sample. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
@@ -949,7 +949,7 @@ As the repository grows, learning material should increasingly provide:
 * [ ] Prerequisites.
 * [ ] Estimated scope rather than artificial completion times.
 * [ ] Runnable companion samples.
-* [ ] Executable tests. ([#2](https://github.com/AsiBackbone/Learning/issues/2))
+* [x] Executable tests. ([#2](https://github.com/AsiBackbone/Learning/issues/2))
 * [ ] Consistent "When not to use this" guidance.
 * [ ] Stronger links to implementation repositories.
 * [ ] Links to relevant ADRs.
@@ -978,7 +978,7 @@ Automation should support quality without making contribution unnecessarily diff
 * [ ] Automated link checking.
 * [x] Sample restore validation. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
 * [x] Sample build validation. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
-* [ ] Sample test execution. ([#1](https://github.com/AsiBackbone/Learning/issues/1), [#2](https://github.com/AsiBackbone/Learning/issues/2))
+* [x] Sample test execution. ([#1](https://github.com/AsiBackbone/Learning/issues/1), [#2](https://github.com/AsiBackbone/Learning/issues/2))
 * [ ] Dependency updates.
 * [ ] Secret scanning review.
 * [ ] Code scanning where executable code justifies it.

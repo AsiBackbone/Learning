@@ -42,6 +42,16 @@ From the repository root:
 dotnet run --project samples/decision-before-execution/DecisionBeforeExecution/DecisionBeforeExecution.csproj
 ```
 
+## Run the Tests
+
+From the repository root:
+
+```bash
+dotnet test samples/decision-before-execution/DecisionBeforeExecution.Tests/DecisionBeforeExecution.Tests.csproj
+```
+
+The focused xUnit tests assert that denied, deferred, and acknowledgment-required decisions never invoke the executor. A positive-control test confirms that an allowed decision crosses the execution boundary exactly once.
+
 The sample evaluates five deterministic scenarios:
 
 - Allowed
@@ -52,7 +62,7 @@ The sample evaluates five deterministic scenarios:
 
 Only the allowed scenario crosses the execution boundary. The executor performs no real account operation; it records and prints a simulated host action.
 
-At the end of the run, the sample verifies that exactly one scenario reached execution. If a blocked decision accidentally reaches the executor, the program fails instead of silently accepting the boundary violation.
+At the end of the run, the sample still verifies that exactly one scenario reached execution as a runtime demonstration. The companion test project makes the same architectural contract available as structured, repeatable tests for local development and CI.
 
 ## What to Observe
 

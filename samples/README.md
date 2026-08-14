@@ -8,9 +8,9 @@ It is intended to contain intentionally small .NET examples that complement the 
 
 ## Current Status
 
-**Sample foundation established — three executable companion samples available.**
+**Sample foundation established — three executable companion samples and focused invariant tests available.**
 
-The `samples/` area defines the structure, expectations, and design principles for executable examples and now includes runnable companion projects for the first three foundational tutorials.
+The `samples/` area defines the structure, expectations, and design principles for executable examples and now includes runnable companion projects plus sibling xUnit test projects for the first three foundational tutorials.
 
 Individual sample projects will continue to be added incrementally as the foundational tutorials are paired with runnable implementations.
 
@@ -340,6 +340,8 @@ No Execution
 
 These tests help make the architectural contract executable.
 
+Current test projects are named consistently with their sample using the `<SampleName>.Tests` convention and are included in the shared `Samples.slnx` solution so repository-level `dotnet test` and sample CI execute them automatically.
+
 ### Prefer Deterministic Local Behavior
 
 Samples should be easy to run without external infrastructure where practical.
@@ -479,6 +481,8 @@ dotnet test Samples.slnx --no-build
 ```
 
 Common compiler settings are centralized in [`Directory.Build.props`](Directory.Build.props), so sample projects share the same target framework, nullable configuration, implicit-usings setting, and warnings-as-errors behavior.
+
+Focused xUnit test projects live beside their corresponding executable sample projects and reference those executable projects directly. This keeps the samples small while making their architectural contracts testable without introducing separate class-library layers solely for testing.
 
 ## Per-Sample Documentation
 

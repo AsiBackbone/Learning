@@ -56,6 +56,16 @@ From the repository root:
 dotnet run --project samples/acknowledgment-and-audit-residue/AcknowledgmentAndAuditResidue/AcknowledgmentAndAuditResidue.csproj
 ```
 
+## Run the Tests
+
+From the repository root:
+
+```bash
+dotnet test samples/acknowledgment-and-audit-residue/AcknowledgmentAndAuditResidue.Tests/AcknowledgmentAndAuditResidue.Tests.csproj
+```
+
+The focused xUnit tests make the boundary explicit: acknowledgment can satisfy one governance requirement, but it does not itself grant authorization or execution authority. Re-evaluation still controls the next step, and changed resource state can still block execution.
+
 The sample uses deterministic local data and does not call external services.
 
 ## Scenarios
@@ -163,7 +173,9 @@ It checks that:
 6. Every residue in one workflow preserves the same correlation identifier.
 7. The audit stage sequence matches the expected lifecycle.
 
-This follows the current Learning sample convention of making architectural checks executable inside the sample until a repository-level sample test structure is established.
+The runtime checks remain useful because they make failures visible while learners execute the demonstration directly.
+
+The companion xUnit project now provides structured test results for the same class of architectural invariants and is included in the shared sample solution for CI execution.
 
 ## Audit Residue Is Not the Same as Logging
 
