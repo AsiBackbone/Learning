@@ -1,6 +1,7 @@
 # ASI Backbone Learning
 
 [![Documentation Validation](https://github.com/AsiBackbone/Learning/actions/workflows/docs-validation.yml/badge.svg?branch=main)](https://github.com/AsiBackbone/Learning/actions/workflows/docs-validation.yml)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://asibackbone.github.io/Learning/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21923997.svg)](https://doi.org/10.5281/zenodo.21923997)
 
 A community-maintained living tutorial for practical .NET architecture, governed execution, policy-driven systems, secure application design, AI integration, and related architectural patterns.
