@@ -5,6 +5,18 @@
 **Difficulty:** Intermediate  
 **Prerequisites:** The first four foundational tutorials. Familiarity with AI tool or function calling is helpful but not required.
 
+## Pattern Card
+
+> **Problem:** A model-generated tool proposal can be treated too directly as permission to perform a real-world side effect, while model-supplied context may be incomplete, stale, or untrusted.
+>
+> **Pattern:** Keep proposal and execution separate: the host owns the tool registry, argument validation, authoritative context, policy decision, acknowledgment, scoped capability, execution-boundary validation, tool invocation, and evidence.
+>
+> **Use when:** AI can propose consequential tool calls or external state changes and the application needs explicit host-side authority, validation, or evidence boundaries.
+>
+> **Prefer something simpler when:** The model is advisory or read-only, proposed actions are non-consequential, or ordinary host authorization and input validation fully cover the bounded operation.
+>
+> **Observe:** Unknown or invalid proposals never reach the handler, model-provided claims cannot override authoritative host context, and stale or replayed execution authority is rejected.
+
 This is the fifth foundational tutorial in ASI Backbone Learning.
 
 It builds on:

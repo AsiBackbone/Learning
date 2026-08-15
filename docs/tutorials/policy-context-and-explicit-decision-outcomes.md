@@ -5,6 +5,18 @@
 **Difficulty:** Beginner  
 **Prerequisites:** [Decision Before Execution](decision-before-execution.md)
 
+## Pattern Card
+
+> **Problem:** Decision facts can become scattered across application layers while a boolean result hides meaningful states such as defer, acknowledgment, or escalation.
+>
+> **Pattern:** Build an explicit policy-context snapshot and return a structured decision outcome without performing the governed side effect.
+>
+> **Use when:** A decision depends on multiple actor, resource, operation, environment, policy, or correlation facts, or when the host needs outcomes richer than allow/deny.
+>
+> **Prefer something simpler when:** A local authorization policy or boolean result fully expresses the required behavior and the decision inputs do not need to be captured or reasoned about independently.
+>
+> **Observe:** Policy evaluation consumes an explicit context snapshot and returns a structured outcome without performing the governed side effect.
+
 This is the second foundational tutorial in ASI Backbone Learning.
 
 It builds on [Decision Before Execution](decision-before-execution.md), which established the first boundary:

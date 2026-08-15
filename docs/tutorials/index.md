@@ -24,6 +24,10 @@ Working repository example
 
 The goal is not to require adoption of a specific framework.
 
+Each foundational tutorial also opens with a compact **Pattern Card** summarizing the problem, the architectural pattern, when it is useful, when a simpler approach may be preferable, and the observable invariant carried into the companion sample or tests.
+
+The card is an orientation aid, not a substitute for the tutorial's reasoning, tradeoffs, alternatives, or implementation discussion.
+
 A tutorial should remain useful even if you never install the `AsiBackbone` package or use `NetCoreApplicationTemplate`.
 
 ## Foundational Tutorials
