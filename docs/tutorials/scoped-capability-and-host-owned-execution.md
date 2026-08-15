@@ -5,6 +5,18 @@
 **Difficulty:** Intermediate  
 **Prerequisites:** [Decision Before Execution](decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md), and [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md)
 
+## Pattern Card
+
+> **Problem:** An allowed decision can accidentally expand into broad, reusable, or stale execution authority that no longer matches the operation originally approved.
+>
+> **Pattern:** Mint narrowly scoped, short-lived authority only from an allowed decision, then validate its bindings against current host context immediately before host-owned execution.
+>
+> **Use when:** Execution authority crosses a layer, process, gateway, time window, or trust boundary and must remain bound to a specific actor, operation, resource, audience, policy state, or acknowledgment.
+>
+> **Prefer something simpler when:** The same trusted host immediately performs the approved operation under current authorization and no delegated, reusable, or time-separated execution authority exists.
+>
+> **Observe:** A blocked decision cannot mint execution authority, and expired or stale authority never reaches the executor.
+
 This is the fourth foundational tutorial in ASI Backbone Learning.
 
 It builds on:
