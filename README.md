@@ -5,9 +5,9 @@
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://asibackbone.github.io/Learning/)
 [![DOI](https://zenodo.org/badge/1332248453.svg)](https://doi.org/10.5281/zenodo.21938556)
 
-A community-maintained living tutorial for practical .NET architecture, governed execution, policy-driven systems, secure application design, AI integration, and related architectural patterns.
+**Practical .NET architecture education for governed execution, secure applications, AI integration, and policy-driven systems.**
 
-`AsiBackbone/Learning` is the educational layer of the ASI Backbone organization.
+`AsiBackbone/Learning` is an open, community-oriented learning resource and the educational layer of the ASI Backbone organization.
 
 The goal is not to create another framework or package. The goal is to explain architectural ideas clearly, demonstrate them through focused examples, examine their tradeoffs, and connect those lessons to working implementations in the organization's existing repositories.
 
@@ -30,6 +30,14 @@ They also need to ask:
 * How can secure defaults and application structure reduce operational risk?
 
 This repository explores those questions through tutorials, diagrams, minimal examples, architectural discussions, and hands-on labs.
+
+## Start Here
+
+New to governed-execution architecture? Start with [Decision Before Execution](docs/tutorials/decision-before-execution.md) for the foundational separation between proposed intent, explicit decision-making, and host-owned execution.
+
+Already using ASP.NET Core authorization and wondering whether you need anything broader? Start with [When ASP.NET Core Authorization Is Enough](docs/architecture/when-aspnet-core-authorization-is-enough.md). It demonstrates the framework-native alternative and explains where a broader governance pipeline may add value.
+
+You do not need to install an `AsiBackbone` package to use this material. The tutorials, samples, comparisons, and labs are intended to remain useful as independent architecture education.
 
 ## Relationship to the ASI Backbone Organization
 
@@ -363,9 +371,9 @@ Production systems remain responsible for their own authentication, authorizatio
 
 ## Project Status
 
-**Active development — foundational learning path established**
+**Active development — foundational tutorial, sample, test, and lab path established**
 
-ASI Backbone Learning has moved beyond its initial repository scaffolding and now provides a foundational tutorial sequence covering the core governed-execution model:
+ASI Backbone Learning has moved beyond its initial repository scaffolding and now provides a five-tutorial foundational sequence covering the core governed-execution model:
 
 1. [Decision Before Execution](docs/tutorials/decision-before-execution.md)
 2. [Policy Context and Explicit Decision Outcomes](docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
@@ -375,16 +383,16 @@ ASI Backbone Learning has moved beyond its initial repository scaffolding and no
 
 Together, these tutorials establish the initial learning path from proposed intent through policy evaluation, acknowledgment, scoped authority, host-owned execution, and durable audit residue.
 
-The repository also includes its DocFX documentation foundation, contribution and governance guidance, and a dedicated `samples/` area for executable companion code.
+The learning path is now supported end to end:
 
-**Active development — foundational tutorial, sample, test, and lab path established**
+* All five foundational tutorials have runnable companion samples.
+* The samples include focused architectural-invariant tests.
+* All five foundational topics have learner exercises or labs.
+* DocFX publishes the documentation and executable-samples path.
+* The first alternative-pattern comparison, [When ASP.NET Core Authorization Is Enough](docs/architecture/when-aspnet-core-authorization-is-enough.md), is published.
+* Contribution, governance, citation, and licensing guidance are established.
 
-* all five foundational tutorials have runnable companion samples;
-* the samples have focused architectural-invariant tests;
-* all five foundational topics now have learner exercises/labs;
-* DocFX has a published executable-samples path;
-* the first alternative-pattern comparison has been published;
-* current development has shifted toward implementation references, deeper labs, ASP.NET Core architecture, security/trust architecture, and governance material.
+Current development has shifted toward working implementation references, deeper labs, ASP.NET Core architecture, security/trust architecture, governance material, and additional architecture comparisons.
 
 This remains a living educational project. Material may evolve as the implementation repositories mature, better teaching approaches emerge, and community feedback identifies new questions or gaps.
 

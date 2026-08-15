@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`AsiBackbone/Learning` is a community-maintained living tutorial for practical .NET architecture, governed execution, policy-driven systems, secure application design, AI integration, and related architectural patterns.
+`AsiBackbone/Learning` is an open, community-oriented learning resource for practical .NET architecture, governed execution, policy-driven systems, secure application design, AI integration, and related architectural patterns.
 
 This roadmap describes the intended direction of the Learning repository.
 
