@@ -11,6 +11,14 @@
 
 The goal is not to create another framework or package. The goal is to explain architectural ideas clearly, demonstrate them through focused examples, examine their tradeoffs, and connect those lessons to working implementations in the organization's existing repositories.
 
+## Start Here
+
+New to governed-execution architecture? Start with [Decision Before Execution](docs/tutorials/decision-before-execution.md) for the foundational separation between proposed intent, explicit decision-making, and host-owned execution.
+
+Already using ASP.NET Core authorization and wondering whether you need anything broader? Start with [When ASP.NET Core Authorization Is Enough](docs/architecture/when-aspnet-core-authorization-is-enough.md). It demonstrates the framework-native alternative and explains where a broader governance pipeline may add value.
+
+You do not need to install an `AsiBackbone` package to use this material. The tutorials, samples, comparisons, and labs are intended to remain useful as independent architecture education.
+
 ## Purpose
 
 Modern software systems increasingly need to answer questions that go beyond:
@@ -30,14 +38,6 @@ They also need to ask:
 * How can secure defaults and application structure reduce operational risk?
 
 This repository explores those questions through tutorials, diagrams, minimal examples, architectural discussions, and hands-on labs.
-
-## Start Here
-
-New to governed-execution architecture? Start with [Decision Before Execution](docs/tutorials/decision-before-execution.md) for the foundational separation between proposed intent, explicit decision-making, and host-owned execution.
-
-Already using ASP.NET Core authorization and wondering whether you need anything broader? Start with [When ASP.NET Core Authorization Is Enough](docs/architecture/when-aspnet-core-authorization-is-enough.md). It demonstrates the framework-native alternative and explains where a broader governance pipeline may add value.
-
-You do not need to install an `AsiBackbone` package to use this material. The tutorials, samples, comparisons, and labs are intended to remain useful as independent architecture education.
 
 ## Relationship to the ASI Backbone Organization
 
