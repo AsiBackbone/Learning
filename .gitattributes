@@ -1,0 +1,61 @@
+# ASI Backbone Learning - Git attributes
+#
+# Line-ending normalization is defined here rather than left to each
+# contributor's local Git configuration. Text files are stored with LF in the
+# repository and checked out with the platform's native line endings.
+
+* text=auto
+
+# ---------------------------------------------------------------------------
+# Documentation and educational material
+# ---------------------------------------------------------------------------
+
+*.md        text diff=markdown
+*.txt       text
+*.cff       text
+*.toml      text
+*.css       text
+
+# ---------------------------------------------------------------------------
+# Source and project files
+# ---------------------------------------------------------------------------
+
+*.cs        text diff=csharp
+*.csproj    text
+*.props     text
+*.targets   text
+*.slnx      text
+*.json      text
+*.yml       text
+*.yaml      text
+
+# Visual Studio writes classic solution files with CRLF.
+*.sln       text eol=crlf
+
+# ---------------------------------------------------------------------------
+# Scripts - line endings are functional, not cosmetic
+# ---------------------------------------------------------------------------
+
+# Shell scripts must be LF or they fail with "bad interpreter" on Linux/macOS,
+# including inside GitHub Actions runners.
+*.sh        text eol=lf
+
+*.cmd       text eol=crlf
+*.bat       text eol=crlf
+*.ps1       text eol=crlf
+
+# ---------------------------------------------------------------------------
+# Binary files - never normalize or diff as text
+# ---------------------------------------------------------------------------
+
+*.png       binary
+*.ico       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.svg       text
+*.pdf       binary
+*.zip       binary
+*.snk       binary
+*.dll       binary
+*.exe       binary
