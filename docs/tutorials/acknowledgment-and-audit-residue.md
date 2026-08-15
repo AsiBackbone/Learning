@@ -5,6 +5,18 @@
 **Difficulty:** Intermediate  
 **Prerequisites:** [Decision Before Execution](decision-before-execution.md) and [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md)
 
+## Pattern Card
+
+> **Problem:** Some consequential operations must pause for explicit acceptance, but a generic confirmation can accidentally become an execution bypass and leave weak evidence of what happened.
+>
+> **Pattern:** Issue a narrowly bound acknowledgment challenge, validate the response, reconstruct current context, re-evaluate policy, and preserve distinct decision, acknowledgment, re-evaluation, and execution evidence.
+>
+> **Use when:** An operation must pause for explicit human or system acknowledgment and the governed path may need to be reconstructed later.
+>
+> **Prefer something simpler when:** No acknowledgment boundary is required and ordinary authorization, a conventional confirmation interaction, and normal operational logging adequately express the application's requirements.
+>
+> **Observe:** A valid acknowledgment does not override policy; changed context can still block execution after acknowledgment.
+
 This is the third foundational tutorial in ASI Backbone Learning.
 
 It builds on:

@@ -5,6 +5,18 @@
 **Difficulty:** Beginner  
 **Prerequisites:** None. Familiarity with basic application request/response flows is helpful but not required.
 
+## Pattern Card
+
+> **Problem:** Consequential side effects can occur too directly after request handling or authorization, leaving policy reasoning and execution coupled.
+>
+> **Pattern:** Represent the proposed operation as intent, evaluate it, return an explicit decision, and let the host perform the side effect only when that decision permits execution.
+>
+> **Use when:** An operation needs more than yes/no authorization, such as policy context, deferral, escalation, acknowledgment, evidence, or an explicit execution boundary.
+>
+> **Prefer something simpler when:** An ordinary authorization check and direct service call fully express the application's real requirements and no richer decision lifecycle is needed.
+>
+> **Observe:** A blocked decision never reaches the executor.
+
 This is the first foundational tutorial in ASI Backbone Learning.
 
 The pattern is deliberately broader than the `AsiBackbone` package. You can use the same separation in a small application, an API gateway, an administrative workflow, a background process, or an AI-assisted tool system.
