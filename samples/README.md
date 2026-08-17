@@ -281,6 +281,48 @@ Host Rebuilds Authoritative Classification
 AcknowledgmentRequired
 ```
 
+## ASP.NET Core Architecture Samples
+
+The sample area also supports focused ASP.NET Core architecture lessons beyond the five foundational governance tutorials.
+
+### Middleware Ordering Changes Behavior
+
+Related tutorial:
+
+[Middleware Ordering Changes Behavior](../docs/aspnetcore/middleware-ordering-changes-behavior.md)
+
+Executable companion:
+
+[Middleware Ordering Changes Behavior sample](middleware-ordering-changes-behavior/README.md)
+
+The sample contains corrected and deliberately incorrect middleware sequences and focused tests for:
+
+```text
+Request order
+   ↓
+Endpoint
+   ↓
+Reverse response order
+```
+
+and:
+
+```text
+Exception boundary before fault
+   ↓
+Failure handled
+```
+
+versus:
+
+```text
+Fault before exception boundary
+   ↓
+Custom handler never entered
+```
+
+The sample remains deliberately smaller than `NetCoreApplicationTemplate`; the working repository is used to inspect routing, proxy correction, request logging, security headers, rate limiting, authentication, authorization, and other production concerns in a fuller pipeline.
+
 ## Sample Design Principles
 
 Samples should optimize for **learning value**, not production completeness.

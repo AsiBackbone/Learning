@@ -132,6 +132,32 @@ dotnet run --project samples/governed-ai-tool-gateway/GovernedAiToolGateway/Gove
 - [Read the tutorial](../tutorials/governed-ai-tool-gateway.md)
 - [Continue with the advanced lab](../labs/governed-ai-tool-gateway.md)
 
+## ASP.NET Core Architecture Samples
+
+### Middleware Ordering Changes Behavior
+
+**Learning objective:** Observe request/response traversal order and prove that an exception boundary can only handle failures produced by middleware or endpoints that execute downstream from it.
+
+**Difficulty:** Intermediate
+
+**Key invariants:**
+
+> **Requests enter middleware in registration order; responses unwind in reverse order.**
+
+> **An exception boundary cannot catch a failure that occurs before the boundary is entered.**
+
+Run the corrected pipeline from the repository root:
+
+```bash
+dotnet run --project samples/middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior/MiddlewareOrderingChangesBehavior.csproj -- --PipelineMode=correct --urls http://127.0.0.1:5080
+```
+
+Restart with `--PipelineMode=incorrect` to move the fault-producing middleware outside the sample exception boundary and compare the observable behavior.
+
+- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/middleware-ordering-changes-behavior/README.md)
+- [Read Middleware Ordering Changes Behavior](../aspnetcore/middleware-ordering-changes-behavior.md)
+- [Inspect the fuller NetCoreApplicationTemplate pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/PipelineExtensions.cs)
+
 ## Run the Complete Sample Suite
 
 The shared sample solution is [`samples/Samples.slnx`](https://github.com/AsiBackbone/Learning/blob/main/samples/Samples.slnx).

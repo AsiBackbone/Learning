@@ -1,2 +1,5 @@
-- name: ASP.NET Core 
+- name: ASP.NET Core
   href: index.md
+
+- name: Middleware Ordering Changes Behavior
+  href: middleware-ordering-changes-behavior.md
