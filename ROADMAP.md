@@ -374,7 +374,7 @@ The repository Markdown remains canonical.
 
 ## Status
 
-**Foundational five-tutorial sequence established — targeted reference refinement remains**
+**Complete — foundational five-tutorial sequence established**
 
 Quality and refinement now matter more than adding another foundational tutorial merely to increase tutorial count.
 
@@ -432,7 +432,7 @@ Escalate
 * [x] Discuss replay and validation boundaries.
 * [x] Pair with executable companion sample. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [x] Add capability-focused lab. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
-* [ ] Strengthen links to working implementation references. ([#18](https://github.com/AsiBackbone/Learning/issues/18))
+* [x] Strengthen links to working implementation references. ([#18](https://github.com/AsiBackbone/Learning/issues/18))
 
 ## Tutorial 5 — Governed AI Tool Gateway
 
@@ -456,7 +456,7 @@ Escalate
 
 ## Status
 
-**Foundational sample set complete — implementation linking and ongoing refinement remain**
+**Foundational sample set complete — ongoing refinement remains**
 
 The `samples/` area now contains executable companions for all five foundational tutorials, including focused invariant tests and the Governed AI Tool Gateway capstone.
 
@@ -503,7 +503,7 @@ They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicati
 * [x] Add per-sample README files where setup or explanation is needed. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
 * [x] Cross-link each sample to its tutorial. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
 * [x] Cross-link each tutorial to its sample. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
-* [ ] Link samples to fuller working repository implementations where useful. ([#18](https://github.com/AsiBackbone/Learning/issues/18))
+* [x] Link samples to fuller working repository implementations where useful. ([#18](https://github.com/AsiBackbone/Learning/issues/18))
 
 ## Sample Design Standard
 
@@ -1032,24 +1032,22 @@ It should not force the project into unnecessary release ceremony.
 
 The highest-priority work now is:
 
-1. Strengthen Tutorial 4 and its companion sample with carefully selected working
-   implementation references. ([#18](https://github.com/AsiBackbone/Learning/issues/18))
-2. Add the next beginner lab around identifying and removing a hidden execution
+1. Add the next beginner lab around identifying and removing a hidden execution
    side effect. ([#19](https://github.com/AsiBackbone/Learning/issues/19))
-3. Begin the broader ASP.NET Core learning path with middleware ordering and
+2. Begin the broader ASP.NET Core learning path with middleware ordering and
    observable failure behavior. ([#20](https://github.com/AsiBackbone/Learning/issues/20))
-4. Begin the Security and Trust Architecture path with trust boundaries and least
+3. Begin the Security and Trust Architecture path with trust boundaries and least
    privilege as architectural concepts. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
-5. Continue strengthening tutorial → sample → lab → working implementation links
+4. Continue strengthening tutorial → sample → lab → working implementation links
    where the reference materially improves understanding.
-6. Expand architecture comparisons beyond the first ASP.NET Core authorization
+5. Expand architecture comparisons beyond the first ASP.NET Core authorization
    comparison, preserving honest cases where simpler or adjacent patterns win.
-7. Add deeper intermediate and advanced labs around governed API operations,
+6. Add deeper intermediate and advanced labs around governed API operations,
    policy-version evidence, replay resistance, regional/tenant policy, and safe
    degraded-mode behavior.
-8. Begin Governance and Policy Architecture material after the first ASP.NET Core
+7. Begin Governance and Policy Architecture material after the first ASP.NET Core
    and security bridge lessons are usable.
-9. Use community feedback and implementation changes to decide which advanced or
+8. Use community feedback and implementation changes to decide which advanced or
    experimental subjects deserve promotion into the main learning path.
 
 The short-term emphasis should remain:
