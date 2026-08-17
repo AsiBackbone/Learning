@@ -6,10 +6,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - '**/*.md'
-      - 'lychee.toml'
-      - '.github/workflows/link-validation.yml'
 
   push:
     branches:
