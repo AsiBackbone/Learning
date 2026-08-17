@@ -615,25 +615,29 @@ Where multiple valid solutions exist, the discussion should explain the tradeoff
 
 # Milestone 6 — ASP.NET Core Architecture Learning ([#5](https://github.com/AsiBackbone/Learning/issues/5))
 
+## Status
+
+**In progress — middleware-ordering foundation established**
+
 ## Goal
 
 Use `NetCoreApplicationTemplate` as a working reference specimen for broader application-architecture lessons.
 
 These materials should remain useful independently of that repository.
 
-## Middleware Ordering
+## Middleware Ordering ([#20](https://github.com/AsiBackbone/Learning/issues/20))
 
-Planned topics include:
-
-* [ ] Why middleware order changes behavior.
-* [ ] Exception handling boundaries.
-* [ ] Authentication placement.
-* [ ] Authorization placement.
-* [ ] Security-header placement.
-* [ ] Request logging.
-* [ ] Rate limiting.
-* [ ] Reverse-proxy considerations.
-* [ ] Failure modes caused by incorrect ordering.
+* [x] Why middleware order changes behavior.
+* [x] Exception handling boundaries.
+* [x] Authentication placement.
+* [x] Authorization placement.
+* [x] Security-header placement.
+* [x] Request logging.
+* [x] Rate limiting.
+* [x] Reverse-proxy considerations.
+* [x] Failure modes caused by incorrect ordering.
+* [x] Pair with a runnable corrected/incorrect middleware-ordering sample.
+* [x] Add focused tests for request/response traversal and exception-boundary placement.
 
 ## Secure Defaults
 
@@ -1034,17 +1038,17 @@ The highest-priority work now is:
 
 1. Add the next beginner lab around identifying and removing a hidden execution
    side effect. ([#19](https://github.com/AsiBackbone/Learning/issues/19))
-2. Begin the broader ASP.NET Core learning path with middleware ordering and
-   observable failure behavior. ([#20](https://github.com/AsiBackbone/Learning/issues/20))
-3. Begin the Security and Trust Architecture path with trust boundaries and least
+2. Begin the Security and Trust Architecture path with trust boundaries and least
    privilege as architectural concepts. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
-4. Continue strengthening tutorial → sample → lab → working implementation links
+3. Continue strengthening tutorial → sample → lab → working implementation links
    where the reference materially improves understanding.
-5. Expand architecture comparisons beyond the first ASP.NET Core authorization
+4. Expand architecture comparisons beyond the first ASP.NET Core authorization
    comparison, preserving honest cases where simpler or adjacent patterns win.
-6. Add deeper intermediate and advanced labs around governed API operations,
+5. Add deeper intermediate and advanced labs around governed API operations,
    policy-version evidence, replay resistance, regional/tenant policy, and safe
    degraded-mode behavior.
+6. Continue the ASP.NET Core learning path with secure defaults, structured
+   logging, centralized error handling, and data-access boundaries.
 7. Begin Governance and Policy Architecture material after the first ASP.NET Core
    and security bridge lessons are usable.
 8. Use community feedback and implementation changes to decide which advanced or

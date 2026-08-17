@@ -6,13 +6,19 @@ The focus is not on teaching every ASP.NET Core feature.
 
 Instead, this section examines how application structure can make security, governance, execution boundaries, and operational behavior easier to understand and maintain.
 
-> **Section status:** This page is currently an overview. Focused ASP.NET Core tutorials and examples are planned; start with the [Foundational Tutorials](../tutorials/index.md) for the current learning path.
+> **Section status:** Focused ASP.NET Core learning has begun. Start with [Middleware Ordering Changes Behavior](middleware-ordering-changes-behavior.md), then use the [Foundational Tutorials](../tutorials/index.md) when you want to connect request-pipeline structure to governed execution.
+
+## Start Here
+
+[Middleware Ordering Changes Behavior](middleware-ordering-changes-behavior.md) is the first focused ASP.NET Core tutorial. It explains the two-direction request/response pipeline, short-circuiting, exception-handler coverage, authentication/authorization order, endpoint-routing boundaries, request logging, security headers, proxy correction, and rate-limiting placement.
+
+Its [companion sample](https://github.com/AsiBackbone/Learning/blob/main/samples/middleware-ordering-changes-behavior/README.md) includes both a corrected pipeline and a deliberately incorrect pipeline so the order-sensitive behavior is observable.
 
 ## Architectural Areas
 
-Future material in this section may examine topics such as:
+This section will continue to expand into topics such as:
 
-- Middleware ordering
+- [Middleware ordering](middleware-ordering-changes-behavior.md)
 - Dependency injection boundaries
 - Request validation
 - Centralized exception handling
@@ -102,9 +108,9 @@ Learning should explain the architectural lesson without reproducing the full ap
 
 ## Current Status
 
-The ASP.NET Core learning area is established and will expand as focused tutorials, architectural comparisons, and small implementation examples are added.
+The ASP.NET Core learning area now has its first focused tutorial and executable companion sample. Additional material will expand into secure defaults, structured logging, centralized error handling, data access, configuration, and related application-architecture concerns.
 
-Until then, use the [Foundational Tutorials](../tutorials/index.md) for the governance model and `NetCoreApplicationTemplate` for a fuller application specimen.
+Use the [Foundational Tutorials](../tutorials/index.md) for the governance model and `NetCoreApplicationTemplate` for a fuller application specimen.
 
 ---
 
