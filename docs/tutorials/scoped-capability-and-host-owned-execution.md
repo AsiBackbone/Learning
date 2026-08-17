@@ -1330,36 +1330,71 @@ The pattern is valuable when the narrowed authority is meaningful.
 
 It should not become ceremony around trivial operations.
 
-## Relationship to AsiBackbone
+## Working Implementation References
 
-This tutorial is framework-neutral, but the working `AsiBackbone` repository contains a production-oriented capability-grant model.
+This tutorial is deliberately framework-neutral. The working `AsiBackbone` repository implements fuller versions of the same capability and execution-boundary concepts with signing, explicit validation profiles, bounded-use state, richer failure outcomes, and host integration seams.
 
-Useful references include:
+Use these references as an implementation map rather than as required dependencies for understanding the pattern.
 
-- [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — provider-neutral, short-lived capability metadata including issuer, audience, scopes, time bounds, subject, operation, policy identity, acknowledgment/handshake references, gateway binding, and resource binding.
-- [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) — execution-context validation for capability grants.
-- [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) — provider-neutral seam for bounded-use and replay-state enforcement.
-- [`Capability Grant Hardening`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) — detailed guidance on execution-boundary validation, proof handling, binding checks, clock skew, failure behavior, and bounded use.
-- [`Capability Proof Trust Pinning`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-proof-trust-pinning.md) — trust considerations for proof verification.
-- [`Intent to Execution Pattern`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) — fuller governed flow from proposal to host execution.
+### Concept-to-Implementation Map
+
+| Tutorial concept | Working reference | What to inspect |
+| --- | --- | --- |
+| Narrow, short-lived execution authority | [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) | Compare the tutorial's compact `ExecutionCapability` with the provider-neutral grant metadata for issuer, audience, scopes, time bounds, subject, operation, policy identity, acknowledgment/handshake references, gateway binding, and resource binding. |
+| Execution-boundary versus metadata-only validation | [`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) | Compare `CreateExecutionBoundary(...)`, which requires proof and bounded-use validation by default, with the deliberately weaker `CreateMetadataValidation(...)` profile. |
+| Capability validation pipeline | [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) | Follow proof verification, issuer/audience checks, time bounds, scopes, policy identity, acknowledgment/handshake references, gateway/resource bindings, and optional bounded-use state before a result can allow continuation. |
+| Execution-profile behavior under tests | [`CapabilityGrantValidationProfileTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidationProfileTests.cs) and [`CapabilityGrantValidatorTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidatorTests.cs) | Inspect executable cases for strict execution-boundary defaults, metadata-only behavior, proof failure, unavailable use-state, binding mismatches, expiration, policy evidence, and validation outcomes. |
+| Bounded-use and replay-state seam | [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) and [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Storage.InMemory/CapabilityTokens/InMemoryCapabilityGrantUseStore.cs) | Compare the provider-neutral host contract with the explicitly local in-memory reference implementation. Durable, distributed, atomic replay guarantees remain host-owned. |
+| Bounded-use behavior under tests | [`InMemoryCapabilityGrantUseStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/InMemoryCapabilityGrantUseStoreTests.cs) | Follow first-use, reuse-limit, stopped/cancelled, and local-state behavior without mistaking the in-memory store for distributed replay protection. |
+| Production-oriented capability hardening | [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) | Review execution-boundary profiles, proof handling, binding checks, clock skew, failure behavior, bounded use, and the explicit boundary between capability validation and host authorization/execution. |
+| Proof trust narrowing | [Capability Proof Trust Pinning](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-proof-trust-pinning.md) | See how a host can narrow which otherwise valid signing authority is acceptable for a particular capability-validation context. |
+| Host-owned execution lifecycle | [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) | Follow the broader governed lifecycle and observe that execution remains deliberately outside the governance spine and under host control. |
+
+### Follow the Capability Path
+
+For a code-first inspection, follow these references in order:
+
+1. [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — begin with the provider-neutral description of narrow follow-on authority.
+2. [`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) — inspect how the host declares whether it is performing strict execution-boundary validation or intentionally weaker metadata validation.
+3. [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) — follow the configured proof, time, scope, policy, acknowledgment, gateway, resource, and use-state checks.
+4. [`CapabilityGrantValidationProfileTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidationProfileTests.cs) and [`CapabilityGrantValidatorTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidatorTests.cs) — compare the API surface with executable allow, deny, and defer behavior.
+5. [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) and [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Storage.InMemory/CapabilityTokens/InMemoryCapabilityGrantUseStore.cs) — continue into bounded-use state while keeping production persistence and concurrency guarantees host-owned.
+6. [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) — put those source types back into their production-oriented security and failure-handling context.
+7. [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) — finish at the broader lifecycle and the boundary where the host performs the real side effect.
+
+### Teaching Model Versus Working Framework
+
+The Learning sample is intentionally smaller and more explicit than the working framework.
+
+For example:
+
+- The teaching sample uses an in-process capability object so actor, operation, resource, audience, policy, acknowledgment, time, and intended-use bindings remain easy to see.
+- The sample's integer `ResourceVersion` is a teaching-specific freshness mechanism. The working framework exposes a host-defined `ResourceBinding`; it does not prescribe a row version, ETag, revision number, or database concurrency model.
+- The sample directly validates deterministic current-context facts immediately before its simulated executor. The framework separates grant metadata, validation policy, proof verification, bounded-use state, and host integration so applications can add their own authentication, authorization, resource-freshness, and execution checks.
+- The framework's execution-boundary profile can require signed-proof verification and bounded-use enforcement. The teaching sample intentionally omits cryptographic proof and durable replay infrastructure.
+- The in-memory framework use store is a reference implementation for tests and local validation, not a claim of durable or distributed single-use enforcement.
 
 The working framework explicitly describes `CapabilityTokenGrant` as a **metadata model, not a bearer-token format**.
 
-That is an important distinction.
-
-The host still decides:
+That distinction preserves the same architectural boundary taught here:
 
 ```text
-How the grant is serialized
-How it is transported
-How it is protected
-How authentication is performed
-How authorization is performed
-How replay is prevented
-How external execution occurs
+Governance decision
+   ↓
+Narrow follow-on authority
+   ↓
+Current host context
+   ↓
+Execution-boundary validation
+   ↓
+Host decides whether to execute
+   ↓
+Host-owned side effect
 ```
 
-The framework models the governance boundary; the host owns the operational security properties.
+The host still decides how the grant is serialized, transported, protected, bound to authentication and authorization, checked against current resource state, protected against replay, and translated into a real external action.
+
+The implementation links are therefore examples of how the pattern becomes richer in working software, not instructions to copy the teaching classes one-for-one.
 
 ## Apply the Pattern to AI
 

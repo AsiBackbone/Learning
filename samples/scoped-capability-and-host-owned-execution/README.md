@@ -199,6 +199,31 @@ This is a teaching artifact, not a production authorization service. It intentio
 
 A plain in-memory capability object is not presented as a secure bearer token.
 
+## Compare with the Working Framework
+
+This sample exposes the capability boundary with intentionally small, deterministic types. The working `AsiBackbone` repository separates those responsibilities into reusable grant metadata, validation profiles, proof verification, bounded-use state, tests, and host-owned integration seams.
+
+| Teaching sample | Working reference | Important difference |
+| --- | --- | --- |
+| `ExecutionCapability` | [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) | The framework grant is provider-neutral metadata and adds fields such as not-before time, policy hash, handshake reference, gateway binding, resource binding, metadata, and schema version. It is explicitly not a bearer-token format. |
+| `ExecutionCapabilityValidator` | [`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) and [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) | The framework distinguishes strict execution-boundary validation from intentionally weaker metadata validation and can add proof verification plus bounded-use checks. |
+| Deterministic validation scenarios | [`CapabilityGrantValidationProfileTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidationProfileTests.cs) and [`CapabilityGrantValidatorTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidatorTests.cs) | The framework tests cover the richer validation surface, including proof, use-state availability, time, scope, policy, acknowledgment, gateway, and resource behavior. |
+| Replay deliberately omitted from the baseline | [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs), [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Storage.InMemory/CapabilityTokens/InMemoryCapabilityGrantUseStore.cs), and [`InMemoryCapabilityGrantUseStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/InMemoryCapabilityGrantUseStoreTests.cs) | The framework provides a bounded-use seam and a local reference store, while durable distributed replay protection remains a host responsibility. |
+| `DisableAccountGateway` owns the simulated side effect | [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) and [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) | The framework validates governance authority but deliberately does not become the external account, robotics, deployment, or tool executor. The host still owns the real action. |
+
+The sample's `ResourceVersion` deserves special attention. It exists so a learner can observe state drift directly:
+
+```text
+Approved version = 7
+Current version = 8
+   ↓
+Execution authority is stale
+```
+
+The working framework's `ResourceBinding` is host-defined rather than a prescribed version field. A production host might bind an ETag, row version, revision, fingerprint, or other resource identity/state evidence, or it may perform a fresh authoritative resource check at the execution boundary.
+
+Do not port the sample classes one-for-one into production. Use them to recognize the architectural boundaries, then inspect the working implementation to see where signing, validation profiles, use-state persistence, host authentication/authorization, and operational execution become separate concerns.
+
 ## Try It
 
 Useful experiments include:
