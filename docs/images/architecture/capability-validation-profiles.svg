@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Capability metadata inspection versus execution-boundary validation</title>
+  <desc id="desc">Two columns compare metadata inspection with execution-boundary validation. Metadata inspection checks structural and temporal information for routing or diagnostics and explicitly does not grant execution authority. Execution-boundary validation verifies proof and authority bindings, after which host authentication, authorization, resource validation, and safety controls still apply before execution may be considered.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#52606d"/>
+    </marker>
+    <style>
+      .title { font: 700 36px Arial, Helvetica, sans-serif; fill: #102a43; }
+      .header { font: 700 27px Arial, Helvetica, sans-serif; fill: #ffffff; text-anchor: middle; }
+      .boxtext { font: 700 22px Arial, Helvetica, sans-serif; fill: #102a43; text-anchor: middle; }
+      .small { font: 400 18px Arial, Helvetica, sans-serif; fill: #334e68; text-anchor: middle; }
+      .list { font: 400 18px Arial, Helvetica, sans-serif; fill: #243b53; }
+      .stop { font: 700 24px Arial, Helvetica, sans-serif; fill: #9b1c1c; text-anchor: middle; }
+      .note { font: 700 18px Arial, Helvetica, sans-serif; fill: #7b341e; text-anchor: middle; }
+      .arrow { stroke: #52606d; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1200" height="1200" fill="#ffffff"/>
+  <text x="600" y="58" class="title" text-anchor="middle">Capability Validation Profiles</text>
+
+  <rect x="55" y="95" width="500" height="1035" rx="24" fill="#f7fafc" stroke="#9fb3c8" stroke-width="2"/>
+  <rect x="55" y="95" width="500" height="75" rx="24" fill="#627d98"/>
+  <rect x="55" y="145" width="500" height="25" fill="#627d98"/>
+  <text x="305" y="143" class="header">Metadata Inspection</text>
+
+  <rect x="105" y="205" width="400" height="82" rx="14" fill="#edf2f7" stroke="#627d98" stroke-width="3"/>
+  <text x="305" y="255" class="boxtext">Capability Artifact</text>
+  <path d="M305 287 V325" class="arrow"/>
+
+  <rect x="105" y="330" width="400" height="92" rx="14" fill="#eaf4fb" stroke="#3978a8" stroke-width="3"/>
+  <text x="305" y="370" class="boxtext">Metadata-Oriented Profile</text>
+  <text x="305" y="400" class="small">intentionally reduced validation contract</text>
+  <path d="M305 422 V460" class="arrow"/>
+
+  <rect x="105" y="465" width="400" height="200" rx="14" fill="#ffffff" stroke="#9fb3c8" stroke-width="2"/>
+  <text x="305" y="505" class="boxtext">Inspect Configured Metadata</text>
+  <text x="140" y="548" class="list">• structure and expected fields</text>
+  <text x="140" y="580" class="list">• scope / audience / policy bindings</text>
+  <text x="140" y="612" class="list">• not-before / expiration information</text>
+  <text x="140" y="644" class="list">• routing or diagnostic metadata</text>
+  <path d="M305 665 V704" class="arrow"/>
+
+  <rect x="105" y="709" width="400" height="82" rx="14" fill="#e9f7ef" stroke="#2f7d4e" stroke-width="3"/>
+  <text x="305" y="759" class="boxtext">Metadata Checks Pass</text>
+  <path d="M305 791 V830" class="arrow"/>
+
+  <rect x="105" y="835" width="400" height="92" rx="14" fill="#f7fafc" stroke="#627d98" stroke-width="2"/>
+  <text x="305" y="875" class="boxtext">Inspection / Routing / Diagnostics</text>
+  <text x="305" y="905" class="small">use only for the reduced purpose</text>
+  <path d="M305 927 V965" class="arrow"/>
+
+  <rect x="105" y="970" width="400" height="105" rx="14" fill="#fdecec" stroke="#b42318" stroke-width="4"/>
+  <text x="305" y="1016" class="stop">NOT EXECUTION AUTHORITY</text>
+  <text x="305" y="1044" class="small">proof and bounded-use guarantees</text>
+  <text x="305" y="1068" class="small">may be absent</text>
+
+  <rect x="645" y="95" width="500" height="1035" rx="24" fill="#f4f9fd" stroke="#9fb3c8" stroke-width="2"/>
+  <rect x="645" y="95" width="500" height="75" rx="24" fill="#2f6f9f"/>
+  <rect x="645" y="145" width="500" height="25" fill="#2f6f9f"/>
+  <text x="895" y="143" class="header">Execution-Boundary Validation</text>
+
+  <rect x="695" y="205" width="400" height="82" rx="14" fill="#edf2f7" stroke="#627d98" stroke-width="3"/>
+  <text x="895" y="245" class="boxtext">Signed Capability +</text>
+  <text x="895" y="273" class="boxtext">Authoritative Host Context</text>
+  <path d="M895 287 V325" class="arrow"/>
+
+  <rect x="695" y="330" width="400" height="92" rx="14" fill="#eaf4fb" stroke="#3978a8" stroke-width="3"/>
+  <text x="895" y="370" class="boxtext">Execution-Boundary Profile</text>
+  <text x="895" y="400" class="small">stronger checks for consequential use</text>
+  <path d="M895 422 V460" class="arrow"/>
+
+  <rect x="695" y="465" width="400" height="285" rx="14" fill="#ffffff" stroke="#3978a8" stroke-width="3"/>
+  <text x="895" y="500" class="boxtext">Validate Required</text>
+  <text x="895" y="528" class="boxtext">Authority Bindings</text>
+  <text x="730" y="566" class="list">• proof / signature authenticity</text>
+  <text x="730" y="598" class="list">• issuer / audience / subject</text>
+  <text x="730" y="630" class="list">• operation / scope / resource</text>
+  <text x="730" y="662" class="list">• policy / acknowledgment / time</text>
+  <text x="730" y="694" class="list">• bounded use / replay when owned here</text>
+  <text x="730" y="726" class="list">• revocation / cancellation when required</text>
+  <path d="M895 750 V788" class="arrow"/>
+
+  <rect x="695" y="793" width="400" height="82" rx="14" fill="#e9f7ef" stroke="#2f7d4e" stroke-width="3"/>
+  <text x="895" y="843" class="boxtext">Capability Validation Succeeds</text>
+  <path d="M895 875 V912" class="arrow"/>
+
+  <rect x="695" y="917" width="400" height="125" rx="14" fill="#fff7e6" stroke="#b7791f" stroke-width="3"/>
+  <text x="895" y="955" class="boxtext">Host Controls Still Apply</text>
+  <text x="895" y="984" class="small">authentication • authorization</text>
+  <text x="895" y="1010" class="small">resource checks • input validation</text>
+  <text x="895" y="1036" class="small">transactions • operational safety</text>
+  <path d="M895 1042 V1070" class="arrow"/>
+
+  <rect x="695" y="1075" width="400" height="55" rx="14" fill="#e9f7ef" stroke="#2f7d4e" stroke-width="3"/>
+  <text x="895" y="1110" class="boxtext">Host May Consider Execution</text>
+
+  <text x="600" y="1172" class="note">A validated capability is one bounded input to host authority — never a replacement for the host's security or safety model.</text>
+</svg>

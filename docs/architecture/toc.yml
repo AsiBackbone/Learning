@@ -1,5 +1,8 @@
 - name: Architecture
   href: index.md
 
+- name: Governance Spine and Capability Validation Diagrams
+  href: governance-spine-and-capability-validation-diagrams.md
+
 - name: When ASP.NET Core Authorization Is Enough
   href: when-aspnet-core-authorization-is-enough.md
