@@ -24,7 +24,7 @@ Working Repository
 
 ## Current Status
 
-The lab navigation foundation is established, with four beginner labs, two intermediate labs, and one advanced capstone lab now available.
+The lab navigation foundation is established, with four beginner labs, three intermediate labs, and one advanced capstone lab now available.
 
 Additional labs will appear in this section as the learning path expands into deeper architecture, security, and AI-governance topics.
 
@@ -111,6 +111,20 @@ Related material:
 
 - [Scoped Capability and Host-Owned Execution tutorial](../tutorials/scoped-capability-and-host-owned-execution.md)
 - [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/scoped-capability-and-host-owned-execution/README.md)
+
+### Policy-Version Evidence in Governance Decisions
+
+[Policy-Version Evidence in Governance Decisions](policy-version-evidence-in-governance-decisions.md)
+
+**Difficulty:** Intermediate
+
+Preserve the policy identity that produced a decision, detect policy drift across acknowledgment, capability issuance, and execution, and distinguish useful provenance from perfect replay or cryptographic proof.
+
+Related material:
+
+- [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md)
+- [Acknowledgment and Audit Residue lab](acknowledgment-and-audit-residue.md)
+- [Scoped Capability and Host-Owned Execution lab](scoped-capability-and-host-owned-execution.md)
 
 ### Governed AI Tool Gateway
 

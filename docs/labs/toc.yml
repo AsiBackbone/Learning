@@ -21,6 +21,8 @@
       href: acknowledgment-and-audit-residue.md
     - name: Scoped Capability and Host-Owned Execution
       href: scoped-capability-and-host-owned-execution.md
+    - name: Policy-Version Evidence in Governance Decisions
+      href: policy-version-evidence-in-governance-decisions.md
 
 
 - name: Advanced Labs

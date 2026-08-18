@@ -592,7 +592,7 @@ Potential initial labs:
 * [ ] Build a governed API operation.
 * [ ] Refactor scattered governance logic into a decision pipeline.
 * [x] Detect stale or mismatched execution authority. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
-* [ ] Add policy-version evidence to a decision path.
+* [x] Add policy-version evidence to a decision path. ([#37](https://github.com/AsiBackbone/Learning/issues/37))
 
 ## Advanced Labs
 
