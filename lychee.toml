@@ -22,4 +22,7 @@ exclude = [
   # Private vulnerability reporting is intentionally conditional and may
   # return 404 to automated or unauthenticated link checkers.
   '^https://github\.com/AsiBackbone/Learning/security/advisories/new$'
+  # excluding the following since they may return a timeout
+  ,'^https://zenodo\.org'
+  ,'^https://doi\.org'
 ]

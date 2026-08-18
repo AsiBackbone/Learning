@@ -6,6 +6,10 @@ This page tracks learning topics that the community would like to see explained,
 
 If a topic repeatedly appears in Issues or Discussions, that is a strong signal that it may deserve dedicated Learning material.
 
+`ROADMAP.md` remains the strategic source of truth for project direction and implementation status. This page is a lighter-weight community intake and history surface, so statuses are synchronized periodically at meaningful curriculum milestones rather than after every repository change.
+
+The presence of a topic here does not, by itself, mean that it is highly community-requested. Issues, Discussions, concrete use cases, and contributor interest are stronger signals of demand.
+
 ## How to Request a Topic
 
 For a new topic request, prefer opening an [ASI Backbone Organization Discussion](https://github.com/orgs/AsiBackbone/discussions) when the subject is exploratory, architectural, or likely to benefit from community input.
@@ -43,15 +47,19 @@ Requested topics may use the following informal status labels:
 
 These labels are descriptive rather than a formal release commitment.
 
+A topic may be **Published** here while a narrower follow-up, alternative treatment, or deeper lab remains a valid future idea elsewhere in the repository.
+
 ---
 
-# Current Priority Requests
+# Foundational Requests — Published
 
-These topics align with the initial Learning roadmap and are strong candidates for early tutorials and labs.
+These topics shaped the initial Learning roadmap and now have published coverage in the foundational tutorial/sample/test/lab path. Their original questions and suggested formats are retained below as historical planning context.
+
+The published foundation consists of [Decision Before Execution](../docs/tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../docs/tutorials/policy-context-and-explicit-decision-outcomes.md), [Acknowledgment and Audit Residue](../docs/tutorials/acknowledgment-and-audit-residue.md), [Scoped Capability and Host-Owned Execution](../docs/tutorials/scoped-capability-and-host-owned-execution.md), and [Governed AI Tool Gateway](../docs/tutorials/governed-ai-tool-gateway.md), with corresponding runnable samples under [`samples/`](../samples/README.md) and learner labs under [`docs/labs/`](../docs/labs/index.md).
 
 ## Decision Before Execution
 
-**Status:** Planned
+**Status:** Published
 
 Explain why a consequential operation should be represented as proposed intent before the host performs the operation.
 
@@ -74,7 +82,7 @@ Suggested format:
 
 ## Policy Context
 
-**Status:** Planned
+**Status:** Published
 
 Explain how to gather the facts required for a governance decision into an explicit context model.
 
@@ -97,7 +105,7 @@ Suggested format:
 
 ## Explicit Decision Outcomes
 
-**Status:** Planned
+**Status:** Published
 
 Explain why a governance result may need more expressive outcomes than a boolean allow/deny response.
 
@@ -129,7 +137,7 @@ Suggested format:
 
 ## Acknowledgment Workflows
 
-**Status:** Planned
+**Status:** Published
 
 Explain how a workflow can pause for explicit acknowledgment before a consequential operation proceeds.
 
@@ -152,7 +160,7 @@ Suggested format:
 
 ## Audit Residue and Provenance
 
-**Status:** Planned
+**Status:** Published
 
 Explain the difference between normal application logs and durable governance evidence.
 
@@ -175,7 +183,7 @@ Suggested format:
 
 ## Scoped Capability
 
-**Status:** Planned
+**Status:** Published
 
 Explain how a decision may produce narrow, temporary authority for a specific follow-on operation.
 
@@ -198,7 +206,7 @@ Suggested format:
 
 ## Host-Owned Execution
 
-**Status:** Planned
+**Status:** Published
 
 Explain why the governance layer should not automatically become the component that performs the real-world action.
 
@@ -220,7 +228,7 @@ Suggested format:
 
 ## Governed AI Tool Gateway
 
-**Status:** Planned
+**Status:** Published
 
 Build an end-to-end example in which an AI system proposes a tool action but the host retains authority to evaluate and execute it.
 
@@ -252,7 +260,15 @@ Suggested format:
 
 ## Middleware Ordering
 
-**Status:** Requested
+**Status:** Published
+
+Middleware ordering has moved beyond the original request stage. The repository now includes an architecture article, runnable sample, focused tests, and a learner lab showing how ordering changes application behavior and trust boundaries.
+
+Published material:
+
+- [Middleware Ordering Changes Behavior](../docs/aspnetcore/middleware-ordering-changes-behavior.md)
+- [Runnable sample and focused tests](../samples/middleware-ordering-changes-behavior/README.md)
+- [Identify Middleware Ordering Problems lab](../docs/labs/identify-middleware-ordering-problems.md)
 
 Explore how middleware order changes application behavior and trust boundaries.
 
