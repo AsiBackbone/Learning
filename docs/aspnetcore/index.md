@@ -14,6 +14,8 @@ Instead, this section examines how application structure can make security, gove
 
 Its [companion sample](https://github.com/AsiBackbone/Learning/blob/main/samples/middleware-ordering-changes-behavior/README.md) includes both a corrected pipeline and a deliberately incorrect pipeline so the order-sensitive behavior is observable.
 
+Continue with the [Identify Middleware Ordering Problems lab](../labs/identify-middleware-ordering-problems.md) to diagnose the incorrect sequence, repair a disposable copy, validate the changed behavior, and explain the ordering dependency.
+
 ## Architectural Areas
 
 This section will continue to expand into topics such as:
@@ -108,7 +110,7 @@ Learning should explain the architectural lesson without reproducing the full ap
 
 ## Current Status
 
-The ASP.NET Core learning area now has its first focused tutorial and executable companion sample. Additional material will expand into secure defaults, structured logging, centralized error handling, data access, configuration, and related application-architecture concerns.
+The ASP.NET Core learning area now has its first focused tutorial, executable companion sample, focused invariant tests, and beginner diagnostic lab. Additional material will expand into secure defaults, structured logging, centralized error handling, data access, configuration, and related application-architecture concerns.
 
 Use the [Foundational Tutorials](../tutorials/index.md) for the governance model and `NetCoreApplicationTemplate` for a fuller application specimen.
 

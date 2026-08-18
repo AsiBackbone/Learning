@@ -575,6 +575,7 @@ Before moving on, you should be able to answer:
 ## Related Content
 
 - [ASP.NET Core learning area](index.md)
+- [Identify Middleware Ordering Problems lab](../labs/identify-middleware-ordering-problems.md)
 - [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md)
 - [Decision Before Execution](../tutorials/decision-before-execution.md)
 - [Executable Samples](../samples/index.md)
