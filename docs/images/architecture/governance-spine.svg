@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1460" viewBox="0 0 1200 1460" role="img" aria-labelledby="title desc">
+  <title id="title">Governance spine and host-owned execution boundary</title>
+  <desc id="desc">A vertical flow from proposed intent through authoritative context, constraint evaluation, governance decision, optional acknowledgment, scoped capability, execution-boundary validation, host-owned execution, and audit or lifecycle evidence. Denied, deferred, or escalated decisions branch to no execution. A dashed line marks where authority becomes action.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#52606d"/>
+    </marker>
+    <style>
+      .title { font: 700 38px Arial, Helvetica, sans-serif; fill: #102a43; }
+      .subtitle { font: 400 21px Arial, Helvetica, sans-serif; fill: #486581; }
+      .boxtext { font: 700 24px Arial, Helvetica, sans-serif; fill: #102a43; text-anchor: middle; }
+      .small { font: 400 18px Arial, Helvetica, sans-serif; fill: #334e68; text-anchor: middle; }
+      .side { font: 700 19px Arial, Helvetica, sans-serif; fill: #7b341e; text-anchor: middle; }
+      .zone { font: 700 18px Arial, Helvetica, sans-serif; fill: #486581; letter-spacing: 1px; }
+      .arrow { stroke: #52606d; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1200" height="1460" fill="#ffffff"/>
+  <text x="600" y="60" class="title" text-anchor="middle">Governance Spine</text>
+  <text x="600" y="95" class="subtitle" text-anchor="middle">Governance structures the decision path; the host owns the protected side effect.</text>
+
+  <rect x="155" y="125" width="750" height="610" rx="24" fill="#f4f9fd" stroke="#9fb3c8" stroke-width="2" stroke-dasharray="10 8"/>
+  <text x="180" y="160" class="zone">GOVERNANCE / EVALUATION</text>
+
+  <rect x="270" y="180" width="520" height="82" rx="14" fill="#eaf4fb" stroke="#3978a8" stroke-width="3"/>
+  <text x="530" y="230" class="boxtext">Proposed Intent</text>
+
+  <path d="M530 262 V300" class="arrow"/>
+  <rect x="270" y="305" width="520" height="96" rx="14" fill="#eaf4fb" stroke="#3978a8" stroke-width="3"/>
+  <text x="530" y="345" class="boxtext">Host Builds Authoritative Context</text>
+  <text x="530" y="377" class="small">trusted facts for this evaluation</text>
+
+  <path d="M530 401 V438" class="arrow"/>
+  <rect x="270" y="443" width="520" height="82" rx="14" fill="#eaf4fb" stroke="#3978a8" stroke-width="3"/>
+  <text x="530" y="493" class="boxtext">Constraints Evaluate</text>
+
+  <path d="M530 525 V562" class="arrow"/>
+  <rect x="270" y="567" width="520" height="96" rx="14" fill="#eaf4fb" stroke="#3978a8" stroke-width="3"/>
+  <text x="530" y="607" class="boxtext">Governance Decision</text>
+  <text x="530" y="639" class="small">allow, deny, defer, acknowledge, or escalate</text>
+
+  <path d="M790 615 H912" class="arrow"/>
+  <rect x="918" y="555" width="245" height="122" rx="14" fill="#fff2e8" stroke="#c05621" stroke-width="3"/>
+  <text x="1040" y="594" class="side">Denied / Deferred /</text>
+  <text x="1040" y="620" class="side">Escalated</text>
+  <text x="1040" y="652" class="small">No execution + evidence</text>
+
+  <path d="M530 663 V705" class="arrow"/>
+  <rect x="270" y="710" width="520" height="82" rx="14" fill="#fff7e6" stroke="#b7791f" stroke-width="3"/>
+  <text x="530" y="760" class="boxtext">Acknowledgment When Required</text>
+
+  <rect x="155" y="825" width="750" height="270" rx="24" fill="#f7fafc" stroke="#9fb3c8" stroke-width="2" stroke-dasharray="10 8"/>
+  <text x="180" y="860" class="zone">SCOPED AUTHORITY / VALIDATION</text>
+
+  <path d="M530 792 V875" class="arrow"/>
+  <rect x="270" y="880" width="520" height="82" rx="14" fill="#f0eefa" stroke="#6b5ca5" stroke-width="3"/>
+  <text x="530" y="930" class="boxtext">Scoped Capability</text>
+
+  <path d="M530 962 V998" class="arrow"/>
+  <rect x="270" y="1003" width="520" height="82" rx="14" fill="#f0eefa" stroke="#6b5ca5" stroke-width="3"/>
+  <text x="530" y="1053" class="boxtext">Execution-Boundary Validation</text>
+
+  <line x1="120" y1="1140" x2="1080" y2="1140" stroke="#b42318" stroke-width="4" stroke-dasharray="14 10"/>
+  <rect x="315" y="1115" width="570" height="50" rx="10" fill="#ffffff"/>
+  <text x="600" y="1147" class="side">PROTECTED SIDE-EFFECT BOUNDARY — AUTHORITY BECOMES ACTION BELOW</text>
+
+  <path d="M530 1085 V1180" class="arrow"/>
+  <rect x="270" y="1185" width="520" height="92" rx="14" fill="#e9f7ef" stroke="#2f7d4e" stroke-width="4"/>
+  <text x="530" y="1230" class="boxtext">Host-Owned Execution</text>
+  <text x="530" y="1260" class="small">the host performs the protected operation</text>
+
+  <path d="M530 1277 V1315" class="arrow"/>
+  <rect x="270" y="1320" width="520" height="92" rx="14" fill="#edf2f7" stroke="#627d98" stroke-width="3"/>
+  <text x="530" y="1365" class="boxtext">Audit / Lifecycle Evidence</text>
+  <text x="530" y="1395" class="small">decision, acknowledgment, authority, and outcome residue</text>
+</svg>

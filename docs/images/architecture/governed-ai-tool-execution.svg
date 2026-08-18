@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1480" viewBox="0 0 1200 1480" role="img" aria-labelledby="title desc">
+  <title id="title">Governed AI tool execution boundary</title>
+  <desc id="desc">An AI model produces a proposal only. The proposal crosses a trust and authority boundary into host-owned controls: tool registry, argument validation, authoritative context, governance, scoped capability or gateway, execution-boundary validation, host tool handler, and audit or lifecycle evidence. The model never owns execution authority.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#52606d"/>
+    </marker>
+    <style>
+      .title { font: 700 38px Arial, Helvetica, sans-serif; fill: #102a43; }
+      .subtitle { font: 400 21px Arial, Helvetica, sans-serif; fill: #486581; }
+      .zone { font: 700 19px Arial, Helvetica, sans-serif; fill: #486581; letter-spacing: 1px; }
+      .boxtext { font: 700 24px Arial, Helvetica, sans-serif; fill: #102a43; text-anchor: middle; }
+      .small { font: 400 18px Arial, Helvetica, sans-serif; fill: #334e68; text-anchor: middle; }
+      .rule { font: 700 21px Arial, Helvetica, sans-serif; fill: #7b341e; text-anchor: middle; }
+      .arrow { stroke: #52606d; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1200" height="1480" fill="#ffffff"/>
+  <text x="600" y="58" class="title" text-anchor="middle">Governed AI Tool Execution</text>
+  <text x="600" y="94" class="subtitle" text-anchor="middle">The model may propose. The host retains execution authority.</text>
+
+  <rect x="105" y="125" width="990" height="230" rx="24" fill="#f7fafc" stroke="#9fb3c8" stroke-width="2" stroke-dasharray="10 8"/>
+  <text x="135" y="162" class="zone">MODEL / PROPOSAL ZONE</text>
+
+  <rect x="170" y="195" width="330" height="95" rx="16" fill="#edf2f7" stroke="#627d98" stroke-width="3"/>
+  <text x="335" y="250" class="boxtext">AI Model</text>
+
+  <path d="M500 242 H650" class="arrow"/>
+  <rect x="655" y="195" width="330" height="95" rx="16" fill="#fff7e6" stroke="#b7791f" stroke-width="3"/>
+  <text x="820" y="235" class="boxtext">Proposal Only</text>
+  <text x="820" y="268" class="small">tool name + proposed arguments</text>
+
+  <line x1="95" y1="405" x2="1105" y2="405" stroke="#b42318" stroke-width="4" stroke-dasharray="14 10"/>
+  <rect x="260" y="378" width="680" height="54" rx="10" fill="#ffffff"/>
+  <text x="600" y="412" class="rule">TRUST / AUTHORITY BOUNDARY — PROPOSAL CROSSES INTO HOST CONTROL</text>
+
+  <rect x="105" y="455" width="990" height="930" rx="24" fill="#f4f9fd" stroke="#9fb3c8" stroke-width="2" stroke-dasharray="10 8"/>
+  <text x="135" y="492" class="zone">HOST-OWNED AUTHORITY / EXECUTION ZONE</text>
+
+  <path d="M820 290 V515 H600 V542" class="arrow"/>
+  <rect x="300" y="547" width="600" height="84" rx="14" fill="#eaf4fb" stroke="#3978a8" stroke-width="3"/>
+  <text x="600" y="598" class="boxtext">Host Tool Registry</text>
+
+  <path d="M600 631 V665" class="arrow"/>
+  <rect x="300" y="670" width="600" height="84" rx="14" fill="#eaf4fb" stroke="#3978a8" stroke-width="3"/>
+  <text x="600" y="721" class="boxtext">Argument Validation</text>
+
+  <path d="M600 754 V788" class="arrow"/>
+  <rect x="300" y="793" width="600" height="96" rx="14" fill="#eaf4fb" stroke="#3978a8" stroke-width="3"/>
+  <text x="600" y="833" class="boxtext">Authoritative Context</text>
+  <text x="600" y="865" class="small">trusted actor, tenant, resource, region, risk, and policy facts</text>
+
+  <path d="M600 889 V923" class="arrow"/>
+  <rect x="300" y="928" width="600" height="84" rx="14" fill="#eaf4fb" stroke="#3978a8" stroke-width="3"/>
+  <text x="600" y="979" class="boxtext">Governance Decision</text>
+
+  <path d="M600 1012 V1046" class="arrow"/>
+  <rect x="300" y="1051" width="600" height="84" rx="14" fill="#f0eefa" stroke="#6b5ca5" stroke-width="3"/>
+  <text x="600" y="1102" class="boxtext">Scoped Capability / Gateway</text>
+
+  <path d="M600 1135 V1169" class="arrow"/>
+  <rect x="300" y="1174" width="600" height="84" rx="14" fill="#f0eefa" stroke="#6b5ca5" stroke-width="3"/>
+  <text x="600" y="1225" class="boxtext">Execution-Boundary Validation</text>
+
+  <path d="M600 1258 V1292" class="arrow"/>
+  <rect x="300" y="1297" width="600" height="84" rx="14" fill="#e9f7ef" stroke="#2f7d4e" stroke-width="4"/>
+  <text x="600" y="1338" class="boxtext">Host Tool Handler</text>
+  <text x="600" y="1368" class="small">protected side effect occurs here</text>
+
+  <path d="M900 1339 H1000" class="arrow"/>
+  <rect x="1005" y="1288" width="165" height="102" rx="14" fill="#edf2f7" stroke="#627d98" stroke-width="2"/>
+  <text x="1088" y="1324" class="small">Audit /</text>
+  <text x="1088" y="1352" class="small">lifecycle</text>
+  <text x="1088" y="1380" class="small">evidence</text>
+
+  <text x="600" y="1440" class="rule">Model output never becomes execution authority merely because it is syntactically valid.</text>
+</svg>

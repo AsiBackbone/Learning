@@ -37,6 +37,19 @@ This separation makes it easier to reason about:
 * Which component performs the real-world side effect.
 * What evidence remains afterward.
 
+## Visual Reference
+
+For a compact orientation to the major boundaries, see [Governance Spine and Capability Validation Diagrams](governance-spine-and-capability-validation-diagrams.md).
+
+The visual reference covers:
+
+* The governance spine from intent through host-owned execution.
+* Policy context, independent constraints, and explicit decision composition.
+* Metadata inspection versus execution-boundary capability validation.
+* AI proposal versus host authority in a governed tool gateway.
+
+The diagrams are reference aids rather than substitutes for the tutorials, samples, tests, and labs.
+
 ## Start with the Foundational Tutorials
 
 If you are new to these architectural ideas, begin with:
@@ -90,7 +103,7 @@ An ASP.NET Core reference architecture demonstrating middleware organization, se
 
 ## Current Status
 
-The Architecture section is established as a learning area and will grow as architectural comparisons, diagrams, alternative patterns, and cross-repository studies are added.
+The Architecture section is established as a learning area and now includes a governed-execution visual reference alongside alternative-pattern material. It will continue to grow through additional comparisons, diagrams, and cross-repository studies.
 
 For the current learning path, continue with the [Foundational Tutorials](../tutorials/index.md).
 
