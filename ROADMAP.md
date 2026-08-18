@@ -617,7 +617,7 @@ Where multiple valid solutions exist, the discussion should explain the tradeoff
 
 ## Status
 
-**In progress — middleware-ordering and secure-defaults foundations established**
+**In progress — middleware-ordering, secure-defaults, and structured-logging foundations established**
 
 ## Goal
 
@@ -649,14 +649,14 @@ These materials should remain useful independently of that repository.
 * [x] Safer failure defaults.
 * [x] Configuration ownership boundaries.
 
-## Structured Logging
+## Structured Logging ([#38](https://github.com/AsiBackbone/Learning/issues/38))
 
-* [ ] Events versus strings.
-* [ ] Correlation.
-* [ ] Operational diagnostics.
-* [ ] Avoiding sensitive-data leakage.
-* [ ] Logging boundaries.
-* [ ] Distinguishing operational logs from audit records.
+* [x] Events versus strings.
+* [x] Correlation.
+* [x] Operational diagnostics.
+* [x] Avoiding sensitive-data leakage.
+* [x] Logging boundaries.
+* [x] Distinguishing operational logs from audit records.
 
 ## Error Handling
 

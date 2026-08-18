@@ -6,3 +6,6 @@
 
 - name: Secure-by-Default ASP.NET Core Configuration
   href: secure-by-default-configuration.md
+
+- name: Structured Logging Without Sensitive-Data Sprawl
+  href: structured-logging-without-sensitive-data-sprawl.md

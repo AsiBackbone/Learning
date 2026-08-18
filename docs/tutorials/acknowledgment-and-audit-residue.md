@@ -1365,6 +1365,7 @@ This continues the same principle established throughout Learning:
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — revisit the explicit decision inputs and outcomes that can lead to an acknowledgment requirement.
 - [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — continue from acknowledgment into narrow, short-lived execution authority.
 - [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see acknowledgment, capability, execution, and audit residue composed around AI-proposed actions.
+- [Structured Logging Without Sensitive-Data Sprawl](../aspnetcore/structured-logging-without-sensitive-data-sprawl.md) — compare high-volume operational diagnostics with evidence-oriented governance records that may share correlation without becoming the same artifact.
 - [Acknowledgment and Audit Residue sample](https://github.com/AsiBackbone/Learning/blob/main/samples/acknowledgment-and-audit-residue/README.md) — run the companion workflow and observe bound acknowledgment, re-evaluation, correlation, and distinct evidence stages.
 - [Acknowledgment and Audit Residue intermediate lab](../labs/acknowledgment-and-audit-residue.md) — break and strengthen the acknowledgment boundary, add replay state, preserve evidence behind a store, and distinguish policy decisions from execution failure.
 - [Executable Samples](../samples/index.md) — explore the published companion-sample guide before following a canonical sample README.
