@@ -688,17 +688,21 @@ These materials should remain useful independently of that repository.
 
 # Milestone 7 — Security and Trust Architecture ([#5](https://github.com/AsiBackbone/Learning/issues/5))
 
+## Status
+
+**In progress — trust-boundary and least-privilege foundation established**
+
 ## Goal
 
 Teach security as an architectural property rather than a collection of isolated controls.
 
 ## Planned Topics
 
-* [ ] Trust boundaries.
-* [ ] Least privilege.
+* [x] Trust boundaries. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
+* [x] Least privilege. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
 * [ ] Capability-based authority.
-* [ ] Authentication versus governance.
-* [ ] Authorization versus policy evaluation.
+* [x] Authentication versus governance. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
+* [x] Authorization versus policy evaluation. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
 * [ ] Replay protection.
 * [ ] Signing and verification concepts.
 * [ ] Key custody boundaries.
@@ -1036,8 +1040,9 @@ It should not force the project into unnecessary release ceremony.
 
 The highest-priority work now is:
 
-1. Begin the Security and Trust Architecture path with trust boundaries and least
-   privilege as architectural concepts. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
+1. Continue the Security and Trust Architecture path beyond trust boundaries and
+   least privilege with replay protection, signing/verification, key custody, and
+   fail-safe behavior.
 2. Continue strengthening tutorial → sample → lab → working implementation links
    where the reference materially improves understanding.
 3. Expand architecture comparisons beyond the first ASP.NET Core authorization

@@ -4,15 +4,22 @@ The Security section examines architectural boundaries that can reduce accidenta
 
 Security in ASI Backbone Learning is approached as an architectural responsibility rather than a single feature or package.
 
-> **Section status:** This page is currently an overview. Focused security tutorials and examples are planned; start with the [Foundational Tutorials](../tutorials/index.md) for the current learning path.
+> **Section status:** Focused security learning has begun. Start with [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), then use the [Foundational Tutorials](../tutorials/index.md) to connect security boundaries to governed execution.
 
 > **A secure boundary should remain visible when the system is under pressure.**
+
+## Start Here
+
+[Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md) is the first focused security tutorial. It treats trust boundaries as changes in control over data or authority and least privilege as an architectural constraint on what authority crosses those boundaries.
+
+The tutorial connects caller-supplied versus authoritative context, authentication, authorization, policy decisions, credential ownership, narrow authority, boundary validation, resource ownership, and fail-safe behavior.
 
 ## Security Themes
 
 Current and future material may examine:
 
-- Least privilege
+- [Trust boundaries](trust-boundaries-and-least-privilege.md)
+- [Least privilege](trust-boundaries-and-least-privilege.md)
 - Explicit execution boundaries
 - Short-lived authority
 - Actor and resource binding
@@ -110,9 +117,11 @@ Application-specific security analysis remains necessary.
 
 ## Current Status
 
-The Security section is established as a future learning area.
+The Security section now has its first focused tutorial, establishing trust boundaries and least privilege as the starting architecture concepts for Milestone 7.
 
-For the current curriculum, begin with the [Foundational Tutorials](../tutorials/index.md), then compare those boundaries with the organization's working repositories.
+Future material will extend into capability-based authority, replay protection, signing and verification, key custody, tamper-evident records, secure logging, dependency integrity, and threat modeling.
+
+Use the [Foundational Tutorials](../tutorials/index.md) to connect these security concepts to the existing governed-execution learning path.
 
 ---
 
