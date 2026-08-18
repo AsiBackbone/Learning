@@ -581,7 +581,7 @@ Potential initial labs:
 * [x] Replace boolean authorization with explicit decision outcomes.
 * [x] Build a small policy-context model.
 * [x] Add structured reason codes.
-* [ ] Identify a hidden execution side effect.
+* [x] Identify a hidden execution side effect. ([#19](https://github.com/AsiBackbone/Learning/issues/19))
 * [ ] Identify middleware ordering problems.
 
 ## Intermediate Labs
@@ -1036,22 +1036,20 @@ It should not force the project into unnecessary release ceremony.
 
 The highest-priority work now is:
 
-1. Add the next beginner lab around identifying and removing a hidden execution
-   side effect. ([#19](https://github.com/AsiBackbone/Learning/issues/19))
-2. Begin the Security and Trust Architecture path with trust boundaries and least
+1. Begin the Security and Trust Architecture path with trust boundaries and least
    privilege as architectural concepts. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
-3. Continue strengthening tutorial → sample → lab → working implementation links
+2. Continue strengthening tutorial → sample → lab → working implementation links
    where the reference materially improves understanding.
-4. Expand architecture comparisons beyond the first ASP.NET Core authorization
+3. Expand architecture comparisons beyond the first ASP.NET Core authorization
    comparison, preserving honest cases where simpler or adjacent patterns win.
-5. Add deeper intermediate and advanced labs around governed API operations,
+4. Add deeper intermediate and advanced labs around governed API operations,
    policy-version evidence, replay resistance, regional/tenant policy, and safe
    degraded-mode behavior.
-6. Continue the ASP.NET Core learning path with secure defaults, structured
+5. Continue the ASP.NET Core learning path with secure defaults, structured
    logging, centralized error handling, and data-access boundaries.
-7. Begin Governance and Policy Architecture material after the first ASP.NET Core
+6. Begin Governance and Policy Architecture material after the first ASP.NET Core
    and security bridge lessons are usable.
-8. Use community feedback and implementation changes to decide which advanced or
+7. Use community feedback and implementation changes to decide which advanced or
    experimental subjects deserve promotion into the main learning path.
 
 The short-term emphasis should remain:

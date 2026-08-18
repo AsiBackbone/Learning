@@ -8,6 +8,8 @@
       href: decision-before-execution.md
     - name: Policy Context and Explicit Decision Outcomes
       href: policy-context-and-explicit-decision-outcomes.md
+    - name: Identify and Remove a Hidden Execution Side Effect
+      href: hidden-execution-side-effect.md
 
 
 - name: Intermediate Labs
