@@ -8,9 +8,13 @@ Unlike [requested-topics.md](requested-topics.md), which tracks subjects the com
 
 These ideas are not release commitments.
 
-They are starting points.
+Some are starting points; others are retained as historical idea shapes after equivalent learning material has been published.
 
 > **Read it. Run it. Question it. Improve it.**
+
+`ROADMAP.md` remains authoritative for strategic project direction and implementation status. This file is an idea incubator and historical planning surface, not a second roadmap.
+
+Status labels here describe the state of the tutorial idea, not the level of community demand. Repeated Issues, Discussions, concrete use cases, and contributor interest provide stronger evidence of actual demand than inclusion in this file.
 
 ---
 
@@ -122,7 +126,7 @@ Audit Residue
 
 Refactor a controller that performs a sensitive operation directly into a decision-before-execution workflow.
 
-**Status:** High priority
+**Status:** Published — foundational coverage available
 
 ---
 
@@ -164,7 +168,7 @@ bool CanExecute(Request request)
 
 and evolve toward a structured decision result.
 
-**Status:** High priority
+**Status:** Published — covered by Policy Context and Explicit Decision Outcomes
 
 ---
 
@@ -202,7 +206,7 @@ Understand how to represent the facts needed for policy evaluation without scatt
 
 Given policy checks scattered across a controller, service, and helper, consolidate the relevant facts into a policy context.
 
-**Status:** High priority
+**Status:** Published — covered by Policy Context and Explicit Decision Outcomes
 
 ---
 
@@ -282,7 +286,7 @@ Execution Authority
 
 Add acknowledgment to an already authenticated and authorized administrative workflow.
 
-**Status:** High priority
+**Status:** Published — foundational acknowledgment coverage available
 
 ---
 
@@ -309,7 +313,7 @@ Implement a workflow that pauses a consequential action until acknowledgment is 
 
 A destructive administrative operation requires the operator to explicitly acknowledge the affected resource and consequence before proceeding.
 
-**Status:** High priority
+**Status:** Published foundation coverage; specialized ASP.NET Core follow-up remains a candidate
 
 ---
 
@@ -377,7 +381,7 @@ Understand why logs and audit residue serve different purposes.
 
 Given a set of application logs, design the smallest useful governance receipt.
 
-**Status:** High priority
+**Status:** Published — covered by Acknowledgment and Audit Residue
 
 ---
 
@@ -413,7 +417,7 @@ Design a structured record that explains what was requested, how it was evaluate
 - Immutability versus tamper evidence.
 - Storage ownership.
 
-**Status:** High priority
+**Status:** Published foundation coverage; deeper standalone audit-receipt treatment remains a candidate
 
 ---
 
@@ -474,7 +478,7 @@ Understand why a successful decision may grant narrow, short-lived authority rat
 
 Replace a broad "admin can execute" check with a grant scoped to one operation and resource.
 
-**Status:** High priority
+**Status:** Published — covered by Scoped Capability and Host-Owned Execution
 
 ---
 
@@ -514,7 +518,7 @@ Capability Revalidated
 Operation Executes
 ```
 
-**Status:** High priority
+**Status:** Published — execution-boundary validation covered in the scoped-capability path
 
 ---
 
@@ -540,7 +544,7 @@ Clarify why a policy framework should not silently become an execution engine.
 
 A governance decision permits a deployment operation, but the deployment system still owns credentials, environment controls, retries, rollback, and execution.
 
-**Status:** High priority
+**Status:** Published — covered by Scoped Capability and Host-Owned Execution
 
 ---
 
@@ -603,7 +607,13 @@ Audit Residue
 - Threat-model notes.
 - Lab.
 
-**Status:** Highest-priority end-to-end tutorial
+**Status:** Published — end-to-end tutorial, runnable sample, tests, and lab available
+
+Published material:
+
+- [Governed AI Tool Gateway tutorial](../docs/tutorials/governed-ai-tool-gateway.md)
+- [Runnable sample](../samples/governed-ai-tool-gateway/README.md)
+- [End-to-end lab](../docs/labs/governed-ai-tool-gateway.md)
 
 ---
 
@@ -748,7 +758,15 @@ Understand middleware ordering as an architectural decision rather than boilerpl
 
 Give the learner an intentionally misordered pipeline and require them to identify behavior and security problems.
 
-**Status:** High-value NCAT tutorial
+**Status:** Published — article, runnable sample, focused tests, and learner lab available
+
+Published material:
+
+- [Middleware Ordering Changes Behavior](../docs/aspnetcore/middleware-ordering-changes-behavior.md)
+- [Runnable sample and focused tests](../samples/middleware-ordering-changes-behavior/README.md)
+- [Identify Middleware Ordering Problems lab](../docs/labs/identify-middleware-ordering-problems.md)
+
+Additional middleware-ordering ideas should add a distinct scenario, diagnostic exercise, or architectural tradeoff rather than reproduce the existing learning path.
 
 ---
 
@@ -1615,9 +1633,11 @@ An idea may be merged with another topic, reduced to a diagram, deferred, moved 
 
 ---
 
-# Current Recommended Starting Set
+# Published Foundation and Next Candidates
 
-If the community were to build only a small first collection, the recommended starting tutorials are:
+The original recommended starting set is no longer entirely prospective. The governed-execution foundation and Middleware Ordering now have published coverage, while Architecture Decision Records remains a future learning candidate.
+
+The list is retained to show how the original curriculum shaped the current repository:
 
 1. **Decision Before Execution**
 2. **Policy Context**
@@ -1630,7 +1650,9 @@ If the community were to build only a small first collection, the recommended st
 9. **ASP.NET Core Middleware Ordering**
 10. **Writing ADRs That Future Maintainers Can Actually Use**
 
-Together, these establish the core teaching language for the repository while connecting naturally to both working ASI Backbone projects.
+Items 1–9 now have either dedicated published material or substantive published coverage inside the foundational path. Item 10 remains a candidate for future work.
+
+Future selection should therefore emphasize gaps, deeper tradeoffs, alternative patterns, and evidence of real learner or contributor demand rather than rebuilding the initial foundation.
 
 ---
 
