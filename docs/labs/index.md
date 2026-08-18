@@ -24,7 +24,7 @@ Working Repository
 
 ## Current Status
 
-The lab navigation foundation is established, with two beginner labs, two intermediate labs, and one advanced capstone lab now available.
+The lab navigation foundation is established, with three beginner labs, two intermediate labs, and one advanced capstone lab now available.
 
 Additional labs will appear in this section as the learning path expands into deeper architecture, security, and AI-governance topics.
 
@@ -57,6 +57,20 @@ Related material:
 
 - [Policy Context and Explicit Decision Outcomes tutorial](../tutorials/policy-context-and-explicit-decision-outcomes.md)
 - [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md)
+
+### Identify and Remove a Hidden Execution Side Effect
+
+[Identify and Remove a Hidden Execution Side Effect](hidden-execution-side-effect.md)
+
+**Difficulty:** Beginner
+
+Start from deliberately flawed policy code that quietly starts an external deployment while it is still "checking" the request, make the denied-side-effect invariant fail visibly, and refactor the workflow so evaluation is observational and execution occurs only after an explicit decision boundary.
+
+Related material:
+
+- [Decision Before Execution tutorial](../tutorials/decision-before-execution.md)
+- [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md)
+- [Decision Before Execution lab](decision-before-execution.md)
 
 ### Acknowledgment and Audit Residue
 
