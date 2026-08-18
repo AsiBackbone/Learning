@@ -1,2 +1,5 @@
-- name: Security 
+- name: Security
   href: index.md
+
+- name: Trust Boundaries and Least Privilege
+  href: trust-boundaries-and-least-privilege.md
