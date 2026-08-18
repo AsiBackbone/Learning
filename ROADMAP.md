@@ -617,7 +617,7 @@ Where multiple valid solutions exist, the discussion should explain the tradeoff
 
 ## Status
 
-**In progress — middleware-ordering foundation established**
+**In progress — middleware-ordering and secure-defaults foundations established**
 
 ## Goal
 
@@ -639,15 +639,15 @@ These materials should remain useful independently of that repository.
 * [x] Pair with a runnable corrected/incorrect middleware-ordering sample.
 * [x] Add focused tests for request/response traversal and exception-boundary placement.
 
-## Secure Defaults
+## Secure Defaults ([#36](https://github.com/AsiBackbone/Learning/issues/36))
 
-* [ ] Secure-by-default configuration.
-* [ ] Explicit opt-in versus implicit exposure.
-* [ ] Configuration validation.
-* [ ] Environment-specific behavior.
-* [ ] Secrets handling.
-* [ ] Safer failure defaults.
-* [ ] Configuration ownership boundaries.
+* [x] Secure-by-default configuration.
+* [x] Explicit opt-in versus implicit exposure.
+* [x] Configuration validation.
+* [x] Environment-specific behavior.
+* [x] Secrets handling.
+* [x] Safer failure defaults.
+* [x] Configuration ownership boundaries.
 
 ## Structured Logging
 

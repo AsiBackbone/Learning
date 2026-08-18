@@ -6,7 +6,7 @@ The focus is not on teaching every ASP.NET Core feature.
 
 Instead, this section examines how application structure can make security, governance, execution boundaries, and operational behavior easier to understand and maintain.
 
-> **Section status:** Focused ASP.NET Core learning has begun. Start with [Middleware Ordering Changes Behavior](middleware-ordering-changes-behavior.md), then use the [Foundational Tutorials](../tutorials/index.md) when you want to connect request-pipeline structure to governed execution.
+> **Section status:** Focused ASP.NET Core learning is expanding. Start with [Middleware Ordering Changes Behavior](middleware-ordering-changes-behavior.md), continue with [Secure-by-Default ASP.NET Core Configuration](secure-by-default-configuration.md), then use the [Foundational Tutorials](../tutorials/index.md) when you want to connect application structure to governed execution.
 
 ## Start Here
 
@@ -16,11 +16,14 @@ Its [companion sample](https://github.com/AsiBackbone/Learning/blob/main/samples
 
 Continue with the [Identify Middleware Ordering Problems lab](../labs/identify-middleware-ordering-problems.md) to diagnose the incorrect sequence, repair a disposable copy, validate the changed behavior, and explain the ordering dependency.
 
+[Secure-by-Default ASP.NET Core Configuration](secure-by-default-configuration.md) then treats configuration as part of the application architecture and trust boundary. It covers explicit opt-in, startup validation, environment-specific behavior, secrets, safer failure choices, and configuration ownership boundaries.
+
 ## Architectural Areas
 
 This section will continue to expand into topics such as:
 
 - [Middleware ordering](middleware-ordering-changes-behavior.md)
+- [Secure defaults and configuration](secure-by-default-configuration.md)
 - Dependency injection boundaries
 - Request validation
 - Centralized exception handling
@@ -31,7 +34,7 @@ This section will continue to expand into topics such as:
 - Rate limiting
 - Authentication-ready architecture
 - Data-access boundaries
-- Configuration
+- Configuration ownership
 - Background processing
 - Health checks
 - Operational diagnostics
@@ -100,6 +103,7 @@ That repository provides a fuller ASP.NET Core reference architecture demonstrat
 * Middleware organization
 * Structured logging
 * Security defaults
+* Configuration validation and environment handling
 * Error handling
 * Rate limiting
 * Authentication-ready design
@@ -110,7 +114,7 @@ Learning should explain the architectural lesson without reproducing the full ap
 
 ## Current Status
 
-The ASP.NET Core learning area now has its first focused tutorial, executable companion sample, focused invariant tests, and beginner diagnostic lab. Additional material will expand into secure defaults, structured logging, centralized error handling, data access, configuration, and related application-architecture concerns.
+The ASP.NET Core learning area now covers middleware ordering and secure-by-default configuration. The middleware lesson is paired with an executable companion sample, focused invariant tests, and a beginner diagnostic lab; the configuration lesson establishes the next architecture foundation around explicit opt-in, startup validation, environment behavior, secrets, safer failure, and configuration ownership. Additional material will expand into structured logging, centralized error handling, data access, and related application-architecture concerns.
 
 Use the [Foundational Tutorials](../tutorials/index.md) for the governance model and `NetCoreApplicationTemplate` for a fuller application specimen.
 

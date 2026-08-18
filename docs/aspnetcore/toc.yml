@@ -3,3 +3,6 @@
 
 - name: Middleware Ordering Changes Behavior
   href: middleware-ordering-changes-behavior.md
+
+- name: Secure-by-Default ASP.NET Core Configuration
+  href: secure-by-default-configuration.md
