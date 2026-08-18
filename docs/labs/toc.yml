@@ -10,6 +10,8 @@
       href: policy-context-and-explicit-decision-outcomes.md
     - name: Identify and Remove a Hidden Execution Side Effect
       href: hidden-execution-side-effect.md
+    - name: Identify Middleware Ordering Problems
+      href: identify-middleware-ordering-problems.md
 
 
 - name: Intermediate Labs

@@ -224,6 +224,12 @@ Useful experiments include:
 5. Add a test that proves a short-circuit endpoint is never invoked.
 6. Compare this small demonstration with the full `NetCoreApplicationTemplate` pipeline and identify which components depend on routing, authentication, proxy correction, or response coverage.
 
+## Continue with the Diagnostic Lab
+
+After you can run both pipeline modes, continue with [Identify Middleware Ordering Problems](../../docs/labs/identify-middleware-ordering-problems.md).
+
+The lab asks you to predict the defective behavior before running it, distinguish host fallback behavior from the custom exception boundary, encode the repaired expectation in a focused test, repair a disposable copy of the sample, and reason about authentication/authorization, logging, security-header, and rate-limiting placement.
+
 ## License
 
 Executable sample code under `samples/` is licensed under the MIT License. See [LICENSING.md](../../LICENSING.md).

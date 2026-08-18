@@ -24,11 +24,11 @@ Working Repository
 
 ## Current Status
 
-The lab navigation foundation is established, with three beginner labs, two intermediate labs, and one advanced capstone lab now available.
+The lab navigation foundation is established, with four beginner labs, two intermediate labs, and one advanced capstone lab now available.
 
 Additional labs will appear in this section as the learning path expands into deeper architecture, security, and AI-governance topics.
 
-The current labs pair all five foundational tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated governance boundaries.
+The foundational labs pair all five governance tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated boundaries. The ASP.NET Core diagnostic lab begins the next learning area by requiring learners to predict, observe, repair, and explain middleware-ordering behavior.
 
 ## Available Labs
 
@@ -71,6 +71,20 @@ Related material:
 - [Decision Before Execution tutorial](../tutorials/decision-before-execution.md)
 - [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md)
 - [Decision Before Execution lab](decision-before-execution.md)
+
+### Identify Middleware Ordering Problems
+
+[Identify Middleware Ordering Problems](identify-middleware-ordering-problems.md)
+
+**Difficulty:** Beginner
+
+Run the deliberately incorrect ASP.NET Core pipeline, predict and observe the failure boundary, encode the repaired behavior in a focused test, reorder a disposable copy of the sample, and explain the changed request/response behavior in terms of wrapping, reachability, and coverage rather than a memorized middleware list.
+
+Related material:
+
+- [Middleware Ordering Changes Behavior](../aspnetcore/middleware-ordering-changes-behavior.md)
+- [Middleware Ordering Changes Behavior sample](https://github.com/AsiBackbone/Learning/blob/main/samples/middleware-ordering-changes-behavior/README.md)
+- [ASP.NET Core learning area](../aspnetcore/index.md)
 
 ### Acknowledgment and Audit Residue
 

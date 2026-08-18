@@ -582,7 +582,7 @@ Potential initial labs:
 * [x] Build a small policy-context model.
 * [x] Add structured reason codes.
 * [x] Identify a hidden execution side effect. ([#19](https://github.com/AsiBackbone/Learning/issues/19))
-* [ ] Identify middleware ordering problems.
+* [x] Identify middleware ordering problems. ([#34](https://github.com/AsiBackbone/Learning/issues/34))
 
 ## Intermediate Labs
 
