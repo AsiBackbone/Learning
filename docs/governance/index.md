@@ -76,6 +76,14 @@ Explores narrow, short-lived execution authority and validation at the execution
 
 Composes the earlier ideas into an AI-assisted workflow while preserving host-owned execution authority.
 
+## Deeper Governance Material
+
+### Constraint Composition and Policy Precedence
+
+[Constraint Composition and Policy Precedence](constraint-composition-and-policy-precedence.md)
+
+Expands the policy pipeline beyond individual rule evaluation. It explains deny/warning/not-applicable composition, deliberate precedence, full evaluation versus first-denial short-circuiting, empty-policy and exception behavior, optional post-composition decision policy, determinism, and the continuing separation between governance decisions and host-owned execution.
+
 ## Governance Is Not Compliance Certification
 
 The patterns explored here may support systems with governance, security, accountability, or audit requirements.
@@ -101,12 +109,11 @@ Learning explains the architectural reasoning in intentionally smaller examples 
 
 ## Current Status
 
-The foundational governance tutorial sequence is established.
+The foundational governance tutorial sequence is established, and the Governance section now begins the next layer with explicit policy-pipeline, constraint-composition, and precedence guidance.
 
 Future material may expand into:
 
-* Policy composition
-* Decision conflict resolution
+* Decision conflict resolution beyond the current base composition model
 * Policy versioning
 * Delegated authority
 * Multi-tenant governance

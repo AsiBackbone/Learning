@@ -1235,6 +1235,7 @@ It will examine how a consequential operation can pause for explicit acknowledgm
 
 - [Foundational Tutorial Index](index.md) — view the complete five-tutorial governed-execution learning path.
 - [Decision Before Execution](decision-before-execution.md) — revisit the separation between proposed intent, governance decisions, and host-owned execution.
+- [Constraint Composition and Policy Precedence](../governance/constraint-composition-and-policy-precedence.md) — go deeper on how independent constraint results are combined into a base decision and how explicit precedence avoids accidental rule-order behavior.
 - [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md) — compare this richer decision model with built-in ASP.NET Core policies, requirements, handlers, and resource-based authorization, including cases where the simpler authorization model is the better choice.
 - [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — continue from explicit decision outcomes into acknowledgment, re-evaluation, correlation, and governance evidence.
 - [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — follow allowed or acknowledged decisions into narrowly scoped execution authority.
