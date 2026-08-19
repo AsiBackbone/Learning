@@ -276,11 +276,12 @@ public sealed class ReplayProtectionBoundaryTests
         Assert.False(result.ExecutionCompleted);
         Assert.Equal("capability.use-store-unavailable", result.ReasonCode);
         Assert.Equal(0, executor.InvocationCount);
-        Assert.True(
-            evidence.Snapshot().Any(item =>
+        Assert.Contains(
+            evidence.Snapshot(),
+            item =>
                 item.Stage == "capability-consumption" &&
                 item.Outcome == "unavailable" &&
-                !item.ExecutionAttempted));
+                !item.ExecutionAttempted);
     }
 
     [Fact]
@@ -300,11 +301,12 @@ public sealed class ReplayProtectionBoundaryTests
 
         Assert.Equal(1, store.GetObservedUseCount(capability.CapabilityId));
         Assert.Equal(1, executor.InvocationCount);
-        Assert.True(
-            evidence.Snapshot().Any(item =>
+        Assert.Contains(
+            evidence.Snapshot(),
+            item =>
                 item.Stage == "execution" &&
                 item.Outcome == "failed" &&
-                item.ReasonCode == "execution.failed-after-consumption"));
+                item.ReasonCode == "execution.failed-after-consumption");
 
         CapabilityExecutionResult replay = await gateway.ExecuteAsync(
             capability,
