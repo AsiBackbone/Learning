@@ -691,7 +691,7 @@ These materials should remain useful independently of that repository.
 
 ## Status
 
-**In progress — trust-boundary and least-privilege foundation established**
+**In progress — trust-boundary, least-privilege, and replay-protection foundations established**
 
 ## Goal
 
@@ -704,7 +704,7 @@ Teach security as an architectural property rather than a collection of isolated
 * [ ] Capability-based authority.
 * [x] Authentication versus governance. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
 * [x] Authorization versus policy evaluation. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
-* [ ] Replay protection.
+* [x] Replay protection. ([#52](https://github.com/AsiBackbone/Learning/issues/52))
 * [ ] Signing and verification concepts.
 * [ ] Key custody boundaries.
 * [ ] Tamper-evident records.
@@ -1041,9 +1041,8 @@ It should not force the project into unnecessary release ceremony.
 
 The highest-priority work now is:
 
-1. Continue the Security and Trust Architecture path beyond trust boundaries and
-   least privilege with replay protection, signing/verification, key custody, and
-   fail-safe behavior.
+1. Continue the Security and Trust Architecture path beyond replay protection with
+   signing/verification, key custody, tamper-evident records, and fail-safe behavior.
 2. Continue strengthening tutorial → sample → lab → working implementation links
    where the reference materially improves understanding.
 3. Expand architecture comparisons beyond the first ASP.NET Core authorization

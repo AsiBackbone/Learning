@@ -413,7 +413,9 @@ Suggested areas:
 
 ## Replay Protection
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [Replay Protection and Bounded-Use Authority](../docs/security/replay-protection-and-bounded-use.md)
 
 Explain replay as a system-level concern rather than only a token-validation detail.
 

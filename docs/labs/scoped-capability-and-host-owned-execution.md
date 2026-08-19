@@ -334,6 +334,8 @@ The architectural contract is that the mismatched authority cannot cross the hos
 
 # Part 7 — Add Single-Use State
 
+Before implementing the exercise, use [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) as the canonical explanation of durable replay state, atomic consumption, distributed races, and failure windows. This lab intentionally keeps the implementation local and in-memory.
+
 The baseline sample deliberately omits replay enforcement.
 
 Add a small in-memory use-store abstraction such as:
@@ -529,6 +531,7 @@ Use `git status` first so you understand which local work will be affected.
 - [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/README.md#scoped-capability-and-host-owned-execution) — return to the executable baseline used by the exercise.
 - [Acknowledgment and Audit Residue lab](acknowledgment-and-audit-residue.md) — revisit acknowledgment, re-evaluation, and evidence before execution authority is issued.
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — continue into the end-to-end composition where AI may propose and the host retains execution authority.
+- [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — connect this lab's in-memory single-use exercise to durable, atomic, multi-instance replay protection and idempotency boundaries.
 - [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — compare the teaching capability with the working framework model.
 - [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) — inspect fuller execution-boundary validation.
 - [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) — compare the lab's in-memory replay exercise with the provider-neutral production seam.

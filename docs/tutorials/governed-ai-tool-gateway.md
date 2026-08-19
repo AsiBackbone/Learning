@@ -1389,6 +1389,8 @@ This proves the governed target cannot be silently swapped after approval.
 
 ## Test Capability Replay
 
+Use this test to observe the local single-use boundary. For the broader distributed-state model, including durable consumption, multi-instance races, request idempotency, and ambiguous external execution outcomes, see [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md).
+
 For a single-use capability:
 
 ```text
@@ -1777,6 +1779,7 @@ Learning is intended to make those tradeoffs visible rather than prescribe one u
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — review how the host constructs authoritative context and produces explicit governance outcomes.
 - [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — explore responsibility boundaries, re-evaluation, correlation, and evidence across consequential workflows.
 - [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — examine narrow execution authority, capability bindings, replay considerations, and execution-boundary validation.
+- [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — distinguish single-use capability enforcement from request idempotency and exactly-once execution claims.
 - [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) — run the capstone with a simulated proposal generator, host-built context, acknowledgment, scoped capability, dry-run execution, and invariant tests.
 - [Governed AI Tool Gateway advanced lab](../labs/governed-ai-tool-gateway.md) — deliberately weaken and repair the gateway, then threat-model its trust boundaries.
 

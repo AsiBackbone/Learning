@@ -3,3 +3,6 @@
 
 - name: Trust Boundaries and Least Privilege
   href: trust-boundaries-and-least-privilege.md
+
+- name: Replay Protection and Bounded-Use Authority
+  href: replay-protection-and-bounded-use.md

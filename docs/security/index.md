@@ -4,7 +4,7 @@ The Security section examines architectural boundaries that can reduce accidenta
 
 Security in ASI Backbone Learning is approached as an architectural responsibility rather than a single feature or package.
 
-> **Section status:** Focused security learning has begun. Start with [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), then use the [Foundational Tutorials](../tutorials/index.md) to connect security boundaries to governed execution.
+> **Section status:** Focused security learning now covers trust boundaries, least privilege, and replay protection. Start with [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), continue with [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), then use the [Foundational Tutorials](../tutorials/index.md) to connect security boundaries to governed execution.
 
 > **A secure boundary should remain visible when the system is under pressure.**
 
@@ -13,6 +13,8 @@ Security in ASI Backbone Learning is approached as an architectural responsibili
 [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md) is the first focused security tutorial. It treats trust boundaries as changes in control over data or authority and least privilege as an architectural constraint on what authority crosses those boundaries.
 
 The tutorial connects caller-supplied versus authoritative context, authentication, authorization, policy decisions, credential ownership, narrow authority, boundary validation, resource ownership, and fail-safe behavior.
+
+[Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md) continues from narrow authority into stateful execution-boundary enforcement. It covers one-time and bounded-use grants, atomic consumption, multi-instance and restart behavior, durable replay state, failure windows, request idempotency, and why replay resistance is not an exactly-once execution guarantee.
 
 ## Security Themes
 
@@ -23,7 +25,7 @@ Current and future material may examine:
 - Explicit execution boundaries
 - Short-lived authority
 - Actor and resource binding
-- Replay resistance
+- [Replay resistance and bounded-use authority](replay-protection-and-bounded-use.md)
 - Input validation
 - Secret isolation
 - Egress control
@@ -117,9 +119,9 @@ Application-specific security analysis remains necessary.
 
 ## Current Status
 
-The Security section now has its first focused tutorial, establishing trust boundaries and least privilege as the starting architecture concepts for Milestone 7.
+The Security section now has focused tutorials for trust boundaries and least privilege, plus replay protection and bounded-use authority. Together they establish the first security architecture path from identifying where trust changes to preserving narrow authority and controlling whether that authority may be consumed again.
 
-Future material will extend into capability-based authority, replay protection, signing and verification, key custody, tamper-evident records, secure logging, dependency integrity, and threat modeling.
+Future material will extend into capability-based authority, signing and verification, key custody, tamper-evident records, secure logging, dependency integrity, and threat modeling.
 
 Use the [Foundational Tutorials](../tutorials/index.md) to connect these security concepts to the existing governed-execution learning path.
 
