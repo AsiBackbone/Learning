@@ -5,6 +5,7 @@
 **Pattern classification:** General learning material
 
 **Difficulty:** Intermediate
+
 **Prerequisites:** [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) and [Constraint Composition and Policy Precedence](constraint-composition-and-policy-precedence.md). Familiarity with [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) is helpful for the continuation examples.
 
 ## Pattern Card

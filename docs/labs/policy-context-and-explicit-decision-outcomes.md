@@ -3,6 +3,7 @@
 **Learning objective:** Practice replacing scattered authorization facts and boolean results with an explicit policy-context snapshot, structured decision outcomes, stable reason codes, and intentional rule precedence.
 
 **Difficulty:** Beginner
+
 **Prerequisites:** Complete the [Policy Context and Explicit Decision Outcomes tutorial](../tutorials/policy-context-and-explicit-decision-outcomes.md) and run the [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md).
 
 This lab builds directly on the second foundational tutorial and its executable companion sample.

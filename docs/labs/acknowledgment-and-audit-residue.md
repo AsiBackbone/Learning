@@ -2,7 +2,8 @@
 
 **Learning objective:** Practice treating acknowledgment as a narrowly bound governance event rather than permission, preserving re-evaluation after acknowledgment, and maintaining a correlated audit timeline that distinguishes decisions, acknowledgments, and execution outcomes.
 
-**Difficulty:** Intermediate
+**Difficulty:** Intermediate  
+
 **Prerequisites:** Complete the [Acknowledgment and Audit Residue tutorial](../tutorials/acknowledgment-and-audit-residue.md) and run the [Acknowledgment and Audit Residue sample](https://github.com/AsiBackbone/Learning/blob/main/samples/acknowledgment-and-audit-residue/README.md).
 
 This lab builds directly on the third foundational tutorial and its executable companion sample.

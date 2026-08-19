@@ -3,6 +3,7 @@
 **Learning objective:** Understand why the facts used to make a governance decision should be represented explicitly, and why the result should describe what happens next rather than collapse every decision into a boolean.
 
 **Difficulty:** Beginner  
+
 **Prerequisites:** [Decision Before Execution](decision-before-execution.md)
 
 ## Pattern Card

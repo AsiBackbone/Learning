@@ -3,6 +3,7 @@
 **Learning objective:** Understand why a consequential operation should be represented as proposed intent, evaluated, and converted into an explicit decision before the host performs the real-world action.
 
 **Difficulty:** Beginner  
+
 **Prerequisites:** None. Familiarity with basic application request/response flows is helpful but not required.
 
 ## Pattern Card

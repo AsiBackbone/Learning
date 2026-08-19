@@ -3,6 +3,7 @@
 **Learning objective:** Practice preserving host-owned execution authority when an AI system proposes a consequential tool action, and threat-model the trust boundaries between model output, authoritative host context, governance, acknowledgment, scoped capability, and execution.
 
 **Difficulty:** Advanced
+
 **Prerequisites:** Complete the [Governed AI Tool Gateway tutorial](../tutorials/governed-ai-tool-gateway.md), run the [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md), and be comfortable with the first four foundational patterns.
 
 This is the capstone lab for the foundational ASI Backbone Learning path.
