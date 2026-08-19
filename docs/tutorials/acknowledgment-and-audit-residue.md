@@ -3,6 +3,7 @@
 **Learning objective:** Understand how a consequential operation can pause for explicit acknowledgment, resume through a governed boundary, and leave structured evidence explaining what was proposed, decided, acknowledged, and ultimately performed.
 
 **Difficulty:** Intermediate  
+
 **Prerequisites:** [Decision Before Execution](decision-before-execution.md) and [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md)
 
 ## Pattern Card

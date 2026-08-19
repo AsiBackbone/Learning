@@ -3,6 +3,7 @@
 **Learning objective:** Understand why an allowed or acknowledged operation should not automatically become broad execution authority, and how a short-lived, narrowly scoped capability can preserve a clear host-controlled execution boundary.
 
 **Difficulty:** Intermediate  
+
 **Prerequisites:** [Decision Before Execution](decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md), and [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md)
 
 ## Pattern Card

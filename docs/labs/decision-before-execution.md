@@ -3,6 +3,7 @@
 **Learning objective:** Practice preserving an explicit decision boundary so that blocked operations cannot reach a host-owned executor.
 
 **Difficulty:** Beginner  
+
 **Prerequisites:** Complete the [Decision Before Execution tutorial](../tutorials/decision-before-execution.md) and run the [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md).
 
 This lab builds directly on the first foundational tutorial and its executable companion sample.

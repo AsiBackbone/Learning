@@ -3,6 +3,7 @@
 **Learning objective:** Compose the first four foundational patterns into an end-to-end AI-assisted execution boundary where a model may propose a tool action, but the host owns authoritative context, governance, acknowledgment, scoped authority, execution, and evidence.
 
 **Difficulty:** Intermediate  
+
 **Prerequisites:** The first four foundational tutorials. Familiarity with AI tool or function calling is helpful but not required.
 
 > **Terminology note:** `Governed AI Tool Gateway` is a Learning composition term, not a claim that tool mediation, reference-monitor, authorization, or human-oversight ideas originated here. See [Terminology and Established Architecture Concepts](../architecture/terminology-and-established-concepts.md).

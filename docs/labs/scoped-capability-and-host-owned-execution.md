@@ -3,6 +3,7 @@
 **Learning objective:** Practice preserving narrow, short-lived execution authority across the transition from an allowed decision to a host-owned side effect, and detect when execution authority has become expired, mismatched, or stale.
 
 **Difficulty:** Intermediate
+
 **Prerequisites:** Complete the [Scoped Capability and Host-Owned Execution tutorial](../tutorials/scoped-capability-and-host-owned-execution.md) and run the [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/README.md#scoped-capability-and-host-owned-execution).
 
 This lab builds directly on the fourth foundational tutorial and its executable companion sample.
