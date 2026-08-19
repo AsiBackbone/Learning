@@ -12,3 +12,6 @@
 
 - name: Centralized Error Handling and Problem Details
   href: centralized-error-handling-and-problem-details.md
+
+- name: Data-Access Boundaries and Transaction Reasoning with EF Core
+  href: data-access-boundaries-and-transaction-reasoning.md
