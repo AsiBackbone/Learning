@@ -765,6 +765,8 @@ Fix time synchronization rather than using tolerance as a substitute for reliabl
 
 ## Replay and Bounded Use
 
+This section introduces the capability-specific replay boundary. For the deeper treatment of durable use state, atomic consumption, multi-instance and restart behavior, request idempotency, and failure windows, continue with [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md).
+
 A capability may be correctly scoped and still be dangerous if it can be replayed indefinitely.
 
 Suppose:
@@ -1572,6 +1574,7 @@ It is the first full composition of the primitives established so far.
 - [Decision Before Execution](decision-before-execution.md) — revisit the foundational boundary between a proposed operation, a governance decision, and the host-owned side effect.
 - [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — review the responsibility and evidence boundaries that may precede issuance of execution authority.
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — revisit the policy facts, outcome semantics, and policy identity that justify a scoped capability.
+- [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — go deeper on durable replay state, atomic consumption, distributed races, idempotency, and execution failure windows.
 - [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see scoped capabilities used as part of a complete AI-proposed, host-governed execution path.
 - [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/scoped-capability-and-host-owned-execution/README.md) — run the capability issuance and execution-boundary validation pattern.
 - [Scoped Capability and Host-Owned Execution lab](../labs/scoped-capability-and-host-owned-execution.md) — break expiration, resource-freshness, and scope boundaries, then repair them.

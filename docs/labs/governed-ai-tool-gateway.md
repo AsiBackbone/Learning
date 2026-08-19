@@ -486,6 +486,8 @@ The lesson is:
 
 # Part 8 — Break Single-Use Enforcement
 
+Use [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) for the canonical distributed-state treatment. The sample's `InMemoryCapabilityUseStore` demonstrates the state transition but does not provide a durable or cross-instance replay guarantee.
+
 The sample uses `InMemoryCapabilityUseStore` to demonstrate bounded use.
 
 Remove this check:
@@ -940,6 +942,7 @@ git restore samples/governed-ai-tool-gateway
 - [Governed AI Tool Gateway tutorial](../tutorials/governed-ai-tool-gateway.md) — review the complete architectural reasoning behind the capstone pattern.
 - [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) — return to the executable baseline used by this lab.
 - [Scoped Capability and Host-Owned Execution lab](scoped-capability-and-host-owned-execution.md) — revisit capability binding, expiration, stale authority, and replay concepts in isolation.
+- [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — distinguish capability replay protection from request idempotency, external retry semantics, and exactly-once execution claims.
 - [Acknowledgment and Audit Residue lab](acknowledgment-and-audit-residue.md) — revisit responsibility and evidence boundaries before they are composed into AI tool execution.
 - [AI Agent Gateway Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/ai-agent-gateway.md) — compare the teaching gateway with the working framework's scenario documentation.
 - [Human Approval Before AI Tool Execution](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/human-approval-before-ai-tool-execution.md) — compare acknowledgment handling with the implementation-oriented guidance.
