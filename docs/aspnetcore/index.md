@@ -6,7 +6,7 @@ The focus is not on teaching every ASP.NET Core feature.
 
 Instead, this section examines how application structure can make security, governance, execution boundaries, and operational behavior easier to understand and maintain.
 
-> **Section status:** Focused ASP.NET Core learning is expanding. Start with [Middleware Ordering Changes Behavior](middleware-ordering-changes-behavior.md), continue with [Secure-by-Default ASP.NET Core Configuration](secure-by-default-configuration.md), then read [Structured Logging Without Sensitive-Data Sprawl](structured-logging-without-sensitive-data-sprawl.md). Use the [Foundational Tutorials](../tutorials/index.md) when you want to connect application structure to governed execution.
+> **Section status:** Focused ASP.NET Core learning is expanding. Start with [Middleware Ordering Changes Behavior](middleware-ordering-changes-behavior.md), continue with [Secure-by-Default ASP.NET Core Configuration](secure-by-default-configuration.md), then read [Structured Logging Without Sensitive-Data Sprawl](structured-logging-without-sensitive-data-sprawl.md) and [Centralized Error Handling and Problem Details](centralized-error-handling-and-problem-details.md). Use the [Foundational Tutorials](../tutorials/index.md) when you want to connect application structure to governed execution.
 
 ## Start Here
 
@@ -20,6 +20,8 @@ Continue with the [Identify Middleware Ordering Problems lab](../labs/identify-m
 
 [Structured Logging Without Sensitive-Data Sprawl](structured-logging-without-sensitive-data-sprawl.md) continues into operational diagnostics. It explains structured events, stable event identity, correlation, logging boundaries, exception logging, data minimization, volume/cardinality, and the difference between troubleshooting telemetry and governance audit evidence.
 
+[Centralized Error Handling and Problem Details](centralized-error-handling-and-problem-details.md) then establishes one application-level exception boundary for unexpected failures, safe RFC 9457 Problem Details responses, deliberate status mapping, correlation with operational logs, and explicit HTTP translation of expected governance outcomes without converting those outcomes into exceptions. Its [companion sample](https://github.com/AsiBackbone/Learning/blob/main/samples/centralized-error-handling-and-problem-details/README.md) includes focused integration tests for safe `500` responses, known failure mapping, governance-result translation, correlation, and status-code Problem Details.
+
 ## Architectural Areas
 
 This section will continue to expand into topics such as:
@@ -28,8 +30,8 @@ This section will continue to expand into topics such as:
 - [Secure defaults and configuration](secure-by-default-configuration.md)
 - Dependency injection boundaries
 - Request validation
-- Centralized exception handling
-- Status-code handling
+- [Centralized exception handling and Problem Details](centralized-error-handling-and-problem-details.md)
+- [Status-code handling](centralized-error-handling-and-problem-details.md#status-code-pages-handle-non-exceptional-http-failures)
 - [Structured logging](structured-logging-without-sensitive-data-sprawl.md)
 - Forwarded headers
 - Reverse-proxy deployment
@@ -116,7 +118,7 @@ Learning should explain the architectural lesson without reproducing the full ap
 
 ## Current Status
 
-The ASP.NET Core learning area now covers middleware ordering, secure-by-default configuration, and structured logging. The middleware lesson is paired with an executable companion sample, focused invariant tests, and a beginner diagnostic lab; the configuration lesson establishes explicit opt-in, startup validation, environment behavior, secrets, safer failure, and configuration ownership; and the logging lesson establishes structured operational events, correlation, diagnostic boundaries, sensitive-data minimization, and a deliberate separation between logs and governance audit evidence. Additional material will expand into centralized error handling, data access, and related application-architecture concerns.
+The ASP.NET Core learning area now covers middleware ordering, secure-by-default configuration, structured logging, and centralized error handling. The middleware lesson is paired with an executable companion sample, focused invariant tests, and a beginner diagnostic lab; the configuration lesson establishes explicit opt-in, startup validation, environment behavior, secrets, safer failure, and configuration ownership; the logging lesson establishes structured operational events, correlation, diagnostic boundaries, sensitive-data minimization, and a deliberate separation between logs and governance audit evidence; and the error-handling lesson adds a centralized `IExceptionHandler`/Problem Details boundary plus a runnable sample and focused integration tests. Additional material will expand into data access, Architecture Decision Records, and related application-architecture concerns.
 
 Use the [Foundational Tutorials](../tutorials/index.md) for the governance model and `NetCoreApplicationTemplate` for a fuller application specimen.
 

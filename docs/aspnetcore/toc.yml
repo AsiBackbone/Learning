@@ -9,3 +9,6 @@
 
 - name: Structured Logging Without Sensitive-Data Sprawl
   href: structured-logging-without-sensitive-data-sprawl.md
+
+- name: Centralized Error Handling and Problem Details
+  href: centralized-error-handling-and-problem-details.md
