@@ -3,9 +3,11 @@
 **Learning objective:** Practice preserving the policy identity that produced a governance decision, detecting policy drift before consequential execution, and distinguishing useful policy provenance from stronger claims such as historical replay or cryptographic proof.
 
 **Difficulty:** Intermediate
-**Prerequisites:** Complete the [Policy Context and Explicit Decision Outcomes tutorial](../tutorials/policy-context-and-explicit-decision-outcomes.md), the [Acknowledgment and Audit Residue tutorial](../tutorials/acknowledgment-and-audit-residue.md), and run the [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md).
+**Prerequisites:** Complete the [Policy Versioning and Decision Provenance tutorial](../governance/policy-versioning-and-decision-provenance.md) and run the [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md).
 
-This lab begins with the second foundational sample because it already carries a policy version in the evaluation context while returning a decision that contains only the outcome and reasons.
+This lab applies the policy-identity, decision-provenance, drift, and freshness concepts established in the dedicated governance tutorial.
+
+It begins with the second foundational sample because it already carries a policy version in the evaluation context while returning a decision that contains only the outcome and reasons.
 
 That creates a useful question:
 
@@ -771,6 +773,7 @@ Use `git status` first so you understand which local work will be affected.
 
 ## Related Content
 
+- [Policy Versioning and Decision Provenance tutorial](../governance/policy-versioning-and-decision-provenance.md) — review the conceptual model this lab puts into practice, including stable policy identity, drift, freshness, fingerprints, and evidence boundaries.
 - [Policy Context and Explicit Decision Outcomes tutorial](../tutorials/policy-context-and-explicit-decision-outcomes.md) — review explicit decision inputs, outputs, reason codes, and policy identity.
 - [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md) — use the intentionally small executable baseline for this lab.
 - [Acknowledgment and Audit Residue tutorial](../tutorials/acknowledgment-and-audit-residue.md) — review acknowledgment binding, re-evaluation, correlation, and durable governance evidence.

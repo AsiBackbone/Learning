@@ -733,8 +733,8 @@ Expand the conceptual vocabulary around policy-governed systems after the founda
 * [x] Policy pipeline design. ([#44](https://github.com/AsiBackbone/Learning/issues/44))
 * [x] Constraint composition. ([#44](https://github.com/AsiBackbone/Learning/issues/44))
 * [x] Policy precedence. ([#44](https://github.com/AsiBackbone/Learning/issues/44))
-* [ ] Policy versioning.
-* [ ] Policy identity and hashing.
+* [x] Policy versioning. ([#53](https://github.com/AsiBackbone/Learning/issues/53))
+* [x] Policy identity and hashing. ([#53](https://github.com/AsiBackbone/Learning/issues/53))
 * [ ] Regional policy overlays.
 * [ ] Tenant-specific policy.
 * [ ] Risk-based decisions.

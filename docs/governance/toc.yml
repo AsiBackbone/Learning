@@ -3,3 +3,6 @@
 
 - name: Constraint Composition and Policy Precedence
   href: constraint-composition-and-policy-precedence.md
+
+- name: Policy Versioning and Decision Provenance
+  href: policy-versioning-and-decision-provenance.md
