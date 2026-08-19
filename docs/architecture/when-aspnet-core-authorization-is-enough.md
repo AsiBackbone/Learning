@@ -659,6 +659,7 @@ For the framework behavior discussed in this comparison, see:
 * [Architecture](index.md) — return to the architecture learning area.
 * [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — compare the richer governance-decision model directly.
 * [Decision Before Execution](../tutorials/decision-before-execution.md) — revisit the separation between decision and host-owned execution.
+* [Build a Governed API Operation](../labs/build-a-governed-api-operation.md) — practice the hybrid boundary by keeping ASP.NET Core authorization while adding explicit governance, acknowledgment, scoped authority, host-owned execution, and invariant tests.
 * [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — see when authority becomes a separate, narrowly scoped artifact after approval.
 * [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — see why AI-proposed consequential operations often require more than endpoint authorization alone.
 

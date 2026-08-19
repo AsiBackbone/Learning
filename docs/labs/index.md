@@ -24,7 +24,7 @@ Working Repository
 
 ## Current Status
 
-The lab navigation foundation is established, with four beginner labs, three intermediate labs, and one advanced capstone lab now available.
+The lab navigation foundation is established, with four beginner labs, four intermediate labs, and one advanced capstone lab now available.
 
 Additional labs will appear in this section as the learning path expands into deeper architecture, security, and AI-governance topics.
 
@@ -125,6 +125,22 @@ Related material:
 - [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md)
 - [Acknowledgment and Audit Residue lab](acknowledgment-and-audit-residue.md)
 - [Scoped Capability and Host-Owned Execution lab](scoped-capability-and-host-owned-execution.md)
+
+### Build a Governed API Operation
+
+[Build a Governed API Operation](build-a-governed-api-operation.md)
+
+**Difficulty:** Intermediate
+
+Extend an authorized ASP.NET Core account-disable endpoint into a governed operation with explicit intent, authoritative context, structured outcomes, acknowledgment, scoped authority, host-owned execution, audit residue, and integration tests that prove blocked paths never invoke the underlying account service.
+
+Related material:
+
+- [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md)
+- [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
+- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+- [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
+- [ASP.NET Core learning area](../aspnetcore/index.md)
 
 ### Governed AI Tool Gateway
 
