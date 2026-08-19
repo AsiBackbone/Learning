@@ -24,7 +24,7 @@ Working Repository
 
 ## Current Status
 
-The lab navigation foundation is established, with four beginner labs, five intermediate labs, and one advanced capstone lab now available.
+The lab navigation foundation is established, with four beginner labs, five intermediate labs, and two advanced labs now available.
 
 Additional labs will appear in this section as the learning path expands into deeper architecture, security, and AI-governance topics.
 
@@ -168,6 +168,22 @@ Related material:
 
 - [Governed AI Tool Gateway tutorial](../tutorials/governed-ai-tool-gateway.md)
 - [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md)
+
+### Safe Degraded Mode and Fail-Safe Governance
+
+[Safe Degraded Mode and Fail-Safe Governance](safe-degraded-mode-and-fail-safe-governance.md)
+
+**Difficulty:** Advanced
+
+Classify which trust or operational property is unavailable, compare low-consequence and consequential operations, design explicit deny/defer/escalate or bounded degraded behavior, and prove that policy, replay, verification, acknowledgment, evidence, and executor failures do not silently manufacture execution authority.
+
+Related material:
+
+- [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md)
+- [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md)
+- [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md)
+- [Centralized Error Handling and Problem Details](../aspnetcore/centralized-error-handling-and-problem-details.md)
+- [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md)
 
 ## Start with the Tutorials
 

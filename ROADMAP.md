@@ -602,7 +602,7 @@ Potential initial labs:
 * [x] Threat-model a governed execution gateway. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 * [ ] Design a regional or tenant-specific policy layer.
 * [ ] Analyze a deliberately flawed high-consequence workflow.
-* [ ] Design safe degraded-mode behavior.
+* [x] Design safe degraded-mode behavior. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 * [ ] Critique an architecture where an AI agent owns both proposal and execution authority.
 
 ## Lab Quality Standard
@@ -714,8 +714,8 @@ Teach security as an architectural property rather than a collection of isolated
 * [ ] Supply-chain provenance.
 * [ ] GitHub Actions SHA pinning.
 * [ ] SBOM concepts.
-* [ ] Fail-open versus fail-closed behavior.
-* [ ] Security failure modes.
+* [x] Fail-open versus fail-closed behavior. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
+* [x] Security failure modes. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 * [ ] Threat modeling as architecture reasoning.
 
 Educational security examples should clearly distinguish demonstrated patterns from production security guarantees.

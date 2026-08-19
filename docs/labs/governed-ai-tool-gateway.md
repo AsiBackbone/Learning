@@ -944,6 +944,7 @@ git restore samples/governed-ai-tool-gateway
 - [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) — return to the executable baseline used by this lab.
 - [Scoped Capability and Host-Owned Execution lab](scoped-capability-and-host-owned-execution.md) — revisit capability binding, expiration, stale authority, and replay concepts in isolation.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — distinguish capability replay protection from request idempotency, external retry semantics, and exactly-once execution claims.
+- [Safe Degraded Mode and Fail-Safe Governance](safe-degraded-mode-and-fail-safe-governance.md) — continue from the gateway's single fail-open exercise into explicit policy, replay, verification, acknowledgment, evidence, and executor failure behavior.
 - [Acknowledgment and Audit Residue lab](acknowledgment-and-audit-residue.md) — revisit responsibility and evidence boundaries before they are composed into AI tool execution.
 - [AI Agent Gateway Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/ai-agent-gateway.md) — compare the teaching gateway with the working framework's scenario documentation.
 - [Human Approval Before AI Tool Execution](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/human-approval-before-ai-tool-execution.md) — compare acknowledgment handling with the implementation-oriented guidance.
