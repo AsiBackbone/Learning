@@ -34,3 +34,5 @@
   items:
     - name: Governed AI Tool Gateway
       href: governed-ai-tool-gateway.md
+    - name: Safe Degraded Mode and Fail-Safe Governance
+      href: safe-degraded-mode-and-fail-safe-governance.md
