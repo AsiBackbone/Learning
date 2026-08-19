@@ -14,6 +14,8 @@ New to the project?
 
 Begin with [Getting Started](getting-started/index.md) for an introduction to the core concepts and recommended learning path.
 
+If the repository's vocabulary is new to you, use [Terminology and Established Architecture Concepts](architecture/terminology-and-established-concepts.md) to map Learning terms to established authorization, policy, capability, provenance, workflow, and mediation concepts.
+
 Already using ASP.NET Core authorization and unsure whether you need a broader governed-execution model? Read [When ASP.NET Core Authorization Is Enough](architecture/when-aspnet-core-authorization-is-enough.md). It presents the simpler framework-native approach first and explains where the architectural problem becomes larger than authorization.
 
 Learning does not require installing an `AsiBackbone` package. The material is intended to be useful as independent .NET architecture education.
