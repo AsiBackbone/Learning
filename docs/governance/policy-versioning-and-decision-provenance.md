@@ -1506,6 +1506,7 @@ AsiBackbone working implementation references
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — see policy identity carried into narrow execution authority.
 - [Policy-Version Evidence in Governance Decisions lab](../labs/policy-version-evidence-in-governance-decisions.md) — practice preserving provenance and detecting policy drift.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — compare policy freshness with replay/use-state checks at the execution boundary.
+- [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md) — continue from policy fingerprints into cryptographic authenticity, verifier trust policy, historical key verification, and tamper-evidence boundaries.
 
 ---
 

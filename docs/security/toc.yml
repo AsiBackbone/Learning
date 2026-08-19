@@ -6,3 +6,6 @@
 
 - name: Replay Protection and Bounded-Use Authority
   href: replay-protection-and-bounded-use.md
+
+- name: Signing, Verification, Key Custody, and Tamper Evidence
+  href: signing-verification-key-custody-and-tamper-evidence.md

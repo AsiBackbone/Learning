@@ -4,7 +4,7 @@ The Security section examines architectural boundaries that can reduce accidenta
 
 Security in ASI Backbone Learning is approached as an architectural responsibility rather than a single feature or package.
 
-> **Section status:** Focused security learning now covers trust boundaries, least privilege, and replay protection. Start with [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), continue with [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), then use the [Foundational Tutorials](../tutorials/index.md) to connect security boundaries to governed execution.
+> **Section status:** Focused security learning now covers trust boundaries, least privilege, replay protection, and cryptographic evidence boundaries. Start with [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), continue with [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), then study [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md) before using the [Foundational Tutorials](../tutorials/index.md) to connect security boundaries to governed execution.
 
 > **A secure boundary should remain visible when the system is under pressure.**
 
@@ -16,6 +16,8 @@ The tutorial connects caller-supplied versus authoritative context, authenticati
 
 [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md) continues from narrow authority into stateful execution-boundary enforcement. It covers one-time and bounded-use grants, atomic consumption, multi-instance and restart behavior, durable replay state, failure windows, request idempotency, and why replay resistance is not an exactly-once execution guarantee.
 
+[Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md) adds the cryptographic evidence boundary. It separates hashes from signatures, signing from verification and authorization, key custody from ordinary application configuration, normal rotation from compromise, and tamper evidence from tamper prevention.
+
 ## Security Themes
 
 Current and future material may examine:
@@ -26,6 +28,7 @@ Current and future material may examine:
 - Short-lived authority
 - Actor and resource binding
 - [Replay resistance and bounded-use authority](replay-protection-and-bounded-use.md)
+- [Signing, verification, key custody, and tamper evidence](signing-verification-key-custody-and-tamper-evidence.md)
 - Input validation
 - Secret isolation
 - Egress control
@@ -119,9 +122,9 @@ Application-specific security analysis remains necessary.
 
 ## Current Status
 
-The Security section now has focused tutorials for trust boundaries and least privilege, plus replay protection and bounded-use authority. Together they establish the first security architecture path from identifying where trust changes to preserving narrow authority and controlling whether that authority may be consumed again.
+The Security section now has focused tutorials for trust boundaries and least privilege, replay protection and bounded-use authority, and signing/verification with key-custody and tamper-evidence boundaries. Together they establish a security architecture path from identifying where trust changes, to preserving narrow authority, to controlling whether authority may be consumed again, to deciding what cryptographic evidence can safely establish across trust boundaries.
 
-Future material will extend into capability-based authority, signing and verification, key custody, tamper-evident records, secure logging, dependency integrity, and threat modeling.
+Future material will extend into capability-based authority, secure logging, dependency integrity, and threat modeling.
 
 Use the [Foundational Tutorials](../tutorials/index.md) to connect these security concepts to the existing governed-execution learning path.
 

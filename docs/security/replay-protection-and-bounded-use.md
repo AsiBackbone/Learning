@@ -1548,6 +1548,7 @@ Before moving on, you should be able to answer:
 - [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) — observe single-use consumption inside the dry-run AI gateway.
 - [Governed AI Tool Gateway lab](../labs/governed-ai-tool-gateway.md) — break single-use enforcement and threat-model replay versus idempotency.
 - [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — preserve evidence across decision, acknowledgment, execution, and failure stages.
+- [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md) — continue from replay-safe authority into cryptographic authenticity, verifier trust policy, key lifecycle, and tamper-evidence boundaries.
 
 ---
 
