@@ -16,6 +16,8 @@ The tutorial connects caller-supplied versus authoritative context, authenticati
 
 [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md) continues from narrow authority into stateful execution-boundary enforcement. It covers one-time and bounded-use grants, atomic consumption, multi-instance and restart behavior, durable replay state, failure windows, request idempotency, and why replay resistance is not an exactly-once execution guarantee.
 
+Run the [Replay Protection and Bounded-Use Authority sample](https://github.com/AsiBackbone/Learning/blob/main/samples/replay-protection-and-bounded-use/README.md) to compare a deterministic check-then-act race with atomic in-process consumption, then use the [intermediate concurrency lab](../labs/replay-protection-and-bounded-use.md) to repair and extend the boundary.
+
 [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md) adds the cryptographic evidence boundary. It separates hashes from signatures, signing from verification and authorization, key custody from ordinary application configuration, normal rotation from compromise, and tamper evidence from tamper prevention.
 
 ## Security Themes

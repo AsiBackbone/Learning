@@ -1399,6 +1399,16 @@ Host-owned execution
 
 The scoped-capability lab then asks the learner to add a small in-memory single-use store.
 
+The dedicated replay-protection sample isolates the concurrency boundary and makes both outcomes observable:
+
+```text
+Deliberately unsafe check-then-act
+        versus
+Atomic TryConsume
+```
+
+The companion replay lab begins from the unsafe implementation, requires the learner to eliminate the race, and then extends the exercise into bounded final-use contention, evidence, cancellation, store failure, durable-state design, idempotency, and recovery reasoning.
+
 The governed AI tool-gateway sample includes single-use consumption so a replayed capability does not reach the dry-run handler twice.
 
 Those examples are intentionally local and deterministic.
@@ -1415,7 +1425,7 @@ Production deployment topology
 Choose durable atomic semantics that match the claimed guarantee
 ```
 
-Use the existing samples to observe the boundary.
+Use the dedicated replay sample to observe the concurrency boundary directly.
 
 Use this tutorial to reason about the production state and failure model.
 
@@ -1544,6 +1554,8 @@ Before moving on, you should be able to answer:
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — review how narrow execution authority is created and validated.
 - [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/scoped-capability-and-host-owned-execution/README.md) — run the existing capability boundary and focused invariant tests.
 - [Scoped Capability and Host-Owned Execution lab](../labs/scoped-capability-and-host-owned-execution.md) — add local single-use state and observe its limits.
+- [Replay Protection and Bounded-Use Authority sample](https://github.com/AsiBackbone/Learning/blob/main/samples/replay-protection-and-bounded-use/README.md) — reproduce the check-then-act race and compare it with atomic in-process consumption.
+- [Replay Protection and Bounded-Use Authority lab](../labs/replay-protection-and-bounded-use.md) — repair the concurrency failure and reason about durable state, failure windows, and idempotency boundaries.
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — see single-use capability validation composed around AI-proposed actions.
 - [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) — observe single-use consumption inside the dry-run AI gateway.
 - [Governed AI Tool Gateway lab](../labs/governed-ai-tool-gateway.md) — break single-use enforcement and threat-model replay versus idempotency.

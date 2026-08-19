@@ -24,7 +24,7 @@ Working Repository
 
 ## Current Status
 
-The lab navigation foundation is established, with four beginner labs, four intermediate labs, and one advanced capstone lab now available.
+The lab navigation foundation is established, with four beginner labs, five intermediate labs, and one advanced capstone lab now available.
 
 Additional labs will appear in this section as the learning path expands into deeper architecture, security, and AI-governance topics.
 
@@ -111,6 +111,20 @@ Related material:
 
 - [Scoped Capability and Host-Owned Execution tutorial](../tutorials/scoped-capability-and-host-owned-execution.md)
 - [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/scoped-capability-and-host-owned-execution/README.md)
+
+### Replay Protection and Bounded-Use Authority
+
+[Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md)
+
+**Difficulty:** Intermediate
+
+Reproduce a deterministic check-then-act race, repair it with atomic `TryConsume` semantics, prove that exactly one concurrent final-use consumer reaches protected execution, and reason about evidence, cancellation, durable state, idempotency, and the failure window between consumption and execution.
+
+Related material:
+
+- [Replay Protection and Bounded-Use Authority tutorial](../security/replay-protection-and-bounded-use.md)
+- [Replay Protection and Bounded-Use Authority sample](https://github.com/AsiBackbone/Learning/blob/main/samples/replay-protection-and-bounded-use/README.md)
+- [Data Access Boundaries and Transaction Reasoning](../aspnetcore/data-access-boundaries-and-transaction-reasoning.md)
 
 ### Policy-Version Evidence in Governance Decisions
 

@@ -132,6 +132,30 @@ dotnet run --project samples/governed-ai-tool-gateway/GovernedAiToolGateway/Gove
 - [Read the tutorial](../tutorials/governed-ai-tool-gateway.md)
 - [Continue with the advanced lab](../labs/governed-ai-tool-gateway.md)
 
+## Security and Trust Architecture Samples
+
+### Replay Protection and Bounded-Use Authority
+
+**Learning objective:** Observe why bounded-use authority requires state, reproduce a check-then-act race, and prove that an atomic consume boundary permits exactly one consumer to claim the final use inside the teaching process.
+
+**Difficulty:** Intermediate
+
+**Key invariant:**
+
+> **With `MaximumUses = 1`, two concurrent consumers produce one accepted consumption, one rejected replay, and one protected execution.**
+
+The sample also demonstrates that successful capability consumption does not establish exactly-once completion of an external side effect.
+
+Run from the repository root:
+
+```bash
+dotnet run --project samples/replay-protection-and-bounded-use/ReplayProtectionAndBoundedUse/ReplayProtectionAndBoundedUse.csproj
+```
+
+- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/replay-protection-and-bounded-use/README.md)
+- [Read Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md)
+- [Continue with the intermediate concurrency lab](../labs/replay-protection-and-bounded-use.md)
+
 ## ASP.NET Core Architecture Samples
 
 ### Middleware Ordering Changes Behavior
