@@ -589,7 +589,7 @@ Potential initial labs:
 * [x] Add acknowledgment to a consequential workflow.
 * [x] Preserve an audit receipt.
 * [x] Introduce capability-scoped execution. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
-* [ ] Build a governed API operation.
+* [x] Build a governed API operation. ([#54](https://github.com/AsiBackbone/Learning/issues/54))
 * [ ] Refactor scattered governance logic into a decision pipeline.
 * [x] Detect stale or mismatched execution authority. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [x] Add policy-version evidence to a decision path. ([#37](https://github.com/AsiBackbone/Learning/issues/37))
