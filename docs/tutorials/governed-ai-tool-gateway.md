@@ -5,6 +5,8 @@
 **Difficulty:** Intermediate  
 **Prerequisites:** The first four foundational tutorials. Familiarity with AI tool or function calling is helpful but not required.
 
+> **Terminology note:** `Governed AI Tool Gateway` is a Learning composition term, not a claim that tool mediation, reference-monitor, authorization, or human-oversight ideas originated here. See [Terminology and Established Architecture Concepts](../architecture/terminology-and-established-concepts.md).
+
 ## Pattern Card
 
 > **Problem:** A model-generated tool proposal can be treated too directly as permission to perform a real-world side effect, while model-supplied context may be incomplete, stale, or untrusted.

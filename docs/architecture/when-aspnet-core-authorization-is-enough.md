@@ -4,6 +4,8 @@
 **Difficulty:** Intermediate  
 **Prerequisites:** [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
 
+> **Terminology note:** The Learning vocabulary used in this comparison is mapped to established authorization, ABAC, workflow, capability, provenance, and mediation concepts in [Terminology and Established Architecture Concepts](terminology-and-established-concepts.md).
+
 ASP.NET Core already includes a capable authorization system.
 
 For many applications, that built-in system is not merely an acceptable alternative to a broader governance pipeline.

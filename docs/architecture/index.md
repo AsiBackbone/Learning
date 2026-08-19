@@ -8,6 +8,12 @@ Instead, this section examines why particular boundaries exist, what problems th
 
 > **Good architecture makes important boundaries visible.**
 
+## Terminology and Lineage
+
+Learning uses a consistent vocabulary for recurring boundaries, but that vocabulary is not a claim that the underlying architectural ideas originated with ASI Backbone.
+
+Start with [Terminology and Established Architecture Concepts](terminology-and-established-concepts.md) to connect terms such as governed execution, policy context, audit residue, capability-scoped authority, host-owned execution, and governed AI tool gateways to established software architecture and security concepts.
+
 ## Current Focus
 
 The current foundational material emphasizes separation among:
