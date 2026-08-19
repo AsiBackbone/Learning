@@ -586,7 +586,9 @@ Possible areas:
 
 ## Policy Versioning
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [Policy Versioning and Decision Provenance](../docs/governance/policy-versioning-and-decision-provenance.md)
 
 Explain why a decision should often record which policy version produced it.
 

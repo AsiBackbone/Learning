@@ -84,6 +84,14 @@ Composes the earlier ideas into an AI-assisted workflow while preserving host-ow
 
 Expands the policy pipeline beyond individual rule evaluation. It explains deny/warning/not-applicable composition, deliberate precedence, full evaluation versus first-denial short-circuiting, empty-policy and exception behavior, optional post-composition decision policy, determinism, and the continuing separation between governance decisions and host-owned execution.
 
+### Policy Versioning and Decision Provenance
+
+[Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md)
+
+Explains stable policy identity, policy versions and fingerprints, decision-time provenance, policy drift, execution-freshness strategies, acknowledgment and capability continuity, rollback, composition across multiple policies, canonicalization before hashing, and the limits of what a policy hash can prove.
+
+Continue into the [Policy-Version Evidence in Governance Decisions lab](../labs/policy-version-evidence-in-governance-decisions.md) to practice the boundary.
+
 ## Governance Is Not Compliance Certification
 
 The patterns explored here may support systems with governance, security, accountability, or audit requirements.
@@ -109,12 +117,11 @@ Learning explains the architectural reasoning in intentionally smaller examples 
 
 ## Current Status
 
-The foundational governance tutorial sequence is established, and the Governance section now begins the next layer with explicit policy-pipeline, constraint-composition, and precedence guidance.
+The foundational governance tutorial sequence is established, and the Governance section now extends that foundation with explicit policy-pipeline composition, precedence, policy versioning, and decision-provenance guidance.
 
 Future material may expand into:
 
 * Decision conflict resolution beyond the current base composition model
-* Policy versioning
 * Delegated authority
 * Multi-tenant governance
 * Regional policy overlays

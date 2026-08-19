@@ -816,6 +816,8 @@ These values do not decide the operation by themselves.
 
 They help explain **which decision process was applied**.
 
+The dedicated [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) tutorial continues from this field-level introduction into stable policy identity, fingerprints, drift, execution freshness, rollback, and historical decision evidence.
+
 A useful conceptual record is:
 
 ```text

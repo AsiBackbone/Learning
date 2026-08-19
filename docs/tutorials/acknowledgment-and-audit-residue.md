@@ -528,6 +528,8 @@ PolicyHash
 DecisionStage
 ```
 
+These policy fields are part of decision provenance, not merely decoration on an audit record. See [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) for the deeper treatment of decision-time identity, policy drift, freshness, and the limits of fingerprints.
+
 A minimal educational model:
 
 ```csharp
