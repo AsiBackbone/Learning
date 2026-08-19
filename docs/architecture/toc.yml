@@ -9,3 +9,6 @@
 
 - name: When ASP.NET Core Authorization Is Enough
   href: when-aspnet-core-authorization-is-enough.md
+
+- name: When a Simple Application Service Is Enough
+  href: when-a-simple-application-service-is-enough.md
