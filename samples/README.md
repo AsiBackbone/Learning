@@ -8,9 +8,11 @@ It is intended to contain intentionally small .NET examples that complement the 
 
 ## Current Status
 
-**Foundational sample set established — five governance companions plus focused ASP.NET Core architecture samples and invariant tests are available.**
+**Foundational sample set established — five governance companions plus focused security and ASP.NET Core architecture samples and invariant tests are available.**
 
 The `samples/` area pairs all five foundational tutorials with runnable companion projects and sibling xUnit test projects, culminating in the Governed AI Tool Gateway capstone. Focused ASP.NET Core samples now make middleware ordering and centralized error-handling behavior executable as the application-architecture path expands.
+
+The security path now includes a replay-protection and bounded-use sample that makes the check-then-act concurrency race, atomic consumption, replay evidence, and exactly-once boundary directly observable.
 
 Future sample work can focus on refinement, additional invariants, alternative patterns, and new learning areas rather than filling a gap in the foundational sequence.
 
@@ -280,6 +282,44 @@ Host Rebuilds Authoritative Classification
    ↓
 AcknowledgmentRequired
 ```
+
+## Security and Trust Architecture Samples
+
+Security samples isolate state, trust, and execution-boundary behavior that benefits from direct observation under failure or concurrency pressure.
+
+### Replay Protection and Bounded-Use Authority
+
+Related tutorial:
+
+[Replay Protection and Bounded-Use Authority](../docs/security/replay-protection-and-bounded-use.md)
+
+Executable companion:
+
+[Replay Protection and Bounded-Use Authority sample](replay-protection-and-bounded-use/README.md)
+
+The sample contrasts an intentionally unsafe check-then-act use store with an atomic in-process `TryConsumeAsync` boundary.
+
+Its central invariant is:
+
+```text
+MaximumUses = 1
+        ↓
+Two concurrent consumers
+        ↓
+Exactly one consumption succeeds
+        ↓
+Exactly one reaches protected execution
+```
+
+Focused tests also cover sequential replay rejection, bounded-use counts, static validation before consumption, rejected-replay evidence, cancellation before consumption, replay-store unavailability, and execution failure after authority has already been consumed.
+
+The sample explicitly limits its claim to process-local in-memory coordination. It does not claim durable multi-instance replay protection or exactly-once completion of an external side effect.
+
+Companion lab:
+
+[Replay Protection and Bounded-Use Authority lab](../docs/labs/replay-protection-and-bounded-use.md)
+
+The lab begins from the deliberately unsafe implementation, requires the learner to repair the race, and then extends the reasoning into durable-store semantics, idempotency, and recovery.
 
 ## ASP.NET Core Architecture Samples
 

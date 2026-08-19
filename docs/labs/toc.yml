@@ -21,6 +21,8 @@
       href: acknowledgment-and-audit-residue.md
     - name: Scoped Capability and Host-Owned Execution
       href: scoped-capability-and-host-owned-execution.md
+    - name: Replay Protection and Bounded-Use Authority
+      href: replay-protection-and-bounded-use.md
     - name: Policy-Version Evidence in Governance Decisions
       href: policy-version-evidence-in-governance-decisions.md
     - name: Build a Governed API Operation
