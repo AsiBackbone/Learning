@@ -8,9 +8,9 @@ It is intended to contain intentionally small .NET examples that complement the 
 
 ## Current Status
 
-**Foundational sample set established — five executable companion samples and focused invariant tests available.**
+**Foundational sample set established — five governance companions plus focused ASP.NET Core architecture samples and invariant tests are available.**
 
-The `samples/` area now pairs all five foundational tutorials with runnable companion projects and sibling xUnit test projects, culminating in the Governed AI Tool Gateway capstone.
+The `samples/` area pairs all five foundational tutorials with runnable companion projects and sibling xUnit test projects, culminating in the Governed AI Tool Gateway capstone. Focused ASP.NET Core samples now make middleware ordering and centralized error-handling behavior executable as the application-architecture path expands.
 
 Future sample work can focus on refinement, additional invariants, alternative patterns, and new learning areas rather than filling a gap in the foundational sequence.
 
@@ -322,6 +322,38 @@ Custom handler never entered
 ```
 
 The sample remains deliberately smaller than `NetCoreApplicationTemplate`; the working repository is used to inspect routing, proxy correction, request logging, security headers, rate limiting, authentication, authorization, and other production concerns in a fuller pipeline.
+
+### Centralized Error Handling and Problem Details
+
+Related tutorial:
+
+[Centralized Error Handling and Problem Details](../docs/aspnetcore/centralized-error-handling-and-problem-details.md)
+
+Executable companion:
+
+[Centralized Error Handling and Problem Details sample](centralized-error-handling-and-problem-details/README.md)
+
+The sample uses a small ASP.NET Core API to keep these paths distinct:
+
+```text
+Unexpected exception
+   ↓
+Central IExceptionHandler
+   ↓
+Safe Problem Details + structured exception log
+```
+
+versus:
+
+```text
+Expected governance outcome
+   ↓
+Explicit host HTTP mapping
+   ↓
+Problem Details when the transport needs one
+```
+
+Focused integration tests prove that an unexpected failure becomes a safe `500`, a known dependency failure maps consistently to `503`, sensitive exception detail is not returned publicly, a response `traceId` can be correlated with the handler log, expected governance outcomes do not pass through the exception handler, and an ordinary missing route can use Problem Details without throwing.
 
 ## Sample Design Principles
 

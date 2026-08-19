@@ -46,6 +46,7 @@ jobs:
         with:
           args: >-
             --root-dir "${{ github.workspace }}"
+            --remap "^https://github\.com/AsiBackbone/Learning/blob/main file://${{ github.workspace }}"
             './**/*.md'
           token: ${{ secrets.GITHUB_TOKEN }}
           fail: true

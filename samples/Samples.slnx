@@ -11,4 +11,6 @@
   <Project Path="scoped-capability-and-host-owned-execution/ScopedCapabilityAndHostOwnedExecution.Tests/ScopedCapabilityAndHostOwnedExecution.Tests.csproj" />
   <Project Path="middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior/MiddlewareOrderingChangesBehavior.csproj" />
   <Project Path="middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior.Tests/MiddlewareOrderingChangesBehavior.Tests.csproj" />
+  <Project Path="centralized-error-handling-and-problem-details/CentralizedErrorHandlingAndProblemDetails/CentralizedErrorHandlingAndProblemDetails.csproj" />
+  <Project Path="centralized-error-handling-and-problem-details/CentralizedErrorHandlingAndProblemDetails.Tests/CentralizedErrorHandlingAndProblemDetails.Tests.csproj" />
 </Solution>

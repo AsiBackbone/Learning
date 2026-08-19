@@ -617,7 +617,7 @@ Where multiple valid solutions exist, the discussion should explain the tradeoff
 
 ## Status
 
-**In progress — middleware-ordering, secure-defaults, and structured-logging foundations established**
+**In progress — middleware-ordering, secure-defaults, structured-logging, and centralized-error-handling foundations established**
 
 ## Goal
 
@@ -658,14 +658,15 @@ These materials should remain useful independently of that repository.
 * [x] Logging boundaries.
 * [x] Distinguishing operational logs from audit records.
 
-## Error Handling
+## Error Handling ([#51](https://github.com/AsiBackbone/Learning/issues/51))
 
-* [ ] Centralized exception handling.
-* [ ] Problem Details.
-* [ ] Information disclosure.
-* [ ] Status-code handling.
-* [ ] Observability considerations.
-* [ ] Safe failure behavior.
+* [x] Centralized exception handling.
+* [x] Problem Details.
+* [x] Information disclosure.
+* [x] Status-code handling.
+* [x] Observability considerations.
+* [x] Safe failure behavior.
+* [x] Pair with a runnable sample and focused integration tests. ([#51](https://github.com/AsiBackbone/Learning/issues/51))
 
 ## Data Access
 
