@@ -3,7 +3,8 @@
 [![Documentation Validation](https://github.com/AsiBackbone/Learning/actions/workflows/docs-validation.yml/badge.svg?branch=main)](https://github.com/AsiBackbone/Learning/actions/workflows/docs-validation.yml)
 [![Samples Validation](https://github.com/AsiBackbone/Learning/actions/workflows/samples-validation.yml/badge.svg?branch=main)](https://github.com/AsiBackbone/Learning/actions/workflows/samples-validation.yml)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://asibackbone.github.io/Learning/)
-[![DOI](https://zenodo.org/badge/1332248453.svg)](https://doi.org/10.5281/zenodo.21938556)
+[![Zenodo DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21938556-blue)](https://doi.org/10.5281/zenodo.21938556)
+
 
 **Practical .NET architecture education for governed execution, secure applications, AI integration, and policy-driven systems.**
 
