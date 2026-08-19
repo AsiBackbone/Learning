@@ -617,7 +617,7 @@ Where multiple valid solutions exist, the discussion should explain the tradeoff
 
 ## Status
 
-**In progress — middleware-ordering, secure-defaults, structured-logging, and centralized-error-handling foundations established**
+**In progress — middleware-ordering, secure-defaults, structured-logging, centralized-error-handling, and data-access foundations established**
 
 ## Goal
 
@@ -668,14 +668,14 @@ These materials should remain useful independently of that repository.
 * [x] Safe failure behavior.
 * [x] Pair with a runnable sample and focused integration tests. ([#51](https://github.com/AsiBackbone/Learning/issues/51))
 
-## Data Access
+## Data Access ([#55](https://github.com/AsiBackbone/Learning/issues/55))
 
-* [ ] EF Core boundaries.
-* [ ] Persistence abstractions.
-* [ ] Transaction reasoning.
-* [ ] Interceptors and cross-cutting behavior.
-* [ ] Local versus production storage choices.
-* [ ] Data-access failure boundaries.
+* [x] EF Core boundaries.
+* [x] Persistence abstractions.
+* [x] Transaction reasoning.
+* [x] Interceptors and cross-cutting behavior.
+* [x] Local versus production storage choices.
+* [x] Data-access failure boundaries.
 
 ## Architecture Decision Records
 

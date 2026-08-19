@@ -341,7 +341,9 @@ Possible areas:
 
 ## EF Core Cross-Cutting Behavior
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [Data-Access Boundaries and Transaction Reasoning with EF Core](../docs/aspnetcore/data-access-boundaries-and-transaction-reasoning.md)
 
 Explain when interceptors, repositories, unit-of-work patterns, or direct DbContext usage make sense.
 
