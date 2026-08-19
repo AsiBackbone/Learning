@@ -88,6 +88,7 @@ Architecture should be compared against viable alternatives rather than presente
 Start with:
 
 * [When ASP.NET Core Authorization Is Enough](when-aspnet-core-authorization-is-enough.md) — compares the governed-execution model with ASP.NET Core policies, requirements, handlers, and resource-based authorization, including cases where the built-in authorization model is the simpler and better choice.
+* [When a Simple Application Service Is Enough](when-a-simple-application-service-is-enough.md) — examines the middle ground where authorization alone is not the whole use case, but an immediate application-service workflow still expresses the required validation, domain rules, persistence, execution, and audit boundaries without a broader governance lifecycle.
 
 The purpose of these comparisons is not to make adjacent approaches compete. It is to make their different responsibilities, trust boundaries, and operational costs visible.
 
@@ -109,7 +110,7 @@ An ASP.NET Core reference architecture demonstrating middleware organization, se
 
 ## Current Status
 
-The Architecture section is established as a learning area and now includes a governed-execution visual reference alongside alternative-pattern material. It will continue to grow through additional comparisons, diagrams, and cross-repository studies.
+The Architecture section is established as a learning area and now includes a governed-execution visual reference alongside two concrete alternative-pattern comparisons. It will continue to grow through additional comparisons, diagrams, and cross-repository studies.
 
 For the current learning path, continue with the [Foundational Tutorials](../tutorials/index.md).
 
