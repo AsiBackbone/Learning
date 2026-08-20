@@ -8,7 +8,7 @@ It means that the problem usually contains more interacting boundaries, assumpti
 
 > **Complexity should be earned by the problem, not introduced by habit.**
 
-> **Section status:** This page is the advanced-material overview. The first dedicated advanced article, [Regional and Tenant Policy Overlays](regional-and-tenant-policy-overlays.md), is now published; begin with the [Foundational Tutorials](../tutorials/index.md) and [Hands-On Labs](../labs/index.md) before moving into the advanced material.
+> **Section status:** This page is the advanced-material overview. Dedicated articles now cover [Regional and Tenant Policy Overlays](regional-and-tenant-policy-overlays.md) and the experimental [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md); begin with the [Foundational Tutorials](../tutorials/index.md) and [Hands-On Labs](../labs/index.md) before moving into the advanced material.
 
 ## Before Continuing
 
@@ -352,6 +352,8 @@ Useful questions include:
 The foundational rule still applies:
 
 > **The model may propose. The host retains execution authority.**
+
+Continue with [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md) for an explicitly experimental treatment of proposal provenance, delegation, authority narrowing, multi-step capabilities, cross-service trust, replay/revocation, agent loops, and failure recovery.
 
 ## Alternative Architectures
 
