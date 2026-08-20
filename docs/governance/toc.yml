@@ -6,3 +6,6 @@
 
 - name: Policy Versioning and Decision Provenance
   href: policy-versioning-and-decision-provenance.md
+
+- name: Practical Policy Testing and Decision-Table Strategies
+  href: practical-policy-testing-and-decision-table-strategies.md

@@ -1502,6 +1502,7 @@ AsiBackbone working implementation references
 - [Governance Index](index.md) — view the deeper governance learning path.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — begin with explicit decision-time facts, policy identity, and structured outcomes.
 - [Constraint Composition and Policy Precedence](constraint-composition-and-policy-precedence.md) — examine how several rule results and composition behavior become one final governance decision.
+- [Practical Policy Testing and Decision-Table Strategies](practical-policy-testing-and-decision-table-strategies.md) — test policy versions, drift, structured outcomes, and non-execution invariants as a coherent decision system.
 - [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — connect decision provenance to acknowledgment, re-evaluation, and durable governance evidence.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — see policy identity carried into narrow execution authority.
 - [Policy-Version Evidence in Governance Decisions lab](../labs/policy-version-evidence-in-governance-decisions.md) — practice preserving provenance and detecting policy drift.
