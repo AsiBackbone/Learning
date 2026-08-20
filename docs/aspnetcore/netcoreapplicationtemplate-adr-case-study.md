@@ -398,6 +398,7 @@ That is the durable connection between Learning material and an implementation r
 - [Architecture Decision Record Lifecycle, Review, Deprecation, and Supersession](architecture-decision-record-lifecycle-review-deprecation-and-supersession.md)
 - [Middleware Ordering Changes Behavior](middleware-ordering-changes-behavior.md)
 - [Structured Logging Without Sensitive-Data Sprawl](structured-logging-without-sensitive-data-sprawl.md)
+- [Write and Revisit an Architecture Decision Record lab](../labs/write-and-revisit-an-architecture-decision-record.md)
 
 ## Working Repository References
 

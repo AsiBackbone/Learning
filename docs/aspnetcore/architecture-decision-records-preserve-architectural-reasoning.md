@@ -469,6 +469,8 @@ Use it as a specimen of a repository preserving architectural reasoning, not as 
 
 Continue with [Working Repository ADR Case Study: NetCoreApplicationTemplate](netcoreapplicationtemplate-adr-case-study.md) to trace two accepted decisions from the general Learning problem through repository-specific constraints, ADR rationale, current implementation, alternatives, consequences, and review triggers.
 
+Then complete the [Write and Revisit an Architecture Decision Record lab](../labs/write-and-revisit-an-architecture-decision-record.md) to compare alternatives, write your own ADR, define review conditions, and revisit the record after the scenario changes.
+
 ## Related Learning Material
 
 Several existing ASP.NET Core lessons contain architectural choices that a real project might decide to preserve in ADRs:

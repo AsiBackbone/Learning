@@ -24,11 +24,11 @@ Working Repository
 
 ## Current Status
 
-The lab navigation foundation is established, with four beginner labs, five intermediate labs, and two advanced labs now available.
+The lab navigation foundation is established, with four beginner labs, six intermediate labs, and two advanced labs now available.
 
 Additional labs will appear in this section as the learning path expands into deeper architecture, security, and AI-governance topics.
 
-The foundational labs pair all five governance tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated boundaries. The ASP.NET Core diagnostic lab begins the next learning area by requiring learners to predict, observe, repair, and explain middleware-ordering behavior.
+The foundational labs pair all five governance tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated boundaries. The ASP.NET Core diagnostic lab begins the next learning area by requiring learners to predict, observe, repair, and explain middleware-ordering behavior; the ADR lab extends that application-architecture path by requiring learners to make, record, and revisit a decision under changed constraints.
 
 ## Available Labs
 
@@ -155,6 +155,21 @@ Related material:
 - [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 - [ASP.NET Core learning area](../aspnetcore/index.md)
+
+### Write and Revisit an Architecture Decision Record
+
+[Write and Revisit an Architecture Decision Record](write-and-revisit-an-architecture-decision-record.md)
+
+**Difficulty:** Intermediate
+
+Evaluate a structured-logging architecture under competing constraints, compare credible alternatives, write a concise ADR with explicit consequences and review conditions, then revisit the decision after the telemetry platform changes and decide whether the record should be retained, deprecated, superseded, or left unchanged while only the implementation evolves.
+
+Related material:
+
+- [Architecture Decision Records Preserve Architectural Reasoning](../aspnetcore/architecture-decision-records-preserve-architectural-reasoning.md)
+- [Architecture Decision Record Lifecycle, Review, Deprecation, and Supersession](../aspnetcore/architecture-decision-record-lifecycle-review-deprecation-and-supersession.md)
+- [Structured Logging Without Sensitive-Data Sprawl](../aspnetcore/structured-logging-without-sensitive-data-sprawl.md)
+- [Working Repository ADR Case Study: NetCoreApplicationTemplate](../aspnetcore/netcoreapplicationtemplate-adr-case-study.md)
 
 ### Governed AI Tool Gateway
 
