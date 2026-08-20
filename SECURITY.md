@@ -187,3 +187,4 @@ It is not accurate to describe this repository as providing:
 * [ROADMAP.md](ROADMAP.md)
 * [LICENSING.md](LICENSING.md)
 * [samples/README.md](samples/README.md)
+* [Software Supply-Chain Integrity for .NET Repositories](docs/security/software-supply-chain-integrity-for-dotnet-repositories.md)

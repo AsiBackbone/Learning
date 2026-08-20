@@ -468,7 +468,9 @@ This topic should remain explicit about the difference between a conceptual patt
 
 ## Software Supply-Chain Integrity
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [Software Supply-Chain Integrity for .NET Repositories](../docs/security/software-supply-chain-integrity-for-dotnet-repositories.md)
 
 Use the organization repositories as practical examples for:
 
