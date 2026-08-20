@@ -8,7 +8,7 @@ It means that the problem usually contains more interacting boundaries, assumpti
 
 > **Complexity should be earned by the problem, not introduced by habit.**
 
-> **Section status:** This page is currently the advanced-material overview. Dedicated advanced articles are planned as the curriculum expands; begin with the [Foundational Tutorials](../tutorials/index.md) and [Hands-On Labs](../labs/index.md).
+> **Section status:** This page is the advanced-material overview. The first dedicated advanced article, [Regional and Tenant Policy Overlays](regional-and-tenant-policy-overlays.md), is now published; begin with the [Foundational Tutorials](../tutorials/index.md) and [Hands-On Labs](../labs/index.md) before moving into the advanced material.
 
 ## Before Continuing
 
@@ -309,6 +309,8 @@ Advanced questions include:
 * How are conflicting requirements surfaced?
 
 These concerns become increasingly important when governance spans organizational or geographic boundaries.
+
+Continue with [Regional and Tenant Policy Overlays](regional-and-tenant-policy-overlays.md) for a dedicated treatment of policy authority, narrowing versus broadening, explicit override paths, conflict handling, multi-policy provenance, drift, degraded mode, and overlay testing.
 
 ## AI Agent Orchestration
 
