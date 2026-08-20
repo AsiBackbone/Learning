@@ -90,7 +90,13 @@ Expands the policy pipeline beyond individual rule evaluation. It explains deny/
 
 Explains stable policy identity, policy versions and fingerprints, decision-time provenance, policy drift, execution-freshness strategies, acknowledgment and capability continuity, rollback, composition across multiple policies, canonicalization before hashing, and the limits of what a policy hash can prove.
 
-Continue into the [Policy-Version Evidence in Governance Decisions lab](../labs/policy-version-evidence-in-governance-decisions.md) to practice the boundary.
+### Practical Policy Testing and Decision-Table Strategies
+
+[Practical Policy Testing and Decision-Table Strategies](practical-policy-testing-and-decision-table-strategies.md)
+
+Shows how to translate policy requirements into decision tables, equivalence classes, boundary cases, layered tests, policy-version regressions, and execution-boundary invariants without attempting to enumerate every possible system state.
+
+Continue into the [Policy-Version Evidence in Governance Decisions lab](../labs/policy-version-evidence-in-governance-decisions.md) to practice the provenance boundary.
 
 ## Governance Is Not Compliance Certification
 
@@ -117,7 +123,7 @@ Learning explains the architectural reasoning in intentionally smaller examples 
 
 ## Current Status
 
-The foundational governance tutorial sequence is established, and the Governance section now extends that foundation with explicit policy-pipeline composition, precedence, policy versioning, and decision-provenance guidance.
+The foundational governance tutorial sequence is established, and the Governance section now extends that foundation with explicit policy-pipeline composition, precedence, policy versioning, decision provenance, and decision-boundary testing guidance.
 
 Future material may expand into:
 

@@ -1251,6 +1251,7 @@ If several answers are unclear, the system may have policy logic, but it does no
 ## Related Content
 
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — begin with explicit decision-time facts and structured outcomes.
+- [Practical Policy Testing and Decision-Table Strategies](practical-policy-testing-and-decision-table-strategies.md) — turn composition rules, precedence, and execution boundaries into explicit regression-testable cases.
 - [Decision Before Execution](../tutorials/decision-before-execution.md) — revisit the boundary between a governance decision and the protected side effect.
 - [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — continue from final decisions into acknowledgment and governance evidence.
 - [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md) — compare the richer governance model with a simpler built-in authorization approach.
