@@ -22,5 +22,5 @@
 - name: Architecture Decision Record Lifecycle, Review, Deprecation, and Supersession
   href: architecture-decision-record-lifecycle-review-deprecation-and-supersession.md
 
-- name: Working Repository ADR Case Study: NetCoreApplicationTemplate
+- name: "Working Repository ADR Case Study: NetCoreApplicationTemplate"
   href: netcoreapplicationtemplate-adr-case-study.md
