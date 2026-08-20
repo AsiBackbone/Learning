@@ -10,17 +10,15 @@
 
 > **Experimental architecture note:** This article explores design boundaries for multi-agent systems. It does not define a standardized agent-to-agent protocol, autonomous-agent safety guarantee, AGI architecture, or production-ready agent platform.
 
-## Pattern Card
+## At a Glance
 
-> **Problem:** Adding planner, specialist, supervisor, or tool-using agents can make a workflow appear more authoritative simply because several models agree, pass work to one another, or act through multiple services.
+> **Problem:** Multi-agent workflows can make recommendations or delegated work appear more authoritative simply because several agents agree, pass requests among themselves, or operate across multiple services.
 >
-> **Pattern:** Treat agent-to-agent messages as typed proposals, plans, recommendations, or delegation requests. Preserve originating identity and intent, validate each trust-boundary crossing, resolve authoritative facts through the host, and establish execution authority explicitly through host-owned governance and narrowly scoped capabilities.
+> **Core idea:** Treat agent-to-agent messages as typed proposals, plans, recommendations, or delegation requests; validate each trust-boundary crossing; resolve authoritative facts through the host; and establish execution authority explicitly through host-owned governance and scoped capabilities.
 >
-> **Use when:** An AI-assisted workflow contains multiple agents, multi-hop requests, long-running tasks, cross-service coordination, or delegated execution steps that can ultimately reach consequential tools or external side effects.
+> **Why it matters:** Agent agreement, coordination, or delegation does not create authorization by itself, and authority must not silently widen as a request crosses agents, services, or execution boundaries.
 >
-> **Prefer something simpler when:** One model proposes one bounded operation and the existing [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) already expresses the complete trust and execution boundary.
->
-> **Observe:** Agent agreement does not create authorization, delegated authority cannot silently exceed source authority, changed arguments invalidate prior approval, and every non-executable path leaves the protected executor untouched.
+> **Read this if:** An AI-assisted workflow has multiple agents, multi-hop requests, long-running tasks, cross-service coordination, or delegated steps that can ultimately reach consequential tools or external side effects.
 
 The central learning question is:
 

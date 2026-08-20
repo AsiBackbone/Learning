@@ -8,17 +8,15 @@
 
 **Prerequisites:** [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), [Constraint Composition and Policy Precedence](constraint-composition-and-policy-precedence.md), and [Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md). Familiarity with [Decision Before Execution](../tutorials/decision-before-execution.md) is helpful for the execution-boundary examples.
 
-## Pattern Card
+## At a Glance
 
-> **Problem:** Policy tests often prove isolated implementation details while leaving the actual decision boundary under-specified. Important combinations of actor, resource, environment, policy version, acknowledgment state, and execution authority can therefore remain untested even when code coverage is high.
+> **Problem:** Policy tests can cover implementation branches while still leaving important combinations of context, outcomes, precedence, continuation state, and execution authority under-specified.
 >
-> **Pattern:** Translate policy requirements into explicit decision cases before or alongside implementation. Group equivalent states, test meaningful boundaries, assert structured governance outcomes and reasons, and add invariant tests that prove non-executable decisions never reach protected execution.
+> **Core idea:** Translate policy requirements into explicit decision tables, equivalence classes, boundary cases, structured outcome assertions, and execution-boundary invariants.
 >
-> **Use when:** A system has explicit policy context, multiple governance outcomes, composed constraints, precedence rules, delayed continuation, policy versions, acknowledgment, capability issuance, or a protected execution boundary.
+> **Why it matters:** High code coverage does not prove that meaningful policy behavior is complete, deterministic, or that non-executable decisions are prevented from reaching protected execution.
 >
-> **Prefer something simpler when:** A local guard clause has only a few obvious states, executes immediately inside one trusted boundary, and does not need durable policy evidence, composition, acknowledgment, or separate authority.
->
-> **Observe:** The same authoritative context and policy version produce the expected deterministic decision, policy changes produce intentional regression-test changes, and non-executable outcomes leave the protected executor invocation count at zero.
+> **Read this if:** Your system has multiple governance outcomes, composed constraints, policy versions, acknowledgment, capability issuance, delayed continuation, or a protected execution boundary that must remain regression-testable.
 
 The central lesson is:
 

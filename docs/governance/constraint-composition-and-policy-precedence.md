@@ -6,6 +6,18 @@
 
 **Prerequisites:** [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
 
+## At a Glance
+
+> **Problem:** Several independently evaluated constraints can return different results, allowing evaluation order to become policy accidentally.
+>
+> **Core idea:** Evaluate constraints independently, then compose their results through an explicit, deterministic precedence strategy before any optional decision policy or host-owned execution.
+>
+> **Why it matters:** Constraint order should not silently decide which reasons survive, which outcome wins, whether all rules run, or whether a blocked operation can continue.
+>
+> **Read this if:** Your system has multiple policy rules, independently authored constraints, or decision results that need deterministic composition and reviewable precedence.
+
+![Policy context supplies facts to independent constraints whose results are composed into one governance decision.](../images/architecture/context-constraints-composition.svg)
+
 The foundational policy-context tutorial establishes two important ideas:
 
 > **Policy context contains facts.**
