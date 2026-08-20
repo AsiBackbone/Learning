@@ -3,3 +3,6 @@
 
 - name: Regional and Tenant Policy Overlays
   href: regional-and-tenant-policy-overlays.md
+
+- name: Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries
+  href: governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md
