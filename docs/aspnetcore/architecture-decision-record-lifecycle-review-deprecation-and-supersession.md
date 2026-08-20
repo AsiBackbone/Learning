@@ -10,6 +10,8 @@
 
 > **Working-repository follow-on:** Use [Working Repository ADR Case Study: NetCoreApplicationTemplate](netcoreapplicationtemplate-adr-case-study.md) to inspect how accepted ADRs map into current code and configuration, and how implementation drift can become evidence for review.
 
+> **Hands-on practice:** Complete [Write and Revisit an Architecture Decision Record](../labs/write-and-revisit-an-architecture-decision-record.md) to write an ADR under competing constraints and then decide whether changed conditions justify retention, deprecation, supersession, or only an implementation change.
+
 ## Pattern Card
 
 > **Problem:** Architectural decisions can outlive the assumptions that justified them. If teams treat accepted ADRs as immutable truth, silently edit historical records, delete obsolete decisions, or let implementation drift without updating the record, future maintainers lose both the current architecture and the reasoning that produced it.

@@ -27,6 +27,8 @@
       href: policy-version-evidence-in-governance-decisions.md
     - name: Build a Governed API Operation
       href: build-a-governed-api-operation.md
+    - name: Write and Revisit an Architecture Decision Record
+      href: write-and-revisit-an-architecture-decision-record.md
 
 
 - name: Advanced Labs

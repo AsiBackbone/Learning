@@ -619,7 +619,7 @@ Where multiple valid solutions exist, the discussion should explain the tradeoff
 
 ## Status
 
-**In progress — ASP.NET Core runtime foundations established; ADR reasoning, writing, and lifecycle guidance established; case study and hands-on practice remain**
+**Complete — ASP.NET Core runtime foundations and the ADR reasoning, case-study, and hands-on learning path are established**
 
 ## Goal
 
@@ -686,8 +686,9 @@ These materials should remain useful independently of that repository.
 * [x] How to revisit a decision. ([#88](https://github.com/AsiBackbone/Learning/issues/88), [#90](https://github.com/AsiBackbone/Learning/issues/90))
 * [x] How ADRs preserve architectural reasoning. ([#87](https://github.com/AsiBackbone/Learning/issues/87))
 * [x] How ADRs connect implementation repositories to Learning material. ([#89](https://github.com/AsiBackbone/Learning/issues/89))
+* [x] Pair ADR writing and lifecycle review with a hands-on reasoning lab. ([#90](https://github.com/AsiBackbone/Learning/issues/90))
 
-The ADR learning path now covers why ADRs matter, when a decision merits a record, a practical writing structure, preservation of alternatives and consequences, lifecycle review through retained, deprecated, and superseded decisions, and a working-repository case study connecting `NetCoreApplicationTemplate` ADRs to concrete implementation evidence. Hands-on ADR writing and revisit practice remains separate follow-on work in [#90](https://github.com/AsiBackbone/Learning/issues/90).
+The ADR learning path now covers why ADRs matter, when a decision merits a record, a practical writing structure, preservation of alternatives and consequences, lifecycle review through retained, deprecated, and superseded decisions, a working-repository case study connecting `NetCoreApplicationTemplate` ADRs to concrete implementation evidence, and a two-stage hands-on lab that requires learners to write and revisit a decision under changed constraints.
 
 ---
 
@@ -1072,25 +1073,22 @@ It should not force the project into unnecessary release ceremony.
 
 The highest-priority work now is:
 
-1. Complete the remaining Architecture Decision Records hands-on practice in Milestone 6:
-   add a writing/revisit lab with learner-authored reasoning and review triggers.
-   ([#90](https://github.com/AsiBackbone/Learning/issues/90))
-2. Continue the remaining Security and Trust Architecture work with dedicated
+1. Continue the remaining Security and Trust Architecture work with dedicated
    secure-logging, secret-handling, and threat-modeling treatments.
-3. Deepen Governance and Policy Architecture where dedicated coverage is still
+2. Deepen Governance and Policy Architecture where dedicated coverage is still
    missing: risk-based decisions, broader human-in-the-loop and escalation
    workflows, deterministic/probabilistic inputs, and policy simulation.
-4. Expand AI Integration beyond the established proposal and multi-agent
+3. Expand AI Integration beyond the established proposal and multi-agent
    boundaries with multi-tool workflows, model-uncertainty handling, proposal
    recovery, and agent-memory governance.
-5. Add remaining intermediate and advanced labs where learner reasoning materially
+4. Add remaining intermediate and advanced labs where learner reasoning materially
    improves the curriculum, especially decision-pipeline refactoring, competing
    policy architectures, regional/tenant policy design, high-consequence failure
    critique, and AI proposal/execution-authority separation.
-6. Continue strengthening tutorial → sample → lab → working implementation links
+5. Continue strengthening tutorial → sample → lab → working implementation links
    and expand architecture comparisons while preserving honest cases where simpler
    or adjacent patterns win.
-7. Use community feedback and implementation changes to decide which advanced or
+6. Use community feedback and implementation changes to decide which advanced or
    experimental subjects deserve promotion into the main learning path.
 
 The short-term emphasis should remain:
