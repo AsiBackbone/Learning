@@ -4,7 +4,7 @@ The Security section examines architectural boundaries that can reduce accidenta
 
 Security in ASI Backbone Learning is approached as an architectural responsibility rather than a single feature or package.
 
-> **Section status:** Focused security learning now covers trust boundaries, least privilege, replay protection, and cryptographic evidence boundaries. Start with [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), continue with [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), then study [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md) before using the [Foundational Tutorials](../tutorials/index.md) to connect security boundaries to governed execution.
+> **Section status:** Focused security learning now covers trust boundaries, least privilege, replay protection, cryptographic evidence boundaries, and software supply-chain integrity. Start with [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), continue with [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), study [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md), then use [Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md) to extend trust-boundary reasoning into source, dependencies, CI, artifacts, and release provenance before using the [Foundational Tutorials](../tutorials/index.md) to connect security boundaries to governed execution.
 
 > **A secure boundary should remain visible when the system is under pressure.**
 
@@ -19,6 +19,8 @@ The tutorial connects caller-supplied versus authoritative context, authenticati
 Run the [Replay Protection and Bounded-Use Authority sample](https://github.com/AsiBackbone/Learning/blob/main/samples/replay-protection-and-bounded-use/README.md) to compare a deterministic check-then-act race with atomic in-process consumption, then use the [intermediate concurrency lab](../labs/replay-protection-and-bounded-use.md) to repair and extend the boundary.
 
 [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md) adds the cryptographic evidence boundary. It separates hashes from signatures, signing from verification and authorization, key custody from ordinary application configuration, normal rotation from compromise, and tamper evidence from tamper prevention.
+
+[Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md) extends those trust questions into the process that creates and publishes software. It uses current Learning, AsiBackbone, and NetCoreApplicationTemplate repository practices as selective specimens for workflow permissions, SHA-pinned actions, dependency management, locked restore, package validation, SBOMs, attestations, publication authority, and precise provenance claims.
 
 ## Security Themes
 
@@ -40,7 +42,7 @@ Current and future material may examine:
 - Audit evidence
 - Failure behavior
 - Degraded-mode operation
-- Dependency and supply-chain considerations
+- [Software supply-chain integrity for .NET repositories](software-supply-chain-integrity-for-dotnet-repositories.md)
 - AI tool-execution risks
 
 ## Approval Is Not Unlimited Authority
@@ -124,9 +126,9 @@ Application-specific security analysis remains necessary.
 
 ## Current Status
 
-The Security section now has focused tutorials for trust boundaries and least privilege, replay protection and bounded-use authority, and signing/verification with key-custody and tamper-evidence boundaries. Together they establish a security architecture path from identifying where trust changes, to preserving narrow authority, to controlling whether authority may be consumed again, to deciding what cryptographic evidence can safely establish across trust boundaries.
+The Security section now has focused material for trust boundaries and least privilege, replay protection and bounded-use authority, signing/verification with key-custody and tamper-evidence boundaries, and software supply-chain integrity. Together they establish a security architecture path from identifying where trust changes, to preserving narrow authority, to controlling whether authority may be consumed again, to deciding what cryptographic evidence can safely establish, and finally to applying the same trust-boundary reasoning to source, dependencies, CI, generated artifacts, and publication.
 
-Future material will extend into capability-based authority, secure logging, dependency integrity, and threat modeling.
+Future material will extend into capability-based authority, secure logging, and threat modeling.
 
 Use the [Foundational Tutorials](../tutorials/index.md) to connect these security concepts to the existing governed-execution learning path.
 

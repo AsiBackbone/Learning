@@ -9,3 +9,6 @@
 
 - name: Signing, Verification, Key Custody, and Tamper Evidence
   href: signing-verification-key-custody-and-tamper-evidence.md
+
+- name: Software Supply-Chain Integrity for .NET Repositories
+  href: software-supply-chain-integrity-for-dotnet-repositories.md

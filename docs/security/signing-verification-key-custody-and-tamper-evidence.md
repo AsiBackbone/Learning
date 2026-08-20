@@ -2214,6 +2214,7 @@ The Learning boundary remains:
 - [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md) — identify where authority and data change control before deciding where to sign or verify.
 - [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md) — distinguish cryptographic authenticity from stateful one-time or bounded-use authority.
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) — distinguish policy identity and fingerprints from authenticity and tamper-evidence claims.
+- [Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md) — apply provenance, checksum, signing, and verification distinctions to build and release artifacts without treating any one mechanism as proof of artifact safety.
 - [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — connect signatures to durable governance evidence without treating acknowledgment as an execution override.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — apply verification as one execution-boundary check around narrow authority.
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — preserve the rule that AI may propose while host-owned code retains verification, policy, and execution authority.
