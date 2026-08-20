@@ -541,11 +541,13 @@ rather than immediately invoking real external systems.
 
 ## Status
 
-**Foundational tutorial-aligned lab path established — additional labs in progress**
+**Foundational tutorial-aligned lab path established — advanced lab coverage expanding**
 
-Each foundational tutorial now has a learner exercise or lab. Remaining work
-should deepen failure analysis, policy/version evidence, replay resistance,
-degraded-mode reasoning, and broader ASP.NET Core and security scenarios.
+Each foundational tutorial now has a learner exercise or lab. Replay-resistance
+and safe degraded-mode exercises are established. Remaining work should deepen
+decision-pipeline refactoring, policy-architecture comparisons, regional/tenant
+policy exercises, deliberately flawed high-consequence workflows, and broader
+ASP.NET Core and security scenarios.
 
 Tutorials explain.
 
@@ -597,7 +599,7 @@ Potential initial labs:
 ## Advanced Labs
 
 * [x] Govern an AI tool call. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
-* [ ] Design a replay-resistant capability workflow.
+* [x] Design a replay-resistant capability workflow. ([#65](https://github.com/AsiBackbone/Learning/issues/65))
 * [ ] Compare competing policy architectures.
 * [x] Threat-model a governed execution gateway. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 * [ ] Design a regional or tenant-specific policy layer.
@@ -617,7 +619,7 @@ Where multiple valid solutions exist, the discussion should explain the tradeoff
 
 ## Status
 
-**In progress — middleware-ordering, secure-defaults, structured-logging, centralized-error-handling, and data-access foundations established**
+**In progress — ASP.NET Core runtime foundations established; Architecture Decision Records are the primary unfinished Milestone 6 area**
 
 ## Goal
 
@@ -679,11 +681,11 @@ These materials should remain useful independently of that repository.
 
 ## Architecture Decision Records
 
-* [ ] Why ADRs matter.
-* [ ] How to write an ADR.
-* [ ] How to revisit a decision.
-* [ ] How ADRs preserve architectural reasoning.
-* [ ] How ADRs connect implementation repositories to Learning material.
+* [ ] Why ADRs matter. ([#87](https://github.com/AsiBackbone/Learning/issues/87))
+* [ ] How to write an ADR. ([#87](https://github.com/AsiBackbone/Learning/issues/87), [#90](https://github.com/AsiBackbone/Learning/issues/90))
+* [ ] How to revisit a decision. ([#88](https://github.com/AsiBackbone/Learning/issues/88), [#90](https://github.com/AsiBackbone/Learning/issues/90))
+* [ ] How ADRs preserve architectural reasoning. ([#87](https://github.com/AsiBackbone/Learning/issues/87))
+* [ ] How ADRs connect implementation repositories to Learning material. ([#89](https://github.com/AsiBackbone/Learning/issues/89))
 
 ---
 
@@ -691,7 +693,7 @@ These materials should remain useful independently of that repository.
 
 ## Status
 
-**In progress — trust-boundary, least-privilege, and replay-protection foundations established**
+**In progress — trust-boundary, least-privilege, capability/replay, cryptographic-evidence, fail-safe, and software-supply-chain foundations established**
 
 ## Goal
 
@@ -701,28 +703,37 @@ Teach security as an architectural property rather than a collection of isolated
 
 * [x] Trust boundaries. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
 * [x] Least privilege. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
-* [ ] Capability-based authority.
+* [x] Capability-based authority — [Scoped Capability and Host-Owned Execution](docs/tutorials/scoped-capability-and-host-owned-execution.md).
 * [x] Authentication versus governance. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
 * [x] Authorization versus policy evaluation. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
 * [x] Replay protection. ([#52](https://github.com/AsiBackbone/Learning/issues/52))
-* [ ] Signing and verification concepts.
-* [ ] Key custody boundaries.
-* [ ] Tamper-evident records.
+* [x] Signing and verification concepts. ([#64](https://github.com/AsiBackbone/Learning/issues/64))
+* [x] Key custody boundaries. ([#64](https://github.com/AsiBackbone/Learning/issues/64))
+* [x] Tamper-evident records. ([#64](https://github.com/AsiBackbone/Learning/issues/64))
 * [ ] Secure logging.
 * [ ] Secret handling.
-* [ ] Dependency integrity.
-* [ ] Supply-chain provenance.
-* [ ] GitHub Actions SHA pinning.
-* [ ] SBOM concepts.
+* [x] Dependency integrity. ([#76](https://github.com/AsiBackbone/Learning/issues/76))
+* [x] Supply-chain provenance. ([#76](https://github.com/AsiBackbone/Learning/issues/76))
+* [x] GitHub Actions SHA pinning. ([#76](https://github.com/AsiBackbone/Learning/issues/76))
+* [x] SBOM concepts. ([#76](https://github.com/AsiBackbone/Learning/issues/76))
 * [x] Fail-open versus fail-closed behavior. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 * [x] Security failure modes. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 * [ ] Threat modeling as architecture reasoning.
+
+The remaining dedicated Security and Trust Architecture gaps are secure logging,
+secret handling across trust boundaries, and threat modeling as architecture
+reasoning. Existing ASP.NET Core and AI material touches those concerns, but
+it does not yet complete those Milestone 7 subjects.
 
 Educational security examples should clearly distinguish demonstrated patterns from production security guarantees.
 
 ---
 
 # Milestone 8 — Governance and Policy Architecture 
+
+## Status
+
+**In progress — policy composition, provenance, regional/tenant overlays, degraded-mode behavior, and policy-testing foundations established**
 
 ## Goal
 
@@ -735,23 +746,32 @@ Expand the conceptual vocabulary around policy-governed systems after the founda
 * [x] Policy precedence. ([#44](https://github.com/AsiBackbone/Learning/issues/44))
 * [x] Policy versioning. ([#53](https://github.com/AsiBackbone/Learning/issues/53))
 * [x] Policy identity and hashing. ([#53](https://github.com/AsiBackbone/Learning/issues/53))
-* [ ] Regional policy overlays.
-* [ ] Tenant-specific policy.
+* [x] Regional policy overlays. ([#74](https://github.com/AsiBackbone/Learning/issues/74))
+* [x] Tenant-specific policy. ([#74](https://github.com/AsiBackbone/Learning/issues/74))
 * [ ] Risk-based decisions.
 * [ ] Human-in-the-loop workflows.
 * [ ] Escalation patterns.
-* [ ] Decision provenance.
-* [ ] Policy failure behavior.
-* [ ] Degraded-mode decisions.
+* [x] Decision provenance. ([#53](https://github.com/AsiBackbone/Learning/issues/53))
+* [x] Policy failure behavior. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
+* [x] Degraded-mode decisions. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 * [ ] Deterministic versus probabilistic policy inputs.
-* [ ] Policy testing.
+* [x] Policy testing. ([#72](https://github.com/AsiBackbone/Learning/issues/72))
 * [ ] Policy simulation.
-* [ ] Policy rollout and rollback reasoning.
-* [ ] Separation between policy decision and operational execution.
+* [x] Policy rollout and rollback reasoning. ([#53](https://github.com/AsiBackbone/Learning/issues/53))
+* [x] Separation between policy decision and operational execution. ([#44](https://github.com/AsiBackbone/Learning/issues/44))
+
+Risk-based decision models, broader human-in-the-loop and escalation workflows,
+deterministic-versus-probabilistic policy inputs, and policy simulation remain
+distinct future subjects. Existing material may use those concerns as examples
+without yet providing complete standalone treatment.
 
 ---
 
 # Milestone 9 — Expanded AI Integration ([#5](https://github.com/AsiBackbone/Learning/issues/5))
+
+## Status
+
+**In progress — governed proposal, schema-validation, authoritative-context, scoped-execution, and experimental multi-agent boundaries established**
 
 ## Goal
 
@@ -759,22 +779,26 @@ Build beyond the initial Governed AI Tool Gateway without turning Learning into 
 
 ## Planned Topics
 
-* [ ] Tool proposal schemas.
-* [ ] Tool allowlists.
-* [ ] Argument validation.
-* [ ] Host-side context reconstruction.
-* [ ] Model-provided context versus authoritative context.
-* [ ] Capability-scoped tool execution.
+* [x] Tool proposal schemas. ([#73](https://github.com/AsiBackbone/Learning/issues/73))
+* [x] Tool allowlists. ([#73](https://github.com/AsiBackbone/Learning/issues/73))
+* [x] Argument validation. ([#73](https://github.com/AsiBackbone/Learning/issues/73))
+* [x] Host-side context reconstruction. ([#73](https://github.com/AsiBackbone/Learning/issues/73))
+* [x] Model-provided context versus authoritative context. ([#73](https://github.com/AsiBackbone/Learning/issues/73))
+* [x] Capability-scoped tool execution — [Governed AI Tool Gateway](docs/tutorials/governed-ai-tool-gateway.md).
 * [ ] Multi-tool workflows.
-* [ ] Human acknowledgment for consequential actions.
+* [x] Human acknowledgment for consequential actions — [Governed AI Tool Gateway](docs/tutorials/governed-ai-tool-gateway.md).
 * [ ] Handling model uncertainty.
 * [ ] AI proposal rejection and recovery.
-* [ ] Tool execution receipts.
-* [ ] Prompt injection versus execution controls.
-* [ ] Credential ownership.
+* [x] Tool execution receipts — [Governed AI Tool Gateway](docs/tutorials/governed-ai-tool-gateway.md).
+* [x] Prompt injection versus execution controls. ([#73](https://github.com/AsiBackbone/Learning/issues/73))
+* [x] Credential ownership — [AI Integration](docs/ai-integration/index.md).
 * [ ] Agent memory and governance boundaries.
-* [ ] Multi-agent proposal flows.
-* [ ] Agent-to-agent governed execution as experimental material.
+* [x] Multi-agent proposal flows. ([#75](https://github.com/AsiBackbone/Learning/issues/75))
+* [x] Agent-to-agent governed execution as experimental material. ([#75](https://github.com/AsiBackbone/Learning/issues/75))
+
+Multi-tool workflow orchestration, model-uncertainty handling, broader proposal
+recovery, and agent-memory governance remain open. Current material touches some
+of those concerns but does not yet treat them as complete standalone subjects.
 
 The central rule remains:
 
@@ -926,6 +950,10 @@ Repeated misunderstandings should trigger refinement of existing material before
 
 # Milestone 13 — Advanced and Experimental Material ([#5](https://github.com/AsiBackbone/Learning/issues/5))
 
+## Status
+
+**Started — governed agent-to-agent execution and partial-failure governance now have advanced or experimental learning material**
+
 ## Goal
 
 Provide a clearly labeled area for ideas that are worth exploring but should not yet be presented as established guidance.
@@ -942,11 +970,11 @@ Possible subjects include:
 * [ ] Decision explainability.
 * [ ] Adaptive risk context.
 * [ ] Robotics gateway patterns.
-* [ ] Agent-to-agent governed execution.
+* [x] Agent-to-agent governed execution. ([#75](https://github.com/AsiBackbone/Learning/issues/75))
 * [ ] Cross-system capability exchange.
 * [ ] Federated governance models.
 * [ ] Distributed acknowledgment workflows.
-* [ ] Governance under partial system failure.
+* [x] Governance under partial system failure. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 
 Experimental material should clearly state:
 
@@ -1042,19 +1070,24 @@ It should not force the project into unnecessary release ceremony.
 
 The highest-priority work now is:
 
-1. Continue the Security and Trust Architecture path beyond replay protection with
-   signing/verification, key custody, tamper-evident records, and fail-safe behavior.
-2. Continue strengthening tutorial → sample → lab → working implementation links
-   where the reference materially improves understanding.
-3. Expand architecture comparisons beyond the first ASP.NET Core authorization
-   comparison, preserving honest cases where simpler or adjacent patterns win.
-4. Add deeper intermediate and advanced labs around governed API operations,
-   policy-version evidence, replay resistance, regional/tenant policy, and safe
-   degraded-mode behavior.
-5. Continue the ASP.NET Core learning path with secure defaults, structured
-   logging, centralized error handling, and data-access boundaries.
-6. Begin Governance and Policy Architecture material after the first ASP.NET Core
-   and security bridge lessons are usable.
+1. Complete the Architecture Decision Records path in Milestone 6: introduce ADR
+   reasoning, teach writing and lifecycle review, connect ADRs to a working
+   repository case study, and add a hands-on writing/revisit lab. ([#87](https://github.com/AsiBackbone/Learning/issues/87), [#88](https://github.com/AsiBackbone/Learning/issues/88), [#89](https://github.com/AsiBackbone/Learning/issues/89), [#90](https://github.com/AsiBackbone/Learning/issues/90))
+2. Continue the remaining Security and Trust Architecture work with dedicated
+   secure-logging, secret-handling, and threat-modeling treatments.
+3. Deepen Governance and Policy Architecture where dedicated coverage is still
+   missing: risk-based decisions, broader human-in-the-loop and escalation
+   workflows, deterministic/probabilistic inputs, and policy simulation.
+4. Expand AI Integration beyond the established proposal and multi-agent
+   boundaries with multi-tool workflows, model-uncertainty handling, proposal
+   recovery, and agent-memory governance.
+5. Add remaining intermediate and advanced labs where learner reasoning materially
+   improves the curriculum, especially decision-pipeline refactoring, competing
+   policy architectures, regional/tenant policy design, high-consequence failure
+   critique, and AI proposal/execution-authority separation.
+6. Continue strengthening tutorial → sample → lab → working implementation links
+   and expand architecture comparisons while preserving honest cases where simpler
+   or adjacent patterns win.
 7. Use community feedback and implementation changes to decide which advanced or
    experimental subjects deserve promotion into the main learning path.
 
