@@ -1,2 +1,5 @@
 - name: AI Integration
   href: index.md
+
+- name: Typed AI Proposed Intent and Schema-Validation Boundaries
+  href: typed-ai-proposed-intent-and-schema-validation-boundaries.md
