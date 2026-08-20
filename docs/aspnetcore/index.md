@@ -6,7 +6,7 @@ The focus is not on teaching every ASP.NET Core feature.
 
 Instead, this section examines how application structure can make security, governance, execution boundaries, and operational behavior easier to understand and maintain.
 
-> **Section status:** Focused ASP.NET Core learning is expanding. Start with [Middleware Ordering Changes Behavior](middleware-ordering-changes-behavior.md), continue with [Secure-by-Default ASP.NET Core Configuration](secure-by-default-configuration.md), then read [Structured Logging Without Sensitive-Data Sprawl](structured-logging-without-sensitive-data-sprawl.md), [Centralized Error Handling and Problem Details](centralized-error-handling-and-problem-details.md), and [Data-Access Boundaries and Transaction Reasoning with EF Core](data-access-boundaries-and-transaction-reasoning.md). Use the [Foundational Tutorials](../tutorials/index.md) when you want to connect application structure to governed execution.
+> **Section status:** Focused ASP.NET Core learning is expanding. Start with [Middleware Ordering Changes Behavior](middleware-ordering-changes-behavior.md), continue with [Secure-by-Default ASP.NET Core Configuration](secure-by-default-configuration.md), then read [Structured Logging Without Sensitive-Data Sprawl](structured-logging-without-sensitive-data-sprawl.md), [Centralized Error Handling and Problem Details](centralized-error-handling-and-problem-details.md), [Data-Access Boundaries and Transaction Reasoning with EF Core](data-access-boundaries-and-transaction-reasoning.md), and [Architecture Decision Records Preserve Architectural Reasoning](architecture-decision-records-preserve-architectural-reasoning.md). Use the [Foundational Tutorials](../tutorials/index.md) when you want to connect application structure to governed execution.
 
 ## Start Here
 
@@ -24,6 +24,8 @@ Continue with the [Identify Middleware Ordering Problems lab](../labs/identify-m
 
 [Data-Access Boundaries and Transaction Reasoning with EF Core](data-access-boundaries-and-transaction-reasoning.md) continues from application behavior into durable state. It compares direct `DbContext` usage with meaningful persistence abstractions, explains default and explicit transaction boundaries, distinguishes generic database auditing from governance audit residue, examines `SaveChanges` interceptors, and keeps local relational atomicity separate from external side effects, idempotency, outbox/inbox patterns, and recovery.
 
+[Architecture Decision Records Preserve Architectural Reasoning](architecture-decision-records-preserve-architectural-reasoning.md) then shifts from runtime structure to architectural memory. It explains when a decision deserves an ADR, what belongs in the record, how ADRs differ from other documentation, and how context, alternatives, consequences, and review conditions preserve reasoning that code alone cannot show.
+
 ## Architectural Areas
 
 This section will continue to expand into topics such as:
@@ -40,6 +42,7 @@ This section will continue to expand into topics such as:
 - Rate limiting
 - Authentication-ready architecture
 - [Data-access boundaries and transaction reasoning](data-access-boundaries-and-transaction-reasoning.md)
+- [Architecture Decision Records and preserved reasoning](architecture-decision-records-preserve-architectural-reasoning.md)
 - Configuration ownership
 - Background processing
 - Health checks
@@ -120,7 +123,7 @@ Learning should explain the architectural lesson without reproducing the full ap
 
 ## Current Status
 
-The ASP.NET Core learning area now covers middleware ordering, secure-by-default configuration, structured logging, centralized error handling, and data-access boundaries with EF Core transaction reasoning. The middleware lesson is paired with an executable companion sample, focused invariant tests, and a beginner diagnostic lab; the configuration lesson establishes explicit opt-in, startup validation, environment behavior, secrets, safer failure, and configuration ownership; the logging lesson establishes structured operational events, correlation, diagnostic boundaries, sensitive-data minimization, and a deliberate separation between logs and governance audit evidence; the error-handling lesson adds a centralized `IExceptionHandler`/Problem Details boundary plus a runnable sample and focused integration tests; and the data-access lesson connects durable governance state to `DbContext`, persistence abstractions, relational transactions, interceptors, provider-aware testing, and external-side-effect failure windows. Additional material will expand into Architecture Decision Records and related application-architecture concerns.
+The ASP.NET Core learning area now covers middleware ordering, secure-by-default configuration, structured logging, centralized error handling, data-access boundaries with EF Core transaction reasoning, and introductory Architecture Decision Record reasoning. The middleware lesson is paired with an executable companion sample, focused invariant tests, and a beginner diagnostic lab; the configuration lesson establishes explicit opt-in, startup validation, environment behavior, secrets, safer failure, and configuration ownership; the logging lesson establishes structured operational events, correlation, diagnostic boundaries, sensitive-data minimization, and a deliberate separation between logs and governance audit evidence; the error-handling lesson adds a centralized `IExceptionHandler`/Problem Details boundary plus a runnable sample and focused integration tests; the data-access lesson connects durable governance state to `DbContext`, persistence abstractions, relational transactions, interceptors, provider-aware testing, and external-side-effect failure windows; and the ADR introduction explains when architectural reasoning should be preserved, what a concise record contains, and why alternatives and consequences matter. Additional ADR material will expand into lifecycle review, working-repository case studies, and hands-on practice.
 
 Use the [Foundational Tutorials](../tutorials/index.md) for the governance model and `NetCoreApplicationTemplate` for a fuller application specimen.
 

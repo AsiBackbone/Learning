@@ -619,7 +619,7 @@ Where multiple valid solutions exist, the discussion should explain the tradeoff
 
 ## Status
 
-**In progress — ASP.NET Core runtime foundations established; Architecture Decision Records are the primary unfinished Milestone 6 area**
+**In progress — ASP.NET Core runtime foundations established; Architecture Decision Records path underway with introductory reasoning and writing guidance**
 
 ## Goal
 
@@ -681,11 +681,13 @@ These materials should remain useful independently of that repository.
 
 ## Architecture Decision Records
 
-* [ ] Why ADRs matter. ([#87](https://github.com/AsiBackbone/Learning/issues/87))
-* [ ] How to write an ADR. ([#87](https://github.com/AsiBackbone/Learning/issues/87), [#90](https://github.com/AsiBackbone/Learning/issues/90))
+* [x] Why ADRs matter. ([#87](https://github.com/AsiBackbone/Learning/issues/87))
+* [x] How to write an ADR. ([#87](https://github.com/AsiBackbone/Learning/issues/87), [#90](https://github.com/AsiBackbone/Learning/issues/90))
 * [ ] How to revisit a decision. ([#88](https://github.com/AsiBackbone/Learning/issues/88), [#90](https://github.com/AsiBackbone/Learning/issues/90))
-* [ ] How ADRs preserve architectural reasoning. ([#87](https://github.com/AsiBackbone/Learning/issues/87))
+* [x] How ADRs preserve architectural reasoning. ([#87](https://github.com/AsiBackbone/Learning/issues/87))
 * [ ] How ADRs connect implementation repositories to Learning material. ([#89](https://github.com/AsiBackbone/Learning/issues/89))
+
+The introductory ADR material now covers why ADRs matter, when a decision merits a record, a practical writing structure, and preservation of alternatives and consequences. Lifecycle review, a working-repository case study, and hands-on writing/revisit practice remain separate follow-on work.
 
 ---
 

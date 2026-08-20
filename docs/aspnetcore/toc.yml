@@ -15,3 +15,6 @@
 
 - name: Data-Access Boundaries and Transaction Reasoning with EF Core
   href: data-access-boundaries-and-transaction-reasoning.md
+
+- name: Architecture Decision Records Preserve Architectural Reasoning
+  href: architecture-decision-records-preserve-architectural-reasoning.md
