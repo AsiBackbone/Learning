@@ -183,6 +183,8 @@ It does not answer:
 
 > Should the host execute it?
 
+For a focused treatment of parsing, schema validation, unknown-field handling, typed proposed intent, schema versioning, and authoritative host context, see [Typed AI Proposed Intent and Schema-Validation Boundaries](../ai-integration/typed-ai-proposed-intent-and-schema-validation-boundaries.md).
+
 ## The Host Owns the Tool Registry
 
 The model should not define arbitrary executable functions.
@@ -1778,6 +1780,7 @@ Learning is intended to make those tradeoffs visible rather than prescribe one u
 - [Foundational Tutorial Index](index.md) — revisit the complete governed-execution learning path and its five architectural stages.
 - [Decision Before Execution](decision-before-execution.md) — revisit the foundational separation between proposed intent and real-world side effects.
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — review how the host constructs authoritative context and produces explicit governance outcomes.
+- [Typed AI Proposed Intent and Schema-Validation Boundaries](../ai-integration/typed-ai-proposed-intent-and-schema-validation-boundaries.md) — zoom into untrusted model output, schema validation, typed proposed intent, and authoritative-context separation before governance.
 - [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — explore responsibility boundaries, re-evaluation, correlation, and evidence across consequential workflows.
 - [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — examine narrow execution authority, capability bindings, replay considerations, and execution-boundary validation.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — distinguish single-use capability enforcement from request idempotency and exactly-once execution claims.

@@ -8,7 +8,7 @@ The central principle is:
 
 This separation allows AI inference to participate in an application workflow without treating model output as authorization, policy, or execution authority.
 
-> **Section status:** This page is currently the AI integration overview. The foundational AI tutorial is published under [Tutorials](../tutorials/index.md); additional focused section pages are planned.
+> **Section status:** The foundational AI gateway tutorial and the first focused AI proposal-boundary tutorial are published; additional focused section pages are planned.
 
 ## Proposal Is Not Execution
 
@@ -81,6 +81,12 @@ Then continue with the foundational AI composition tutorial.
 [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md)
 
 This tutorial composes the earlier patterns into an end-to-end AI-assisted execution gateway.
+
+### Focused AI Boundary: Typed AI Proposed Intent and Schema-Validation Boundaries
+
+[Typed AI Proposed Intent and Schema-Validation Boundaries](typed-ai-proposed-intent-and-schema-validation-boundaries.md)
+
+This tutorial isolates the proposal-translation boundary: untrusted model output, parsing, schema validation, typed proposed intent, authoritative host facts, and the rule that successful parsing does not create authority.
 
 ## Host-Owned Tool Registry
 
@@ -385,11 +391,15 @@ Production AI-assisted systems remain responsible for their own threat models, a
 
 ## Current Status
 
-The foundational AI integration tutorial is published.
+The foundational AI integration tutorial and the first focused AI proposal-boundary tutorial are published.
 
 Future work will expand this section through executable companion samples, hands-on labs, threat-model exercises, alternative gateway designs, and additional agent and tool-execution scenarios.
 
-For the current end-to-end learning path, continue with:
+For the focused model-output acceptance boundary, continue with:
+
+[Typed AI Proposed Intent and Schema-Validation Boundaries](typed-ai-proposed-intent-and-schema-validation-boundaries.md)
+
+For the complete end-to-end execution path, continue with:
 
 [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md)
 
