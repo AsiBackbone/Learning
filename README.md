@@ -12,6 +12,49 @@
 
 The goal is not to create another framework or package. The goal is to explain architectural ideas clearly, demonstrate them through focused examples, examine their tradeoffs, and connect those lessons to working implementations in the organization's existing repositories.
 
+## Quick Start — Run It in 10 Minutes
+
+Prefer to see the architecture run before reading the deeper explanation? The foundational **Decision Before Execution** sample provides the shortest path from clone to observable behavior.
+
+**Prerequisite:** .NET 10 SDK
+
+From a terminal:
+
+```bash
+git clone https://github.com/AsiBackbone/Learning.git
+cd Learning
+
+dotnet run --project samples/decision-before-execution/DecisionBeforeExecution/DecisionBeforeExecution.csproj
+
+dotnet test samples/decision-before-execution/DecisionBeforeExecution.Tests/DecisionBeforeExecution.Tests.csproj
+```
+
+### What to Observe
+
+The sample makes one architectural invariant visible:
+
+> **A blocked decision never reaches the executor.**
+
+```text
+Allowed decision
+   ↓
+Host-owned executor invoked
+
+Denied / deferred / escalation-recommended / acknowledgment-required decision
+   ↓
+Executor not invoked
+```
+
+The console sample evaluates five deterministic scenarios and verifies that exactly one allowed operation crosses the execution boundary. The focused xUnit tests make the same contract repeatable for local development and CI.
+
+Want to understand why this boundary exists or experiment with it?
+
+- [Decision Before Execution sample README](samples/decision-before-execution/README.md)
+- [Decision Before Execution tutorial](docs/tutorials/decision-before-execution.md)
+- [Getting Started](docs/getting-started/index.md)
+
+This gives code-first readers a **run → observe → understand → experiment** path while preserving the existing explanation-first learning path below.
+
 ## Start Here
 
 New to governed-execution architecture? Start with [Decision Before Execution](docs/tutorials/decision-before-execution.md) for the foundational separation between proposed intent, explicit decision-making, and host-owned execution.
