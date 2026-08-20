@@ -2251,8 +2251,8 @@ You should now be able to answer:
 - [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md) — apply the same trust-boundary questions to source, build, dependency, and release stages.
 - [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md) — go deeper on signatures, verification policy, key ownership, hashes, and evidence claims.
 - [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md) — compare release credentials and bounded authority with stateful execution-boundary controls.
-- [Contributing](../../CONTRIBUTING.md) — review repository contribution expectations alongside workflow and validation boundaries.
-- [Security Policy](../../SECURITY.md) — review the repository's vulnerability-reporting and automation-security scope.
+- [Contributing](https://github.com/AsiBackbone/Learning/blob/main/CONTRIBUTING.md) — review repository contribution expectations alongside workflow and validation boundaries.
+- [Security Policy](https://github.com/AsiBackbone/Learning/blob/main/SECURITY.md) — review the repository's vulnerability-reporting and automation-security scope.
 
 ---
 
