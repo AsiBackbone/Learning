@@ -619,7 +619,7 @@ Where multiple valid solutions exist, the discussion should explain the tradeoff
 
 ## Status
 
-**In progress — ASP.NET Core runtime foundations established; Architecture Decision Records path underway with introductory reasoning and writing guidance**
+**In progress — ASP.NET Core runtime foundations established; ADR reasoning, writing, and lifecycle guidance established; case study and hands-on practice remain**
 
 ## Goal
 
@@ -683,11 +683,11 @@ These materials should remain useful independently of that repository.
 
 * [x] Why ADRs matter. ([#87](https://github.com/AsiBackbone/Learning/issues/87))
 * [x] How to write an ADR. ([#87](https://github.com/AsiBackbone/Learning/issues/87), [#90](https://github.com/AsiBackbone/Learning/issues/90))
-* [ ] How to revisit a decision. ([#88](https://github.com/AsiBackbone/Learning/issues/88), [#90](https://github.com/AsiBackbone/Learning/issues/90))
+* [x] How to revisit a decision. ([#88](https://github.com/AsiBackbone/Learning/issues/88), [#90](https://github.com/AsiBackbone/Learning/issues/90))
 * [x] How ADRs preserve architectural reasoning. ([#87](https://github.com/AsiBackbone/Learning/issues/87))
 * [ ] How ADRs connect implementation repositories to Learning material. ([#89](https://github.com/AsiBackbone/Learning/issues/89))
 
-The introductory ADR material now covers why ADRs matter, when a decision merits a record, a practical writing structure, and preservation of alternatives and consequences. Lifecycle review, a working-repository case study, and hands-on writing/revisit practice remain separate follow-on work.
+The ADR learning path now covers why ADRs matter, when a decision merits a record, a practical writing structure, preservation of alternatives and consequences, and lifecycle review through retained, deprecated, and superseded decisions. A working-repository case study and hands-on writing/revisit practice remain separate follow-on work.
 
 ---
 
@@ -1072,9 +1072,9 @@ It should not force the project into unnecessary release ceremony.
 
 The highest-priority work now is:
 
-1. Complete the Architecture Decision Records path in Milestone 6: introduce ADR
-   reasoning, teach writing and lifecycle review, connect ADRs to a working
-   repository case study, and add a hands-on writing/revisit lab. ([#87](https://github.com/AsiBackbone/Learning/issues/87), [#88](https://github.com/AsiBackbone/Learning/issues/88), [#89](https://github.com/AsiBackbone/Learning/issues/89), [#90](https://github.com/AsiBackbone/Learning/issues/90))
+1. Complete the remaining Architecture Decision Records path in Milestone 6:
+   connect ADRs to a working repository case study and add a hands-on
+   writing/revisit lab. ([#89](https://github.com/AsiBackbone/Learning/issues/89), [#90](https://github.com/AsiBackbone/Learning/issues/90))
 2. Continue the remaining Security and Trust Architecture work with dedicated
    secure-logging, secret-handling, and threat-modeling treatments.
 3. Deepen Governance and Policy Architecture where dedicated coverage is still

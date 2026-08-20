@@ -338,7 +338,7 @@ Review conditions do not mean the decision expires automatically.
 
 They identify the evidence that would justify opening the reasoning again.
 
-Detailed ADR lifecycle, deprecation, and supersession are separate topics; the important point here is that an accepted decision should not be mistaken for an eternal law.
+Continue with [Architecture Decision Record Lifecycle, Review, Deprecation, and Supersession](architecture-decision-record-lifecycle-review-deprecation-and-supersession.md) for the detailed lifecycle; the important point here is that an accepted decision should not be mistaken for an eternal law.
 
 ## Example: A Small but Complete ADR
 

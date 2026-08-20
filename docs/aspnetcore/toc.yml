@@ -18,3 +18,6 @@
 
 - name: Architecture Decision Records Preserve Architectural Reasoning
   href: architecture-decision-records-preserve-architectural-reasoning.md
+
+- name: Architecture Decision Record Lifecycle, Review, Deprecation, and Supersession
+  href: architecture-decision-record-lifecycle-review-deprecation-and-supersession.md
