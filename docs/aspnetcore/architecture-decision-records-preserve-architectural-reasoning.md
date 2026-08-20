@@ -467,6 +467,8 @@ The NCAT structure is a working convention, not a required Learning format.
 
 Use it as a specimen of a repository preserving architectural reasoning, not as proof that every project needs the same numbering scheme, headings, or status vocabulary.
 
+Continue with [Working Repository ADR Case Study: NetCoreApplicationTemplate](netcoreapplicationtemplate-adr-case-study.md) to trace two accepted decisions from the general Learning problem through repository-specific constraints, ADR rationale, current implementation, alternatives, consequences, and review triggers.
+
 ## Related Learning Material
 
 Several existing ASP.NET Core lessons contain architectural choices that a real project might decide to preserve in ADRs:

@@ -8,6 +8,8 @@
 
 **Learning objective:** Understand an ADR as a record of a decision made under particular assumptions rather than as permanent doctrine; recognize when a decision should be reviewed; distinguish proposed, accepted, deprecated, and superseded states; preserve historical reasoning while changing the active architecture; and detect drift between ADR state and implementation.
 
+> **Working-repository follow-on:** Use [Working Repository ADR Case Study: NetCoreApplicationTemplate](netcoreapplicationtemplate-adr-case-study.md) to inspect how accepted ADRs map into current code and configuration, and how implementation drift can become evidence for review.
+
 ## Pattern Card
 
 > **Problem:** Architectural decisions can outlive the assumptions that justified them. If teams treat accepted ADRs as immutable truth, silently edit historical records, delete obsolete decisions, or let implementation drift without updating the record, future maintainers lose both the current architecture and the reasoning that produced it.
