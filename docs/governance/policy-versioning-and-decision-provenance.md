@@ -8,17 +8,15 @@
 
 **Prerequisites:** [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) and [Constraint Composition and Policy Precedence](constraint-composition-and-policy-precedence.md). Familiarity with [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) is helpful for the continuation examples.
 
-## Pattern Card
+## At a Glance
 
-> **Problem:** A consequential decision can outlive the policy evaluation that created it. If the decision does not preserve policy identity, later reviewers and execution boundaries may be unable to tell which policy produced the result or whether that authority is still fresh.
+> **Problem:** A consequential decision can outlive the policy evaluation that created it, making it difficult to tell which policy produced the decision or whether its authority is still fresh.
 >
-> **Pattern:** Capture stable policy evidence at decision time, preserve it without rewriting history, and apply an explicit freshness rule when current policy differs before acknowledgment, capability issuance, or execution.
+> **Core idea:** Capture stable policy identity and evidence at decision time, preserve that historical provenance, and apply an explicit freshness rule when current policy differs before later continuation or execution.
 >
-> **Use when:** Decisions, acknowledgments, capabilities, queues, workflows, or audit evidence may survive policy deployments, rollbacks, process boundaries, or delayed execution.
+> **Why it matters:** Rewriting old evidence or silently continuing after policy drift makes decisions harder to reconstruct and can allow stale authority to cross a later execution boundary.
 >
-> **Prefer something simpler when:** A low-consequence operation is evaluated and executed immediately inside one trusted boundary, no durable decision evidence is required, and policy changes cannot race the operation in a meaningful way.
->
-> **Observe:** An old decision remains attributable to the policy that created it even after a newer policy becomes current, and policy drift causes an explicit continuation decision rather than silent execution.
+> **Read this if:** Decisions, acknowledgments, capabilities, queues, workflows, or audit records may survive policy deployments, rollbacks, process boundaries, or delayed execution.
 
 The central question is simple:
 

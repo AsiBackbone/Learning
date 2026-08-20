@@ -8,17 +8,15 @@
 
 **Prerequisites:** [Constraint Composition and Policy Precedence](../governance/constraint-composition-and-policy-precedence.md), [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md), and [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md).
 
-## Pattern Card
+## At a Glance
 
-> **Problem:** A shared platform may need global, regional, tenant, application, and operation-specific policy at the same decision boundary. If those authorities are combined implicitly, the last evaluator to run can accidentally become the strongest policy.
+> **Problem:** Global, regional, tenant, application, and operation-specific policy can all apply to one decision, allowing registration order or implicit overrides to become accidental authority.
 >
-> **Pattern:** Resolve the required policy set from authoritative host context, evaluate each policy contribution explicitly, compose those contributions through a documented overlay contract, and preserve the participating policy identities in decision provenance.
+> **Core idea:** Resolve applicable policy scopes from authoritative host context, evaluate each contribution explicitly, compose them through a documented overlay contract, and preserve participating policy identities in decision provenance.
 >
-> **Use when:** A consequential operation is governed by more than one independently owned or versioned policy authority, especially across jurisdictions, organizations, tenants, applications, or delegated exception paths.
+> **Why it matters:** Policy scope alone does not define authority. Without explicit overlay rules, a lower layer may silently broaden a restriction, conflicts may disappear, and reviewers may be unable to reconstruct the decision.
 >
-> **Prefer something simpler when:** One application owns one compact rule set, policy and execution occur in the same trusted boundary, and there is no meaningful need to preserve multiple policy authorities or their historical versions.
->
-> **Observe:** Reordering policy registrations does not change the final outcome; an unauthorized lower layer cannot broaden a mandatory higher-layer restriction; conflicts and missing policy are explicit states; and a reviewer can reconstruct which policies participated in the decision.
+> **Read this if:** A consequential operation is governed by multiple independently owned or versioned policy authorities across jurisdictions, organizations, tenants, applications, or delegated exception paths.
 
 A useful conceptual structure is:
 
