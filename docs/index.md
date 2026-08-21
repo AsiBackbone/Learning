@@ -8,6 +8,8 @@ description: Practical .NET architecture tutorials, labs, and reference patterns
 
 ASI Backbone Learning is the educational layer of the ASI Backbone organization.
 
+In this project, **ASI** means **Accountable Systems Infrastructure**. ASI Backbone Learning focuses on software architecture, governed execution, secure .NET applications, and AI integration; it is not affiliated with the Artificial Superintelligence Alliance.
+
 It exists to explain architectural ideas clearly, demonstrate them with focused examples, examine their tradeoffs, and connect those lessons to fuller working implementations.
 
 > **Read it. Run it. Question it. Improve it.**
