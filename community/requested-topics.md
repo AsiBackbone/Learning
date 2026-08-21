@@ -491,6 +491,31 @@ Suggested format:
 
 ---
 
+## Threat Modeling as Architecture Reasoning
+
+**Status:** Published
+
+Published material: [Threat Modeling as Architecture Reasoning](../docs/security/threat-modeling-as-architecture-reasoning.md)
+
+Teach threat modeling as a way to reason about architecture under adversarial and failure conditions rather than as a compliance worksheet or substitute for testing.
+
+Questions to address:
+
+- What assets and security objectives matter inside the selected scope?
+- Where do data, trust, and authority cross boundaries?
+- Which abuse paths can replay, forge, modify, disclose, exhaust, or bypass the intended flow?
+- Which controls mitigate concrete threats, and which assumptions remain unenforced?
+- What architectural invariants can verify that blocked paths never reach consequential execution?
+- What residual risk remains, and what architecture changes should trigger re-evaluation?
+
+Suggested format:
+
+- Tutorial
+- Worked architecture flow
+- Threat-to-mitigation and invariant table
+
+---
+
 # AI and Agent Governance Requests
 
 ## AI Proposed Intent

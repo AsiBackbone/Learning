@@ -16,5 +16,8 @@
 - name: Signing, Verification, Key Custody, and Tamper Evidence
   href: signing-verification-key-custody-and-tamper-evidence.md
 
+- name: Threat Modeling as Architecture Reasoning
+  href: threat-modeling-as-architecture-reasoning.md
+
 - name: Software Supply-Chain Integrity for .NET Repositories
   href: software-supply-chain-integrity-for-dotnet-repositories.md

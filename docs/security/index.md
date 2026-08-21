@@ -1,5 +1,5 @@
 ---
-description: Explore security architecture for trust boundaries, least privilege, secret handling, secure logging, replay protection, cryptographic evidence, supply-chain integrity, and fail-safe behavior.
+description: Explore security architecture for trust boundaries, least privilege, secret handling, secure logging, replay protection, cryptographic evidence, supply-chain integrity, threat modeling, and fail-safe behavior.
 ---
 
 # Security
@@ -8,7 +8,7 @@ The Security section examines architectural boundaries that can reduce accidenta
 
 Security in ASI Backbone Learning is approached as an architectural responsibility rather than a single feature or package.
 
-> **Section status:** Focused security learning now covers trust boundaries, least privilege, secret handling, secure logging, replay protection, cryptographic evidence boundaries, and software supply-chain integrity. Start with [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), continue with [Secret Handling Across Trust Boundaries](secret-handling-across-trust-boundaries.md) to follow authority-bearing values through custody, delivery, use, rotation, and revocation, then use [Secure Logging Across Trust Boundaries](secure-logging-across-trust-boundaries.md) to examine observability as an outbound data boundary. Continue with [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md), and [Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md) before using the [Foundational Tutorials](../tutorials/index.md) to connect security boundaries to governed execution.
+> **Section status:** Focused security learning now covers trust boundaries, least privilege, secret handling, secure logging, replay protection, cryptographic evidence boundaries, software supply-chain integrity, and threat modeling as architecture reasoning. Start with [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), continue with [Secret Handling Across Trust Boundaries](secret-handling-across-trust-boundaries.md) to follow authority-bearing values through custody, delivery, use, rotation, and revocation, then use [Secure Logging Across Trust Boundaries](secure-logging-across-trust-boundaries.md) to examine observability as an outbound data boundary. Continue with [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md), and [Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md). Finish with [Threat Modeling as Architecture Reasoning](threat-modeling-as-architecture-reasoning.md) to synthesize those controls into a repeatable architecture-review method before returning to the [Foundational Tutorials](../tutorials/index.md) and governed-execution path.
 
 > **A secure boundary should remain visible when the system is under pressure.**
 
@@ -29,6 +29,8 @@ Run the [Replay Protection and Bounded-Use Authority sample](https://github.com/
 [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md) adds the cryptographic evidence boundary. It separates hashes from signatures, signing from verification and authorization, key custody from ordinary application configuration, normal rotation from compromise, and tamper evidence from tamper prevention.
 
 [Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md) extends those trust questions into the process that creates and publishes software. It uses current Learning, AsiBackbone, and NetCoreApplicationTemplate repository practices as selective specimens for workflow permissions, SHA-pinned actions, dependency management, locked restore, package validation, SBOMs, attestations, publication authority, and precise provenance claims.
+
+[Threat Modeling as Architecture Reasoning](threat-modeling-as-architecture-reasoning.md) is the synthesis tutorial for the section. It starts from system and authority flows, then teaches learners to identify assets, trust changes, abuse paths, unprotected assumptions, mitigations, verification invariants, and residual risk without confusing the exercise with a penetration test, scanner, checklist, or security certification.
 
 ## Security Themes
 
@@ -52,6 +54,7 @@ Current and future material may examine:
 - Failure behavior
 - Degraded-mode operation
 - [Software supply-chain integrity for .NET repositories](software-supply-chain-integrity-for-dotnet-repositories.md)
+- [Threat modeling as architecture reasoning](threat-modeling-as-architecture-reasoning.md)
 - AI tool-execution risks
 
 ## Approval Is Not Unlimited Authority
@@ -135,9 +138,9 @@ Application-specific security analysis remains necessary.
 
 ## Current Status
 
-The Security section now has focused material for trust boundaries and least privilege, secret handling, secure logging, replay protection and bounded-use authority, signing/verification with key-custody and tamper-evidence boundaries, and software supply-chain integrity. Together they establish a security architecture path from identifying where trust changes, to reducing the lifetime and distribution of authority-bearing secrets, to deciding what data may safely cross into observability systems, to preserving narrow authority, to controlling whether authority may be consumed again, to deciding what cryptographic evidence can safely establish, and finally to applying the same trust-boundary reasoning to source, dependencies, CI, generated artifacts, and publication.
+The Security section now has focused material for trust boundaries and least privilege, secret handling, secure logging, replay protection and bounded-use authority, signing/verification with key-custody and tamper-evidence boundaries, software supply-chain integrity, and threat modeling as architecture reasoning. Together they establish a security architecture path from identifying where trust changes, to reducing the lifetime and distribution of authority-bearing secrets, to deciding what data may safely cross into observability systems, to preserving narrow authority, to controlling whether authority may be consumed again, to deciding what cryptographic evidence can safely establish, to applying the same trust-boundary reasoning to source, dependencies, CI, generated artifacts, and publication, and finally to synthesizing those concerns into explicit abuse paths, mitigations, verification invariants, and residual risk.
 
-Future material will extend into threat modeling as architecture reasoning.
+The dedicated Milestone 7 Security and Trust Architecture foundation is complete. Future material may deepen individual threat-model exercises or application-specific examples without implying that a Learning diagram is a production security assessment.
 
 Use the [Foundational Tutorials](../tutorials/index.md) to connect these security concepts to the existing governed-execution learning path.
 

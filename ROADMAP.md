@@ -696,7 +696,7 @@ The ADR learning path now covers why ADRs matter, when a decision merits a recor
 
 ## Status
 
-**In progress — trust-boundary, least-privilege, secret-handling, secure-logging, capability/replay, cryptographic-evidence, fail-safe, and software-supply-chain foundations established**
+**Complete — dedicated Security and Trust Architecture foundation established**
 
 ## Goal
 
@@ -721,12 +721,13 @@ Teach security as an architectural property rather than a collection of isolated
 * [x] SBOM concepts. ([#76](https://github.com/AsiBackbone/Learning/issues/76))
 * [x] Fail-open versus fail-closed behavior. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 * [x] Security failure modes. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
-* [ ] Threat modeling as architecture reasoning.
+* [x] Threat modeling as architecture reasoning — [Threat Modeling as Architecture Reasoning](docs/security/threat-modeling-as-architecture-reasoning.md). ([#102](https://github.com/AsiBackbone/Learning/issues/102))
 
-The remaining dedicated Security and Trust Architecture gap is threat modeling
-as architecture reasoning. Existing tutorials already contain focused threat-model
-questions and exercises, but Milestone 7 does not yet have a complete standalone
-treatment of threat modeling as an architectural practice.
+The dedicated Milestone 7 foundation now connects individual security controls
+to a complete architecture-reasoning practice: define scope, identify assets and
+authority, mark trust and execution boundaries, enumerate abuse paths, map
+mitigations to threats, verify architectural invariants, record residual risk, and
+revisit the model as trust relationships change.
 
 Educational security examples should clearly distinguish demonstrated patterns from production security guarantees.
 
@@ -1073,22 +1074,20 @@ It should not force the project into unnecessary release ceremony.
 
 The highest-priority work now is:
 
-1. Complete the remaining Security and Trust Architecture work with a dedicated
-   threat-modeling-as-architecture-reasoning treatment.
-2. Deepen Governance and Policy Architecture where dedicated coverage is still
+1. Deepen Governance and Policy Architecture where dedicated coverage is still
    missing: risk-based decisions, broader human-in-the-loop and escalation
    workflows, deterministic/probabilistic inputs, and policy simulation.
-3. Expand AI Integration beyond the established proposal and multi-agent
+2. Expand AI Integration beyond the established proposal and multi-agent
    boundaries with multi-tool workflows, model-uncertainty handling, proposal
    recovery, and agent-memory governance.
-4. Add remaining intermediate and advanced labs where learner reasoning materially
+3. Add remaining intermediate and advanced labs where learner reasoning materially
    improves the curriculum, especially decision-pipeline refactoring, competing
    policy architectures, regional/tenant policy design, high-consequence failure
    critique, and AI proposal/execution-authority separation.
-5. Continue strengthening tutorial → sample → lab → working implementation links
+4. Continue strengthening tutorial → sample → lab → working implementation links
    and expand architecture comparisons while preserving honest cases where simpler
    or adjacent patterns win.
-6. Use community feedback and implementation changes to decide which advanced or
+5. Use community feedback and implementation changes to decide which advanced or
    experimental subjects deserve promotion into the main learning path.
 
 The short-term emphasis should remain:
