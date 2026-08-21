@@ -1582,6 +1582,7 @@ It is the first full composition of the primitives established so far.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — go deeper on durable replay state, atomic consumption, distributed races, idempotency, and execution failure windows.
 - [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](../advanced/governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md) — explore the experimental delegation rule that derived authority must not silently become broader than its source authority.
 - [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see scoped capabilities used as part of a complete AI-proposed, host-governed execution path.
+- [Threat Modeling as Architecture Reasoning](../security/threat-modeling-as-architecture-reasoning.md) — trace capability replay, audience/resource substitution, privilege broadening, and alternate execution paths back to testable mitigations.
 - [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/scoped-capability-and-host-owned-execution/README.md) — run the capability issuance and execution-boundary validation pattern.
 - [Scoped Capability and Host-Owned Execution lab](../labs/scoped-capability-and-host-owned-execution.md) — break expiration, resource-freshness, and scope boundaries, then repair them.
 

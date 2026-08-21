@@ -1247,6 +1247,7 @@ It will examine how a consequential operation can pause for explicit acknowledgm
 - [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — continue from explicit decision outcomes into acknowledgment, re-evaluation, correlation, and governance evidence.
 - [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — follow allowed or acknowledged decisions into narrowly scoped execution authority.
 - [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see authoritative host context and explicit decision outcomes applied to AI-proposed tool actions.
+- [Threat Modeling as Architecture Reasoning](../security/threat-modeling-as-architecture-reasoning.md) — use source-of-authority questions to identify caller-controlled context, trust changes, bypass paths, and unprotected assumptions.
 - [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md) — run the companion decision matrix and observe explicit context snapshots, structured reason codes, and host-controlled next-step semantics.
 - [Policy Context and Explicit Decision Outcomes learner exercise](../labs/policy-context-and-explicit-decision-outcomes.md) — modify the sample to explore boolean information loss, context evolution, structured reasons, and rule precedence.
 - [Executable Samples](../samples/index.md) — explore the published companion-sample guide before following a canonical sample README.
