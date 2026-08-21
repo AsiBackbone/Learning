@@ -12,7 +12,7 @@ The central principle is:
 
 This separation allows AI inference to participate in an application workflow without treating model output as authorization, policy, or execution authority.
 
-> **Section status:** The foundational AI gateway tutorial and the first focused AI proposal-boundary tutorial are published; additional focused section pages are planned.
+> **Section status:** The foundational AI gateway tutorial, the focused proposal-boundary tutorial, and the deterministic/probabilistic policy-input bridge are published; additional focused section pages are planned.
 
 ## Proposal Is Not Execution
 
@@ -91,6 +91,12 @@ This tutorial composes the earlier patterns into an end-to-end AI-assisted execu
 [Typed AI Proposed Intent and Schema-Validation Boundaries](typed-ai-proposed-intent-and-schema-validation-boundaries.md)
 
 This tutorial isolates the proposal-translation boundary: untrusted model output, parsing, schema validation, typed proposed intent, authoritative host facts, and the rule that successful parsing does not create authority.
+
+### Governance / AI Bridge: Deterministic and Probabilistic Inputs in Policy Evaluation
+
+[Deterministic and Probabilistic Inputs in Policy Evaluation](../governance/deterministic-and-probabilistic-inputs-in-policy-evaluation.md)
+
+This advanced tutorial distinguishes host-authoritative deterministic facts from model-derived or statistical signals and shows how provenance, uncertainty, confidence, calibration, threshold policy, freshness, and host-owned execution remain explicit.
 
 ## Host-Owned Tool Registry
 
@@ -353,6 +359,8 @@ Future material in this section may examine:
 * Semantic versus broad execution primitives
 * Prompt guidance versus enforcement
 * Model-generated versus host-authoritative context
+* Deterministic versus probabilistic policy inputs
+* Confidence, calibration, and model-signal provenance
 * Human acknowledgment
 * Scoped execution authority
 * Secret isolation
@@ -395,13 +403,17 @@ Production AI-assisted systems remain responsible for their own threat models, a
 
 ## Current Status
 
-The foundational AI integration tutorial and the first focused AI proposal-boundary tutorial are published.
+The foundational AI integration tutorial, the focused AI proposal-boundary tutorial, and the deterministic/probabilistic policy-input bridge are published.
 
 Future work will expand this section through executable companion samples, hands-on labs, threat-model exercises, alternative gateway designs, and additional agent and tool-execution scenarios.
 
 For the focused model-output acceptance boundary, continue with:
 
 [Typed AI Proposed Intent and Schema-Validation Boundaries](typed-ai-proposed-intent-and-schema-validation-boundaries.md)
+
+For the probabilistic model-signal boundary, continue with:
+
+[Deterministic and Probabilistic Inputs in Policy Evaluation](../governance/deterministic-and-probabilistic-inputs-in-policy-evaluation.md)
 
 For the complete end-to-end execution path, continue with:
 

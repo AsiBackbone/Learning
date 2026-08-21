@@ -94,6 +94,12 @@ Expands the policy pipeline beyond individual rule evaluation. It explains deny/
 
 Shows how explicit consequence, likelihood, exposure, uncertainty, resource sensitivity, and environmental factors can influence a governance outcome without turning a risk score into hidden authorization or execution authority. It covers qualitative and quantitative models, risk bands, versioned outcome mapping, unavailable signals, freshness, provenance, overlays, and threshold testing.
 
+### Deterministic and Probabilistic Inputs in Policy Evaluation
+
+[Deterministic and Probabilistic Inputs in Policy Evaluation](deterministic-and-probabilistic-inputs-in-policy-evaluation.md)
+
+Distinguishes authoritative deterministic facts from probabilistic or model-derived observations, preserving score meaning, uncertainty, model identity, calibration, freshness, threshold policy, provenance, and host-owned execution.
+
 ### Human-in-the-Loop Governance Workflows
 
 [Human-in-the-Loop Governance Workflows](human-in-the-loop-governance-workflows.md)
@@ -145,7 +151,7 @@ Learning explains the architectural reasoning in intentionally smaller examples 
 
 ## Current Status
 
-The foundational governance tutorial sequence is established, and the Governance section now extends that foundation with explicit policy-pipeline composition, precedence, risk-based decisions, human-in-the-loop review, escalation lifecycles, policy versioning, decision provenance, and decision-boundary testing guidance.
+The foundational governance tutorial sequence is established, and the Governance section now extends that foundation with explicit policy-pipeline composition, precedence, risk-based decisions, deterministic/probabilistic input boundaries, human-in-the-loop review, escalation lifecycles, policy versioning, decision provenance, and decision-boundary testing guidance.
 
 Future material may expand into:
 

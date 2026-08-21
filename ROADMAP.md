@@ -737,7 +737,7 @@ Educational security examples should clearly distinguish demonstrated patterns f
 
 ## Status
 
-**In progress — policy composition, provenance, regional/tenant overlays, risk-based decisions, human-in-the-loop review, escalation patterns, degraded-mode behavior, and policy-testing foundations established**
+**In progress — policy composition, provenance, regional/tenant overlays, risk-based decisions, deterministic/probabilistic input boundaries, human-in-the-loop review, escalation patterns, degraded-mode behavior, and policy-testing foundations established**
 
 ## Goal
 
@@ -758,15 +758,14 @@ Expand the conceptual vocabulary around policy-governed systems after the founda
 * [x] Decision provenance. ([#53](https://github.com/AsiBackbone/Learning/issues/53))
 * [x] Policy failure behavior. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 * [x] Degraded-mode decisions. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
-* [ ] Deterministic versus probabilistic policy inputs.
+* [x] Deterministic versus probabilistic policy inputs. ([#115](https://github.com/AsiBackbone/Learning/issues/115))
 * [x] Policy testing. ([#72](https://github.com/AsiBackbone/Learning/issues/72))
 * [ ] Policy simulation.
 * [x] Policy rollout and rollback reasoning. ([#53](https://github.com/AsiBackbone/Learning/issues/53))
 * [x] Separation between policy decision and operational execution. ([#44](https://github.com/AsiBackbone/Learning/issues/44))
 
-Deterministic-versus-probabilistic policy inputs and policy simulation remain distinct
-future subjects. Existing material may use those concerns as examples without yet providing
-complete standalone treatment.
+Policy simulation remains a distinct future subject. Existing material may use simulation
+as an example without yet providing complete standalone treatment.
 
 ---
 
