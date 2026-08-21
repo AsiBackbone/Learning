@@ -15,6 +15,7 @@ static class FeedGenerator
     private static readonly Uri FeedUri = new(SiteRoot, "feed.xml");
     private const string AtomNamespace = "http://www.w3.org/2005/Atom";
     private const string DublinCoreNamespace = "http://purl.org/dc/elements/1.1/";
+    private const string MediaNamespace = "http://search.yahoo.com/mrss/";
     private static readonly HashSet<string> PublicationKeys = new(StringComparer.OrdinalIgnoreCase)
     {
         "title",
@@ -320,17 +321,29 @@ static class FeedGenerator
         writer.WriteAttributeString("version", "2.0");
         writer.WriteAttributeString("xmlns", "atom", null, AtomNamespace);
         writer.WriteAttributeString("xmlns", "dc", null, DublinCoreNamespace);
+        writer.WriteAttributeString("xmlns", "media", null, MediaNamespace);
 
         writer.WriteStartElement("channel");
+
         writer.WriteElementString("title", "ASI Backbone Learning");
         writer.WriteElementString("link", SiteRoot.AbsoluteUri);
         writer.WriteElementString(
             "description",
-            "Long-form technical articles from the ASI Backbone Learning documentation site.");
+            "Long-form technical articles from Accountable Systems Infrastructure (ASI) Backbone Learning on " +
+            "governed .NET decision flow and execution, secure application architecture, AI integration, and policy-" +
+            "driven systems.");
         writer.WriteElementString("language", "en-us");
         writer.WriteElementString(
             "lastBuildDate",
             DateTimeOffset.UtcNow.ToString("R", CultureInfo.InvariantCulture));
+
+        writer.WriteStartElement("image");
+        writer.WriteElementString(
+            "url",
+            new Uri(SiteRoot, "images/asibackbone-icon-50.png").AbsoluteUri);
+        writer.WriteElementString("title", "ASI Backbone Learning");
+        writer.WriteElementString("link", SiteRoot.AbsoluteUri);
+        writer.WriteEndElement();
 
         writer.WriteStartElement("atom", "link", AtomNamespace);
         writer.WriteAttributeString("href", FeedUri.AbsoluteUri);
@@ -358,6 +371,12 @@ static class FeedGenerator
                 "creator",
                 DublinCoreNamespace,
                 article.Author);
+
+            writer.WriteStartElement("media", "thumbnail", MediaNamespace);
+            writer.WriteAttributeString(
+                "url",
+                new Uri(SiteRoot, "images/asibackbone-icon-50.png").AbsoluteUri);
+            writer.WriteEndElement();
             writer.WriteEndElement();
         }
 
