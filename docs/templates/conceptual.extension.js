@@ -31,6 +31,10 @@ function normalizePublicationDate(value) {
 }
 
 exports.postTransform = function (model) {
+  if (!model.description && !model._description && model.summary) {
+      model.description = model.summary
+  }
+
   if (!model.author || !model.published) {
     return model
   }
