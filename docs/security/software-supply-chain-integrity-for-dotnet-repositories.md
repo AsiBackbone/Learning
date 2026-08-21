@@ -1,3 +1,7 @@
+---
+description: Trace trust from source commit to .NET artifact and learn how dependency, CI, build, signing, provenance, and release controls reduce supply-chain risk.
+---
+
 # Software Supply-Chain Integrity for .NET Repositories
 
 **Learning objective:** Trace how trust changes from source commit to published .NET artifact, connect common repository controls to the threats they are intended to reduce, and distinguish useful integrity evidence from guarantees those controls do not provide.

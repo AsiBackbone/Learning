@@ -1,3 +1,7 @@
+---
+description: Learn an AI tool gateway pattern where models propose actions while the host owns context, governance, acknowledgment, authority, execution, and evidence.
+---
+
 # Governed AI Tool Gateway
 
 **Learning objective:** Compose the first four foundational patterns into an end-to-end AI-assisted execution boundary where a model may propose a tool action, but the host owns authoritative context, governance, acknowledgment, scoped authority, execution, and evidence.

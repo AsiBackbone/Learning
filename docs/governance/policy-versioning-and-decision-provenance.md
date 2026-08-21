@@ -1,3 +1,7 @@
+---
+description: Learn to preserve policy identity and decision provenance, detect policy drift, and reason about what versions and fingerprints can and cannot prove.
+---
+
 # Policy Versioning and Decision Provenance
 
 **Learning objective:** Understand how to preserve the identity of the policy that produced a governance decision, how to reason about policy drift before later execution, and what policy versions and fingerprints can and cannot prove.

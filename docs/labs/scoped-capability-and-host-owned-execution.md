@@ -1,3 +1,7 @@
+---
+description: Practice carrying narrow, short-lived authority from an allowed decision to host-owned execution while detecting expired, mismatched, or stale capabilities.
+---
+
 # Lab — Scoped Capability and Host-Owned Execution
 
 **Learning objective:** Practice preserving narrow, short-lived execution authority across the transition from an allowed decision to a host-owned side effect, and detect when execution authority has become expired, mismatched, or stale.

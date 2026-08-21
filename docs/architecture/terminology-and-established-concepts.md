@@ -1,3 +1,7 @@
+---
+description: Map ASI Backbone Learning terminology to established software architecture, authorization, security, workflow, provenance, and AI-governance concepts.
+---
+
 # Terminology and Established Architecture Concepts
 
 ASI Backbone Learning uses a consistent vocabulary to make recurring architectural boundaries easier to teach, test, and compare.

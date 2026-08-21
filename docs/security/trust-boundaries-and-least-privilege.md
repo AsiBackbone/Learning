@@ -1,3 +1,7 @@
+---
+description: Learn to identify trust-boundary crossings, distinguish caller claims from authoritative context, and carry only the minimum required authority forward.
+---
+
 # Trust Boundaries and Least Privilege
 
 **Pattern classification:** General learning material

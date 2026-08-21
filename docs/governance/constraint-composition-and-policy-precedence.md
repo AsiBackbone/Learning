@@ -1,3 +1,7 @@
+---
+description: Learn to compose independently evaluated constraints through explicit, deterministic precedence so rule ordering does not become accidental policy.
+---
+
 # Constraint Composition and Policy Precedence
 
 **Pattern classification:** Canonical Pattern

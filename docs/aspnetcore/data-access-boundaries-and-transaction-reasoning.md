@@ -1,3 +1,7 @@
+---
+description: Learn how to place EF Core behind clear boundaries, choose transaction scopes, use interceptors carefully, and separate database work from external effects.
+---
+
 # Data-Access Boundaries and Transaction Reasoning with EF Core
 
 **Pattern classification:** General learning material

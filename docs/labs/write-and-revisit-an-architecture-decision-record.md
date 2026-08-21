@@ -1,3 +1,7 @@
+---
+description: Practice comparing alternatives, writing an ADR, recording consequences and review conditions, and revisiting the decision when assumptions change.
+---
+
 # Lab — Write and Revisit an Architecture Decision Record
 
 **Learning objective:** Evaluate a realistic architectural decision under competing constraints, compare credible alternatives, write a concise Architecture Decision Record that preserves the reasoning, and then revisit that decision when requirements and platform conditions change without rewriting architectural history.

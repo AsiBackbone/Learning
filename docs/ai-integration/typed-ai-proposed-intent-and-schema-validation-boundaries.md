@@ -1,3 +1,7 @@
+---
+description: Learn how to turn untrusted model output into typed proposed intent through schema validation without treating generated data as authority or permission.
+---
+
 # Typed AI Proposed Intent and Schema-Validation Boundaries
 
 **Learning objective:** Understand how raw AI model output can be translated into a typed proposed intent without allowing model-generated data to become authoritative context, authorization, or execution authority.

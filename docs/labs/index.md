@@ -1,3 +1,7 @@
+---
+description: Browse hands-on ASI Backbone Learning labs for diagnosing, modifying, testing, and explaining architectural and governed-execution boundaries.
+---
+
 # Labs
 
 Labs are the **practice and reasoning layer** of ASI Backbone Learning.

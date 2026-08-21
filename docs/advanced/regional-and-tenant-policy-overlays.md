@@ -1,3 +1,7 @@
+---
+description: Learn how global, regional, tenant, application, and operation policy layers can compose explicitly without accidental precedence or hidden overrides.
+---
+
 # Regional and Tenant Policy Overlays
 
 **Learning objective:** Understand how multiple policy authorities can participate in one governance decision without allowing precedence, override behavior, or decision provenance to emerge accidentally from registration order.

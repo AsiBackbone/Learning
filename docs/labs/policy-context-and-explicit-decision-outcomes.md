@@ -1,3 +1,7 @@
+---
+description: Practice explicit policy context, structured decision outcomes, stable reason codes, and intentional precedence instead of scattered facts and booleans.
+---
+
 # Lab — Policy Context and Explicit Decision Outcomes
 
 **Learning objective:** Practice replacing scattered authorization facts and boolean results with an explicit policy-context snapshot, structured decision outcomes, stable reason codes, and intentional rule precedence.

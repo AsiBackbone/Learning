@@ -1,3 +1,7 @@
+---
+description: Explore governance patterns for explicit, reviewable decisions, policy context, provenance, acknowledgment, scoped authority, and auditable execution.
+---
+
 # Governance
 
 The Governance section explores how software can make consequential decisions explicit, constrained, reviewable, and auditable before real-world execution occurs.

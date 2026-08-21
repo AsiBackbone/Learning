@@ -1,3 +1,7 @@
+---
+description: Learn when an architectural decision deserves an ADR and how to preserve context, alternatives, consequences, tradeoffs, and future review conditions.
+---
+
 # Architecture Decision Records Preserve Architectural Reasoning
 
 **Pattern classification:** General Learning Material

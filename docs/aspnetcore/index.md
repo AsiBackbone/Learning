@@ -1,3 +1,7 @@
+---
+description: Explore practical ASP.NET Core architecture for middleware, secure configuration, logging, error handling, data access, ADRs, and governed execution.
+---
+
 # ASP.NET Core
 
 The ASP.NET Core section connects the architectural ideas in ASI Backbone Learning to practical application structure in modern .NET web applications.

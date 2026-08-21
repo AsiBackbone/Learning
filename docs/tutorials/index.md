@@ -1,3 +1,7 @@
+---
+description: Browse problem-first tutorials that expose failure modes, introduce architectural patterns, and connect focused examples to working implementations.
+---
+
 # Tutorials
 
 Tutorials in ASI Backbone Learning are **problem-first**.
