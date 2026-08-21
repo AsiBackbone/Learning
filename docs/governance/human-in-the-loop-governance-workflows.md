@@ -1848,6 +1848,7 @@ If several answers are unclear, the system may have an approval screen, but it d
 - [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — distinguish acknowledgment from approval and preserve decision, acknowledgment, re-evaluation, and execution evidence.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — build the authoritative facts and structured outcomes that can lead into a human-review state.
 - [Risk-Based Decisions in Governed Systems](risk-based-decisions-in-governed-systems.md) — see how changing consequence, likelihood, uncertainty, and environmental context can change whether human review is required.
+- [Escalation Patterns in Governed Systems](escalation-patterns-in-governed-systems.md) — place human review inside a broader escalation lifecycle when another authority must receive and resolve the decision problem.
 - [Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md) — reason about policy drift, decision freshness, and historical evidence across a delayed review window.
 - [Practical Policy Testing and Decision-Table Strategies](practical-policy-testing-and-decision-table-strategies.md) — convert reviewer eligibility, quorum, expiration, drift, and continuation rules into explicit test cases.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — preserve least-privilege execution authority after a valid review and revalidation.

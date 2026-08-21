@@ -842,6 +842,7 @@ and examines how the facts and outcomes of a governance decision can be represen
 
 - [Foundational Tutorial Index](index.md) — view the complete five-tutorial learning path.
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — continue into explicit policy facts, constraints, and structured outcomes.
+- [Escalation Patterns in Governed Systems](../governance/escalation-patterns-in-governed-systems.md) — follow `EscalationRecommended` into an explicit non-executable routing, evidence, and re-evaluation lifecycle.
 - [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — follow the decision lifecycle into acknowledgment and evidence.
 - [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see the proposal-versus-execution boundary composed around AI-proposed tool calls.
 - [Threat Modeling as Architecture Reasoning](../security/threat-modeling-as-architecture-reasoning.md) — examine the decision boundary under adversarial assumptions and connect bypass risks to explicit architectural invariants.

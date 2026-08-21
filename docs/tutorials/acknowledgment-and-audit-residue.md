@@ -1372,6 +1372,7 @@ This continues the same principle established throughout Learning:
 
 - [Foundational Tutorial Index](index.md) — view the complete five-tutorial learning path.
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — revisit the explicit decision inputs and outcomes that can lead to an acknowledgment requirement.
+- [Escalation Patterns in Governed Systems](../governance/escalation-patterns-in-governed-systems.md) — compare acknowledgment with escalation and follow an escalation into a separate authority, evidence, and re-evaluation path.
 - [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — continue from acknowledgment into narrow, short-lived execution authority.
 - [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see acknowledgment, capability, execution, and audit residue composed around AI-proposed actions.
 - [Threat Modeling as Architecture Reasoning](../security/threat-modeling-as-architecture-reasoning.md) — reason about acknowledgment replay, evidence leakage, alternate continuation paths, and residual risk around responsibility boundaries.
