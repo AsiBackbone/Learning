@@ -4,6 +4,9 @@
 - name: Constraint Composition and Policy Precedence
   href: constraint-composition-and-policy-precedence.md
 
+- name: Risk-Based Decisions in Governed Systems
+  href: risk-based-decisions-in-governed-systems.md
+
 - name: Policy Versioning and Decision Provenance
   href: policy-versioning-and-decision-provenance.md
 

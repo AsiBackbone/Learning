@@ -1268,6 +1268,7 @@ If several answers are unclear, the system may have policy logic, but it does no
 
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — begin with explicit decision-time facts and structured outcomes.
 - [Practical Policy Testing and Decision-Table Strategies](practical-policy-testing-and-decision-table-strategies.md) — turn composition rules, precedence, and execution boundaries into explicit regression-testable cases.
+- [Risk-Based Decisions in Governed Systems](risk-based-decisions-in-governed-systems.md) — add risk assessment as an explicit, reviewable input without allowing risk scoring to bypass deterministic constraints or host-owned execution.
 - [Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md) — extend composition from multiple constraints inside one policy boundary to multiple policy authorities with explicit narrowing, override, conflict, and provenance rules.
 - [Decision Before Execution](../tutorials/decision-before-execution.md) — revisit the boundary between a governance decision and the protected side effect.
 - [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — continue from final decisions into acknowledgment and governance evidence.

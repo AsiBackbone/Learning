@@ -737,7 +737,7 @@ Educational security examples should clearly distinguish demonstrated patterns f
 
 ## Status
 
-**In progress — policy composition, provenance, regional/tenant overlays, degraded-mode behavior, and policy-testing foundations established**
+**In progress — policy composition, provenance, regional/tenant overlays, risk-based decisions, degraded-mode behavior, and policy-testing foundations established**
 
 ## Goal
 
@@ -752,7 +752,7 @@ Expand the conceptual vocabulary around policy-governed systems after the founda
 * [x] Policy identity and hashing. ([#53](https://github.com/AsiBackbone/Learning/issues/53))
 * [x] Regional policy overlays. ([#74](https://github.com/AsiBackbone/Learning/issues/74))
 * [x] Tenant-specific policy. ([#74](https://github.com/AsiBackbone/Learning/issues/74))
-* [ ] Risk-based decisions.
+* [x] Risk-based decisions. ([#112](https://github.com/AsiBackbone/Learning/issues/112))
 * [ ] Human-in-the-loop workflows.
 * [ ] Escalation patterns.
 * [x] Decision provenance. ([#53](https://github.com/AsiBackbone/Learning/issues/53))
@@ -764,10 +764,9 @@ Expand the conceptual vocabulary around policy-governed systems after the founda
 * [x] Policy rollout and rollback reasoning. ([#53](https://github.com/AsiBackbone/Learning/issues/53))
 * [x] Separation between policy decision and operational execution. ([#44](https://github.com/AsiBackbone/Learning/issues/44))
 
-Risk-based decision models, broader human-in-the-loop and escalation workflows,
-deterministic-versus-probabilistic policy inputs, and policy simulation remain
-distinct future subjects. Existing material may use those concerns as examples
-without yet providing complete standalone treatment.
+Broader human-in-the-loop and escalation workflows, deterministic-versus-probabilistic
+policy inputs, and policy simulation remain distinct future subjects. Existing material
+may use those concerns as examples without yet providing complete standalone treatment.
 
 ---
 
