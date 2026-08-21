@@ -94,6 +94,12 @@ Expands the policy pipeline beyond individual rule evaluation. It explains deny/
 
 Shows how explicit consequence, likelihood, exposure, uncertainty, resource sensitivity, and environmental factors can influence a governance outcome without turning a risk score into hidden authorization or execution authority. It covers qualitative and quantitative models, risk bands, versioned outcome mapping, unavailable signals, freshness, provenance, overlays, and threshold testing.
 
+### Human-in-the-Loop Governance Workflows
+
+[Human-in-the-Loop Governance Workflows](human-in-the-loop-governance-workflows.md)
+
+Explains how a consequential workflow can enter a durable pending-review state, bind a human disposition to an exact intent and eligible reviewer scope, handle timeout, delegation, quorum, cancellation, policy or context drift, and resume only after revalidation and scoped host-owned authority.
+
 ### Policy Versioning and Decision Provenance
 
 [Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md)
@@ -133,7 +139,7 @@ Learning explains the architectural reasoning in intentionally smaller examples 
 
 ## Current Status
 
-The foundational governance tutorial sequence is established, and the Governance section now extends that foundation with explicit policy-pipeline composition, precedence, risk-based decision models, policy versioning, decision provenance, and decision-boundary testing guidance.
+The foundational governance tutorial sequence is established, and the Governance section now extends that foundation with explicit policy-pipeline composition, precedence, risk-based decisions, human-in-the-loop review, policy versioning, decision provenance, and decision-boundary testing guidance.
 
 Future material may expand into:
 
@@ -143,7 +149,7 @@ Future material may expand into:
 * Regional policy overlays
 * Durable audit persistence
 * Degraded-mode decisions
-* Human escalation
+* Human escalation and broader escalation-routing patterns
 * Alternative governance architectures
 
 Continue with the [Foundational Tutorials](../tutorials/index.md) or explore the [Hands-On Labs](../labs/index.md) as they are developed.
