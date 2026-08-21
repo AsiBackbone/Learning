@@ -17,6 +17,7 @@ on:
       - 'docs/**'
       - 'docs/templates/**'
       - 'tools/generate-feed.cs'
+      - 'tools/validate-doc-metadata.cs'
       - '.config/dotnet-tools.json'
       - '.github/workflows/docs-validation.yml'
       
@@ -61,3 +62,6 @@ jobs:
 
       - name: Generate RSS feed
         run: dotnet run --file tools/generate-feed.cs
+
+      - name: Validate generated documentation metadata
+        run: dotnet run --file tools/validate-doc-metadata.cs
