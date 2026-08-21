@@ -399,6 +399,8 @@ The job has no credentials
 
 A workflow may still receive `GITHUB_TOKEN`, OIDC identity, environment secrets, package credentials, cloud credentials, or other authority through different mechanisms.
 
+For the broader credential lifecycle—including CI/CD secret separation, federated/OIDC identity, short-lived authority, runtime secret boundaries, rotation, revocation, and compromise response—see [Secret Handling Across Trust Boundaries](secret-handling-across-trust-boundaries.md). Supply-chain controls decide which jobs may obtain authority; secret-handling architecture decides how that authority is issued, scoped, used, renewed, and invalidated.
+
 ---
 
 ## Stage 4: Dependency Trust Is More Than Version Selection
