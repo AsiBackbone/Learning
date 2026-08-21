@@ -1587,6 +1587,8 @@ Policy Versioning and Decision Provenance
         ↓
 Practical Policy Testing and Decision-Table Strategies
         ↓
+Policy Simulation and Change-Impact Analysis
+        ↓
 Hands-on labs and working implementation tests
 ```
 
@@ -1618,6 +1620,7 @@ Repeatable automated test
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — start with explicit facts, reason codes, and structured outcomes.
 - [Constraint Composition and Policy Precedence](constraint-composition-and-policy-precedence.md) — understand the composition rules that the decision-table tests should protect.
 - [Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md) — extend regression cases across historical policy identity and drift.
+- [Policy Simulation and Change-Impact Analysis lab](../labs/policy-simulation-and-change-impact-analysis.md) — replay identical contexts against baseline and candidate policy versions, compare changed outcomes and reasons, and preserve a strict no-execution simulation boundary.
 - [Decision Before Execution](../tutorials/decision-before-execution.md) — revisit the boundary between a decision and a protected side effect.
 - [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — test delayed continuation without turning acknowledgment into authorization.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — test capability issuance and host-owned execution boundaries.

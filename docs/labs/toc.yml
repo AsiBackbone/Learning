@@ -25,6 +25,8 @@
       href: replay-protection-and-bounded-use.md
     - name: Policy-Version Evidence in Governance Decisions
       href: policy-version-evidence-in-governance-decisions.md
+    - name: Policy Simulation and Change-Impact Analysis
+      href: policy-simulation-and-change-impact-analysis.md
     - name: Build a Governed API Operation
       href: build-a-governed-api-operation.md
     - name: Write and Revisit an Architecture Decision Record
