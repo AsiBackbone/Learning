@@ -1,5 +1,5 @@
 ---
-description: Explore governance patterns for explicit, reviewable decisions, policy context, provenance, acknowledgment, scoped authority, and auditable execution.
+description: Explore governance patterns for explicit, reviewable decisions, risk-informed policy, provenance, acknowledgment, scoped authority, and auditable execution.
 ---
 
 # Governance
@@ -88,6 +88,12 @@ Composes the earlier ideas into an AI-assisted workflow while preserving host-ow
 
 Expands the policy pipeline beyond individual rule evaluation. It explains deny/warning/not-applicable composition, deliberate precedence, full evaluation versus first-denial short-circuiting, empty-policy and exception behavior, optional post-composition decision policy, determinism, and the continuing separation between governance decisions and host-owned execution.
 
+### Risk-Based Decisions in Governed Systems
+
+[Risk-Based Decisions in Governed Systems](risk-based-decisions-in-governed-systems.md)
+
+Shows how explicit consequence, likelihood, exposure, uncertainty, resource sensitivity, and environmental factors can influence a governance outcome without turning a risk score into hidden authorization or execution authority. It covers qualitative and quantitative models, risk bands, versioned outcome mapping, unavailable signals, freshness, provenance, overlays, and threshold testing.
+
 ### Policy Versioning and Decision Provenance
 
 [Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md)
@@ -127,7 +133,7 @@ Learning explains the architectural reasoning in intentionally smaller examples 
 
 ## Current Status
 
-The foundational governance tutorial sequence is established, and the Governance section now extends that foundation with explicit policy-pipeline composition, precedence, policy versioning, decision provenance, and decision-boundary testing guidance.
+The foundational governance tutorial sequence is established, and the Governance section now extends that foundation with explicit policy-pipeline composition, precedence, risk-based decision models, policy versioning, decision provenance, and decision-boundary testing guidance.
 
 Future material may expand into:
 
