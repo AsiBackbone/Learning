@@ -1485,6 +1485,8 @@ The lab starts from the existing Policy Context sample and asks you to:
 - Correlate historical and current policy identity in audit residue.
 - Add a policy fingerprint without overclaiming what it proves.
 
+After that exercise, continue with [Policy Simulation and Change-Impact Analysis](../labs/policy-simulation-and-change-impact-analysis.md) to replay identical contexts against a baseline and candidate policy before rollout.
+
 The preferred progression is now:
 
 ```text
@@ -1493,6 +1495,8 @@ Policy Versioning and Decision Provenance
 Minimal policy-evidence model
         ↓
 Policy-Version Evidence lab
+        ↓
+Policy Simulation and Change-Impact Analysis lab
         ↓
 AsiBackbone working implementation references
 ```
@@ -1509,6 +1513,7 @@ AsiBackbone working implementation references
 - [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — connect decision provenance to acknowledgment, re-evaluation, and durable governance evidence.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — see policy identity carried into narrow execution authority.
 - [Policy-Version Evidence in Governance Decisions lab](../labs/policy-version-evidence-in-governance-decisions.md) — practice preserving provenance and detecting policy drift.
+- [Policy Simulation and Change-Impact Analysis lab](../labs/policy-simulation-and-change-impact-analysis.md) — compare baseline and candidate behavior using identical contexts while keeping simulation non-executable.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — compare policy freshness with replay/use-state checks at the execution boundary.
 - [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md) — continue from policy fingerprints into cryptographic authenticity, verifier trust policy, historical key verification, and tamper-evidence boundaries.
 

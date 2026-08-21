@@ -28,11 +28,11 @@ Working Repository
 
 ## Current Status
 
-The lab navigation foundation is established, with four beginner labs, six intermediate labs, and two advanced labs now available.
+The lab navigation foundation is established, with four beginner labs, seven intermediate labs, and two advanced labs now available.
 
 Additional labs will appear in this section as the learning path expands into deeper architecture, security, and AI-governance topics.
 
-The foundational labs pair all five governance tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated boundaries. The ASP.NET Core diagnostic lab begins the next learning area by requiring learners to predict, observe, repair, and explain middleware-ordering behavior; the ADR lab extends that application-architecture path by requiring learners to make, record, and revisit a decision under changed constraints.
+The foundational labs pair all five governance tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated boundaries. The governance lab path now also includes policy-version evidence and candidate-policy simulation, while the ASP.NET Core diagnostic lab begins the next learning area by requiring learners to predict, observe, repair, and explain middleware-ordering behavior; the ADR lab extends that application-architecture path by requiring learners to make, record, and revisit a decision under changed constraints.
 
 ## Available Labs
 
@@ -143,6 +143,21 @@ Related material:
 - [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md)
 - [Acknowledgment and Audit Residue lab](acknowledgment-and-audit-residue.md)
 - [Scoped Capability and Host-Owned Execution lab](scoped-capability-and-host-owned-execution.md)
+
+### Policy Simulation and Change-Impact Analysis
+
+[Policy Simulation and Change-Impact Analysis](policy-simulation-and-change-impact-analysis.md)
+
+**Difficulty:** Intermediate
+
+Replay identical deterministic contexts against baseline and candidate policy versions, compare outcome, reason-code, and contributor changes, expose expected and surprising change impact, add tenant and boundary cases, and prove that simulation never invokes protected execution.
+
+Related material:
+
+- [Practical Policy Testing and Decision-Table Strategies](../governance/practical-policy-testing-and-decision-table-strategies.md)
+- [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md)
+- [Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md)
+- [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
 
 ### Build a Governed API Operation
 

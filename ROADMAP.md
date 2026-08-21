@@ -737,13 +737,13 @@ Educational security examples should clearly distinguish demonstrated patterns f
 
 ## Status
 
-**In progress — policy composition, provenance, regional/tenant overlays, risk-based decisions, deterministic/probabilistic input boundaries, human-in-the-loop review, escalation patterns, degraded-mode behavior, and policy-testing foundations established**
+**Complete — governance and policy architecture learning path established through composition, provenance, overlays, risk, deterministic/probabilistic inputs, human review, escalation, degraded-mode behavior, testing, simulation, and rollout/rollback reasoning**
 
 ## Goal
 
 Expand the conceptual vocabulary around policy-governed systems after the foundational learning path is well supported by samples and labs.
 
-## Planned Topics
+## Completed Topics
 
 * [x] Policy pipeline design. ([#44](https://github.com/AsiBackbone/Learning/issues/44))
 * [x] Constraint composition. ([#44](https://github.com/AsiBackbone/Learning/issues/44))
@@ -760,12 +760,12 @@ Expand the conceptual vocabulary around policy-governed systems after the founda
 * [x] Degraded-mode decisions. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 * [x] Deterministic versus probabilistic policy inputs. ([#115](https://github.com/AsiBackbone/Learning/issues/115))
 * [x] Policy testing. ([#72](https://github.com/AsiBackbone/Learning/issues/72))
-* [ ] Policy simulation.
+* [x] Policy simulation. ([#116](https://github.com/AsiBackbone/Learning/issues/116))
 * [x] Policy rollout and rollback reasoning. ([#53](https://github.com/AsiBackbone/Learning/issues/53))
 * [x] Separation between policy decision and operational execution. ([#44](https://github.com/AsiBackbone/Learning/issues/44))
 
-Policy simulation remains a distinct future subject. Existing material may use simulation
-as an example without yet providing complete standalone treatment.
+Milestone 8 now includes a hands-on policy-simulation exercise that compares baseline and
+candidate decisions before rollout while preserving a strict no-execution boundary.
 
 ---
 
