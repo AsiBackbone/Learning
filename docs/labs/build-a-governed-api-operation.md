@@ -1,3 +1,7 @@
+---
+description: Extend an ASP.NET Core API into governed execution with explicit intent, policy, acknowledgment, scoped authority, and host-owned side effects.
+---
+
 # Lab — Build a Governed API Operation
 
 **Learning objective:** Extend a realistic ASP.NET Core API operation from ordinary authorization into an explicit governed-execution flow while preserving host-owned side effects and testable execution boundaries.

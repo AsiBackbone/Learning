@@ -1,3 +1,7 @@
+---
+description: Practice fail-safe governance when policy, replay, acknowledgment, verification, evidence, or execution dependencies are unavailable or uncertain.
+---
+
 # Lab — Safe Degraded Mode and Fail-Safe Governance
 
 **Learning objective:** Practice deciding how a governed system should behave when a dependency required to establish policy, authority, replay state, acknowledgment, verification, evidence, or execution status is unavailable. Preserve the distinction between inability to establish a required trust fact, an explicit governance denial, and an operational execution failure.

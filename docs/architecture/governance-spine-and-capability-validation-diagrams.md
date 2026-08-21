@@ -1,3 +1,7 @@
+---
+description: Visualize the core governed-execution spine, capability validation profiles, context and constraint composition, and host-owned execution boundaries.
+---
+
 # Governance Spine and Capability Validation Diagrams
 
 This page provides a compact visual reference for the major governed-execution boundaries introduced across the foundational Learning path.

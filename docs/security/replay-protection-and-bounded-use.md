@@ -1,3 +1,7 @@
+---
+description: Learn to treat replay protection as stateful execution-boundary enforcement with atomic consumption, durable state, bounded use, and clear idempotency limits.
+---
+
 # Replay Protection and Bounded-Use Authority
 
 **Pattern classification:** General learning material

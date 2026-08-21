@@ -1,3 +1,7 @@
+---
+description: Learn to make governance inputs explicit with policy-context snapshots and return structured outcomes instead of hiding important states behind booleans.
+---
+
 # Policy Context and Explicit Decision Outcomes
 
 **Learning objective:** Understand why the facts used to make a governance decision should be represented explicitly, and why the result should describe what happens next rather than collapse every decision into a boolean.

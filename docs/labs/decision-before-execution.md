@@ -1,3 +1,7 @@
+---
+description: Practice enforcing an explicit decision boundary so denied or blocked operations cannot reach the host-owned executor or consequential side effects.
+---
+
 # Lab — Decision Before Execution
 
 **Learning objective:** Practice preserving an explicit decision boundary so that blocked operations cannot reach a host-owned executor.

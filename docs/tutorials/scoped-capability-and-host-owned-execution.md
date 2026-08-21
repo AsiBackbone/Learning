@@ -1,3 +1,7 @@
+---
+description: Learn how narrow, short-lived capabilities preserve host control between an allowed decision and execution while preventing broad, reusable, or stale authority.
+---
+
 # Scoped Capability and Host-Owned Execution
 
 **Learning objective:** Understand why an allowed or acknowledged operation should not automatically become broad execution authority, and how a short-lived, narrowly scoped capability can preserve a clear host-controlled execution boundary.

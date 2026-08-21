@@ -1,3 +1,7 @@
+---
+description: Practice governing AI-proposed tool actions while preserving host-owned context, policy, acknowledgment, scoped authority, execution, and evidence boundaries.
+---
+
 # Lab — Governed AI Tool Gateway
 
 **Learning objective:** Practice preserving host-owned execution authority when an AI system proposes a consequential tool action, and threat-model the trust boundaries between model output, authoritative host context, governance, acknowledgment, scoped capability, and execution.

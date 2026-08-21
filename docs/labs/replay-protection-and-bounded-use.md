@@ -1,3 +1,7 @@
+---
+description: Reproduce a replay race, repair it with atomic bounded-use consumption, prove the concurrency invariant, and reason about guarantees outside the replay store.
+---
+
 # Lab — Replay Protection and Bounded-Use Authority
 
 **Learning objective:** Reproduce a check-then-act replay race, repair it with atomic bounded-use consumption, prove the concurrency invariant with executable tests, and explain which guarantees remain outside the replay store.

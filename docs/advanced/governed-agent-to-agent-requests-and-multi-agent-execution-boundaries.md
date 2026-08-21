@@ -1,3 +1,7 @@
+---
+description: Learn how multi-agent AI workflows can exchange proposals and delegated work while keeping validation, authority, and execution under host control.
+---
+
 # Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries
 
 **Learning objective:** Understand how proposals, plans, recommendations, and delegated work can move among multiple AI agents without allowing agent-to-agent communication to become implicit execution authority.

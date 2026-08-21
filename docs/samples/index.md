@@ -1,3 +1,7 @@
+---
+description: Browse runnable companion samples that demonstrate ASI Backbone Learning patterns between the problem-first tutorials and hands-on architectural labs.
+---
+
 # Executable Samples
 
 Executable samples are the **runnable demonstration layer** of ASI Backbone Learning.

@@ -1,3 +1,7 @@
+---
+description: Explore AI integration patterns that let models propose useful actions while the host retains context, governance, authorization, and execution control.
+---
+
 # AI Integration
 
 The AI Integration section explores how AI-assisted systems can propose useful actions without automatically receiving authority to perform them.

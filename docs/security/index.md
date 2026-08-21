@@ -1,3 +1,7 @@
+---
+description: Explore security architecture for trust boundaries, least privilege, replay protection, cryptographic evidence, supply-chain integrity, and fail-safe behavior.
+---
+
 # Security
 
 The Security section examines architectural boundaries that can reduce accidental authority, hidden execution paths, unsafe defaults, and ambiguous control flow.

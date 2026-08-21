@@ -1,3 +1,7 @@
+---
+description: Learn how ASP.NET Core middleware order changes request coverage, response behavior, exception handling, authentication, authorization, and security boundaries.
+---
+
 # Middleware Ordering Changes Behavior
 
 **Pattern classification:** Canonical Pattern

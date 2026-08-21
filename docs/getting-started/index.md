@@ -1,3 +1,7 @@
+---
+description: Start ASI Backbone Learning with core governed-execution concepts, the recommended learning path, practical examples, labs, and pattern-evaluation guidance.
+---
+
 # Getting Started
 
 Welcome to **ASI Backbone Learning**.

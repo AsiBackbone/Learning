@@ -1,3 +1,7 @@
+---
+description: Learn to treat ASP.NET Core configuration as a trust boundary with explicit opt-in, startup validation, safer failure behavior, and clear ownership.
+---
+
 # Secure-by-Default ASP.NET Core Configuration
 
 **Pattern classification:** General Learning Material

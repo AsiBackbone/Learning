@@ -1,3 +1,7 @@
+---
+description: Design centralized ASP.NET Core error handling with safe Problem Details responses, deliberate status mapping, correlation, and clear exception boundaries.
+---
+
 # Centralized Error Handling and Problem Details
 
 **Pattern classification:** General learning material

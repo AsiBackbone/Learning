@@ -1,3 +1,7 @@
+---
+description: Practical .NET architecture tutorials, labs, and reference patterns for governed execution, secure applications, AI integration, and policy-driven systems.
+---
+
 # ASI Backbone Learning
 
 **Practical software architecture for governed execution, secure applications, AI integration, and policy-driven systems.**

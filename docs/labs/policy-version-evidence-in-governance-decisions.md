@@ -1,3 +1,7 @@
+---
+description: Practice carrying policy identity into decisions, detecting drift before execution, and distinguishing provenance from replay or cryptographic proof.
+---
+
 # Lab — Policy-Version Evidence in Governance Decisions
 
 **Learning objective:** Practice preserving the policy identity that produced a governance decision, detecting policy drift before consequential execution, and distinguishing useful policy provenance from stronger claims such as historical replay or cryptographic proof.

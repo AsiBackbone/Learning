@@ -1,3 +1,7 @@
+---
+description: Learn to turn policy requirements into decision tables, equivalence classes, boundary cases, automated tests, and execution-boundary invariants.
+---
+
 # Practical Policy Testing and Decision-Table Strategies
 
 **Learning objective:** Learn how to translate policy requirements into explicit decision tables, equivalence classes, boundary cases, layered automated tests, and execution-boundary invariants so governance behavior remains observable and regression-testable as policy evolves.

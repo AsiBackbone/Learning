@@ -1,3 +1,7 @@
+---
+description: Learn why consequential operations should become explicit proposed intent and governance decisions before the host performs real-world side effects.
+---
+
 # Decision Before Execution
 
 **Learning objective:** Understand why a consequential operation should be represented as proposed intent, evaluated, and converted into an explicit decision before the host performs the real-world action.

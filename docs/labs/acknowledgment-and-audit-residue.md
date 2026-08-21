@@ -1,3 +1,7 @@
+---
+description: Practice acknowledgment as a narrowly bound governance event, re-evaluate policy afterward, and preserve correlated evidence across decisions and execution.
+---
+
 # Lab — Acknowledgment and Audit Residue
 
 **Learning objective:** Practice treating acknowledgment as a narrowly bound governance event rather than permission, preserving re-evaluation after acknowledgment, and maintaining a correlated audit timeline that distinguishes decisions, acknowledgments, and execution outcomes.

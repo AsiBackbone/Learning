@@ -1,3 +1,7 @@
+---
+description: Diagnose a deliberately misordered ASP.NET Core pipeline, predict behavior, repair the boundary, validate the result, and explain why the new order works.
+---
+
 # Lab — Identify Middleware Ordering Problems
 
 **Learning objective:** Inspect a deliberately misordered ASP.NET Core middleware pipeline, predict its request/response behavior, identify the architectural boundary that is broken, repair the order, validate the changed behavior, and explain why the correction works.

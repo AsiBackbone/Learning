@@ -1,3 +1,7 @@
+---
+description: Learn how signatures, verification, key custody, rotation, fingerprints, and tamper-evident records support trust boundaries without implying authorization.
+---
+
 # Signing, Verification, Key Custody, and Tamper Evidence
 
 **Pattern classification:** General learning material

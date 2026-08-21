@@ -1,3 +1,7 @@
+---
+description: Explore software architecture boundaries, responsibilities, failure modes, and tradeoffs for governed systems without prescribing one universal design.
+---
+
 # Architecture
 
 The Architecture section explores the structural boundaries, responsibilities, and tradeoffs behind governed software systems.

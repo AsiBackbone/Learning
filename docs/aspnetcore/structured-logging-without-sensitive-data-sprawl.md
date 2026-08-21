@@ -1,3 +1,7 @@
+---
+description: Design structured ASP.NET Core logging with stable event identity, correlation, low-risk properties, sensitive-data minimization, and clear audit boundaries.
+---
+
 # Structured Logging Without Sensitive-Data Sprawl
 
 **Pattern classification:** General Learning Material

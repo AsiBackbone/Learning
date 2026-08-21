@@ -1,3 +1,7 @@
+---
+description: Identify a hidden side effect inside validation or policy code, then refactor the flow so evaluation remains observational and blocked decisions cannot execute.
+---
+
 # Lab — Identify and Remove a Hidden Execution Side Effect
 
 **Learning objective:** Recognize when code that appears to validate, authorize, or evaluate policy performs a consequential side effect, then refactor the workflow so blocked decisions cannot reach execution.

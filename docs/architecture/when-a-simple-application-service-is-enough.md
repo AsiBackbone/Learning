@@ -1,4 +1,5 @@
 ---
+description: Compare ordinary application-service orchestration with governed execution and learn when additional governance boundaries are justified.
 title: When a Simple Application Service Is Enough
 author: Christopher D. Cavell
 published: 2026-08-19

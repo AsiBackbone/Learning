@@ -1,3 +1,7 @@
+---
+description: Trace two NetCoreApplicationTemplate ADRs from architectural constraints through recorded reasoning, implementation evidence, consequences, and review triggers.
+---
+
 # Working Repository ADR Case Study: NetCoreApplicationTemplate
 
 **Pattern classification:** Working Repository Walkthrough

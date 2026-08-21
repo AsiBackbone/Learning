@@ -1,3 +1,7 @@
+---
+description: Explore advanced ASI Backbone Learning topics requiring deeper reasoning about interacting boundaries, assumptions, failure modes, and tradeoffs.
+---
+
 # Advanced
 
 The Advanced section is reserved for topics that build on the foundational ASI Backbone Learning material and require deeper architectural reasoning, broader system context, or comparison among competing approaches.
