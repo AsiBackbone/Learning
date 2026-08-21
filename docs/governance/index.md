@@ -100,6 +100,12 @@ Shows how explicit consequence, likelihood, exposure, uncertainty, resource sens
 
 Explains how a consequential workflow can enter a durable pending-review state, bind a human disposition to an exact intent and eligible reviewer scope, handle timeout, delegation, quorum, cancellation, policy or context drift, and resume only after revalidation and scoped host-owned authority.
 
+### Escalation Patterns in Governed Systems
+
+[Escalation Patterns in Governed Systems](escalation-patterns-in-governed-systems.md)
+
+Explains `EscalationRecommended` as a non-executable governance outcome with explicit routing, target authority, durable escalation records, additional evidence, re-evaluation, provenance, timeout and cancellation behavior, loop protection, and terminal states.
+
 ### Policy Versioning and Decision Provenance
 
 [Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md)
@@ -139,7 +145,7 @@ Learning explains the architectural reasoning in intentionally smaller examples 
 
 ## Current Status
 
-The foundational governance tutorial sequence is established, and the Governance section now extends that foundation with explicit policy-pipeline composition, precedence, risk-based decisions, human-in-the-loop review, policy versioning, decision provenance, and decision-boundary testing guidance.
+The foundational governance tutorial sequence is established, and the Governance section now extends that foundation with explicit policy-pipeline composition, precedence, risk-based decisions, human-in-the-loop review, escalation lifecycles, policy versioning, decision provenance, and decision-boundary testing guidance.
 
 Future material may expand into:
 
@@ -149,7 +155,6 @@ Future material may expand into:
 * Regional policy overlays
 * Durable audit persistence
 * Degraded-mode decisions
-* Human escalation and broader escalation-routing patterns
 * Alternative governance architectures
 
 Continue with the [Foundational Tutorials](../tutorials/index.md) or explore the [Hands-On Labs](../labs/index.md) as they are developed.
