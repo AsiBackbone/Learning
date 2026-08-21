@@ -805,6 +805,8 @@ public sealed record RiskContext(
 
 The policy can then evaluate what was observed rather than silently invoking an external scorer during the decision.
 
+For a complete treatment of authoritative facts, model-derived signals, confidence, calibration, threshold policy, freshness, and repeatability, see [Deterministic and Probabilistic Inputs in Policy Evaluation](../governance/deterministic-and-probabilistic-inputs-in-policy-evaluation.md).
+
 ## Preserve Policy Identity
 
 If policy changes over time, the same context may legitimately produce a different decision under a different policy version.

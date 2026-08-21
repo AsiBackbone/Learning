@@ -1629,6 +1629,7 @@ If several answers are unclear, the system may have a risk score, but it does no
 
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — begin with explicit actor, resource, operation, environment, policy, and correlation facts.
 - [Constraint Composition and Policy Precedence](constraint-composition-and-policy-precedence.md) — keep deterministic constraints and composition rules explicit before introducing risk-aware decision policy.
+- [Deterministic and Probabilistic Inputs in Policy Evaluation](deterministic-and-probabilistic-inputs-in-policy-evaluation.md) — distinguish authoritative facts from uncertain observations and preserve model identity, calibration, freshness, and threshold policy.
 - [Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md) — preserve policy identity, drift, freshness, and reconstructable decision evidence.
 - [Practical Policy Testing and Decision-Table Strategies](practical-policy-testing-and-decision-table-strategies.md) — test risk thresholds, equivalence classes, failure posture, and decision boundaries systematically.
 - [Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md) — model how multiple policy authorities may narrow, override, or otherwise influence the final decision through an explicit overlay contract.

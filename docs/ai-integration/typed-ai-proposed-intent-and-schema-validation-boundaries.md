@@ -1870,6 +1870,7 @@ If those answers are unclear, the system may have structured AI output without a
 - [AI Integration](index.md) — view the AI-assisted execution learning area.
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — continue from typed proposal translation into the full governance and execution lifecycle.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — see how authoritative host facts become structured governance context and outcomes.
+- [Deterministic and Probabilistic Inputs in Policy Evaluation](../governance/deterministic-and-probabilistic-inputs-in-policy-evaluation.md) — continue from untrusted model output into typed probabilistic signals, provenance, uncertainty, calibration, and policy thresholds.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — follow an allowed decision into narrow execution authority.
 - [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md) — examine caller-supplied versus authoritative context and authority narrowing across boundaries.
 - [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) — inspect the executable capstone and its tests.
