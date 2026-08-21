@@ -1,5 +1,5 @@
 ---
-description: Explore security architecture for trust boundaries, least privilege, replay protection, cryptographic evidence, supply-chain integrity, and fail-safe behavior.
+description: Explore security architecture for trust boundaries, least privilege, secure logging, replay protection, cryptographic evidence, supply-chain integrity, and fail-safe behavior.
 ---
 
 # Security
@@ -8,7 +8,7 @@ The Security section examines architectural boundaries that can reduce accidenta
 
 Security in ASI Backbone Learning is approached as an architectural responsibility rather than a single feature or package.
 
-> **Section status:** Focused security learning now covers trust boundaries, least privilege, replay protection, cryptographic evidence boundaries, and software supply-chain integrity. Start with [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), continue with [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), study [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md), then use [Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md) to extend trust-boundary reasoning into source, dependencies, CI, artifacts, and release provenance before using the [Foundational Tutorials](../tutorials/index.md) to connect security boundaries to governed execution.
+> **Section status:** Focused security learning now covers trust boundaries, least privilege, secure logging, replay protection, cryptographic evidence boundaries, and software supply-chain integrity. Start with [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), continue with [Secure Logging Across Trust Boundaries](secure-logging-across-trust-boundaries.md) to examine observability as an outbound data boundary, then study [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md), and [Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md) before using the [Foundational Tutorials](../tutorials/index.md) to connect security boundaries to governed execution.
 
 > **A secure boundary should remain visible when the system is under pressure.**
 
@@ -17,6 +17,8 @@ Security in ASI Backbone Learning is approached as an architectural responsibili
 [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md) is the first focused security tutorial. It treats trust boundaries as changes in control over data or authority and least privilege as an architectural constraint on what authority crosses those boundaries.
 
 The tutorial connects caller-supplied versus authoritative context, authentication, authorization, policy decisions, credential ownership, narrow authority, boundary validation, resource ownership, and fail-safe behavior.
+
+[Secure Logging Across Trust Boundaries](secure-logging-across-trust-boundaries.md) applies the same boundary reasoning to operational telemetry. It builds on the ASP.NET Core [Structured Logging Without Sensitive-Data Sprawl](../aspnetcore/structured-logging-without-sensitive-data-sprawl.md) article without duplicating its `ILogger` and event-design guidance, concentrating instead on data minimization before emission, provider/export trust, collector and storage access, tenant separation, retention, degraded observability, and the boundary between operational logs and governance evidence.
 
 [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md) continues from narrow authority into stateful execution-boundary enforcement. It covers one-time and bounded-use grants, atomic consumption, multi-instance and restart behavior, durable replay state, failure windows, request idempotency, and why replay resistance is not an exactly-once execution guarantee.
 
@@ -32,6 +34,7 @@ Current and future material may examine:
 
 - [Trust boundaries](trust-boundaries-and-least-privilege.md)
 - [Least privilege](trust-boundaries-and-least-privilege.md)
+- [Secure logging across trust boundaries](secure-logging-across-trust-boundaries.md)
 - Explicit execution boundaries
 - Short-lived authority
 - Actor and resource binding
@@ -130,9 +133,9 @@ Application-specific security analysis remains necessary.
 
 ## Current Status
 
-The Security section now has focused material for trust boundaries and least privilege, replay protection and bounded-use authority, signing/verification with key-custody and tamper-evidence boundaries, and software supply-chain integrity. Together they establish a security architecture path from identifying where trust changes, to preserving narrow authority, to controlling whether authority may be consumed again, to deciding what cryptographic evidence can safely establish, and finally to applying the same trust-boundary reasoning to source, dependencies, CI, generated artifacts, and publication.
+The Security section now has focused material for trust boundaries and least privilege, secure logging, replay protection and bounded-use authority, signing/verification with key-custody and tamper-evidence boundaries, and software supply-chain integrity. Together they establish a security architecture path from identifying where trust changes, to deciding what data may safely cross into observability systems, to preserving narrow authority, to controlling whether authority may be consumed again, to deciding what cryptographic evidence can safely establish, and finally to applying the same trust-boundary reasoning to source, dependencies, CI, generated artifacts, and publication.
 
-Future material will extend into capability-based authority, secure logging, and threat modeling.
+Future material will extend into secret handling across trust boundaries and threat modeling as architecture reasoning.
 
 Use the [Foundational Tutorials](../tutorials/index.md) to connect these security concepts to the existing governed-execution learning path.
 
