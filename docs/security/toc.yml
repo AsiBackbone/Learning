@@ -4,6 +4,9 @@
 - name: Trust Boundaries and Least Privilege
   href: trust-boundaries-and-least-privilege.md
 
+- name: Secure Logging Across Trust Boundaries
+  href: secure-logging-across-trust-boundaries.md
+
 - name: Replay Protection and Bounded-Use Authority
   href: replay-protection-and-bounded-use.md
 

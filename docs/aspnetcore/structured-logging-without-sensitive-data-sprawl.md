@@ -12,6 +12,8 @@ description: Design structured ASP.NET Core logging with stable event identity, 
 
 **Learning objective:** Design structured operational events that answer specific diagnostic questions without turning logging into uncontrolled data collection. Choose stable event identity, useful low-risk properties, correlation context, exception boundaries, log levels, and retention intentionally; distinguish logs from metrics and traces; and preserve a hard boundary between operational logging and governance audit evidence.
 
+**Security continuation:** This article focuses on application-level event design. For the provider, transport, collector, storage, operator-access, tenant-separation, retention, and degraded-observability boundaries surrounding those events, continue to [Secure Logging Across Trust Boundaries](../security/secure-logging-across-trust-boundaries.md).
+
 ## Pattern Card
 
 > **Problem:** Logs become less useful when they are treated as formatted text, filled with entire objects, repeated at every method boundary, or used as a convenient destination for secrets and personal data. High-volume telemetry can become expensive, difficult to search, and unsafe to retain.
@@ -1042,6 +1044,7 @@ Before moving on, you should be able to answer:
 - [Secure-by-Default ASP.NET Core Configuration](secure-by-default-configuration.md)
 - [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
 - [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md)
+- [Secure Logging Across Trust Boundaries](../security/secure-logging-across-trust-boundaries.md)
 - [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)
 - [AsiBackbone](https://github.com/AsiBackbone/AsiBackbone)
 

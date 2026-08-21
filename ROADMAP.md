@@ -696,7 +696,7 @@ The ADR learning path now covers why ADRs matter, when a decision merits a recor
 
 ## Status
 
-**In progress — trust-boundary, least-privilege, capability/replay, cryptographic-evidence, fail-safe, and software-supply-chain foundations established**
+**In progress — trust-boundary, least-privilege, secure-logging, capability/replay, cryptographic-evidence, fail-safe, and software-supply-chain foundations established**
 
 ## Goal
 
@@ -713,7 +713,7 @@ Teach security as an architectural property rather than a collection of isolated
 * [x] Signing and verification concepts. ([#64](https://github.com/AsiBackbone/Learning/issues/64))
 * [x] Key custody boundaries. ([#64](https://github.com/AsiBackbone/Learning/issues/64))
 * [x] Tamper-evident records. ([#64](https://github.com/AsiBackbone/Learning/issues/64))
-* [ ] Secure logging.
+* [x] Secure logging — [Secure Logging Across Trust Boundaries](docs/security/secure-logging-across-trust-boundaries.md). ([#100](https://github.com/AsiBackbone/Learning/issues/100))
 * [ ] Secret handling.
 * [x] Dependency integrity. ([#76](https://github.com/AsiBackbone/Learning/issues/76))
 * [x] Supply-chain provenance. ([#76](https://github.com/AsiBackbone/Learning/issues/76))
@@ -723,10 +723,10 @@ Teach security as an architectural property rather than a collection of isolated
 * [x] Security failure modes. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 * [ ] Threat modeling as architecture reasoning.
 
-The remaining dedicated Security and Trust Architecture gaps are secure logging,
-secret handling across trust boundaries, and threat modeling as architecture
-reasoning. Existing ASP.NET Core and AI material touches those concerns, but
-it does not yet complete those Milestone 7 subjects.
+The remaining dedicated Security and Trust Architecture gaps are secret handling
+across trust boundaries and threat modeling as architecture reasoning. Existing
+ASP.NET Core and AI material touches those concerns, but it does not yet complete
+those Milestone 7 subjects.
 
 Educational security examples should clearly distinguish demonstrated patterns from production security guarantees.
 
