@@ -8,3 +8,20 @@
     .navbar-brand img {
         margin-right: 0.5rem !important;
     }
+
+.publication-metadata {
+    margin: -0.25rem 0 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--bs-border-color);
+    color: var(--bs-secondary-color);
+}
+
+.publication-author {
+    font-weight: 600;
+    color: var(--bs-body-color);
+}
+
+.publication-dates {
+    margin-top: 0.25rem;
+    font-size: 0.95rem;
+}

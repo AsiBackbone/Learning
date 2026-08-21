@@ -1,3 +1,11 @@
+---
+title: When a Simple Application Service Is Enough
+author: Christopher D. Cavell
+published: 2026-08-19
+summary: Use a broader governed-execution lifecycle only when the problem needs boundaries beyond ordinary application orchestration.
+feed: true
+---
+
 # When a Simple Application Service Is Enough
 
 **Pattern classification:** Comparison of multiple approaches
