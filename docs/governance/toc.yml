@@ -7,6 +7,9 @@
 - name: Risk-Based Decisions in Governed Systems
   href: risk-based-decisions-in-governed-systems.md
 
+- name: Human-in-the-Loop Governance Workflows
+  href: human-in-the-loop-governance-workflows.md
+
 - name: Policy Versioning and Decision Provenance
   href: policy-versioning-and-decision-provenance.md
 
