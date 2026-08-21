@@ -789,6 +789,8 @@ Managed custody changes the key-exposure model.
 
 It does not replace security architecture.
 
+Signing-key custody is one specialized case of the broader credential lifecycle. [Secret Handling Across Trust Boundaries](secret-handling-across-trust-boundaries.md) covers passwords, API keys, client secrets, database credentials, access/refresh tokens, CI/CD credentials, workload identity, secret zero, runtime delivery, rotation, revocation, and compromise response. This tutorial remains focused on the narrower cryptographic questions created by signing authority, verification trust, key versions, and evidence claims.
+
 ---
 
 ## Preserve Key and Algorithm Metadata

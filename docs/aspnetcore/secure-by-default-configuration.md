@@ -493,6 +493,8 @@ Validates presence and shape without logging the secret
 
 Do not log secret values merely to prove that configuration succeeded.
 
+For the full credential lifecycle—creation, custody, delivery, runtime use, workload identity, rotation, revocation, compromise response, CI/CD boundaries, and removal—continue with [Secret Handling Across Trust Boundaries](../security/secret-handling-across-trust-boundaries.md). That Security tutorial treats secret custody as an authority problem rather than only a configuration-storage concern.
+
 ## Configuration Ownership Boundaries Matter
 
 A secure configuration model separates **who chooses a value** from **who defines what values are acceptable**.
@@ -783,6 +785,7 @@ Before moving on, you should be able to answer:
 - [ASP.NET Core learning area](index.md)
 - [Middleware Ordering Changes Behavior](middleware-ordering-changes-behavior.md)
 - [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md)
+- [Secret Handling Across Trust Boundaries](../security/secret-handling-across-trust-boundaries.md)
 - [Decision Before Execution](../tutorials/decision-before-execution.md)
 - [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md)
 - [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)

@@ -1,5 +1,5 @@
 ---
-description: Explore security architecture for trust boundaries, least privilege, secure logging, replay protection, cryptographic evidence, supply-chain integrity, and fail-safe behavior.
+description: Explore security architecture for trust boundaries, least privilege, secret handling, secure logging, replay protection, cryptographic evidence, supply-chain integrity, and fail-safe behavior.
 ---
 
 # Security
@@ -8,7 +8,7 @@ The Security section examines architectural boundaries that can reduce accidenta
 
 Security in ASI Backbone Learning is approached as an architectural responsibility rather than a single feature or package.
 
-> **Section status:** Focused security learning now covers trust boundaries, least privilege, secure logging, replay protection, cryptographic evidence boundaries, and software supply-chain integrity. Start with [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), continue with [Secure Logging Across Trust Boundaries](secure-logging-across-trust-boundaries.md) to examine observability as an outbound data boundary, then study [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md), and [Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md) before using the [Foundational Tutorials](../tutorials/index.md) to connect security boundaries to governed execution.
+> **Section status:** Focused security learning now covers trust boundaries, least privilege, secret handling, secure logging, replay protection, cryptographic evidence boundaries, and software supply-chain integrity. Start with [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), continue with [Secret Handling Across Trust Boundaries](secret-handling-across-trust-boundaries.md) to follow authority-bearing values through custody, delivery, use, rotation, and revocation, then use [Secure Logging Across Trust Boundaries](secure-logging-across-trust-boundaries.md) to examine observability as an outbound data boundary. Continue with [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md), and [Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md) before using the [Foundational Tutorials](../tutorials/index.md) to connect security boundaries to governed execution.
 
 > **A secure boundary should remain visible when the system is under pressure.**
 
@@ -17,6 +17,8 @@ Security in ASI Backbone Learning is approached as an architectural responsibili
 [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md) is the first focused security tutorial. It treats trust boundaries as changes in control over data or authority and least privilege as an architectural constraint on what authority crosses those boundaries.
 
 The tutorial connects caller-supplied versus authoritative context, authentication, authorization, policy decisions, credential ownership, narrow authority, boundary validation, resource ownership, and fail-safe behavior.
+
+[Secret Handling Across Trust Boundaries](secret-handling-across-trust-boundaries.md) extends the configuration and least-privilege material into a full credential lifecycle. It treats passwords, API keys, client secrets, database credentials, tokens, and private keys as authority-bearing values whose creation, custody, delivery, runtime use, rotation, revocation, compromise response, and removal cross distinct trust boundaries.
 
 [Secure Logging Across Trust Boundaries](secure-logging-across-trust-boundaries.md) applies the same boundary reasoning to operational telemetry. It builds on the ASP.NET Core [Structured Logging Without Sensitive-Data Sprawl](../aspnetcore/structured-logging-without-sensitive-data-sprawl.md) article without duplicating its `ILogger` and event-design guidance, concentrating instead on data minimization before emission, provider/export trust, collector and storage access, tenant separation, retention, degraded observability, and the boundary between operational logs and governance evidence.
 
@@ -41,7 +43,7 @@ Current and future material may examine:
 - [Replay resistance and bounded-use authority](replay-protection-and-bounded-use.md)
 - [Signing, verification, key custody, and tamper evidence](signing-verification-key-custody-and-tamper-evidence.md)
 - Input validation
-- Secret isolation
+- [Secret handling across trust boundaries](secret-handling-across-trust-boundaries.md)
 - Egress control
 - Safe defaults
 - Rate limiting
@@ -133,9 +135,9 @@ Application-specific security analysis remains necessary.
 
 ## Current Status
 
-The Security section now has focused material for trust boundaries and least privilege, secure logging, replay protection and bounded-use authority, signing/verification with key-custody and tamper-evidence boundaries, and software supply-chain integrity. Together they establish a security architecture path from identifying where trust changes, to deciding what data may safely cross into observability systems, to preserving narrow authority, to controlling whether authority may be consumed again, to deciding what cryptographic evidence can safely establish, and finally to applying the same trust-boundary reasoning to source, dependencies, CI, generated artifacts, and publication.
+The Security section now has focused material for trust boundaries and least privilege, secret handling, secure logging, replay protection and bounded-use authority, signing/verification with key-custody and tamper-evidence boundaries, and software supply-chain integrity. Together they establish a security architecture path from identifying where trust changes, to reducing the lifetime and distribution of authority-bearing secrets, to deciding what data may safely cross into observability systems, to preserving narrow authority, to controlling whether authority may be consumed again, to deciding what cryptographic evidence can safely establish, and finally to applying the same trust-boundary reasoning to source, dependencies, CI, generated artifacts, and publication.
 
-Future material will extend into secret handling across trust boundaries and threat modeling as architecture reasoning.
+Future material will extend into threat modeling as architecture reasoning.
 
 Use the [Foundational Tutorials](../tutorials/index.md) to connect these security concepts to the existing governed-execution learning path.
 

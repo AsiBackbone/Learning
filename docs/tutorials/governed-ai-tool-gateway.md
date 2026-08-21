@@ -1128,6 +1128,8 @@ Model understands action
 Model possesses infrastructure credential
 ```
 
+For the broader custody model—including keeping credentials out of prompts and model-visible tool arguments, preferring workload identity where appropriate, narrowing credential scope, rotating/revoking authority, and separating CI from runtime secrets—see [Secret Handling Across Trust Boundaries](../security/secret-handling-across-trust-boundaries.md).
+
 ## Egress Is a Host Concern
 
 If a tool sends data outside the organization, the host may need to evaluate:
@@ -1789,6 +1791,7 @@ Learning is intended to make those tradeoffs visible rather than prescribe one u
 - [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — examine narrow execution authority, capability bindings, replay considerations, and execution-boundary validation.
 - [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](../advanced/governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md) — extend the single-agent gateway into an explicitly experimental multi-agent model without treating agent agreement, planning, or delegation requests as execution authority.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — distinguish single-use capability enforcement from request idempotency and exactly-once execution claims.
+- [Secret Handling Across Trust Boundaries](../security/secret-handling-across-trust-boundaries.md) — keep infrastructure credentials host-owned and follow their custody, scope, delivery, rotation, revocation, and AI-visible exposure boundaries.
 - [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) — run the capstone with a simulated proposal generator, host-built context, acknowledgment, scoped capability, dry-run execution, and invariant tests.
 - [Governed AI Tool Gateway advanced lab](../labs/governed-ai-tool-gateway.md) — deliberately weaken and repair the gateway, then threat-model its trust boundaries.
 

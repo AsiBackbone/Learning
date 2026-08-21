@@ -696,7 +696,7 @@ The ADR learning path now covers why ADRs matter, when a decision merits a recor
 
 ## Status
 
-**In progress — trust-boundary, least-privilege, secure-logging, capability/replay, cryptographic-evidence, fail-safe, and software-supply-chain foundations established**
+**In progress — trust-boundary, least-privilege, secret-handling, secure-logging, capability/replay, cryptographic-evidence, fail-safe, and software-supply-chain foundations established**
 
 ## Goal
 
@@ -714,7 +714,7 @@ Teach security as an architectural property rather than a collection of isolated
 * [x] Key custody boundaries. ([#64](https://github.com/AsiBackbone/Learning/issues/64))
 * [x] Tamper-evident records. ([#64](https://github.com/AsiBackbone/Learning/issues/64))
 * [x] Secure logging — [Secure Logging Across Trust Boundaries](docs/security/secure-logging-across-trust-boundaries.md). ([#100](https://github.com/AsiBackbone/Learning/issues/100))
-* [ ] Secret handling.
+* [x] Secret handling — [Secret Handling Across Trust Boundaries](docs/security/secret-handling-across-trust-boundaries.md). ([#101](https://github.com/AsiBackbone/Learning/issues/101))
 * [x] Dependency integrity. ([#76](https://github.com/AsiBackbone/Learning/issues/76))
 * [x] Supply-chain provenance. ([#76](https://github.com/AsiBackbone/Learning/issues/76))
 * [x] GitHub Actions SHA pinning. ([#76](https://github.com/AsiBackbone/Learning/issues/76))
@@ -723,10 +723,10 @@ Teach security as an architectural property rather than a collection of isolated
 * [x] Security failure modes. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 * [ ] Threat modeling as architecture reasoning.
 
-The remaining dedicated Security and Trust Architecture gaps are secret handling
-across trust boundaries and threat modeling as architecture reasoning. Existing
-ASP.NET Core and AI material touches those concerns, but it does not yet complete
-those Milestone 7 subjects.
+The remaining dedicated Security and Trust Architecture gap is threat modeling
+as architecture reasoning. Existing tutorials already contain focused threat-model
+questions and exercises, but Milestone 7 does not yet have a complete standalone
+treatment of threat modeling as an architectural practice.
 
 Educational security examples should clearly distinguish demonstrated patterns from production security guarantees.
 
@@ -1073,8 +1073,8 @@ It should not force the project into unnecessary release ceremony.
 
 The highest-priority work now is:
 
-1. Continue the remaining Security and Trust Architecture work with dedicated
-   secure-logging, secret-handling, and threat-modeling treatments.
+1. Complete the remaining Security and Trust Architecture work with a dedicated
+   threat-modeling-as-architecture-reasoning treatment.
 2. Deepen Governance and Policy Architecture where dedicated coverage is still
    missing: risk-based decisions, broader human-in-the-loop and escalation
    workflows, deterministic/probabilistic inputs, and policy simulation.
