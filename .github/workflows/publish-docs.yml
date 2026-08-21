@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'docs/**'
+      - 'docs/templates/**'
+      - 'tools/generate-feed.cs'
       - '.config/dotnet-tools.json'
       - '.github/workflows/publish-docs.yml'
 
@@ -45,6 +47,9 @@ jobs:
 
       - name: Build DocFX site
         run: dotnet tool run docfx docs/docfx.json --warningsAsErrors
+
+      - name: Generate RSS feed
+        run: dotnet run --file tools/generate-feed.cs
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0

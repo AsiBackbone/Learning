@@ -328,6 +328,44 @@ Avoid unnecessary promotional language.
 
 Prefer statements that explain what a pattern **does** over statements that declare it universally superior.
 
+## Publishing Authored Articles
+
+Selected substantive documents may opt into the site's authored-publication and RSS surfaces with YAML frontmatter. Use this for long-form technical articles that stand on their own; do not add it automatically to navigation pages, labs, exercises, sample indexes, TOC support files, or repository housekeeping material.
+
+The supported contract is:
+
+```yaml
+---
+title: When ASP.NET Core Authorization Is Enough
+author: Christopher D. Cavell
+published: 2026-08-14
+updated: 2026-08-20
+summary: Built-in policies and handlers cover more than teams sometimes assume.
+feed: true
+---
+```
+
+The fields mean:
+
+- `title` is the canonical article title.
+- `author` is the displayed author and RSS creator attribution.
+- `published` is the original publication date in `YYYY-MM-DD` format.
+- `updated` is optional and should be changed only for a substantive revision, not routine formatting or link maintenance.
+- `summary` is the concise article description used by the feed.
+- `feed` controls RSS participation explicitly. Only `feed: true` publishes an item.
+
+For a feed-enabled article, `title`, `author`, `published`, and `summary` are required. Publication remains opt-in even when some metadata is present. The feed generator validates required fields, date formats, canonical generated HTML targets, and writes `docs/_site/feed.xml`.
+
+To build and inspect the publication surface locally, run from the repository root:
+
+```bash
+dotnet tool restore
+dotnet tool run docfx docs/docfx.json --warningsAsErrors
+dotnet run --file tools/generate-feed.cs
+```
+
+Then inspect the rendered article metadata under `docs/_site/` and the generated `docs/_site/feed.xml`.
+
 ## Building Documentation Locally
 
 The Learning documentation site is generated with **DocFX**.

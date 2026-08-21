@@ -1,3 +1,12 @@
+---
+title: When ASP.NET Core Authorization Is Enough
+author: Christopher D. Cavell
+published: 2026-08-14
+updated: 2026-08-20
+summary: Built-in policies and handlers cover more than teams sometimes assume.
+feed: true
+---
+
 # When ASP.NET Core Authorization Is Enough
 
 **Pattern classification:** Alternative Pattern  
