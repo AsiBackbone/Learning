@@ -394,6 +394,30 @@ docs/_site/
 
 Warnings are treated as errors intentionally. Contributors should resolve DocFX warnings rather than relying on CI to accept a locally warning-producing build.
 
+### Updating DocFX and the Custom Modern Template
+
+Learning overrides the complete DocFX modern `_master.tmpl` so the site can add metadata and publishing behavior that the current template does not expose through a head partial. That control creates a maintenance obligation whenever the pinned DocFX version changes.
+
+The reviewed upstream baseline is recorded in `docs/templates/docfx-template-baseline.json`. CI validates that its DocFX version matches `.config/dotnet-tools.json`, that the local `_master.tmpl` comment declares the same baseline, and that `docs/docfx.json` still composes the upstream `modern` template with the local `templates` override.
+
+Run the consistency check locally with:
+
+```bash
+dotnet run --file tools/validate-docfx-template-baseline.cs
+```
+
+When upgrading DocFX:
+
+1. Update `.config/dotnet-tools.json` to the intended DocFX version.
+2. Obtain the `modern` `_master.tmpl` corresponding to that exact DocFX release and diff it against the baseline used by `docs/templates/layout/_master.tmpl`.
+3. Re-evaluate whether a complete `_master.tmpl` override is still necessary. If the target DocFX release provides a supported head-extension mechanism that covers the site's needs, prefer removing the full-template override and its synchronization burden.
+4. Reapply only the intentional Learning customizations to the new upstream layout. Preserve required site behavior such as the language attribute, search/navigation metadata, verification tags, descriptions, canonical URLs, structured data, RSS discovery, contribution links, and previous/next article behavior where the target template supports them.
+5. Only after that review, update `docs/templates/docfx-template-baseline.json` and the version comment at the top of `docs/templates/layout/_master.tmpl`.
+6. Run the baseline validator, build DocFX with warnings as errors, generate the RSS feed, and run `tools/validate-doc-metadata.cs`.
+7. Inspect representative generated HTML under `docs/_site/`, including navigation/search behavior and the custom `<head>` output, before merging the upgrade.
+
+The version-consistency check cannot prove that an upstream diff was reviewed. Its purpose is to make a package-only DocFX bump fail visibly until the custom-template baseline is deliberately reconciled.
+
 ## Preview the Documentation Locally
 
 After building the site, start the DocFX local server with:

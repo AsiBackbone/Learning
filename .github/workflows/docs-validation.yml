@@ -18,6 +18,7 @@ on:
       - 'docs/templates/**'
       - 'tools/generate-feed.cs'
       - 'tools/validate-doc-metadata.cs'
+      - 'tools/validate-docfx-template-baseline.cs'
       - '.config/dotnet-tools.json'
       - '.github/workflows/docs-validation.yml'
       
@@ -53,6 +54,9 @@ jobs:
 
       - name: Display .NET information
         run: dotnet --info
+
+      - name: Validate DocFX template baseline
+        run: dotnet run --file tools/validate-docfx-template-baseline.cs
 
       - name: Restore .NET tools
         run: dotnet tool restore
