@@ -7,6 +7,9 @@
 - name: Deterministic and Probabilistic Inputs in Policy Evaluation
   href: ../governance/deterministic-and-probabilistic-inputs-in-policy-evaluation.md
 
+- name: AI Governance Observability and End-to-End Decision Tracing
+  href: ai-governance-observability-and-end-to-end-decision-tracing.md
+
 - name: Governed Multi-Tool Workflows and Recovery Boundaries
   href: governed-multi-tool-workflows-and-recovery-boundaries.md
 

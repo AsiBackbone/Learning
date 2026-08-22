@@ -134,7 +134,10 @@ dotnet run --project samples/governed-ai-tool-gateway/GovernedAiToolGateway/Gove
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md)
 - [Read the tutorial](../tutorials/governed-ai-tool-gateway.md)
+- [Trace the governed proposal end to end](../ai-integration/ai-governance-observability-and-end-to-end-decision-tracing.md)
 - [Continue with the advanced lab](../labs/governed-ai-tool-gateway.md)
+
+The same executable includes a deterministic local observability demonstration using `ActivitySource`, trace/span relationships, structured activity events, distinct proposal/correlation identity, policy-version evidence, and the existing audit residue. It prints allowed, denied, and acknowledgment-required traces without requiring a real AI provider or telemetry backend.
 
 ## Security and Trust Architecture Samples
 

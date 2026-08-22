@@ -126,6 +126,8 @@ Console.WriteLine("- Capability validation occurs immediately before the dry-run
 Console.WriteLine("- The model never receives infrastructure credentials or invokes the handler directly.");
 Console.WriteLine("- The sample performs no real external side effect; it only reports WouldExecute.");
 
+await GovernanceObservabilityDemo.RunAsync();
+
 static void PrintResult(
     string scenario,
     GatewayResult result,
@@ -350,7 +352,8 @@ public sealed class HostPolicyContextFactory(
     public AiToolPolicyContext Create(
         AiToolProposal proposal,
         ToolDescriptor descriptor,
-        HostActor actor)
+        HostActor actor,
+        string? hostCorrelationId = null)
     {
         string recipient = proposal.Arguments["recipient"];
         string template = proposal.Arguments["template"];
@@ -366,7 +369,7 @@ public sealed class HostPolicyContextFactory(
             Recipient: recipient,
             Template: template,
             DestinationClassification: classification,
-            CorrelationId: proposal.ProposalId,
+            CorrelationId: hostCorrelationId ?? proposal.ProposalId,
             PolicyVersion: "5.0",
             SatisfiedAcknowledgmentId: null);
     }
@@ -739,9 +742,18 @@ public sealed class RecordingNotificationHandler
         AiToolPolicyContext context,
         CancellationToken cancellationToken)
     {
+        using System.Diagnostics.Activity? activity =
+            GovernanceObservabilityInstrumentation.StartStage(
+                "executor.invoke",
+                context.CorrelationId,
+                context.Proposal.ProposalId);
+
         cancellationToken.ThrowIfCancellationRequested();
         InvocationCount++;
         LastRecipient = context.Recipient;
+
+        activity?.SetTag("execution.invoked", true);
+        activity?.SetTag("execution.result", "would-execute");
 
         return Task.FromResult(
             new ToolExecutionResult(
@@ -761,7 +773,8 @@ public sealed record AuditResidue(
     string CorrelationId,
     string Stage,
     string Outcome,
-    string ReasonCode);
+    string ReasonCode,
+    string? PolicyVersion = null);
 
 public sealed class InMemoryAuditSink
 {
@@ -773,14 +786,18 @@ public sealed class InMemoryAuditSink
         string correlationId,
         string stage,
         string outcome,
-        string reasonCode)
+        string reasonCode,
+        string? policyVersion = null)
     {
-        _entries.Add(
-            new AuditResidue(
-                correlationId,
-                stage,
-                outcome,
-                reasonCode));
+        var residue = new AuditResidue(
+            correlationId,
+            stage,
+            outcome,
+            reasonCode,
+            policyVersion);
+
+        _entries.Add(residue);
+        GovernanceObservabilityInstrumentation.RecordAuditEvent(residue);
     }
 }
 
@@ -869,9 +886,13 @@ public sealed class GovernedAiToolGateway(
         HostActor actor,
         DateTimeOffset nowUtc,
         AcknowledgmentResponse? acknowledgmentResponse,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string? hostCorrelationId = null)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
+        string correlationId =
+            hostCorrelationId ?? proposal.ProposalId;
 
         ToolDescriptor? descriptor =
             toolRegistry.Find(proposal.ToolName);
@@ -879,13 +900,13 @@ public sealed class GovernedAiToolGateway(
         if (descriptor is null)
         {
             auditSink.Write(
-                proposal.ProposalId,
+                correlationId,
                 "proposal-validation",
                 "rejected",
                 "tool.unknown");
 
             return GatewayResult.Rejected(
-                proposal.ProposalId,
+                correlationId,
                 "tool.unknown");
         }
 
@@ -895,27 +916,35 @@ public sealed class GovernedAiToolGateway(
         if (!proposalValidation.IsValid)
         {
             auditSink.Write(
-                proposal.ProposalId,
+                correlationId,
                 "proposal-validation",
                 "rejected",
                 proposalValidation.ReasonCode);
 
             return GatewayResult.Rejected(
-                proposal.ProposalId,
+                correlationId,
                 proposalValidation.ReasonCode);
         }
+
+        auditSink.Write(
+            correlationId,
+            "proposal-validation",
+            "valid",
+            proposalValidation.ReasonCode);
 
         AiToolPolicyContext context =
             contextFactory.Create(
                 proposal,
                 descriptor,
-                actor);
+                actor,
+                correlationId);
 
         auditSink.Write(
             context.CorrelationId,
             "context",
             context.DestinationClassification.ToString(),
-            "context.host-authoritative");
+            "context.host-authoritative",
+            context.PolicyVersion);
 
         GovernanceDecision decision =
             policy.Evaluate(context);
@@ -924,7 +953,8 @@ public sealed class GovernedAiToolGateway(
             context.CorrelationId,
             "decision",
             decision.Outcome.ToString(),
-            decision.ReasonCode);
+            decision.ReasonCode,
+            context.PolicyVersion);
 
         if (decision.Outcome is
             GovernanceDecisionOutcome.Denied or
@@ -990,7 +1020,8 @@ public sealed class GovernedAiToolGateway(
                 context.CorrelationId,
                 "re-evaluation",
                 decision.Outcome.ToString(),
-                decision.ReasonCode);
+                decision.ReasonCode,
+                context.PolicyVersion);
 
             if (!decision.CanProceed)
             {

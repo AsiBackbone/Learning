@@ -367,6 +367,50 @@ Would execute
 
 Those are related events, not one event.
 
+## Governance Observability and Decision Tracing
+
+The executable also runs three deterministic observability scenarios after the baseline gateway demonstration:
+
+1. An allowed internal proposal that reaches the dry-run executor.
+2. A denied blocklisted proposal that produces zero executor calls.
+3. An external proposal that pauses for acknowledgment before re-evaluation and scoped authority.
+
+The observability layer uses the .NET `ActivitySource` API and an in-process listener. No model provider, OpenTelemetry exporter, collector, or external backend is required.
+
+The trace keeps these identities visible:
+
+```text
+Host correlation ID
+Proposal ID
+Trace ID
+Span ID / parent span ID
+Decision outcome + reason code
+Policy version where recorded
+Acknowledgment challenge identity
+Capability identity
+Executor invocation
+Audit residue
+```
+
+The sample deliberately preserves this distinction:
+
+> **Telemetry records what happened. Telemetry does not authorize what may happen.**
+
+`InMemoryAuditSink` continues to represent the governance-evidence path. While a trace is active, each audit write is also projected as an `ActivityEvent` so the same lifecycle can be inspected through trace relationships without making telemetry the source of authority.
+
+The host-owned handler creates the `executor.invoke` activity at the actual dry-run side-effect boundary. Therefore a denied trace can demonstrate all three negative observations together:
+
+```text
+Decision = Denied
+Capability-issued audit stage = absent
+executor.invoke activity = absent
+Executor invocation count = 0
+```
+
+The companion tutorial explains correlation, structured events, policy provenance, sampling, sensitive-data minimization, and the boundary between operational telemetry and durable governance evidence:
+
+[AI Governance Observability and End-to-End Decision Tracing](../../docs/ai-integration/ai-governance-observability-and-end-to-end-decision-tracing.md)
+
 ## Important Invariants
 
 The focused test project verifies that:
@@ -451,6 +495,9 @@ Compare the small teaching implementation with the fuller working `AsiBackbone` 
 - [AuditResidue](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs)
 - [CapabilityTokenGrant](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs)
 - [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md)
+- [`AsiBackbone.OpenTelemetry` README](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/README.md)
+- [`OpenTelemetryGovernanceInstrumentation`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/OpenTelemetryGovernanceInstrumentation.cs)
+- [`OpenTelemetryGovernanceAttributes`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/OpenTelemetryGovernanceAttributes.cs)
 
 The Learning sample remains framework-neutral so the architectural pattern can be studied independently of package adoption.
 
