@@ -1865,6 +1865,24 @@ Use the smallest architecture that preserves the authority boundaries the actual
 
 ---
 
+## When Not to Use Multi-Agent Execution
+
+Do not introduce agent-to-agent execution paths merely to make a workflow appear more capable.
+
+Prefer the simpler [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md), or ordinary deterministic application orchestration, when:
+
+- One model or service can produce the proposal.
+- The workflow does not need independent agent specialization or cross-service delegation.
+- No authority needs to cross agent or service hops.
+- Failures can be handled inside one host-owned operation.
+- Adding another agent would not create a distinct trust or responsibility boundary.
+
+Even when several models collaborate on text, ranking, or planning, capability delegation and multi-hop execution controls may be unnecessary if their outputs remain advisory and a single host later performs ordinary validation and governance.
+
+Use this experimental multi-agent pattern only when distributed proposal, delegation, trust, or failure boundaries are part of the real problem.
+
+---
+
 ## What This Experimental Pattern Does Not Guarantee
 
 This architecture does not automatically provide:

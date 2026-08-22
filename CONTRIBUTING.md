@@ -280,6 +280,27 @@ Where useful, leave readers with unresolved questions or possible experiments.
 
 Not every tutorial must contain every section, but contributions should prioritize clarity and learning value.
 
+### Apply Usage Boundaries and ADR Links Selectively
+
+Usage-boundary guidance should be explicit when a reader could reasonably over-apply the demonstrated architecture. A Pattern Card's `Prefer something simpler when` field may be enough for a compact tutorial; use a dedicated **When Not to Use It**, **Use a Simpler Approach When**, or equivalent section when the tradeoff needs more explanation.
+
+Where practical, name the simpler or framework-native alternative rather than only saying that the pattern may be excessive. Examples include an ordinary application service, ASP.NET Core authorization or validation, one EF Core unit of work, or a single host-owned AI gateway when those mechanisms preserve the required boundary with less machinery.
+
+When a working implementation has an Architecture Decision Record that directly explains the repository-specific choice, link it as a separate source of rationale:
+
+```text
+Learning pattern
+    = reusable architectural reasoning
+
+Working implementation
+    = current code, configuration, tests, and operational behavior
+
+Architecture Decision Record
+    = repository-specific context, decision, alternatives, and consequences
+```
+
+Do not add ADR links merely for link density. A related ADR should help the reader understand why a working repository selected or retained a particular implementation direction. The ADR does not make that local choice universally required, and a Learning page does not need an ADR link when no direct decision record exists.
+
 ## Lab Guidelines
 
 Labs should encourage active reasoning rather than simply repeating tutorial steps.

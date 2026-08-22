@@ -1445,6 +1445,26 @@ That separation makes incident analysis far easier.
 
 ---
 
+## When a Simpler Persistence Boundary Is Better
+
+Do not introduce repositories, explicit transaction coordinators, save interceptors, outboxes, or durable capability-use state merely because EF Core can support them.
+
+A smaller design is usually preferable when:
+
+- One `DbContext` and one `SaveChangesAsync` already define the local unit of work.
+- One application service owns the mutation clearly.
+- No invariant spans several persistence abstractions.
+- No durable replay, use-limit, or acknowledgment state is required.
+- No remote side effect creates an ambiguous post-commit recovery window.
+
+In those cases, framework-native EF Core transactions and an ordinary application-service boundary may express the behavior more clearly than additional persistence abstractions.
+
+Introduce the heavier boundaries only when a concrete invariant requires them, such as atomic local writes across concerns, ordered save-pipeline behavior, durable replay or use state, reliable asynchronous handoff, or explicit recovery after external side effects.
+
+Use the smallest persistence model that makes the real transaction and recovery ownership visible.
+
+---
+
 ## Working Reference: NetCoreApplicationTemplate
 
 `NetCoreApplicationTemplate` is a useful working specimen because it contains several of the boundaries discussed here without requiring Learning to reproduce the entire implementation.
@@ -1453,6 +1473,7 @@ Relevant references include:
 
 - [`Data Access`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/articles/data-access.md) — provider selection, SQLite local development, migrations, auditing, and disabled data-access mode.
 - [`EF Core Save Pipeline`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/articles/ef-core-save-pipeline.md) — composite save interceptor and explicit ordering of cross-cutting persistence behavior.
+- [ADR 0004: Keep the Composite EF Core SaveChanges Interceptor](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/0004-keep-composite-savechanges-interceptor.md) — records why the template currently keeps ordered save concerns behind one composite interceptor and which concrete extension or maintenance needs would justify revisiting that repository-specific choice.
 - [`ApplicationDbContext`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Infrastructure/Data/ApplicationDbContext.cs) — the fuller EF Core context.
 - [`ApplicationSaveChangesInterceptor`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Infrastructure/Data/ApplicationSaveChangesInterceptor.cs) — the save-lifecycle interception boundary.
 - [`ApplicationAuditedTransaction`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Infrastructure/Data/Auditing/ApplicationAuditedTransaction.cs) — explicit relational transaction coordination for a local application mutation and audit/completion state.
