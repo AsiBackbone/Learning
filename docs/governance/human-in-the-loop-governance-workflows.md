@@ -99,61 +99,22 @@ They are lifecycle, authority, and provenance questions.
 
 ---
 
-## Do Not Collapse Every Human Action into "Approval"
+## Keep Human Dispositions Distinct
 
-A human can participate in several different ways.
+Human review can involve several different acts, but the workflow should not collapse them into one generic `Approve` concept.
 
-Keep the vocabulary explicit.
-
-| Concept | Meaning | Does it itself authorize execution? |
+| Human-facing concept | Meaning in this workflow | Does it itself authorize execution? |
 | --- | --- | --- |
 | Acknowledgment | An identified actor accepts or confirms a defined condition | No |
-| Approval | An eligible reviewer gives a positive disposition for a defined review request | Not necessarily |
-| Authorization | A rule determines whether an actor may perform or request an operation | No direct side effect |
-| Governance decision | Policy determines the system's current governed outcome | No |
-| Override | A specifically delegated authority changes or supersedes a policy result within defined limits | Not by itself |
+| Approval | An eligible reviewer gives a positive disposition for an exact review request | Not necessarily |
+| Override | A specifically delegated authority supersedes a policy result within defined limits | Not by itself |
 | Execution authority | Narrow authority accepted at the protected execution boundary | Only when the host validates and uses it |
-| Execution | The protected side effect actually occurs | Yes; this is the side effect |
 
-The distinction can be summarized as:
+The foundational meanings of authorization and governance outcomes are already covered in [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md). The acknowledgment boundary is covered in [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md), and execution authority in [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md).
 
-```text
-Acknowledgment
-      ≠
-Approval
-      ≠
-Authorization
-      ≠
-Governance decision
-      ≠
-Execution authority
-      ≠
-Execution
-```
+The distinction that matters here is specific to human review: a reviewer can acknowledge that a request is high risk and still reject it, while a requester can acknowledge a warning without having authority to approve the operation.
 
-This prevents a generic human action from silently becoming all of those things at once.
-
----
-
-## Acknowledgment and Approval Are Different Boundaries
-
-[Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) models a person or system responding to a defined challenge.
-
-An acknowledgment means something like:
-
-> I received and accept this stated condition.
-
-An approval means something closer to:
-
-> Within my review role and scope, I give a positive disposition for this exact proposed operation.
-
-Those are different claims.
-
-A reviewer might acknowledge that a request is high risk and still reject it.
-
-A requester might acknowledge a warning but have no authority to approve the operation.
-
-A system should therefore avoid:
+Avoid implicit chains such as:
 
 ```text
 Acknowledged = true
@@ -163,9 +124,7 @@ Approved = true
 Execute
 ```
 
-unless the domain has intentionally defined those states as equivalent.
-
-For most governed workflows, they should remain separate.
+unless the domain has deliberately defined those states as equivalent and the host still validates the resulting execution authority.
 
 ---
 

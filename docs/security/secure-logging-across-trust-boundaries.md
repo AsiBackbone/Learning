@@ -312,45 +312,13 @@ Prefer stable event identity plus separately reviewed properties.
 
 ## Secrets That Should Not Cross the Logging Boundary
 
-Some values should be treated as **never-log** data in ordinary operational telemetry.
+Credential and authority-bearing secrets should be excluded from ordinary operational telemetry by default. [Secret Handling Across Trust Boundaries](secret-handling-across-trust-boundaries.md) is the canonical treatment of passwords, API keys, access and refresh tokens, client secrets, private keys, connection credentials, rotation, revocation, and compromise response.
 
-Examples include:
+The logging-specific rule is simpler:
 
-- Passwords.
-- API keys.
-- Access tokens.
-- Refresh tokens.
-- Client secrets.
-- Private signing keys.
-- Session cookies.
-- `Authorization` header values.
-- Password-reset tokens.
-- One-time verification codes.
-- Connection strings that contain credentials.
-- Provider credentials.
-- Secret-bearing environment-variable values.
+> **If the operational question does not require the secret, do not emit the secret.**
 
-Do not write:
-
-```csharp
-logger.LogDebug(
-    "Calling provider {Provider} with token {AccessToken}",
-    providerName,
-    accessToken);
-```
-
-Do not improve it into:
-
-```csharp
-logger.LogDebug(
-    "Calling provider {Provider} with token {AccessToken}",
-    providerName,
-    Redact(accessToken));
-```
-
-if the token itself is not needed for the diagnostic question.
-
-Prefer:
+Prefer an event that records the provider and operation instead of the credential used to call it:
 
 ```csharp
 logger.LogDebug(
@@ -359,9 +327,7 @@ logger.LogDebug(
     operationName);
 ```
 
-The security improvement is not prettier redaction.
-
-It is removing the secret from the event model.
+Redaction remains useful defense in depth where sensitive data can still appear unexpectedly, but it should not justify adding known secrets to the event model in the first place.
 
 ## Sensitive Data Is Broader Than Credentials
 

@@ -88,41 +88,21 @@ That invariant continues to apply while escalation is pending, expired, cancelle
 
 ---
 
-## Keep the Vocabulary Separate
+## Reuse Existing Human-Review and Authority Semantics
 
-Several concepts are easy to collapse into one generic "approval" or "exception" step.
+Escalation can route to a human reviewer, a specialized policy service, or an explicitly delegated override path, but it should not redefine those concepts locally.
 
-| Concept | Primary question | Does it itself create execution authority? |
-| --- | --- | --- |
-| Escalation | Which other authority should receive this unresolved decision problem? | No |
-| Acknowledgment | Did an identified actor accept a defined condition? | No |
-| Approval | Did an eligible reviewer give a positive disposition for a defined request? | Not necessarily |
-| Override | Did a specifically delegated authority supersede a policy result within defined limits? | Not by itself |
-| Governance decision | What does current policy conclude from current context? | No |
-| Execution authority | What narrow authority is valid at the protected boundary? | Only when the host validates and uses it |
-| Execution | Did the protected side effect occur? | Yes |
+Use the canonical material for the downstream boundary that actually applies:
 
-The distinction can be written directly:
+- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) for acknowledgment semantics.
+- [Human-in-the-Loop Governance Workflows](human-in-the-loop-governance-workflows.md) for reviewer approval, rejection, and bounded override behavior.
+- [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) for execution authority and host-owned side effects.
 
-```text
-Escalation
-    ≠
-Acknowledgment
-    ≠
-Approval
-    ≠
-Override
-    ≠
-Execution
-```
+The escalation-specific question is narrower:
 
-An escalation may eventually route to a human approval workflow.
+> **Which eligible authority or evidence source should receive this unresolved decision problem?**
 
-It may eventually route to an automated specialized policy service.
-
-It may eventually produce an authorized override.
-
-Those later outcomes do not change what escalation itself means.
+Any later approval, override, or new governance decision remains a separate event with its own provenance and validation. Escalation itself does not create execution authority.
 
 ---
 

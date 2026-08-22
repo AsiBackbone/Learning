@@ -29,7 +29,9 @@ A useful flow is:
 ```text
 Deterministic host facts
           +
-Probabilistic observations
+Typed probabilistic observations
+          ↓
+Host validation + provenance
           ↓
 Typed policy context
           ↓
@@ -42,27 +44,7 @@ Scoped authority when needed
 Host-owned execution
 ```
 
-For model-derived input, make the boundary even more explicit:
-
-```text
-Model output
-   ↓
-Typed probabilistic signal
-   ↓
-Host validation + provenance
-   ↓
-Policy interpretation
-   ↓
-Governance decision
-   ↓
-Scoped authority
-   ↓
-Host execution
-```
-
-The central lesson is:
-
-> **A probabilistic signal may inform policy, but uncertainty should not be disguised as an authoritative fact.**
+This article focuses on the semantics of uncertain evidence inside policy context. For the separate boundary where an AI system proposes a typed action for host validation, see [Typed AI-Proposed Intent and Schema-Validation Boundaries](../ai-integration/typed-ai-proposed-intent-and-schema-validation-boundaries.md).
 
 ---
 

@@ -133,51 +133,20 @@ It does not remove host-side execution paths.
 
 The architecture still has to enforce the boundary.
 
-## Threat Model, Penetration Test, Scanner, and Checklist Are Different Tools
+## Threat Models Complement Other Security Tools
 
-These activities can complement one another, but they answer different questions.
+Threat modeling, testing, scanning, and checklists are related but answer different questions:
 
-```text
-Threat model
-      ≠
-Penetration test
-```
+| Tool | Primary question |
+| --- | --- |
+| Threat model | What can go wrong in this architecture, where can it happen, and which boundary should resist it? |
+| Penetration test | Which weaknesses can be exercised in a concrete implementation under the defined scope? |
+| Vulnerability scanner | Which known implementation or dependency weaknesses can be detected automatically? |
+| Security checklist | Which recurring concerns should the team remember to inspect? |
 
-A threat model asks what can go wrong and where architecture should resist it.
+None of these substitutes for the others. In particular, identifying a threat does not eliminate it; a mitigation may reduce likelihood or impact, increase detectability, transfer responsibility, or leave meaningful residual risk.
 
-A penetration test attempts to exercise weaknesses in a concrete implementation under a defined scope.
-
-```text
-Threat model
-      ≠
-Vulnerability scanner
-```
-
-A scanner can identify known classes of implementation or dependency weakness.
-
-It does not explain the intended authority flow, trust model, or whether an apparently valid path should exist at all.
-
-```text
-Threat model
-      ≠
-Security checklist
-```
-
-A checklist can remind a team to inspect recurring concerns.
-
-It should not replace architecture-specific reasoning.
-
-```text
-Threat identified
-      ≠
-Threat eliminated
-```
-
-Identification is only the start.
-
-A mitigation may reduce likelihood, reduce impact, transfer responsibility, make misuse more detectable, or leave substantial residual risk.
-
-Threat modeling should preserve those distinctions.
+The architectural value of the threat model is that it connects those mitigations back to the specific assets, authority paths, and assumptions they are intended to protect.
 
 ## A Practical Ten-Step Method
 

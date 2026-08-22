@@ -123,36 +123,30 @@ The goal is to make variable consequence **explicit and governable**.
 
 ---
 
-## Keep Four Boundaries Separate
+## Keep Risk Assessment in Its Own Boundary
 
-Risk-heavy systems often become confusing because four different responsibilities collapse into one service or one number.
+Risk assessment answers a narrower question than authorization or execution:
 
-| Responsibility | Question | Example |
-| --- | --- | --- |
-| Risk assessment | What risk posture is suggested by the observed factors? | `High` |
-| Authorization | Is the actor permitted to attempt this operation on this resource? | Export role and resource access |
-| Governance decision | Given authorization, constraints, risk, policy, and workflow state, what should happen next? | `EscalationRecommended` |
-| Execution authority | May the host perform the protected side effect now? | Scoped, validated host-controlled continuation |
+> **Given these observed factors, what risk posture and supporting evidence should policy consider?**
 
-The distinction can be written directly:
+It should return reviewable posture, reasons, and evidence rather than silently deciding whether the caller is authorized or performing the protected operation itself.
+
+The broader separations are covered canonically elsewhere:
+
+- [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) explains how context becomes an explicit governance outcome.
+- [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) explains why an allowed decision still does not transfer execution ownership away from the host.
+
+The risk-specific rule for this article is therefore:
 
 ```text
 Risk assessment
-      ≠
-Authorization
-      ≠
-Governance decision
-      ≠
-Execution authority
+      ↓
+Governance policy interprets the assessment
+      ↓
+Host enforces the resulting decision
 ```
 
-A risk assessor should not quietly perform the protected operation.
-
-A risk assessor should not become the only source of authorization truth.
-
-A governance decision should not execute itself.
-
-The host should continue to enforce the final decision at the execution boundary.
+Keeping that boundary explicit prevents a scorer, classifier, or risk service from quietly becoming the authorization system or executor.
 
 ---
 
