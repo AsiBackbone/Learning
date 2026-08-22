@@ -18,6 +18,19 @@ Learning uses a consistent vocabulary for recurring boundaries, but that vocabul
 
 Start with [Terminology and Established Architecture Concepts](terminology-and-established-concepts.md) to connect terms such as governed execution, policy context, audit residue, capability-scoped authority, host-owned execution, and governed AI tool gateways to established software architecture and security concepts.
 
+## Architectural Status Labels
+
+Substantive pages use a visible `Pattern classification` line when architectural status changes how the material should be interpreted:
+
+| Status | Meaning |
+| --- | --- |
+| **Canonical Pattern** | Aligns with the current architecture of one or more ASI Backbone organization repositories. |
+| **Alternative Pattern** | Presents a viable different approach or a comparison that intentionally departs from the canonical organization pattern. |
+| **Experimental** | Explores architecture that is not presented as an established organization pattern or production-ready design. |
+| **General learning material** | Teaches useful architecture without making a stronger canonical, alternative, or experimental claim. |
+
+Not every page needs a classification. The labels are descriptive rather than rankings: canonical does not mean universally correct, and experimental does not mean low quality.
+
 ## Current Focus
 
 The current foundational material emphasizes separation among:

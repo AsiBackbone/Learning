@@ -1012,7 +1012,7 @@ As the repository grows, learning material should increasingly provide:
 * [ ] Links to relevant ADRs.
 * [x] Related-tutorial links.
 * [x] Suggested labs.
-* [ ] Clear canonical, alternative, or experimental status where relevant.
+* [x] Clear canonical, alternative, or experimental status where relevant. ([#139](https://github.com/AsiBackbone/Learning/issues/139))
 * [ ] Accessibility review for diagrams and visual material.
 * [ ] Periodic technical review as .NET and implementation repositories evolve.
 

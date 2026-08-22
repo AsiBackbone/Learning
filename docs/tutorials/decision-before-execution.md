@@ -6,6 +6,8 @@ description: Learn why consequential operations should become explicit proposed 
 
 **Learning objective:** Understand why a consequential operation should be represented as proposed intent, evaluated, and converted into an explicit decision before the host performs the real-world action.
 
+**Pattern classification:** Canonical Pattern
+
 **Difficulty:** Beginner  
 
 **Prerequisites:** None. Familiarity with basic application request/response flows is helpful but not required.

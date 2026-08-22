@@ -12,7 +12,16 @@ It means that the problem usually contains more interacting boundaries, assumpti
 
 > **Complexity should be earned by the problem, not introduced by habit.**
 
-> **Section status:** This page is the advanced-material overview. Dedicated articles now cover [Regional and Tenant Policy Overlays](regional-and-tenant-policy-overlays.md) and the experimental [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md); begin with the [Foundational Tutorials](../tutorials/index.md) and [Hands-On Labs](../labs/index.md) before moving into the advanced material.
+> **Section status:** Advanced is an active learning area with dedicated published material. Begin with the [Foundational Tutorials](../tutorials/index.md) and [Hands-On Labs](../labs/index.md) before moving into topics that combine or stretch those boundaries.
+
+## Published Advanced Material
+
+| Article | Pattern classification | Focus |
+| --- | --- | --- |
+| [Regional and Tenant Policy Overlays](regional-and-tenant-policy-overlays.md) | General learning material | Explicit policy scopes, narrowing and delegated override authority, conflict handling, provenance, drift, degraded mode, and overlay testing. |
+| [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md) | Experimental | Multi-agent proposal provenance, delegation, authority narrowing, replay and revocation, agent loops, cross-service trust, and recovery boundaries. |
+
+The Experimental label is intentional: it marks exploratory architecture whose assumptions and limits should remain visible. It does not imply lower quality, and it does not turn the material into a standardized protocol or production-ready platform.
 
 ## Before Continuing
 
@@ -69,7 +78,7 @@ The objective is not to maximize architectural sophistication.
 
 The objective is to understand what additional complexity buys and what new failure modes it introduces.
 
-## Potential Advanced Topics
+## Additional Advanced Topics
 
 Future material may include:
 
@@ -78,8 +87,7 @@ Future material may include:
 * Replay-resistant capability workflows
 * Distributed execution boundaries
 * Cross-service governance
-* Multi-tenant policy systems
-* Regional policy overlays
+* Multi-tenant policy systems beyond the published overlay treatment
 * Policy-version drift
 * Durable governance evidence
 * Tamper-evident receipts
@@ -88,8 +96,7 @@ Future material may include:
 * Degraded-mode governance
 * Distributed acknowledgment workflows
 * Cross-boundary correlation
-* AI agent orchestration
-* Multi-agent execution boundaries
+* AI agent orchestration beyond the published experimental multi-agent treatment
 * Threat modeling governed AI gateways
 * Alternative policy architectures
 * Architecture comparisons
@@ -483,14 +490,15 @@ Each pattern still requires evaluation against the actual application's threat m
 
 ## Current Status
 
-The Advanced section is established as a destination for later-stage architectural material.
+The Advanced section is established and actively contains later-stage architectural material rather than serving only as a future destination. The published regional/tenant overlay article provides a general advanced treatment of multi-authority policy composition, while the multi-agent article is explicitly Experimental and explores boundaries that are not presented as an established organization protocol.
 
-The current repository priority is to strengthen the foundational learning path through executable companion samples, tests, labs, and working implementation references before substantially expanding the advanced curriculum.
+Further expansion should remain selective and should preserve the same status discipline: canonical alignment, viable alternatives, experimental exploration, and general learning material should be distinguishable without readers having to infer intent from tone.
 
-For now:
+Recommended progression:
 
 * Complete the [Foundational Tutorials](../tutorials/index.md).
-* Explore the [Hands-On Labs](../labs/index.md) as they are published.
+* Use the [Hands-On Labs](../labs/index.md) to exercise the underlying boundaries.
+* Read the dedicated advanced articles when the corresponding multi-authority or multi-agent concerns are relevant.
 * Compare the smaller teaching patterns with the working implementation repositories.
 
 ---

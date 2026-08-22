@@ -6,7 +6,7 @@ description: Learn how multi-agent AI workflows can exchange proposals and deleg
 
 **Learning objective:** Understand how proposals, plans, recommendations, and delegated work can move among multiple AI agents without allowing agent-to-agent communication to become implicit execution authority.
 
-**Pattern classification:** General learning material — **Experimental**
+**Pattern classification:** Experimental
 
 **Difficulty:** Advanced
 
