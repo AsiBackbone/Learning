@@ -1,0 +1,6 @@
+{
+  "template": "modern",
+  "docfxVersion": "2.78.5",
+  "upstreamRelease": "v2.78.5",
+  "localOverride": "docs/templates/layout/_master.tmpl"
+}
