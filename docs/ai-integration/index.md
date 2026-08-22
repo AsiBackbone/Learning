@@ -12,7 +12,7 @@ The central principle is:
 
 This separation allows AI inference to participate in an application workflow without treating model output as authorization, policy, or execution authority.
 
-> **Section status:** The foundational AI gateway and the Milestone 9 focused architecture pages are published, covering typed proposals, probabilistic inputs, multi-tool recovery, bounded rejection and uncertainty, persistent memory, and experimental multi-agent execution boundaries.
+> **Section status:** The foundational AI gateway and focused architecture pages are published, covering typed proposals, probabilistic inputs, governance observability and end-to-end decision tracing, multi-tool recovery, bounded rejection and uncertainty, persistent memory, and experimental multi-agent execution boundaries.
 
 ## Proposal Is Not Execution
 
@@ -97,6 +97,12 @@ This tutorial isolates the proposal-translation boundary: untrusted model output
 [Deterministic and Probabilistic Inputs in Policy Evaluation](../governance/deterministic-and-probabilistic-inputs-in-policy-evaluation.md)
 
 This advanced tutorial distinguishes host-authoritative deterministic facts from model-derived or statistical signals and shows how provenance, uncertainty, confidence, calibration, threshold policy, freshness, and host-owned execution remain explicit.
+
+### Observability: AI Governance Observability and End-to-End Decision Tracing
+
+[AI Governance Observability and End-to-End Decision Tracing](ai-governance-observability-and-end-to-end-decision-tracing.md)
+
+This advanced tutorial shows how correlation IDs, proposal IDs, trace/span relationships, structured events, decision reason codes, policy provenance, acknowledgment, scoped authority, executor invocation, and audit residue can be connected without allowing telemetry to become authorization or execution authority. The companion Governed AI Tool Gateway sample includes deterministic allowed, denied, and acknowledgment-required traces that can be inspected locally without a real AI service or telemetry backend.
 
 ### Multi-Step AI Composition: Governed Multi-Tool Workflows and Recovery Boundaries
 
@@ -385,6 +391,7 @@ Current and future material in this section examines:
 * Destination and egress control
 * Replay and idempotency
 * Dry-run execution
+* Governance observability and end-to-end decision tracing
 * Agent orchestration boundaries
 * Multi-step workflows
 * Agent memory provenance, scope, freshness, and retention
@@ -422,7 +429,7 @@ Production AI-assisted systems remain responsible for their own threat models, a
 
 ## Current Status
 
-The foundational AI integration tutorial and the Milestone 9 focused architecture material are published, including typed proposal boundaries, deterministic/probabilistic policy inputs, multi-tool workflow recovery, bounded rejection and uncertainty, agent-memory governance, and experimental multi-agent execution boundaries.
+The foundational AI integration tutorial and focused architecture material are published, including typed proposal boundaries, deterministic/probabilistic policy inputs, governance observability and end-to-end decision tracing, multi-tool workflow recovery, bounded rejection and uncertainty, agent-memory governance, and experimental multi-agent execution boundaries.
 
 Future work can deepen this section through executable companion samples, hands-on labs, threat-model exercises, alternative gateway designs, and additional agent and tool-execution scenarios.
 
@@ -433,6 +440,10 @@ For the focused model-output acceptance boundary, continue with:
 For the probabilistic model-signal boundary, continue with:
 
 [Deterministic and Probabilistic Inputs in Policy Evaluation](../governance/deterministic-and-probabilistic-inputs-in-policy-evaluation.md)
+
+For end-to-end proposal, governance, execution, and evidence tracing, continue with:
+
+[AI Governance Observability and End-to-End Decision Tracing](ai-governance-observability-and-end-to-end-decision-tracing.md)
 
 For multi-step execution, replanning, and recovery boundaries, continue with:
 
