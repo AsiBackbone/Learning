@@ -104,6 +104,12 @@ This advanced tutorial distinguishes host-authoritative deterministic facts from
 
 This advanced tutorial extends the single-proposal gateway into multi-step execution: whole-plan validation without whole-plan authorization, current per-step policy evaluation, step-scoped authority, result observation, drift handling, bounded replanning, partial failure, idempotency, compensation, cancellation, and recovery.
 
+### Rejection and Uncertainty: AI Proposal Rejection, Uncertainty, and Recovery Patterns
+
+[AI Proposal Rejection, Uncertainty, and Recovery Patterns](ai-proposal-rejection-uncertainty-and-recovery-patterns.md)
+
+This advanced architecture explanation classifies proposal failures by stage, distinguishes invalid output from policy rejection, preserves low-confidence signals as uncertain evidence, and shows how host-owned retry budgets, loop detection, safe model feedback, replanning, escalation, and terminal states keep recovery from weakening the original boundary.
+
 ## Host-Owned Tool Registry
 
 A model should not define its own unrestricted execution surface.

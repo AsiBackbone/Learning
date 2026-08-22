@@ -773,7 +773,7 @@ candidate decisions before rollout while preserving a strict no-execution bounda
 
 ## Status
 
-**In progress — governed proposal, schema-validation, authoritative-context, scoped-execution, multi-tool recovery, and experimental multi-agent boundaries established**
+**In progress — governed proposal, schema-validation, authoritative-context, scoped-execution, bounded rejection/uncertainty recovery, multi-tool recovery, and experimental multi-agent boundaries established**
 
 ## Goal
 
@@ -789,8 +789,8 @@ Build beyond the initial Governed AI Tool Gateway without turning Learning into 
 * [x] Capability-scoped tool execution — [Governed AI Tool Gateway](docs/tutorials/governed-ai-tool-gateway.md).
 * [x] Multi-tool workflows — [Governed Multi-Tool Workflows and Recovery Boundaries](docs/ai-integration/governed-multi-tool-workflows-and-recovery-boundaries.md). ([#125](https://github.com/AsiBackbone/Learning/issues/125))
 * [x] Human acknowledgment for consequential actions — [Governed AI Tool Gateway](docs/tutorials/governed-ai-tool-gateway.md).
-* [ ] Handling model uncertainty.
-* [x] AI proposal rejection and recovery — [Governed Multi-Tool Workflows and Recovery Boundaries](docs/ai-integration/governed-multi-tool-workflows-and-recovery-boundaries.md). ([#125](https://github.com/AsiBackbone/Learning/issues/125))
+* [x] Handling model uncertainty — [AI Proposal Rejection, Uncertainty, and Recovery Patterns](docs/ai-integration/ai-proposal-rejection-uncertainty-and-recovery-patterns.md). ([#126](https://github.com/AsiBackbone/Learning/issues/126))
+* [x] AI proposal rejection and recovery — [AI Proposal Rejection, Uncertainty, and Recovery Patterns](docs/ai-integration/ai-proposal-rejection-uncertainty-and-recovery-patterns.md). ([#125](https://github.com/AsiBackbone/Learning/issues/125), [#126](https://github.com/AsiBackbone/Learning/issues/126))
 * [x] Tool execution receipts — [Governed AI Tool Gateway](docs/tutorials/governed-ai-tool-gateway.md).
 * [x] Prompt injection versus execution controls. ([#73](https://github.com/AsiBackbone/Learning/issues/73))
 * [x] Credential ownership — [AI Integration](docs/ai-integration/index.md).
@@ -799,8 +799,9 @@ Build beyond the initial Governed AI Tool Gateway without turning Learning into 
 * [x] Agent-to-agent governed execution as experimental material. ([#75](https://github.com/AsiBackbone/Learning/issues/75))
 
 Multi-tool workflow orchestration and proposal rejection/recovery are now covered
-through a dedicated tutorial. Model-uncertainty handling and agent-memory governance
-remain open standalone subjects.
+through dedicated tutorials, including bounded retry, low-confidence handling, safe
+model feedback, loop detection, and terminal recovery states. Agent-memory governance
+remains the open standalone Milestone 9 subject.
 
 The central rule remains:
 
