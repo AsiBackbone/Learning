@@ -1007,14 +1007,16 @@ As the repository grows, learning material should increasingly provide:
 * [ ] Estimated scope rather than artificial completion times.
 * [x] Runnable companion samples.
 * [x] Executable tests. ([#2](https://github.com/AsiBackbone/Learning/issues/2))
-* [ ] Consistent "When not to use this" guidance.
+* [x] Consistent "When not to use this" guidance where it materially improves the lesson. ([#140](https://github.com/AsiBackbone/Learning/issues/140))
 * [ ] Stronger links to implementation repositories.
-* [ ] Links to relevant ADRs.
+* [x] Links to relevant ADRs when they directly explain a working implementation decision. ([#140](https://github.com/AsiBackbone/Learning/issues/140))
 * [x] Related-tutorial links.
 * [x] Suggested labs.
 * [x] Clear canonical, alternative, or experimental status where relevant. ([#139](https://github.com/AsiBackbone/Learning/issues/139))
 * [ ] Accessibility review for diagrams and visual material.
 * [ ] Periodic technical review as .NET and implementation repositories evolve.
+
+Issue #140 completed a representative cross-cutting pass rather than adding formulaic sections to every page. Usage boundaries remain explicit where over-application is a meaningful risk, and ADR links are added only when a working repository contains a directly relevant decision record.
 
 ---
 

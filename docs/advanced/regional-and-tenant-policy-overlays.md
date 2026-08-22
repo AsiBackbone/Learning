@@ -1216,6 +1216,24 @@ The value of the pattern is the explicit policy boundary, not the intelligence l
 
 ---
 
+## When a Single Policy Boundary Is Better
+
+Do not build a global, regional, tenant, application, and operation overlay hierarchy when one authority can express the decision cleanly.
+
+A single ASP.NET Core authorization policy, one application policy service, or ordinary tenant-specific configuration may be enough when:
+
+- One team owns the relevant rules.
+- The rules share one version and lifecycle.
+- Lower layers do not have independent authority to narrow or override.
+- There is no need to reconstruct several policy contributors later.
+- Unavailable regional or tenant policy is not a distinct operational state.
+
+Use overlays when independently owned or versioned authorities actually need explicit precedence, narrowing or override rules, conflict handling, provenance, or freshness semantics.
+
+More policy files do not justify more policy layers. Use the smallest authority model that matches the real ownership structure.
+
+---
+
 ## Working Implementation References
 
 The Learning model here is intentionally broader than one framework implementation.
