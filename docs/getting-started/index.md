@@ -16,6 +16,8 @@ Already know the problem you need to solve? [**Find Your Path**](find-your-path.
 
 Use the problem-oriented path chooser when you do not need to work through the foundational sequence from the beginning.
 
+Prefer a visual curriculum overview? [**Learning Path Map**](learning-path-map.md) shows the recommended foundational sequence, optional problem-first entry points, branch-specific advanced paths, and where hands-on practice reinforces the curriculum.
+
 ## What You Will Learn
 
 The Learning material is built around a recurring separation of responsibilities:
