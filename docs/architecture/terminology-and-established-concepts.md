@@ -6,6 +6,8 @@ description: Map ASI Backbone Learning terminology to established software archi
 
 ASI Backbone Learning uses a consistent vocabulary to make recurring architectural boundaries easier to teach, test, and compare.
 
+For concise canonical definitions, start with the [Architecture Glossary](glossary.md). This page focuses on terminology lineage, established concept anchors, and the distinctions between Learning composition terms and broader industry vocabulary.
+
 That vocabulary is **not** a claim that the underlying software architecture, security, authorization, workflow, provenance, or AI-governance ideas originated with ASI Backbone.
 
 Many of the related concepts predate this repository by years or decades.

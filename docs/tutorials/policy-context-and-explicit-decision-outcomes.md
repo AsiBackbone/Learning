@@ -12,6 +12,8 @@ description: Learn to make governance inputs explicit with policy-context snapsh
 
 **Prerequisites:** [Decision Before Execution](decision-before-execution.md)
 
+**Glossary:** [Policy context](../architecture/glossary.md#policy-context), [constraint](../architecture/glossary.md#constraint), [policy evaluation](../architecture/glossary.md#policy-evaluation), [decision outcome](../architecture/glossary.md#decision-outcome), and [policy version](../architecture/glossary.md#policy-version).
+
 ## Pattern Card
 
 > **Problem:** Decision facts can become scattered across application layers while a boolean result hides meaningful states such as defer, acknowledgment, or escalation.

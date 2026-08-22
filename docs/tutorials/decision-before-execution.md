@@ -12,6 +12,8 @@ description: Learn why consequential operations should become explicit proposed 
 
 **Prerequisites:** None. Familiarity with basic application request/response flows is helpful but not required.
 
+**Glossary:** [Intent](../architecture/glossary.md#intent), [decision outcome](../architecture/glossary.md#decision-outcome), [host-owned execution](../architecture/glossary.md#host-owned-execution), and [architectural invariant](../architecture/glossary.md#architectural-invariant).
+
 ## Pattern Card
 
 > **Problem:** Consequential side effects can occur too directly after request handling or authorization, leaving policy reasoning and execution coupled.

@@ -16,7 +16,9 @@ Instead, this section examines why particular boundaries exist, what problems th
 
 Learning uses a consistent vocabulary for recurring boundaries, but that vocabulary is not a claim that the underlying architectural ideas originated with ASI Backbone.
 
-Start with [Terminology and Established Architecture Concepts](terminology-and-established-concepts.md) to connect terms such as governed execution, policy context, audit residue, capability-scoped authority, host-owned execution, and governed AI tool gateways to established software architecture and security concepts.
+Start with the [Architecture Glossary](glossary.md) for canonical Learning definitions of terms such as intent, policy context, decision outcome, acknowledgment, audit residue, scoped capability, execution authority, tool proposal, and trust boundary.
+
+Then use [Terminology and Established Architecture Concepts](terminology-and-established-concepts.md) to connect Learning vocabulary to established software architecture, authorization, security, workflow, provenance, and AI-governance concepts.
 
 ## Architectural Status Labels
 
