@@ -7,6 +7,18 @@ using System.Text;
 using System.Text.Json;
 using System.Xml;
 
+if (args.Length == 1 && string.Equals(args[0], "--self-test", StringComparison.Ordinal))
+{
+    return FeedGenerator.RunSelfTest();
+}
+
+if (args.Length > 0)
+{
+    Console.Error.WriteLine(
+        "Usage: dotnet run --file tools/generate-feed.cs [-- --self-test]");
+    return 2;
+}
+
 return FeedGenerator.Run();
 
 static class FeedGenerator
@@ -112,10 +124,159 @@ static class FeedGenerator
             .ToList();
 
         string outputPath = Path.Combine(siteRoot, "feed.xml");
-        WriteFeed(outputPath, orderedArticles);
+        WriteFeed(outputPath, orderedArticles, DateTimeOffset.UtcNow);
 
         Console.WriteLine($"Generated {NormalizePath(Path.GetRelativePath(repositoryRoot, outputPath))} with {orderedArticles.Count} item(s).");
         return 0;
+    }
+
+    public static int RunSelfTest()
+    {
+        string temporaryRoot = Path.Combine(
+            Path.GetTempPath(),
+            $"learning-feed-generator-{Guid.NewGuid():N}");
+
+        try
+        {
+            Directory.CreateDirectory(temporaryRoot);
+
+            DateOnly published = new(2026, 8, 14);
+            DateOnly updated = new(2026, 8, 20);
+            var articles = new List<FeedArticle>
+            {
+                new(
+                    "Published only",
+                    "Feed Generator Self-Test",
+                    published,
+                    null,
+                    "Synthetic published-only article.",
+                    new Uri(SiteRoot, "articles/published-only.html")),
+                new(
+                    "Published and updated",
+                    "Feed Generator Self-Test",
+                    published,
+                    updated,
+                    "Synthetic updated article.",
+                    new Uri(SiteRoot, "articles/published-and-updated.html"))
+            };
+
+            string outputPath = Path.Combine(temporaryRoot, "feed.xml");
+            WriteFeed(
+                outputPath,
+                articles,
+                new DateTimeOffset(2026, 8, 22, 12, 0, 0, TimeSpan.Zero));
+
+            var document = new XmlDocument();
+            document.Load(outputPath);
+
+            var namespaces = new XmlNamespaceManager(document.NameTable);
+            namespaces.AddNamespace("atom", AtomNamespace);
+
+            XmlNode? publishedOnlyItem =
+                document.SelectSingleNode("/rss/channel/item[title='Published only']");
+            XmlNode? updatedItem =
+                document.SelectSingleNode("/rss/channel/item[title='Published and updated']");
+
+            if (publishedOnlyItem is null || updatedItem is null)
+            {
+                return SelfTestFailure("expected RSS items were not generated.");
+            }
+
+            if (publishedOnlyItem.SelectSingleNode("atom:updated", namespaces) is not null)
+            {
+                return SelfTestFailure(
+                    "a published-only item unexpectedly emitted atom:updated.");
+            }
+
+            string expectedPublicationDate = ToRfc822(published);
+
+            if (!string.Equals(
+                    publishedOnlyItem.SelectSingleNode("pubDate")?.InnerText,
+                    expectedPublicationDate,
+                    StringComparison.Ordinal))
+            {
+                return SelfTestFailure(
+                    "a published-only item did not preserve its publication date.");
+            }
+
+            if (!string.Equals(
+                    updatedItem.SelectSingleNode("pubDate")?.InnerText,
+                    expectedPublicationDate,
+                    StringComparison.Ordinal))
+            {
+                return SelfTestFailure(
+                    "an updated item replaced its original publication date.");
+            }
+
+            if (!string.Equals(
+                    updatedItem.SelectSingleNode("atom:updated", namespaces)?.InnerText,
+                    ToAtomTimestamp(updated),
+                    StringComparison.Ordinal))
+            {
+                return SelfTestFailure(
+                    "an updated item did not emit the expected atom:updated timestamp.");
+            }
+
+            string validationSiteRoot = Path.Combine(temporaryRoot, "validation-site");
+            string validationArticleDirectory =
+                Path.Combine(validationSiteRoot, "articles");
+            Directory.CreateDirectory(validationArticleDirectory);
+            File.WriteAllText(
+                Path.Combine(validationArticleDirectory, "invalid-update.html"),
+                "<!doctype html><title>feed generator self-test</title>");
+
+            var invalidArticles = new List<FeedArticle>();
+            var invalidErrors = new List<string>();
+            var invalidMetadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["title"] = "Invalid update",
+                ["author"] = "Feed Generator Self-Test",
+                ["published"] = "2026-08-20",
+                ["updated"] = "2026-08-19",
+                ["summary"] = "Synthetic invalid article."
+            };
+
+            ValidateFeedArticle(
+                invalidMetadata,
+                "articles/invalid-update.md",
+                validationSiteRoot,
+                invalidArticles,
+                invalidErrors);
+
+            const string expectedInvalidUpdateError =
+                "articles/invalid-update.md: 'updated' cannot be earlier than 'published'.";
+
+            if (invalidArticles.Count != 0 ||
+                invalidErrors.Count != 1 ||
+                !string.Equals(
+                    invalidErrors[0],
+                    expectedInvalidUpdateError,
+                    StringComparison.Ordinal))
+            {
+                return SelfTestFailure(
+                    "an update earlier than publication was not rejected as expected.");
+            }
+
+            Console.WriteLine("RSS feed generator self-test passed.");
+            return 0;
+        }
+        catch (Exception exception)
+        {
+            return SelfTestFailure(exception.Message);
+        }
+        finally
+        {
+            if (Directory.Exists(temporaryRoot))
+            {
+                Directory.Delete(temporaryRoot, recursive: true);
+            }
+        }
+    }
+
+    private static int SelfTestFailure(string message)
+    {
+        Console.Error.WriteLine($"RSS feed generator self-test failed: {message}");
+        return 1;
     }
 
     private static void ValidateFeedArticle(
@@ -304,7 +465,10 @@ static class FeedGenerator
         return value;
     }
 
-    private static void WriteFeed(string outputPath, IReadOnlyList<FeedArticle> articles)
+    private static void WriteFeed(
+        string outputPath,
+        IReadOnlyList<FeedArticle> articles,
+        DateTimeOffset lastBuildDate)
     {
         var settings = new XmlWriterSettings
         {
@@ -335,7 +499,7 @@ static class FeedGenerator
         writer.WriteElementString("language", "en-us");
         writer.WriteElementString(
             "lastBuildDate",
-            DateTimeOffset.UtcNow.ToString("R", CultureInfo.InvariantCulture));
+            lastBuildDate.ToUniversalTime().ToString("R", CultureInfo.InvariantCulture));
 
         writer.WriteStartElement("image");
         writer.WriteElementString(
@@ -366,6 +530,16 @@ static class FeedGenerator
             writer.WriteElementString(
                 "pubDate",
                 ToRfc822(article.Published));
+
+            if (article.Updated is DateOnly updated)
+            {
+                writer.WriteElementString(
+                    "atom",
+                    "updated",
+                    AtomNamespace,
+                    ToAtomTimestamp(updated));
+            }
+
             writer.WriteElementString(
                 "dc",
                 "creator",
@@ -395,6 +569,17 @@ static class FeedGenerator
             0,
             TimeSpan.Zero)
         .ToString("R", CultureInfo.InvariantCulture);
+
+    private static string ToAtomTimestamp(DateOnly date) =>
+        new DateTimeOffset(
+            date.Year,
+            date.Month,
+            date.Day,
+            0,
+            0,
+            0,
+            TimeSpan.Zero)
+        .ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture);
 
     private static IEnumerable<string> EnumerateMarkdownFiles(string directory)
     {

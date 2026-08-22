@@ -52,6 +52,9 @@ jobs:
       - name: Build DocFX site
         run: dotnet tool run docfx docs/docfx.json --warningsAsErrors
 
+      - name: Validate RSS feed generator contract
+        run: dotnet run --file tools/generate-feed.cs -- --self-test
+
       - name: Generate RSS feed
         run: dotnet run --file tools/generate-feed.cs
 
