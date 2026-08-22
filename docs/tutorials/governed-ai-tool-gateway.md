@@ -1777,6 +1777,7 @@ After the foundational sequence, good next steps include:
 - Study durable audit persistence.
 - Study proof/signing and replay protection.
 - Design an AI gateway with dry-run and production modes.
+- Study bounded rejection and retry behavior in [AI Proposal Rejection, Uncertainty, and Recovery Patterns](../ai-integration/ai-proposal-rejection-uncertainty-and-recovery-patterns.md).
 - Extend the single-tool boundary into [Governed Multi-Tool Workflows and Recovery Boundaries](../ai-integration/governed-multi-tool-workflows-and-recovery-boundaries.md).
 - Critique where the pattern introduces unnecessary ceremony.
 
@@ -1789,6 +1790,7 @@ Learning is intended to make those tradeoffs visible rather than prescribe one u
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — review how the host constructs authoritative context and produces explicit governance outcomes.
 - [Escalation Patterns in Governed Systems](../governance/escalation-patterns-in-governed-systems.md) — route an escalated AI-proposed action through host-owned authority without giving the model escalation-routing or execution power.
 - [Typed AI Proposed Intent and Schema-Validation Boundaries](../ai-integration/typed-ai-proposed-intent-and-schema-validation-boundaries.md) — zoom into untrusted model output, schema validation, typed proposed intent, and authoritative-context separation before governance.
+- [AI Proposal Rejection, Uncertainty, and Recovery Patterns](../ai-integration/ai-proposal-rejection-uncertainty-and-recovery-patterns.md) — classify failed proposal stages, preserve uncertainty, bound retries and feedback, and terminate or escalate without weakening host authority.
 - [Governed Multi-Tool Workflows and Recovery Boundaries](../ai-integration/governed-multi-tool-workflows-and-recovery-boundaries.md) — repeat the gateway boundary per step while handling drift, partial failure, replanning, idempotency, compensation, cancellation, and recovery.
 - [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — explore responsibility boundaries, re-evaluation, correlation, and evidence across consequential workflows.
 - [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — examine narrow execution authority, capability bindings, replay considerations, and execution-boundary validation.
