@@ -61,6 +61,8 @@ New to governed-execution architecture? Start with [Decision Before Execution](d
 
 Already using ASP.NET Core authorization and wondering whether you need anything broader? Start with [When ASP.NET Core Authorization Is Enough](docs/architecture/when-aspnet-core-authorization-is-enough.md). It demonstrates the framework-native alternative and explains where a broader governance pipeline may add value.
 
+Already know the problem you are trying to solve? Use [Find Your Path](docs/getting-started/find-your-path.md) to route from common goals to the shortest relevant tutorials, samples, labs, simpler alternatives, and deeper implementation references.
+
 You do not need to install an `AsiBackbone` package to use this material. The tutorials, samples, comparisons, and labs are intended to remain useful as independent architecture education.
 
 ## Purpose

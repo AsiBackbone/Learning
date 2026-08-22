@@ -12,6 +12,10 @@ The goal is not to require adoption of a specific framework. The goal is to make
 
 > **Read it. Run it. Question it. Improve it.**
 
+Already know the problem you need to solve? [**Find Your Path**](find-your-path.md) routes common reader goals to the shortest relevant sequence of tutorials, samples, labs, simpler alternatives, and deeper references.
+
+Use the problem-oriented path chooser when you do not need to work through the foundational sequence from the beginning.
+
 ## What You Will Learn
 
 The Learning material is built around a recurring separation of responsibilities:
