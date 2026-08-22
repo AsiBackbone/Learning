@@ -283,6 +283,40 @@ Host Rebuilds Authoritative Classification
 AcknowledgmentRequired
 ```
 
+## Governance and Policy Architecture Samples
+
+Governance samples make policy behavior observable without turning simulation or evaluation into protected execution.
+
+### Minimal Policy Simulation Harness
+
+Related learning material:
+
+- [Practical Policy Testing and Decision-Table Strategies](../docs/governance/practical-policy-testing-and-decision-table-strategies.md)
+- [Policy Versioning and Decision Provenance](../docs/governance/policy-versioning-and-decision-provenance.md)
+- [Regional and Tenant Policy Overlays](../docs/advanced/regional-and-tenant-policy-overlays.md)
+
+Executable companion:
+
+[Minimal Policy Simulation Harness sample](policy-simulation-harness/README.md)
+
+The sample evaluates fictional `customer.export` scenarios containing explicit actor, resource, operation, region, tenant, risk, environment, and policy-version coordinates.
+
+It demonstrates comparisons such as:
+
+```text
+same intent + different region
+same intent + different tenant
+same intent + different risk
+same intent + different policy version
+```
+
+Each scenario returns a structured decision with reason code, policy identity/version, and matched constraint evidence.
+
+The central invariant is:
+
+> **Simulation evaluates decisions but never owns or invokes a protected executor.**
+
+Focused tests verify deterministic decision comparisons, explicit policy-version behavior, constraint evidence, unavailable-policy handling, and the non-execution boundary.
 ## Security and Trust Architecture Samples
 
 Security samples isolate state, trust, and execution-boundary behavior that benefits from direct observation under failure or concurrency pressure.

@@ -139,6 +139,30 @@ dotnet run --project samples/governed-ai-tool-gateway/GovernedAiToolGateway/Gove
 
 The same executable includes a deterministic local observability demonstration using `ActivitySource`, trace/span relationships, structured activity events, distinct proposal/correlation identity, policy-version evidence, and the existing audit residue. It prints allowed, denied, and acknowledgment-required traces without requiring a real AI provider or telemetry backend.
 
+## Governance and Policy Architecture Samples
+
+### Minimal Policy Simulation Harness
+
+**Learning objective:** Compare deterministic governance outcomes for the same fictional proposed intent while region, tenant, risk, environment, or policy version changes, without invoking a protected executor.
+
+**Difficulty:** Intermediate
+
+**Key invariant:**
+
+> **Simulation evaluates policy behavior; it does not create execution authority or perform the governed side effect.**
+
+The sample emits structured scenario results with decision outcome, reason code, policy identity/version, matched constraint evidence, and an explicit non-execution marker.
+
+Run from the repository root:
+
+```bash
+dotnet run --project samples/policy-simulation-harness/PolicySimulationHarness/PolicySimulationHarness.csproj
+```
+
+- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-simulation-harness/README.md)
+- [Read Practical Policy Testing and Decision-Table Strategies](../governance/practical-policy-testing-and-decision-table-strategies.md)
+- [Read Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md)
+- [Compare Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md)
 ## Security and Trust Architecture Samples
 
 ### Replay Protection and Bounded-Use Authority
