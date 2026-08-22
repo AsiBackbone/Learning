@@ -444,6 +444,16 @@ This remains a living educational project. Material may evolve as the implementa
 
 See [ROADMAP.md](ROADMAP.md) for planned work and longer-term direction.
 
+## Citing a Release
+
+Learning is a living educational repository, but meaningful educational milestones are also preserved as versioned releases and archived snapshots.
+
+Use the [Zenodo concept DOI](https://doi.org/10.5281/zenodo.21938556) when citing the evolving Learning work as a whole. The concept DOI identifies the project across its archived versions.
+
+When reproducibility depends on the exact material reviewed, cite the version-specific DOI shown on that release's Zenodo record and include the corresponding Learning version or GitHub tag. [GitHub Releases](https://github.com/AsiBackbone/Learning/releases) provides the versioned repository trail, while [`CITATION.cff`](CITATION.cff) and [`.zenodo.json`](.zenodo.json) carry the release identity used for archival metadata.
+
+A versioned Learning release is a citable educational snapshot. It does not create a runtime compatibility line, long-term support promise, or security-maintenance guarantee for historical material.
+
 ## License
 
 ASI Backbone Learning uses component-specific licensing.

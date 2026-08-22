@@ -8,17 +8,19 @@ The repository contains documentation, diagrams, exercises, executable teaching 
 
 ## Supported Material
 
-Because Learning is a living educational project rather than a versioned runtime package, security review focuses primarily on the current repository state and the currently published documentation.
+Learning is a living educational project that also preserves meaningful milestones as versioned educational releases. Those releases are archival and citation snapshots, not runtime package support lines. Security review therefore focuses primarily on the current repository state and the currently published documentation.
 
-| Material                                            | Support posture                                                                                                 |
-| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Current `main` branch                               | Primary review target for documentation, sample code, workflows, and repository configuration.                  |
-| Current published documentation                     | Primary review target when the issue affects rendered documentation or published guidance.                      |
-| Current executable samples under `samples/`         | Primary review target for sample behavior and demonstrated security boundaries.                                 |
-| Archived releases or historical snapshots           | Best effort when the same issue affects current material or creates a meaningful migration or citation concern. |
-| Forks, copied examples, or downstream modifications | Outside repository support unless the issue is also present in the canonical Learning repository.               |
+| Material                                            | Support posture                                                                                                                          |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Current `main` branch                               | Primary review target for documentation, sample code, workflows, and repository configuration.                                           |
+| Current published documentation                     | Primary review target when the issue affects rendered documentation or published guidance.                                               |
+| Current executable samples under `samples/`         | Primary review target for sample behavior and demonstrated security boundaries.                                                          |
+| Archived releases or historical snapshots           | Citable historical snapshots; best-effort review when an issue also affects current material or creates a meaningful migration concern. |
+| Forks, copied examples, or downstream modifications | Outside repository support unless the issue is also present in the canonical Learning repository.                                        |
 
 Security-sensitive corrections may result in documentation changes, sample-code changes, workflow hardening, dependency updates, or repository configuration changes depending on where the actual risk lives.
+
+Versioned release records support provenance and reproducibility. They do not imply long-term security maintenance, backported corrections, runtime compatibility, or package-style support for historical Learning releases.
 
 ## Reporting a Vulnerability or Sensitive Concern
 

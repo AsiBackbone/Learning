@@ -45,6 +45,12 @@
       "resource_type": "software"
     },
     {
+      "identifier": "https://doi.org/10.5281/zenodo.20777560",
+      "relation": "isDocumentedBy",
+      "scheme": "url",
+      "resource_type": "publication-workingpaper"
+    },
+    {
       "identifier": "https://doi.org/10.5281/zenodo.20546032",
       "relation": "references",
       "scheme": "url",
