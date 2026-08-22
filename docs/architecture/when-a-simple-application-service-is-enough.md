@@ -9,7 +9,7 @@ feed: true
 
 # When a Simple Application Service Is Enough
 
-**Pattern classification:** Comparison of multiple approaches
+**Pattern classification:** Alternative Pattern
 
 **Difficulty:** Intermediate
 

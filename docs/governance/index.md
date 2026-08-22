@@ -118,6 +118,12 @@ Explains `EscalationRecommended` as a non-executable governance outcome with exp
 
 Explains stable policy identity, policy versions and fingerprints, decision-time provenance, policy drift, execution-freshness strategies, acknowledgment and capability continuity, rollback, composition across multiple policies, canonicalization before hashing, and the limits of what a policy hash can prove.
 
+### Regional and Tenant Policy Overlays
+
+[Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md)
+
+Extends policy composition into an advanced, general-learning treatment of global, regional, tenant, application, and operation-specific authorities, including narrowing versus broadening, delegated override paths, conflict handling, multi-policy provenance, drift, degraded mode, and overlay testing.
+
 ### Practical Policy Testing and Decision-Table Strategies
 
 [Practical Policy Testing and Decision-Table Strategies](practical-policy-testing-and-decision-table-strategies.md)
@@ -151,16 +157,15 @@ Learning explains the architectural reasoning in intentionally smaller examples 
 
 ## Current Status
 
-The foundational governance tutorial sequence is established, and the Governance section now extends that foundation with explicit policy-pipeline composition, precedence, risk-based decisions, deterministic/probabilistic input boundaries, human-in-the-loop review, escalation lifecycles, policy versioning, decision provenance, and decision-boundary testing guidance.
+The foundational governance tutorial sequence is established, and the Governance section now extends that foundation with explicit policy-pipeline composition, precedence, risk-based decisions, deterministic/probabilistic input boundaries, human-in-the-loop review, escalation lifecycles, policy versioning, decision provenance, decision-boundary testing guidance, and a published advanced treatment of regional and tenant policy overlays.
 
-Future material may expand into:
+Additional material may expand into:
 
 * Decision conflict resolution beyond the current base composition model
 * Delegated authority
-* Multi-tenant governance
-* Regional policy overlays
+* Cross-service governance and authority transfer
 * Durable audit persistence
-* Degraded-mode decisions
+* Degraded-mode decisions beyond the current overlay treatment
 * Alternative governance architectures
 
 Continue with the [Foundational Tutorials](../tutorials/index.md) or explore the [Hands-On Labs](../labs/index.md) as they are developed.

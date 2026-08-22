@@ -81,9 +81,9 @@ body:
       label: Pattern classification
       options:
         - General learning material
-        - Canonical pattern
-        - Alternative pattern
-        - Comparison of multiple approaches
+        - Canonical Pattern
+        - Alternative Pattern
+        - Experimental
         - Unsure
     validations:
       required: false

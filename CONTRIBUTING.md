@@ -187,15 +187,24 @@ Contributions may present approaches that differ from the current ASI Backbone i
 - Explicit about tradeoffs
 - Clearly identified as alternatives where necessary
 
-Possible classifications include:
+### Architectural Status Labels
 
-**Canonical Pattern**  
-Aligned with the current architecture of one or more ASI Backbone organization repositories.
+When architectural status materially affects how a page should be interpreted, use one visible line near the page title or learning objective:
 
-**Alternative Pattern**  
-A different approach that addresses the same problem and is included for comparison or learning.
+```text
+**Pattern classification:** <status>
+```
 
-An alternative does not need to be treated as incorrect merely because it differs from the canonical implementation.
+Use one of these values:
+
+- **Canonical Pattern** — aligned with the current architecture of one or more ASI Backbone organization repositories.
+- **Alternative Pattern** — a viable different approach, or a comparison centered on an approach that intentionally differs from the current canonical organization pattern.
+- **Experimental** — exploratory architecture that tests or extends boundaries without claiming an established organization pattern or production-ready design. Experimental pages should state important assumptions, unknowns, and limits explicitly.
+- **General learning material** — educational material for which no stronger architectural-status claim is necessary.
+
+Do not combine statuses into ad hoc labels such as `General learning material — Experimental`. Choose the single status that most affects interpretation. A navigation page, lab, exercise, or other document may omit the field entirely when classification would add no useful information.
+
+These labels are descriptive, not quality rankings. Canonical does not mean universally correct, Alternative does not mean inferior, Experimental does not mean low quality, and General learning material does not mean unimportant. An alternative does not need to be treated as incorrect merely because it differs from the canonical implementation.
 
 ### 6. Preserve Project Boundaries
 

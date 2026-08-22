@@ -6,6 +6,8 @@ description: Learn to make governance inputs explicit with policy-context snapsh
 
 **Learning objective:** Understand why the facts used to make a governance decision should be represented explicitly, and why the result should describe what happens next rather than collapse every decision into a boolean.
 
+**Pattern classification:** Canonical Pattern
+
 **Difficulty:** Beginner  
 
 **Prerequisites:** [Decision Before Execution](decision-before-execution.md)

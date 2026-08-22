@@ -43,7 +43,7 @@
 
 - [ ] Canonical Pattern
 - [ ] Alternative Pattern
-- [ ] General Learning Material
+- [ ] General learning material
 - [ ] Experimental
 - [ ] Not applicable
 

@@ -40,13 +40,13 @@ If you already know authorization, ABAC, capability security, workflow, audit/pr
 
 ### Learning Path at a Glance
 
-| Tutorial | Difficulty | Prerequisites |
-| --- | --- | --- |
-| [Decision Before Execution](decision-before-execution.md) | Beginner | None |
-| [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) | Beginner | Tutorial 1 |
-| [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) | Intermediate | Tutorials 1–2 |
-| [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) | Intermediate | Tutorials 1–3 |
-| [Governed AI Tool Gateway](governed-ai-tool-gateway.md) | Intermediate | Tutorials 1–4 |
+| Tutorial | Pattern classification | Difficulty | Prerequisites |
+| --- | --- | --- | --- |
+| [Decision Before Execution](decision-before-execution.md) | Canonical Pattern | Beginner | None |
+| [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) | Canonical Pattern | Beginner | Tutorial 1 |
+| [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) | Canonical Pattern | Intermediate | Tutorials 1–2 |
+| [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) | Canonical Pattern | Intermediate | Tutorials 1–3 |
+| [Governed AI Tool Gateway](governed-ai-tool-gateway.md) | Canonical Pattern | Intermediate | Tutorials 1–4 |
 
 Difficulty reflects the conceptual complexity of the learning material rather than the production-readiness of the demonstrated patterns.
 
