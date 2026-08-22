@@ -22,6 +22,21 @@ Security-sensitive corrections may result in documentation changes, sample-code 
 
 Versioned release records support provenance and reproducibility. They do not imply long-term security maintenance, backported corrections, runtime compatibility, or package-style support for historical Learning releases.
 
+## Repository Security Automation
+
+Learning keeps its source-controlled security automation deliberately proportional to an educational repository:
+
+* `.github/dependabot.yml` monitors NuGet manifests used by the local DocFX tool and executable samples, and it monitors GitHub Actions dependencies. Routine updates are scheduled, bounded, and grouped so they arrive as reviewable maintenance pull requests rather than unmanaged drift.
+* `.github/workflows/codeql.yml` runs CodeQL analysis over the repository's C# source on relevant pull requests and pushes to `main`, with a periodic scheduled scan. The workflow uses least-privilege token permissions and SHA-pinned actions.
+
+These controls create maintenance and static-analysis signals. They do **not** establish that Learning, its examples, or a consuming application is secure, compliant, vulnerability-free, or appropriate for a particular production risk level.
+
+Some security controls remain repository- or organization-setting concerns rather than source-controlled workflow concerns. Secret scanning, push protection, Dependabot alerts and security updates, branch/ruleset enforcement, and related hosting controls must be verified in GitHub settings; their state cannot be inferred from committed YAML alone.
+
+The committed CodeQL workflow is an advanced-setup configuration. If CodeQL default setup is currently enabled for the repository, switch CodeQL to advanced setup so GitHub does not disable the workflow or block its analysis uploads.
+
+For the architectural reasoning behind these distinctions, see [Software Supply-Chain Integrity for .NET Repositories](docs/security/software-supply-chain-integrity-for-dotnet-repositories.md).
+
 ## Reporting a Vulnerability or Sensitive Concern
 
 Please do **not** place exploit details, secrets, proof-of-concept payloads, private keys, tokens, personal data, or sensitive operational information in a public Issue, pull request, Discussion, commit message, screenshot, or comment.

@@ -1,0 +1,44 @@
+version: 2
+
+updates:
+  # Monitor the repository-local DocFX tool manifest and all NuGet manifests
+  # used by executable teaching samples.
+  - package-ecosystem: "nuget"
+    directories:
+      - "/.config"
+      - "/samples/**"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "15:00"
+      timezone: "America/Chicago"
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      nuget-dependencies:
+        # Keep one update for a shared dependency together across sample projects.
+        group-by: dependency-name
+
+  # GitHub Actions are executable supply-chain dependencies. Keep SHA-pinned
+  # workflow references current through reviewable, grouped pull requests.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "15:30"
+      timezone: "America/Chicago"
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      github-actions:
+        patterns:
+          - "*"

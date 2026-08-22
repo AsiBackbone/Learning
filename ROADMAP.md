@@ -1032,16 +1032,18 @@ Automation should support quality without making contribution unnecessarily diff
 * [x] Sample restore validation. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
 * [x] Sample build validation. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
 * [x] Sample test execution. ([#1](https://github.com/AsiBackbone/Learning/issues/1), [#2](https://github.com/AsiBackbone/Learning/issues/2))
+* [x] Grouped Dependabot version-update automation for NuGet and GitHub Actions dependencies. ([#137](https://github.com/AsiBackbone/Learning/issues/137))
+* [x] Repository-maintained CodeQL scanning for the C# executable surface on relevant pull requests, pushes to `main`, and a weekly schedule. ([#137](https://github.com/AsiBackbone/Learning/issues/137))
 
 ## Planned
 
 * [ ] Markdown validation where it adds value beyond DocFX.
-* [ ] Dependency updates.
-* [ ] Secret scanning review.
-* [ ] Code scanning where executable code justifies it.
-* [ ] Pull request validation.
+* [ ] Review repository-setting controls such as secret scanning and push protection.
+* [ ] Pull request validation beyond the established targeted checks where it adds value.
 * [ ] Documentation artifact validation.
 * [ ] License-boundary validation where practical.
+
+Source-controlled automation and repository-host controls should be reviewed separately. A committed workflow does not prove that branch rules, secret scanning, push protection, Dependabot alerts, or Dependabot security updates are enabled in GitHub settings.
 
 Automation should be introduced when it provides meaningful protection, prevents documentation drift, or reduces maintenance burden.
 

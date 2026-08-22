@@ -84,7 +84,7 @@ The central lesson is:
 
 This article uses three ASI Backbone organization repositories selectively:
 
-- [`AsiBackbone/Learning`](https://github.com/AsiBackbone/Learning) — an educational repository with documentation and sample-validation workflows.
+- [`AsiBackbone/Learning`](https://github.com/AsiBackbone/Learning) — an educational repository with documentation and sample validation, SHA-pinned workflow dependencies, grouped Dependabot update automation, and repository-maintained CodeQL analysis for C# source.
 - [`AsiBackbone/AsiBackbone`](https://github.com/AsiBackbone/AsiBackbone) — a package-producing .NET repository with central dependency management, locked restore, release validation, SBOM generation, provenance attestations, and package publication automation.
 - [`AsiBackbone/NetCoreApplicationTemplate`](https://github.com/AsiBackbone/NetCoreApplicationTemplate) — an ASP.NET Core reference repository with dependency-update automation and broader application CI/security configuration.
 
@@ -529,9 +529,11 @@ Do not treat the network location alone as a complete publisher trust decision.
 
 ## Dependency Update Automation Is an Intake Mechanism
 
-The current `AsiBackbone/AsiBackbone` and `NetCoreApplicationTemplate` repositories use Dependabot configuration for both NuGet and GitHub Actions updates.
+All three working specimens now use Dependabot configuration for dependency-update intake.
 
-The configuration groups related updates, limits open pull requests, applies a cooldown, and schedules update checks.
+Learning keeps that configuration deliberately modest: NuGet manifests under `.config` and `samples/` are checked on a weekly cadence, repeated dependency updates across sample directories are grouped by dependency name, and GitHub Actions updates are grouped together. A cooldown and open-pull-request limit keep routine maintenance from overwhelming the educational workflow.
+
+The implementation repositories use their own schedules and grouping appropriate to their broader package and application surfaces.
 
 That improves maintenance flow.
 
@@ -591,6 +593,34 @@ Automatic proof of exploitability in this application
 The signal is useful.
 
 Its meaning should remain proportional to the evidence.
+
+### Static Code Scanning Has the Same Boundary
+
+The current Learning repository also runs repository-maintained CodeQL analysis for C# on relevant pull requests and pushes to `main`, plus a periodic schedule. C# no-build analysis keeps the workflow proportional to the repository while still examining source outside the sample solution, including file-based C# utilities.
+
+The workflow grants only the repository-read and code-scanning-result permissions required by the job, and its external actions are pinned to reviewed commit SHAs.
+
+That creates another useful review signal:
+
+```text
+CodeQL finding
+      ↓
+Review + investigation
+      ↓
+Possible correction
+```
+
+but:
+
+```text
+CodeQL scan clean
+        ≠
+Repository secure
+```
+
+Static analysis is bounded by the rules, language modeling, source visibility, configuration, and execution context available to the scanner. Passing CodeQL therefore does not establish compliance or production security.
+
+Repository-host controls remain a separate layer. Secret scanning, push protection, Dependabot alerts and security updates, branch/ruleset enforcement, and the choice between CodeQL default and advanced setup are configured through GitHub repository or organization settings. Committed workflow files can demonstrate intent and source-controlled behavior, but they do not prove those hosting controls are enabled. When a committed CodeQL workflow is intended to be authoritative, default setup must not be allowed to override it.
 
 ---
 
