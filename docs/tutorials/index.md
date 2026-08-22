@@ -32,6 +32,10 @@ Each foundational tutorial also opens with a compact **Pattern Card** summarizin
 
 The card is an orientation aid, not a substitute for the tutorial's reasoning, tradeoffs, alternatives, or implementation discussion.
 
+Each foundational tutorial also closes with a short **Check Your Understanding** checklist. These self-assessments describe capabilities the learner should be able to explain or demonstrate rather than trivia to memorize.
+
+The checklist is not a score or certification. Its purpose is to make the learning objective observable before the learner moves into the companion sample, lab, or deeper material.
+
 A tutorial should remain useful even if you never install the `AsiBackbone` package or use `NetCoreApplicationTemplate`.
 
 If you already know authorization, ABAC, capability security, workflow, audit/provenance, or reference-monitor concepts, read [Terminology and Established Architecture Concepts](../architecture/terminology-and-established-concepts.md) for a bridge between that established vocabulary and the terms used throughout these tutorials.

@@ -26,6 +26,29 @@ Alternative Approach
 Working Repository
 ```
 
+## Architectural Acceptance Criteria
+
+A lab is not complete merely because the modified program runs.
+
+The stronger question is:
+
+> **Does the result preserve and demonstrate the architectural boundary the exercise was designed to teach?**
+
+Unless a lab states more specific criteria, use this lightweight self-check:
+
+- [ ] **Required boundary demonstrated** — you can point to the responsibility or trust boundary the lab is teaching and show where it is enforced.
+- [ ] **Prohibited path absent** — the failure or bypass path the lab is intended to prevent cannot silently reach protected execution or broader authority.
+- [ ] **Decision evidence preserved** — when the exercise involves decisions, acknowledgment, capabilities, or lifecycle state, enough evidence remains to explain what happened.
+- [ ] **Relevant failure path observable** — at least one important denied, stale, invalid, unavailable, replayed, or otherwise unsafe path can be observed rather than assumed.
+- [ ] **Architectural invariant verified** — a focused test, deterministic sample result, or equivalent observation demonstrates the property being taught.
+- [ ] **Tradeoff or alternative explained** — you can explain why your design is appropriate for the exercise and name a credible simpler or different approach when one exists.
+
+Individual labs may strengthen, remove, or specialize these items when the subject requires different evidence.
+
+The criteria intentionally evaluate outcomes rather than one prescribed implementation. Two solutions can look different in code and still succeed if both preserve the same architectural invariant.
+
+Automated tests are useful evidence, but they are not the entire learning result. A test can pass while an important responsibility has moved to the wrong component, a bypass path remains reachable, or the learner cannot explain why the boundary matters.
+
 ## Current Status
 
 The lab navigation foundation is established, with four beginner labs, seven intermediate labs, and two advanced labs now available.

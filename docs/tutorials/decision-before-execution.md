@@ -811,18 +811,17 @@ For additional practice, add either a `Deferred` or `AcknowledgmentRequired` out
 
 If adding that outcome requires changing the component that performs the side effect, examine whether your decision and execution responsibilities are still too tightly coupled.
 
-## Review Questions
+## Check Your Understanding
 
-Before moving on, you should be able to answer:
+Before moving on, you should be able to:
 
-1. Why is an intent different from execution?
-2. Why might authorization be only one input into a consequential decision?
-3. What architectural property does an explicit decision result provide?
-4. Why should the evaluator avoid performing the side effect?
-5. What does host-owned execution mean?
-6. Why should tests verify that blocked decisions never invoke the executor?
-7. When would this pattern add unnecessary ceremony?
-8. How does this pattern apply to an AI-proposed tool call?
+- [ ] Explain why a consequential operation should exist as proposed intent before the side effect becomes reachable.
+- [ ] Identify which component evaluates governance and which host-owned component performs the real operation.
+- [ ] Explain why authentication or authorization may be an input to a consequential decision without becoming the entire governance lifecycle.
+- [ ] Demonstrate with a focused test or deterministic observation that a blocked decision results in zero executor calls.
+- [ ] Explain why a correct decision value is insufficient when the host ignores the execution boundary.
+- [ ] Identify a case where a simpler application service or direct operation would preserve the required boundary with less ceremony.
+- [ ] Apply the same proposal-before-execution reasoning to an AI-generated tool request without giving the model execution authority.
 
 ## Next
 

@@ -1211,20 +1211,17 @@ If changing the rule requires changing execution code, examine whether policy an
 
 For a guided version of this exercise, continue with the [Policy Context and Explicit Decision Outcomes learner exercise](../labs/policy-context-and-explicit-decision-outcomes.md). It asks you to observe the information lost by boolean-only decisions, add a new context fact and structured rule, make precedence intentional, and preserve stable reason codes.
 
-## Review Questions
+## Check Your Understanding
 
-Before moving on, you should be able to answer:
+Before moving on, you should be able to:
 
-1. What is policy context?
-2. Why should context contain facts rather than policy conclusions?
-3. Why is a context snapshot easier to test than a collection of service dependencies?
-4. When is a boolean result insufficient?
-5. What is the operational difference between `Denied`, `Deferred`, `AcknowledgmentRequired`, and `EscalationRecommended`?
-6. Why should reason codes be machine-readable and stable?
-7. Why should governance outcomes remain independent of HTTP status codes?
-8. What does policy identity add to a decision?
-9. What problems arise when context becomes too broad?
-10. Why should the host, not an AI model, construct authoritative policy context?
+- [ ] Construct a policy-context snapshot from explicit host-owned facts without smuggling policy conclusions into the context.
+- [ ] Explain when a boolean result loses information that the host needs for denial, deferral, acknowledgment, escalation, or warning behavior.
+- [ ] Define stable reason codes and policy identity that remain meaningful independently of transport-specific status codes.
+- [ ] Explain how explicit outcome semantics let the host decide what happens next without moving execution into the evaluator.
+- [ ] Test context construction separately from policy evaluation and exercise the important decision matrix deterministically.
+- [ ] Identify privacy, coupling, and maintainability problems that appear when policy context becomes an unbounded service locator or audit dump.
+- [ ] Explain why model-provided facts can contribute to a proposal while authoritative security and governance context remains host-owned.
 
 ## Next
 
