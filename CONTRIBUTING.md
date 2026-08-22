@@ -350,17 +350,20 @@ The fields mean:
 - `title` is the canonical article title.
 - `author` is the displayed author and RSS creator attribution.
 - `published` is the original publication date in `YYYY-MM-DD` format.
-- `updated` is optional and should be changed only for a substantive revision, not routine formatting or link maintenance.
+- `updated` is optional, must not be earlier than `published`, and should be changed only for a substantive revision, not routine formatting or link maintenance. When present, the feed emits the date as an Atom `atom:updated` timestamp at `00:00:00Z`; RSS `pubDate` continues to represent the original `published` date.
 - `summary` is the concise article description used by the feed.
 - `feed` controls RSS participation explicitly. Only `feed: true` publishes an item.
 
 For a feed-enabled article, `title`, `author`, `published`, and `summary` are required. Publication remains opt-in even when some metadata is present. The feed generator validates required fields, date formats, canonical generated HTML targets, and writes `docs/_site/feed.xml`.
+
+Article participation and feed-surface validity are separate concerns. Individual documents opt in only with `feed: true`, but the repository's published RSS surface is expected to contain at least one feed-enabled article. Generation intentionally fails when zero feed-enabled documents are found so accidental removal or disablement of the entire feed is visible during validation.
 
 To build and inspect the publication surface locally, run from the repository root:
 
 ```bash
 dotnet tool restore
 dotnet tool run docfx docs/docfx.json --warningsAsErrors
+dotnet run --file tools/generate-feed.cs -- --self-test
 dotnet run --file tools/generate-feed.cs
 ```
 
