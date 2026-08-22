@@ -3,6 +3,8 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <AssemblyName>PolicySimulationHarnessSample.Tests</AssemblyName>
+    <RootNamespace>PolicySimulationHarnessSample.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
