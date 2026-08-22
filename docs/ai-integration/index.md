@@ -12,7 +12,7 @@ The central principle is:
 
 This separation allows AI inference to participate in an application workflow without treating model output as authorization, policy, or execution authority.
 
-> **Section status:** The foundational AI gateway tutorial, the focused proposal-boundary tutorial, the deterministic/probabilistic policy-input bridge, and the multi-tool workflow/recovery tutorial are published; additional focused section pages are planned.
+> **Section status:** The foundational AI gateway and the Milestone 9 focused architecture pages are published, covering typed proposals, probabilistic inputs, multi-tool recovery, bounded rejection and uncertainty, persistent memory, and experimental multi-agent execution boundaries.
 
 ## Proposal Is Not Execution
 
@@ -109,6 +109,12 @@ This advanced tutorial extends the single-proposal gateway into multi-step execu
 [AI Proposal Rejection, Uncertainty, and Recovery Patterns](ai-proposal-rejection-uncertainty-and-recovery-patterns.md)
 
 This advanced architecture explanation classifies proposal failures by stage, distinguishes invalid output from policy rejection, preserves low-confidence signals as uncertain evidence, and shows how host-owned retry budgets, loop detection, safe model feedback, replanning, escalation, and terminal states keep recovery from weakening the original boundary.
+
+### Persistent Context: Agent Memory and Governance Boundaries
+
+[Agent Memory and Governance Boundaries](agent-memory-and-governance-boundaries.md)
+
+This advanced architecture explanation treats remembered information as scoped, provenance-carrying advisory context rather than current authority. It covers memory writes and reads, source identity, freshness, tenant and agent isolation, stale and conflicting values, persistent prompt-injection effects, retention and forgetting, and the rule that current host facts and current policy still control consequential execution.
 
 ## Host-Owned Tool Registry
 
@@ -381,6 +387,7 @@ Current and future material in this section examines:
 * Dry-run execution
 * Agent orchestration boundaries
 * Multi-step workflows
+* Agent memory provenance, scope, freshness, and retention
 * Failure handling
 * AI-specific threat modeling
 * Alternative gateway architectures
@@ -415,9 +422,9 @@ Production AI-assisted systems remain responsible for their own threat models, a
 
 ## Current Status
 
-The foundational AI integration tutorial, the focused AI proposal-boundary tutorial, the deterministic/probabilistic policy-input bridge, and the multi-tool workflow/recovery tutorial are published.
+The foundational AI integration tutorial and the Milestone 9 focused architecture material are published, including typed proposal boundaries, deterministic/probabilistic policy inputs, multi-tool workflow recovery, bounded rejection and uncertainty, agent-memory governance, and experimental multi-agent execution boundaries.
 
-Future work will expand this section through executable companion samples, hands-on labs, threat-model exercises, alternative gateway designs, and additional agent and tool-execution scenarios.
+Future work can deepen this section through executable companion samples, hands-on labs, threat-model exercises, alternative gateway designs, and additional agent and tool-execution scenarios.
 
 For the focused model-output acceptance boundary, continue with:
 
@@ -430,6 +437,10 @@ For the probabilistic model-signal boundary, continue with:
 For multi-step execution, replanning, and recovery boundaries, continue with:
 
 [Governed Multi-Tool Workflows and Recovery Boundaries](governed-multi-tool-workflows-and-recovery-boundaries.md)
+
+For persistent context, memory provenance, scope, freshness, and current-authority reconstruction, continue with:
+
+[Agent Memory and Governance Boundaries](agent-memory-and-governance-boundaries.md)
 
 For the complete end-to-end execution path, continue with:
 

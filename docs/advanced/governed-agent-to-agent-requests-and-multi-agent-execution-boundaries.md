@@ -2005,6 +2005,7 @@ If those answers are unclear, adding more agents may have increased orchestratio
 - [Advanced Overview](index.md) — place multi-agent execution boundaries in the broader advanced learning path.
 - [Typed AI Proposed Intent and Schema-Validation Boundaries](../ai-integration/typed-ai-proposed-intent-and-schema-validation-boundaries.md) — treat each agent-generated operation as untrusted proposed intent before authoritative host context is constructed.
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — begin with the simpler single-agent proposal-to-host execution boundary.
+- [Agent Memory and Governance Boundaries](../ai-integration/agent-memory-and-governance-boundaries.md) — share remembered information across agents while preserving provenance, scope, current host facts, and the rule that shared memory does not share authority.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — review narrow execution authority, audience/resource/operation bindings, expiration, and host-owned validation.
 - [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md) — identify where agent and service hops change what the system is willing to trust.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — examine replay, atomic consumption, distributed use state, and idempotency boundaries.
