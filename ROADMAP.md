@@ -773,7 +773,7 @@ candidate decisions before rollout while preserving a strict no-execution bounda
 
 ## Status
 
-**In progress — governed proposal, schema-validation, authoritative-context, scoped-execution, bounded rejection/uncertainty recovery, multi-tool recovery, and experimental multi-agent boundaries established**
+**Complete — expanded AI integration boundaries established across typed proposals, authoritative context, scoped execution, multi-tool recovery, bounded rejection and uncertainty, agent memory, and experimental multi-agent execution**
 
 ## Goal
 
@@ -794,14 +794,16 @@ Build beyond the initial Governed AI Tool Gateway without turning Learning into 
 * [x] Tool execution receipts — [Governed AI Tool Gateway](docs/tutorials/governed-ai-tool-gateway.md).
 * [x] Prompt injection versus execution controls. ([#73](https://github.com/AsiBackbone/Learning/issues/73))
 * [x] Credential ownership — [AI Integration](docs/ai-integration/index.md).
-* [ ] Agent memory and governance boundaries.
+* [x] Agent memory and governance boundaries — [Agent Memory and Governance Boundaries](docs/ai-integration/agent-memory-and-governance-boundaries.md). ([#128](https://github.com/AsiBackbone/Learning/issues/128))
 * [x] Multi-agent proposal flows. ([#75](https://github.com/AsiBackbone/Learning/issues/75))
 * [x] Agent-to-agent governed execution as experimental material. ([#75](https://github.com/AsiBackbone/Learning/issues/75))
 
-Multi-tool workflow orchestration and proposal rejection/recovery are now covered
-through dedicated tutorials, including bounded retry, low-confidence handling, safe
-model feedback, loop detection, and terminal recovery states. Agent-memory governance
-remains the open standalone Milestone 9 subject.
+Milestone 9 now covers the planned AI integration boundaries through dedicated
+learning material: typed proposal validation, authoritative context reconstruction,
+scoped execution, multi-tool recovery, bounded rejection and uncertainty handling,
+agent-memory governance, and experimental multi-agent execution. Future work can
+refine these areas through executable companions and labs without expanding the
+repository into an autonomous-agent framework.
 
 The central rule remains:
 
@@ -1076,9 +1078,9 @@ The highest-priority work now is:
 1. Deepen Governance and Policy Architecture where dedicated coverage is still
    missing: risk-based decisions, broader human-in-the-loop and escalation
    workflows, deterministic/probabilistic inputs, and policy simulation.
-2. Expand AI Integration beyond the established proposal and multi-agent
-   boundaries with multi-tool workflows, model-uncertainty handling, proposal
-   recovery, and agent-memory governance.
+2. Refine the now-established AI Integration path through executable companions,
+   labs, threat-model exercises, and cross-links for multi-tool workflows, bounded
+   rejection and uncertainty, agent memory, and multi-agent boundaries.
 3. Add remaining intermediate and advanced labs where learner reasoning materially
    improves the curriculum, especially decision-pipeline refactoring, competing
    policy architectures, regional/tenant policy design, high-consequence failure

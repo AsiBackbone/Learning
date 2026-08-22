@@ -12,3 +12,6 @@
 
 - name: AI Proposal Rejection, Uncertainty, and Recovery Patterns
   href: ai-proposal-rejection-uncertainty-and-recovery-patterns.md
+
+- name: Agent Memory and Governance Boundaries
+  href: agent-memory-and-governance-boundaries.md
