@@ -1049,25 +1049,31 @@ Automation should be introduced when it provides meaningful protection, prevents
 
 # Citation and Archival Goals
 
-The Learning repository includes citation and archival metadata so that significant versions can be referenced consistently.
+The Learning repository uses a versioned educational-release model so that meaningful milestones can be archived and cited without treating the project as a versioned runtime package.
 
 ## Established
 
 * [x] Add `CITATION.cff`.
 * [x] Add Zenodo metadata.
 * [x] Establish component-specific licensing metadata.
+* [x] Publish meaningful educational milestones as versioned GitHub and Zenodo snapshots. ([#136](https://github.com/AsiBackbone/Learning/issues/136))
+* [x] Synchronize release identity across `CITATION.cff` and `.zenodo.json`. ([#136](https://github.com/AsiBackbone/Learning/issues/136))
+* [x] Use a Zenodo concept DOI for the evolving Learning work and version-specific DOIs for exact archived releases. ([#136](https://github.com/AsiBackbone/Learning/issues/136))
+* [x] Document how readers should cite the evolving project versus a particular archived release. ([#136](https://github.com/AsiBackbone/Learning/issues/136))
+* [x] Keep archival cadence milestone-based rather than treating every documentation change as a release event. ([#136](https://github.com/AsiBackbone/Learning/issues/136))
 
-## Future Work
+## Ongoing Maintenance
 
-* [ ] Keep citation metadata synchronized with repository releases.
-* [ ] Keep Zenodo metadata synchronized with project identity and licensing.
-* [ ] Establish a sensible release cadence before treating every documentation change as an archival milestone.
-* [ ] Preserve versioned snapshots when the project reaches meaningful educational milestones.
-* [ ] Document how readers should cite archived releases once versioned records are available.
+* [ ] Update the `CITATION.cff` release version/date and `.zenodo.json` version together for each future archived release.
+* [ ] Keep Zenodo project identity, licensing, and related identifiers current.
+* [ ] Preserve new versioned snapshots when a meaningful educational milestone warrants an archival release.
+* [ ] Re-check citation guidance, archival links, and the related-identifier graph when the publication workflow or related works change.
 
 Archival infrastructure should support the learning resource.
 
 It should not force the project into unnecessary release ceremony.
+
+Versioned Learning releases are citable educational snapshots. They do not establish runtime compatibility lines, historical package support, or long-term security maintenance for archived material.
 
 ---
 
