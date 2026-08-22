@@ -12,6 +12,8 @@ description: Learn how narrow, short-lived capabilities preserve host control be
 
 **Prerequisites:** [Decision Before Execution](decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md), and [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md)
 
+**Glossary:** [Scoped capability](../architecture/glossary.md#scoped-capability), [capability token](../architecture/glossary.md#capability-token), [execution authority](../architecture/glossary.md#execution-authority), [host-owned execution](../architecture/glossary.md#host-owned-execution), and [trust boundary](../architecture/glossary.md#trust-boundary).
+
 ## Pattern Card
 
 > **Problem:** An allowed decision can accidentally expand into broad, reusable, or stale execution authority that no longer matches the operation originally approved.

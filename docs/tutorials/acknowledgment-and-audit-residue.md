@@ -12,6 +12,8 @@ description: Learn how operations pause for bound acknowledgment, re-evaluate cu
 
 **Prerequisites:** [Decision Before Execution](decision-before-execution.md) and [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md)
 
+**Glossary:** [Acknowledgment](../architecture/glossary.md#acknowledgment), [audit residue](../architecture/glossary.md#audit-residue), and [decision provenance](../architecture/glossary.md#decision-provenance).
+
 ## Pattern Card
 
 > **Problem:** Some consequential operations must pause for explicit acceptance, but a generic confirmation can accidentally become an execution bypass and leave weak evidence of what happened.

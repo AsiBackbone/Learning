@@ -1,6 +1,9 @@
 - name: Architecture
   href: index.md
 
+- name: Architecture Glossary
+  href: glossary.md
+
 - name: Terminology and Established Architecture Concepts
   href: terminology-and-established-concepts.md
 

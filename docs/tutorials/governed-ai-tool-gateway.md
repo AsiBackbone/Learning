@@ -12,7 +12,7 @@ description: Learn an AI tool gateway pattern where models propose actions while
 
 **Prerequisites:** The first four foundational tutorials. Familiarity with AI tool or function calling is helpful but not required.
 
-> **Terminology note:** `Governed AI Tool Gateway` is a Learning composition term, not a claim that tool mediation, reference-monitor, authorization, or human-oversight ideas originated here. See [Terminology and Established Architecture Concepts](../architecture/terminology-and-established-concepts.md).
+> **Terminology note:** `Governed AI Tool Gateway` is a Learning composition term, not a claim that tool mediation, reference-monitor, authorization, or human-oversight ideas originated here. Use the [Architecture Glossary](../architecture/glossary.md) for canonical definitions of [tool proposal](../architecture/glossary.md#tool-proposal), [tool allowlist](../architecture/glossary.md#tool-allowlist), [operational gateway](../architecture/glossary.md#operational-gateway), and [execution authority](../architecture/glossary.md#execution-authority). See [Terminology and Established Architecture Concepts](../architecture/terminology-and-established-concepts.md) for lineage and external anchors.
 
 ## Pattern Card
 
