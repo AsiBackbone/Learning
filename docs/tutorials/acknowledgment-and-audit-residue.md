@@ -1325,22 +1325,17 @@ Then simulate a process restart and ask:
 
 That question leads naturally toward durable persistence and scoped execution authority.
 
-## Review Questions
+## Check Your Understanding
 
-Before moving on, you should be able to answer:
+Before moving on, you should be able to:
 
-1. Why is acknowledgment different from authorization?
-2. Why should an acknowledgment be bound to a specific challenge?
-3. Why is a generic `confirmed = true` weaker than a structured acknowledgment response?
-4. Why might policy need to be re-evaluated after acknowledgment?
-5. Why should acknowledgment satisfy a requirement rather than bypass all policy?
-6. What is the difference between a decision event and an execution event?
-7. What does audit residue provide that an ordinary log message may not?
-8. Why is structured audit residue not automatically immutable or tamper-proof?
-9. Why should correlation identifiers be preserved across decision, acknowledgment, and execution?
-10. Why should sensitive data be minimized in governance evidence?
-11. How does acknowledgment apply to AI-proposed tool calls?
-12. What additional responsibilities appear when acknowledgment state must survive process restarts?
+- [ ] Distinguish acknowledgment from authorization, policy override, and execution authority.
+- [ ] Design an acknowledgment response that is bound to the intended challenge, actor, operation, reason, and validity period rather than a generic confirmation flag.
+- [ ] Explain why current policy and context may need to be re-evaluated after acknowledgment before execution can proceed.
+- [ ] Demonstrate that rejection, actor mismatch, expiration, replay, or a newly introduced denial still prevents the protected side effect.
+- [ ] Preserve correlated but distinct evidence for decision, acknowledgment, re-evaluation, and execution outcomes.
+- [ ] Explain what audit residue contributes beyond ordinary diagnostics without claiming that an unsigned or mutable store is automatically tamper-proof.
+- [ ] Identify the additional persistence, privacy, and lifecycle responsibilities that appear when acknowledgment and evidence must survive process restarts.
 
 ## Next
 

@@ -1526,24 +1526,17 @@ Then ask:
 
 If the answer is much broader than the original approved operation, narrow the design.
 
-## Review Questions
+## Check Your Understanding
 
-Before moving on, you should be able to answer:
+Before moving on, you should be able to:
 
-1. Why is an allowed decision different from execution authority?
-2. What makes a capability "scoped"?
-3. Why should operation and resource both be bound when the decision was resource-specific?
-4. Why does audience binding matter?
-5. Why should capabilities usually be short-lived?
-6. Why is capability metadata not automatically a secure bearer token?
-7. Why should validation happen near the real side effect?
-8. Why is metadata-only validation weaker than execution-boundary validation?
-9. What problem does bounded-use or replay enforcement solve?
-10. Why can an in-memory use store not prove distributed single-use behavior?
-11. Why should validation failure not broaden authority?
-12. Why does the host still need authentication and authorization?
-13. How can acknowledgment identity be carried forward into capability validation?
-14. How does the capability pattern reduce risk for AI-proposed tool execution?
+- [ ] Explain why an allowed or acknowledged decision is not itself broad execution authority.
+- [ ] Design a narrowly scoped capability bound to the relevant subject, operation, resource, audience, policy identity, acknowledgment, time window, and intended use.
+- [ ] Distinguish metadata inspection from execution-boundary validation and explain why capability metadata is not automatically a secure bearer token.
+- [ ] Demonstrate that an expired, mismatched, revoked, unavailable, or replayed capability cannot silently fall through to the executor.
+- [ ] Explain why capability validation occurs near the real side effect while host authentication, authorization, current resource checks, and operational safety remain separate responsibilities.
+- [ ] Describe what an in-memory bounded-use store can demonstrate and what it cannot prove about distributed or durable single-use behavior.
+- [ ] Evaluate the maximum authority exposed if a capability leaks and narrow the design when that authority exceeds the approved operation.
 
 ## Next
 

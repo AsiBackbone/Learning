@@ -1696,25 +1696,17 @@ Then write tests for:
 
 Only after those tests are trustworthy should you consider connecting the handler to a real external messaging system.
 
-## Review Questions
+## Check Your Understanding
 
-You should now be able to answer:
+You should now be able to:
 
-1. Why is a model-generated tool call a proposal rather than execution authority?
-2. Why should the host own the tool registry?
-3. Which policy-context facts should come from trusted host sources rather than model output?
-4. Why is prompt text not an execution control?
-5. Why are narrow semantic tools safer to govern than broad shell or database tools?
-6. How do explicit decision outcomes improve AI tool handling?
-7. When should acknowledgment pause the flow?
-8. Why should acknowledgment not become a policy override?
-9. What does a scoped capability preserve from the earlier decision?
-10. Why should capability validation occur at the tool execution boundary?
-11. Why should infrastructure secrets remain inside the host tool handler?
-12. What is the difference between capability replay protection and tool idempotency?
-13. How does correlation improve the audit story?
-14. What should happen when governance infrastructure is unavailable?
-15. Which guarantees remain outside the scope of a governed gateway?
+- [ ] Explain why model output remains an untrusted proposal even when the tool name and arguments are syntactically valid.
+- [ ] Identify the host-owned responsibilities for tool registration, argument validation, authoritative context, policy evaluation, credentials, acknowledgment handling, and real-world execution.
+- [ ] Explain why prompt guidance can influence proposals but cannot replace host-side enforcement for consequential tools.
+- [ ] Compose the path from proposal through explicit decision, acknowledgment when required, scoped authority, execution-boundary validation, and host-owned tool invocation.
+- [ ] Demonstrate that unknown tools, invalid arguments, policy denial, acknowledgment failure, capability mismatch, expiration, replay, or unavailable governance dependencies do not silently reach the tool handler.
+- [ ] Distinguish capability replay protection from the idempotency and recovery behavior of the underlying tool.
+- [ ] Explain what the governed gateway makes explicit and which guarantees remain the responsibility of model selection, host security, tool implementation, infrastructure, and application-specific safety controls.
 
 ## Foundational Path Complete
 

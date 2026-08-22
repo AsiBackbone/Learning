@@ -278,6 +278,21 @@ Link to the relevant `AsiBackbone` or `NetCoreApplicationTemplate` implementatio
 
 Where useful, leave readers with unresolved questions or possible experiments.
 
+### Check Your Understanding
+
+Substantive tutorials should normally end with a short **Check Your Understanding** self-assessment.
+
+Keep the checklist capability-based rather than trivia-based. Prefer items that ask whether the learner can explain a boundary, identify responsibility, demonstrate an invariant, compare alternatives, or reason about a failure path.
+
+A useful checklist usually contains four to seven items such as:
+
+- Explain the architectural boundary in your own words.
+- Identify which component owns the decision and which owns the side effect.
+- Demonstrate the important failure path or invariant.
+- Explain when a simpler architecture would be sufficient.
+
+The checklist is reflective guidance, not a quiz, score, certification, or claim that one implementation is the only correct solution.
+
 Not every tutorial must contain every section, but contributions should prioritize clarity and learning value.
 
 ### Apply Usage Boundaries and ADR Links Selectively
@@ -323,6 +338,23 @@ A good lab should clearly state:
 - Constraints
 - Expected outcome
 - How to validate the result
+
+Labs should also define **architectural acceptance criteria** so learners can distinguish a program that merely runs from one that preserves the boundary the exercise is intended to teach.
+
+Use [docs/templates/lab-acceptance-criteria-template.md](docs/templates/lab-acceptance-criteria-template.md) as the reusable authoring starting point. Specialize the criteria to the lab rather than copying them mechanically.
+
+Useful criteria commonly verify that:
+
+- The required architectural boundary is demonstrable.
+- A prohibited execution or authority path is absent.
+- Relevant decision or lifecycle evidence is preserved.
+- At least one important failure path is observable.
+- The architectural invariant is verified by a test, deterministic observation, or other explicit evidence.
+- The learner can explain a meaningful tradeoff or alternative.
+
+Acceptance criteria should describe **architectural outcomes**, not prescribe one code shape when multiple implementations can preserve the same invariant.
+
+Existing automated tests may contribute evidence, but passing tests should not be treated as the only definition of successful learning.
 
 Where solutions are included, consider keeping them separate from the exercise so learners can attempt the problem first.
 
