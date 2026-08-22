@@ -6,15 +6,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - '**/*.cs'
-      - '**/*.csproj'
-      - '**/*.sln'
-      - '**/*.slnx'
-      - '**/*.props'
-      - '**/*.targets'
-      - 'global.json'
-      - '.github/workflows/codeql.yml'
 
   push:
     branches:
