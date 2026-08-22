@@ -1,0 +1,71 @@
+name: CodeQL Analysis
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/*.cs'
+      - '**/*.csproj'
+      - '**/*.sln'
+      - '**/*.slnx'
+      - '**/*.props'
+      - '**/*.targets'
+      - 'global.json'
+      - '.github/workflows/codeql.yml'
+
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.cs'
+      - '**/*.csproj'
+      - '**/*.sln'
+      - '**/*.slnx'
+      - '**/*.props'
+      - '**/*.targets'
+      - 'global.json'
+      - '.github/workflows/codeql.yml'
+
+  schedule:
+    # Periodic analysis can surface newly modeled findings even when source is idle.
+    - cron: '17 7 * * 1'
+
+# Deny all GitHub token permissions by default.
+permissions: {}
+
+concurrency:
+  group: codeql-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze-csharp:
+    name: Analyze C# with CodeQL
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4.37.8
+        with:
+          languages: csharp
+          # C# no-build analysis keeps this educational-repository scan modest and
+          # includes source that is not part of the sample solution, such as tools/*.cs.
+          build-mode: none
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4.37.8
+
+# CodeQL findings are review signals. A successful scan is not evidence that the
+# repository or any consuming application is secure, compliant, or vulnerability-free.
