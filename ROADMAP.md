@@ -773,7 +773,7 @@ candidate decisions before rollout while preserving a strict no-execution bounda
 
 ## Status
 
-**In progress — governed proposal, schema-validation, authoritative-context, scoped-execution, and experimental multi-agent boundaries established**
+**In progress — governed proposal, schema-validation, authoritative-context, scoped-execution, multi-tool recovery, and experimental multi-agent boundaries established**
 
 ## Goal
 
@@ -787,10 +787,10 @@ Build beyond the initial Governed AI Tool Gateway without turning Learning into 
 * [x] Host-side context reconstruction. ([#73](https://github.com/AsiBackbone/Learning/issues/73))
 * [x] Model-provided context versus authoritative context. ([#73](https://github.com/AsiBackbone/Learning/issues/73))
 * [x] Capability-scoped tool execution — [Governed AI Tool Gateway](docs/tutorials/governed-ai-tool-gateway.md).
-* [ ] Multi-tool workflows.
+* [x] Multi-tool workflows — [Governed Multi-Tool Workflows and Recovery Boundaries](docs/ai-integration/governed-multi-tool-workflows-and-recovery-boundaries.md). ([#125](https://github.com/AsiBackbone/Learning/issues/125))
 * [x] Human acknowledgment for consequential actions — [Governed AI Tool Gateway](docs/tutorials/governed-ai-tool-gateway.md).
 * [ ] Handling model uncertainty.
-* [ ] AI proposal rejection and recovery.
+* [x] AI proposal rejection and recovery — [Governed Multi-Tool Workflows and Recovery Boundaries](docs/ai-integration/governed-multi-tool-workflows-and-recovery-boundaries.md). ([#125](https://github.com/AsiBackbone/Learning/issues/125))
 * [x] Tool execution receipts — [Governed AI Tool Gateway](docs/tutorials/governed-ai-tool-gateway.md).
 * [x] Prompt injection versus execution controls. ([#73](https://github.com/AsiBackbone/Learning/issues/73))
 * [x] Credential ownership — [AI Integration](docs/ai-integration/index.md).
@@ -798,9 +798,9 @@ Build beyond the initial Governed AI Tool Gateway without turning Learning into 
 * [x] Multi-agent proposal flows. ([#75](https://github.com/AsiBackbone/Learning/issues/75))
 * [x] Agent-to-agent governed execution as experimental material. ([#75](https://github.com/AsiBackbone/Learning/issues/75))
 
-Multi-tool workflow orchestration, model-uncertainty handling, broader proposal
-recovery, and agent-memory governance remain open. Current material touches some
-of those concerns but does not yet treat them as complete standalone subjects.
+Multi-tool workflow orchestration and proposal rejection/recovery are now covered
+through a dedicated tutorial. Model-uncertainty handling and agent-memory governance
+remain open standalone subjects.
 
 The central rule remains:
 

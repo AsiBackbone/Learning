@@ -12,7 +12,7 @@ The central principle is:
 
 This separation allows AI inference to participate in an application workflow without treating model output as authorization, policy, or execution authority.
 
-> **Section status:** The foundational AI gateway tutorial, the focused proposal-boundary tutorial, and the deterministic/probabilistic policy-input bridge are published; additional focused section pages are planned.
+> **Section status:** The foundational AI gateway tutorial, the focused proposal-boundary tutorial, the deterministic/probabilistic policy-input bridge, and the multi-tool workflow/recovery tutorial are published; additional focused section pages are planned.
 
 ## Proposal Is Not Execution
 
@@ -97,6 +97,12 @@ This tutorial isolates the proposal-translation boundary: untrusted model output
 [Deterministic and Probabilistic Inputs in Policy Evaluation](../governance/deterministic-and-probabilistic-inputs-in-policy-evaluation.md)
 
 This advanced tutorial distinguishes host-authoritative deterministic facts from model-derived or statistical signals and shows how provenance, uncertainty, confidence, calibration, threshold policy, freshness, and host-owned execution remain explicit.
+
+### Multi-Step AI Composition: Governed Multi-Tool Workflows and Recovery Boundaries
+
+[Governed Multi-Tool Workflows and Recovery Boundaries](governed-multi-tool-workflows-and-recovery-boundaries.md)
+
+This advanced tutorial extends the single-proposal gateway into multi-step execution: whole-plan validation without whole-plan authorization, current per-step policy evaluation, step-scoped authority, result observation, drift handling, bounded replanning, partial failure, idempotency, compensation, cancellation, and recovery.
 
 ## Host-Owned Tool Registry
 
@@ -351,7 +357,7 @@ Real external execution can be introduced after the boundaries are understood an
 
 ## AI Integration Topics
 
-Future material in this section may examine:
+Current and future material in this section examines:
 
 * Tool and function calling
 * Tool registries and allowlists
@@ -403,7 +409,7 @@ Production AI-assisted systems remain responsible for their own threat models, a
 
 ## Current Status
 
-The foundational AI integration tutorial, the focused AI proposal-boundary tutorial, and the deterministic/probabilistic policy-input bridge are published.
+The foundational AI integration tutorial, the focused AI proposal-boundary tutorial, the deterministic/probabilistic policy-input bridge, and the multi-tool workflow/recovery tutorial are published.
 
 Future work will expand this section through executable companion samples, hands-on labs, threat-model exercises, alternative gateway designs, and additional agent and tool-execution scenarios.
 
@@ -414,6 +420,10 @@ For the focused model-output acceptance boundary, continue with:
 For the probabilistic model-signal boundary, continue with:
 
 [Deterministic and Probabilistic Inputs in Policy Evaluation](../governance/deterministic-and-probabilistic-inputs-in-policy-evaluation.md)
+
+For multi-step execution, replanning, and recovery boundaries, continue with:
+
+[Governed Multi-Tool Workflows and Recovery Boundaries](governed-multi-tool-workflows-and-recovery-boundaries.md)
 
 For the complete end-to-end execution path, continue with:
 
