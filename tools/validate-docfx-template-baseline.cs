@@ -168,24 +168,40 @@ static class DocFxTemplateBaselineValidator
                 $"Missing DocFX template baseline metadata at '{BaselineRelativePath}'.");
         }
 
-        TemplateBaseline? baseline = JsonSerializer.Deserialize<TemplateBaseline>(
-            File.ReadAllText(path),
-            new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+        using JsonDocument document = JsonDocument.Parse(File.ReadAllText(path));
+        JsonElement root = document.RootElement;
 
-        if (baseline is null ||
-            string.IsNullOrWhiteSpace(baseline.Template) ||
-            string.IsNullOrWhiteSpace(baseline.DocFxVersion) ||
-            string.IsNullOrWhiteSpace(baseline.UpstreamRelease) ||
-            string.IsNullOrWhiteSpace(baseline.LocalOverride))
+        if (!TryReadNonEmptyString(root, "template", out string? template) ||
+            !TryReadNonEmptyString(root, "docfxVersion", out string? docFxVersion) ||
+            !TryReadNonEmptyString(root, "upstreamRelease", out string? upstreamRelease) ||
+            !TryReadNonEmptyString(root, "localOverride", out string? localOverride))
         {
             throw new InvalidOperationException(
                 $"DocFX template baseline metadata in '{BaselineRelativePath}' is incomplete.");
         }
 
-        return baseline;
+        return new TemplateBaseline(
+            template!,
+            docFxVersion!,
+            upstreamRelease!,
+            localOverride!);
+    }
+
+    private static bool TryReadNonEmptyString(
+        JsonElement element,
+        string propertyName,
+        out string? value)
+    {
+        value = null;
+
+        if (!element.TryGetProperty(propertyName, out JsonElement property) ||
+            property.ValueKind != JsonValueKind.String)
+        {
+            return false;
+        }
+
+        value = property.GetString();
+        return !string.IsNullOrWhiteSpace(value);
     }
 
     private static void ValidateTemplateComment(
