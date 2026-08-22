@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace PolicySimulationHarness.Tests;
+namespace PolicySimulationHarnessSample.Tests;
 
 public sealed class PolicySimulationHarnessTests
 {
