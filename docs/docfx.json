@@ -6,6 +6,7 @@
           "index.md",
           "**/toc.yml",
           "advanced/**/*.md",
+          "articles/**/*.md",
           "ai-integration/**/*.md",
           "architecture/**/*.md",
           "aspnetcore/**/*.md",

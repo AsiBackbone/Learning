@@ -4,6 +4,9 @@
 - name: Getting Started
   href: getting-started/index.md
 
+- name: Articles
+  href: articles/index.md
+
 - name: Architecture
   href: architecture/index.md
 
