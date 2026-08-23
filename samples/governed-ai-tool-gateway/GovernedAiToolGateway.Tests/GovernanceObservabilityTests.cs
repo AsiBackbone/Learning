@@ -5,6 +5,52 @@ namespace GovernedAiToolGateway.Tests;
 public sealed class GovernanceObservabilityTests
 {
     [Fact]
+    public void TraceCollectorScopesActivitiesToCorrelationId()
+    {
+        const string firstCorrelationId =
+            "corr-test-collector-first";
+        const string secondCorrelationId =
+            "corr-test-collector-second";
+
+        using var firstCollector =
+            new GovernanceTraceCollector(firstCorrelationId);
+        using var secondCollector =
+            new GovernanceTraceCollector(secondCorrelationId);
+
+        using (var firstActivity =
+               GovernanceObservabilityInstrumentation.StartStage(
+                   "executor.invoke",
+                   firstCorrelationId))
+        {
+            Assert.NotNull(firstActivity);
+        }
+
+        using (var secondActivity =
+               GovernanceObservabilityInstrumentation.StartStage(
+                   "host.governance-gateway",
+                   secondCorrelationId))
+        {
+            Assert.NotNull(secondActivity);
+        }
+
+        GovernanceObservedActivity firstObserved =
+            Assert.Single(firstCollector.Snapshot());
+        GovernanceObservedActivity secondObserved =
+            Assert.Single(secondCollector.Snapshot());
+
+        Assert.Equal("executor.invoke", firstObserved.Name);
+        Assert.Equal(
+            firstCorrelationId,
+            firstObserved.Tags[
+                GovernanceObservabilityInstrumentation.CorrelationIdTagName]);
+        Assert.Equal("host.governance-gateway", secondObserved.Name);
+        Assert.Equal(
+            secondCorrelationId,
+            secondObserved.Tags[
+                GovernanceObservabilityInstrumentation.CorrelationIdTagName]);
+    }
+
+    [Fact]
     public async Task AllowedProposalTraceReachesExecutor()
     {
         GovernanceObservabilityRun run =
