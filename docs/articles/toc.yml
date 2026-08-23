@@ -1,2 +1,4 @@
 - name: Articles
   href: index.md
+- name: Your Authorization Check Runs Too Late
+  href: 2026/authorization-check-runs-too-late.md

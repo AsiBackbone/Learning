@@ -27,6 +27,10 @@ static class MetadataValidator
     {
         new("index.html", SiteRoot.AbsoluteUri, Article: false),
         new("articles/index.html", new Uri(SiteRoot, "articles/").AbsoluteUri, Article: false),
+        new(
+            "articles/2026/authorization-check-runs-too-late.html",
+            new Uri(SiteRoot, "articles/2026/authorization-check-runs-too-late.html").AbsoluteUri,
+            Article: true),
         new("aspnetcore/index.html", new Uri(SiteRoot, "aspnetcore/").AbsoluteUri, Article: false),
         new(
             "tutorials/decision-before-execution.html",

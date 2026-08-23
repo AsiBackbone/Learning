@@ -20,9 +20,13 @@ The Learning site is the canonical publication host. Cross-posted copies should 
 
 ## 2026
 
-_No standalone Articles publications have been released on this surface yet._
+### [Your Authorization Check Runs Too Late](2026/authorization-check-runs-too-late.md)
 
-As articles are published, this archive will list them newest first with the title, author, publication date, summary, and permanent article link.
+**Christopher D. Cavell** · **August 23, 2026**
+
+Authorization can succeed while resource-state or workflow rules still block execution; resolve that decision before protected side effects begin.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/authorization-check-runs-too-late.html`
 
 ## Articles and Tutorials Serve Different Jobs
 
