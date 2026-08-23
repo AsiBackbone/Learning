@@ -1,3 +1,5 @@
+![Learning social image](https://raw.githubusercontent.com/AsiBackbone/Learning/main/docs/images/asibackbone-social.png)
+
 # ASI Backbone Learning
 
 [![Documentation Validation](https://github.com/AsiBackbone/Learning/actions/workflows/docs-validation.yml/badge.svg?branch=main)](https://github.com/AsiBackbone/Learning/actions/workflows/docs-validation.yml)
