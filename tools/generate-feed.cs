@@ -26,6 +26,7 @@ static class FeedGenerator
     private static readonly Uri SiteRoot = new("https://asibackbone.github.io/Learning/");
     private static readonly Uri FeedUri = new(SiteRoot, "feed.xml");
     private static readonly Uri SocialImageUri = new(SiteRoot, "images/asibackbone-social.png");
+    private static readonly Uri FeedImageUri = new(SiteRoot, "images/asibackbone-feed.png");
     private const string AtomNamespace = "http://www.w3.org/2005/Atom";
     private const string DublinCoreNamespace = "http://purl.org/dc/elements/1.1/";
     private const string MediaNamespace = "http://search.yahoo.com/mrss/";
@@ -174,10 +175,39 @@ static class FeedGenerator
             namespaces.AddNamespace("atom", AtomNamespace);
             namespaces.AddNamespace("media", MediaNamespace);
 
+            XmlNode? channelImage =
+                document.SelectSingleNode("/rss/channel/image");
+
             XmlNode? publishedOnlyItem =
                 document.SelectSingleNode("/rss/channel/item[title='Published only']");
             XmlNode? updatedItem =
                 document.SelectSingleNode("/rss/channel/item[title='Published and updated']");
+
+            if (channelImage is null ||
+                !string.Equals(
+                    channelImage.SelectSingleNode("url")?.InnerText,
+                    FeedImageUri.AbsoluteUri,
+                    StringComparison.Ordinal) ||
+                !string.Equals(
+                    channelImage.SelectSingleNode("title")?.InnerText,
+                    "ASI Backbone Learning",
+                    StringComparison.Ordinal) ||
+                !string.Equals(
+                    channelImage.SelectSingleNode("link")?.InnerText,
+                    SiteRoot.AbsoluteUri,
+                    StringComparison.Ordinal) ||
+                !string.Equals(
+                    channelImage.SelectSingleNode("width")?.InnerText,
+                    "144",
+                    StringComparison.Ordinal) ||
+                !string.Equals(
+                    channelImage.SelectSingleNode("height")?.InnerText,
+                    "144",
+                    StringComparison.Ordinal))
+            {
+                return SelfTestFailure(
+                    "the RSS channel did not emit the expected 144x144 feed image metadata.");
+            }
 
             if (publishedOnlyItem is null || updatedItem is null)
             {
@@ -519,11 +549,11 @@ static class FeedGenerator
             lastBuildDate.ToUniversalTime().ToString("R", CultureInfo.InvariantCulture));
 
         writer.WriteStartElement("image");
-        writer.WriteElementString(
-            "url",
-            new Uri(SiteRoot, "images/asibackbone-icon-50.png").AbsoluteUri);
+        writer.WriteElementString("url", FeedImageUri.AbsoluteUri);
         writer.WriteElementString("title", "ASI Backbone Learning");
         writer.WriteElementString("link", SiteRoot.AbsoluteUri);
+        writer.WriteElementString("width", "144");
+        writer.WriteElementString("height", "144");
         writer.WriteEndElement();
 
         writer.WriteStartElement("atom", "link", AtomNamespace);
