@@ -1,0 +1,45 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use Architecture & Patterns for technically grounded discussion of architectural approaches, design tradeoffs, alternative patterns, governance models, and implementation choices.
+
+        Architectural disagreement is welcome. Focus on the problem, constraints, tradeoffs, and evidence rather than treating any pattern as universally correct.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Architectural problem or decision
+      description: What problem, boundary, or design decision should the discussion examine?
+      placeholder: Describe the architectural situation and why it matters.
+    validations:
+      required: true
+
+  - type: textarea
+    id: approach
+    attributes:
+      label: Proposed approach or pattern
+      description: What approach are you proposing, questioning, comparing, or critiquing?
+      placeholder: Explain the pattern or design direction clearly enough for others to evaluate it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints and assumptions
+      description: What security, operational, organizational, performance, regulatory, or implementation constraints shape the decision?
+
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Tradeoffs and alternatives
+      description: What benefits, costs, failure modes, or competing approaches should be considered?
+    validations:
+      required: true
+
+  - type: input
+    id: references
+    attributes:
+      label: Related material
+      description: Link relevant Learning pages, samples, implementation repositories, standards, or external references when useful.
