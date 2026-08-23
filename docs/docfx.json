@@ -48,6 +48,8 @@
       "_structuredDataPublisherName": "ASI Backbone",
       "_structuredDataPublisherAlternateName": "Accountable Systems Infrastructure (ASI) Backbone",
       "_structuredDataPublisherUrl": "https://github.com/AsiBackbone",
+      "_socialImageUrl": "https://asibackbone.github.io/Learning/images/asibackbone-social.png",
+      "_socialImageAlt": "ASI Backbone Learning — practical .NET architecture, security, and governed execution",
       "_appFooter": "ASI Backbone Learning · <a href=\"/Learning/feed.xml\">Subscribe via RSS</a> · Made with <a href=\"https://dotnet.github.io/docfx\">DocFX</a>"
     }
   }

@@ -25,6 +25,7 @@ static class FeedGenerator
 {
     private static readonly Uri SiteRoot = new("https://asibackbone.github.io/Learning/");
     private static readonly Uri FeedUri = new(SiteRoot, "feed.xml");
+    private static readonly Uri SocialImageUri = new(SiteRoot, "images/asibackbone-social.png");
     private const string AtomNamespace = "http://www.w3.org/2005/Atom";
     private const string DublinCoreNamespace = "http://purl.org/dc/elements/1.1/";
     private const string MediaNamespace = "http://search.yahoo.com/mrss/";
@@ -171,6 +172,7 @@ static class FeedGenerator
 
             var namespaces = new XmlNamespaceManager(document.NameTable);
             namespaces.AddNamespace("atom", AtomNamespace);
+            namespaces.AddNamespace("media", MediaNamespace);
 
             XmlNode? publishedOnlyItem =
                 document.SelectSingleNode("/rss/channel/item[title='Published only']");
@@ -180,6 +182,21 @@ static class FeedGenerator
             if (publishedOnlyItem is null || updatedItem is null)
             {
                 return SelfTestFailure("expected RSS items were not generated.");
+            }
+
+            XmlNode? thumbnail =
+                publishedOnlyItem.SelectSingleNode("media:thumbnail", namespaces);
+
+            if (thumbnail is null ||
+                !string.Equals(
+                    thumbnail.Attributes?["url"]?.Value,
+                    SocialImageUri.AbsoluteUri,
+                    StringComparison.Ordinal) ||
+                !string.Equals(thumbnail.Attributes?["width"]?.Value, "1200", StringComparison.Ordinal) ||
+                !string.Equals(thumbnail.Attributes?["height"]?.Value, "630", StringComparison.Ordinal))
+            {
+                return SelfTestFailure(
+                    "an RSS item did not emit the expected social thumbnail metadata.");
             }
 
             if (publishedOnlyItem.SelectSingleNode("atom:updated", namespaces) is not null)
@@ -547,9 +564,9 @@ static class FeedGenerator
                 article.Author);
 
             writer.WriteStartElement("media", "thumbnail", MediaNamespace);
-            writer.WriteAttributeString(
-                "url",
-                new Uri(SiteRoot, "images/asibackbone-icon-50.png").AbsoluteUri);
+            writer.WriteAttributeString("url", SocialImageUri.AbsoluteUri);
+            writer.WriteAttributeString("width", "1200");
+            writer.WriteAttributeString("height", "630");
             writer.WriteEndElement();
             writer.WriteEndElement();
         }

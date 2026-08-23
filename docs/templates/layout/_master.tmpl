@@ -19,6 +19,27 @@
       {{#_description}}<meta name="description" content="{{_description}}">{{/_description}}
       {{#description}}<meta name="description" content="{{description}}">{{/description}}
       {{#_canonicalUrl}}<link rel="canonical" href="{{_canonicalUrl}}">{{/_canonicalUrl}}
+      <meta property="og:site_name" content="ASI Backbone Learning">
+      {{#feed}}<meta property="og:type" content="article">{{/feed}}{{^feed}}<meta property="og:type" content="website">{{/feed}}
+      <meta property="og:title" content="{{#title}}{{title}}{{/title}}{{^title}}{{_appTitle}}{{/title}}">
+      {{#description}}<meta property="og:description" content="{{description}}">{{/description}}
+      {{^description}}{{#_description}}<meta property="og:description" content="{{_description}}">{{/_description}}{{/description}}
+      {{#_canonicalUrl}}<meta property="og:url" content="{{_canonicalUrl}}">{{/_canonicalUrl}}
+      {{#_socialImageUrl}}
+      <meta property="og:image" content="{{_socialImageUrl}}">
+      <meta property="og:image:type" content="image/png">
+      <meta property="og:image:width" content="1200">
+      <meta property="og:image:height" content="630">
+      {{#_socialImageAlt}}<meta property="og:image:alt" content="{{_socialImageAlt}}">{{/_socialImageAlt}}
+      {{/_socialImageUrl}}
+      {{#_publicationPublishedIso}}<meta property="article:published_time" content="{{_publicationPublishedIso}}">{{/_publicationPublishedIso}}
+      {{#_publicationUpdatedIso}}<meta property="article:modified_time" content="{{_publicationUpdatedIso}}">{{/_publicationUpdatedIso}}
+      <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:title" content="{{#title}}{{title}}{{/title}}{{^title}}{{_appTitle}}{{/title}}">
+      {{#description}}<meta name="twitter:description" content="{{description}}">{{/description}}
+      {{^description}}{{#_description}}<meta name="twitter:description" content="{{_description}}">{{/_description}}{{/description}}
+      {{#_socialImageUrl}}<meta name="twitter:image" content="{{_socialImageUrl}}">{{/_socialImageUrl}}
+      {{#_socialImageAlt}}<meta name="twitter:image:alt" content="{{_socialImageAlt}}">{{/_socialImageAlt}}
       {{#_structuredDataJson}}<script type="application/ld+json">{{{_structuredDataJson}}}</script>{{/_structuredDataJson}}
       <link rel="icon" href="{{_rel}}{{{_appFaviconPath}}}{{^_appFaviconPath}}favicon.ico{{/_appFaviconPath}}">
       <link rel="alternate" type="application/rss+xml" title="ASI Backbone Learning" href="/Learning/feed.xml">

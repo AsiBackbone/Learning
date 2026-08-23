@@ -10,6 +10,8 @@ return MetadataValidator.Run();
 static class MetadataValidator
 {
     private static readonly Uri SiteRoot = new("https://asibackbone.github.io/Learning/");
+    private static readonly Uri FeedUri = new(SiteRoot, "feed.xml");
+    private static readonly Uri SocialImageUri = new(SiteRoot, "images/asibackbone-social.png");
 
     private static readonly Regex CanonicalRegex = new(
         "<link\\s+rel=\\\"canonical\\\"\\s+href=\\\"(?<href>[^\\\"]+)\\\">",
@@ -17,6 +19,22 @@ static class MetadataValidator
 
     private static readonly Regex DescriptionRegex = new(
         "<meta\\s+name=\\\"description\\\"\\s+content=\\\"[^\\\"]*\\\">",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static readonly Regex RssAutodiscoveryRegex = new(
+        "<link\\s+rel=\"alternate\"\\s+type=\"application/rss\\+xml\"\\s+title=\"ASI Backbone Learning\"\\s+href=\"(?<href>[^\"]+)\">",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static readonly Regex OpenGraphUrlRegex = new(
+        "<meta\\s+property=\"og:url\"\\s+content=\"(?<href>[^\"]+)\">",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static readonly Regex OpenGraphImageRegex = new(
+        "<meta\\s+property=\"og:image\"\\s+content=\"(?<href>[^\"]+)\">",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static readonly Regex TwitterCardRegex = new(
+        "<meta\\s+name=\"twitter:card\"\\s+content=\"summary_large_image\">",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     private static readonly Regex JsonLdRegex = new(
@@ -70,6 +88,13 @@ static class MetadataValidator
         }
 
         var errors = new List<string>();
+
+        string socialImagePath = Path.Combine(outputRoot, "images", "asibackbone-social.png");
+        if (!File.Exists(socialImagePath))
+        {
+            errors.Add("images/asibackbone-social.png: expected social preview image was not found.");
+        }
+
         int pageCount = ValidateCanonicalUrls(outputRoot, errors);
 
         foreach (ExpectedPage page in RepresentativePages)
@@ -149,6 +174,37 @@ static class MetadataValidator
 
         string html = File.ReadAllText(path);
         ExpectCount(page.Path, "meta description", DescriptionRegex.Matches(html).Count, 1, errors);
+
+        MatchCollection rssLinks = RssAutodiscoveryRegex.Matches(html);
+        ExpectCount(page.Path, "RSS autodiscovery link", rssLinks.Count, 1, errors);
+        if (rssLinks.Count == 1 &&
+            !string.Equals(rssLinks[0].Groups["href"].Value, FeedUri.AbsolutePath, StringComparison.Ordinal))
+        {
+            errors.Add($"{page.Path}: RSS autodiscovery URL must be '{FeedUri.AbsolutePath}'.");
+        }
+
+        MatchCollection openGraphUrls = OpenGraphUrlRegex.Matches(html);
+        ExpectCount(page.Path, "Open Graph URL", openGraphUrls.Count, 1, errors);
+        if (openGraphUrls.Count == 1 &&
+            !string.Equals(openGraphUrls[0].Groups["href"].Value, page.CanonicalUrl, StringComparison.Ordinal))
+        {
+            errors.Add($"{page.Path}: Open Graph URL must be '{page.CanonicalUrl}'.");
+        }
+
+        MatchCollection openGraphImages = OpenGraphImageRegex.Matches(html);
+        ExpectCount(page.Path, "Open Graph image", openGraphImages.Count, 1, errors);
+        if (openGraphImages.Count == 1 &&
+            !string.Equals(openGraphImages[0].Groups["href"].Value, SocialImageUri.AbsoluteUri, StringComparison.Ordinal))
+        {
+            errors.Add($"{page.Path}: Open Graph image must be '{SocialImageUri.AbsoluteUri}'.");
+        }
+
+        ExpectCount(
+            page.Path,
+            "Twitter summary-large-image card",
+            TwitterCardRegex.Matches(html).Count,
+            1,
+            errors);
 
         MatchCollection canonicals = CanonicalRegex.Matches(html);
         ExpectCount(page.Path, "canonical link", canonicals.Count, 1, errors);
