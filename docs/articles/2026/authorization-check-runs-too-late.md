@@ -10,7 +10,9 @@ feed: true
 # Your Authorization Check Runs Too Late
 
 **Pattern classification:** General learning material
+
 **Difficulty:** Intermediate
+
 **Prerequisites:** None
 
 An administrator sends a request to disable an account.
@@ -340,7 +342,7 @@ Moving the decision earlier does not freeze the facts used to make it. In this e
 
 For resource state, a common approach is to carry a version, ETag, row version, or other concurrency token into the execution boundary and require the executor's write to succeed only against that expected version. For externally owned policy facts, capture whatever freshness signal that source can provide: a policy-version stamp, lease, bounded cache lifetime, change token, or an execution-time re-query. The sample re-fetches the operations-policy snapshot before recording the final decision. If the version changed, the host preserves the version originally evaluated in `OperationsPolicyVersion`, captures the newer version in `SupersedingPolicyVersion`, and sends that context back through the same evaluator. The evaluator returns `Deferred`; the host does not manufacture a separate lifecycle outcome.
 
-The sample deliberately defers instead of overwriting the original policy facts with the newer snapshot and immediately deciding again. That keeps the recorded facts tied to the facts actually evaluated, records which newer policy version caused the staleness detection, and avoids turning one request into an unbounded re-evaluation loop. A later attempt can assemble a fresh context from the newer policy snapshot.
+The sample deliberately defers instead of overwriting the original policy facts with the newer snapshot and immediately deciding again. That keeps the recorded facts tied to the facts actually evaluated, records which newer policy version caused the staleness detection, and avoids turning one request into an unbounded re-evaluation loop. A later attempt can assemble a fresh context from the newer policy snapshot. How that attempt is initiated is host-owned: use bounded retry with backoff when automatic retry is safe, or require explicit re-submission when it is not. Each attempt should assemble fresh context, and the host should cap retries so repeated policy churn cannot become an unbounded loop.
 
 That placement is a deliberate trade-off. Recording after the re-fetch keeps the durable evidence aligned with the final decision the host intends to honor, but it leaves a residual window between that freshness check and the irreversible side effect. The executor's `expectedResourceVersion` check is still the last line of defense for account-row concurrency; an operation that also requires stronger policy freshness should repeat or enforce the policy-version check at the execution gateway immediately before the side effect.
 
