@@ -1,0 +1,43 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use Tutorial Ideas to propose new tutorials, labs, examples, learning paths, or educational topics for ASI Backbone Learning.
+
+        A good proposal starts with the learning problem before prescribing a particular product or implementation.
+
+  - type: input
+    id: topic
+    attributes:
+      label: Proposed topic
+      description: What should the tutorial, lab, example, or learning path teach?
+      placeholder: "Example: Testing policy decisions with decision tables"
+    validations:
+      required: true
+
+  - type: textarea
+    id: learning-goal
+    attributes:
+      label: Learning goal
+      description: What should a reader be able to understand, explain, or do after completing it?
+      placeholder: Describe the architectural lesson rather than only the feature to implement.
+    validations:
+      required: true
+
+  - type: textarea
+    id: audience
+    attributes:
+      label: Audience and prerequisites
+      description: Who is this for, and what should they already know?
+
+  - type: textarea
+    id: outline
+    attributes:
+      label: Suggested scope or example
+      description: What scenario, sample, failure mode, comparison, or hands-on exercise could make the lesson concrete?
+
+  - type: textarea
+    id: value
+    attributes:
+      label: Why this belongs in Learning
+      description: How would this topic strengthen the existing curriculum or address a recurring learning need?

@@ -127,16 +127,19 @@ Production systems remain responsible for their own authentication, authorizatio
 
 Use the canonical project surfaces for deeper information rather than treating the root README as the full reference manual:
 
+**Questions and ideas → [Discussions](https://github.com/AsiBackbone/Learning/discussions) · Concrete work → [Issues](https://github.com/AsiBackbone/Learning/issues) · Changes → [Pull Requests](https://github.com/AsiBackbone/Learning/pulls)**
+
 - **Published documentation:** [asibackbone.github.io/Learning](https://asibackbone.github.io/Learning/)
 - **Contribution guidance:** [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Project status and planned work:** [ROADMAP.md](ROADMAP.md)
-- **Architecture discussion:** [ASI Backbone Organization Discussions](https://github.com/orgs/AsiBackbone/discussions)
+- **Learning discussions:** [AsiBackbone/Learning Discussions](https://github.com/AsiBackbone/Learning/discussions)
+- **Organization-wide discussion:** [ASI Backbone Organization Discussions](https://github.com/orgs/AsiBackbone/discussions)
 - **Governance:** [GOVERNANCE.md](GOVERNANCE.md)
 - **Security policy:** [SECURITY.md](SECURITY.md)
 - **Citation metadata:** [CITATION.cff](CITATION.cff)
 - **Licensing details:** [LICENSING.md](LICENSING.md)
 
-Issues are best used for concrete repository work; Discussions are better suited to exploratory architecture questions, tutorial proposals, alternatives, and design debates.
+Issues are best used for concrete repository work; Learning Discussions are better suited to exploratory architecture questions, tutorial proposals, alternatives, design debates, and community examples.
 
 ## Project Status
 

@@ -1,0 +1,36 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use Q&A for questions about .NET architecture, governed execution, security, AI integration, tutorials, samples, and other Learning repository topics.
+
+        For a confirmed defect or clearly scoped implementation change, please open an Issue instead.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What are you trying to understand or decide?
+      placeholder: Describe the question as specifically as you can.
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What system, tutorial, sample, constraint, or architectural situation is relevant?
+      placeholder: Include enough context for others to reason about the question.
+
+  - type: textarea
+    id: attempts
+    attributes:
+      label: What have you considered or tried?
+      description: Share approaches, documentation, experiments, or alternatives you have already considered.
+
+  - type: input
+    id: related-material
+    attributes:
+      label: Related Learning material
+      description: Link a tutorial, sample, lab, documentation page, or repository path when relevant.
+      placeholder: https://asibackbone.github.io/Learning/...

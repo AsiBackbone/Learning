@@ -1,0 +1,42 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use Show and tell to share projects, experiments, adaptations, diagrams, or implementations inspired by concepts and patterns from ASI Backbone Learning.
+
+        Sharing an implementation does not make it a canonical ASI Backbone pattern. Please describe what you changed, learned, and would like feedback on.
+
+  - type: textarea
+    id: project
+    attributes:
+      label: What did you build or try?
+      description: Describe the project, experiment, adaptation, diagram, or implementation.
+      placeholder: Explain the problem you were addressing and what you created.
+    validations:
+      required: true
+
+  - type: textarea
+    id: learning-connection
+    attributes:
+      label: Connection to Learning
+      description: Which Learning concept, tutorial, sample, lab, or architectural pattern influenced the work?
+    validations:
+      required: true
+
+  - type: input
+    id: link
+    attributes:
+      label: Project or demo link
+      description: Provide a public repository, demo, article, diagram, or other reference when available.
+
+  - type: textarea
+    id: lessons
+    attributes:
+      label: Lessons and tradeoffs
+      description: What worked, what did not, and what architectural tradeoffs did you encounter?
+
+  - type: textarea
+    id: feedback
+    attributes:
+      label: Feedback wanted
+      description: What would you most like the community to review, question, or compare?

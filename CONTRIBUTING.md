@@ -89,7 +89,7 @@ Use **Issues** for concrete work such as:
 - DocFX problems
 - Clearly scoped enhancements
 
-Use [**ASI Backbone Organization Discussions**](https://github.com/orgs/AsiBackbone/discussions) for broader or exploratory topics such as:
+Use [**Learning Discussions**](https://github.com/AsiBackbone/Learning/discussions) for broader or exploratory topics such as:
 
 - Architecture questions
 - Tutorial proposals
@@ -98,6 +98,15 @@ Use [**ASI Backbone Organization Discussions**](https://github.com/orgs/AsiBackb
 - "How would you model this?" questions
 - Community learning ideas
 - Topics that may eventually become tutorials or labs
+
+Choose the category that best matches the conversation:
+
+- **Q&A** — questions about .NET architecture, governed execution, security, AI integration, tutorials, samples, and other Learning topics.
+- **Architecture & Patterns** — architectural approaches, design tradeoffs, alternative patterns, governance models, and implementation debates.
+- **Tutorial Ideas** — proposals for tutorials, labs, examples, learning paths, or future educational material.
+- **Show and tell** — projects, experiments, adaptations, diagrams, or implementations inspired by Learning concepts and patterns.
+
+Use [**ASI Backbone Organization Discussions**](https://github.com/orgs/AsiBackbone/discussions) when a topic genuinely spans multiple ASI Backbone repositories or concerns the organization as a whole.
 
 A useful flow is:
 
