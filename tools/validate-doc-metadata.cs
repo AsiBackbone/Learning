@@ -26,6 +26,7 @@ static class MetadataValidator
     private static readonly ExpectedPage[] RepresentativePages =
     {
         new("index.html", SiteRoot.AbsoluteUri, Article: false),
+        new("articles/index.html", new Uri(SiteRoot, "articles/").AbsoluteUri, Article: false),
         new("aspnetcore/index.html", new Uri(SiteRoot, "aspnetcore/").AbsoluteUri, Article: false),
         new(
             "tutorials/decision-before-execution.html",

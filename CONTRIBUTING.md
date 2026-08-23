@@ -392,7 +392,30 @@ Prefer statements that explain what a pattern **does** over statements that decl
 
 ## Publishing Authored Articles
 
-Selected substantive documents may opt into the site's authored-publication and RSS surfaces with YAML frontmatter. Use this for long-form technical articles that stand on their own; do not add it automatically to navigation pages, labs, exercises, sample indexes, TOC support files, or repository housekeeping material.
+Learning supports two related publication cases without creating a second publishing system:
+
+- Selected curriculum documents may continue to opt into authored metadata and RSS when they are substantive enough to stand on their own.
+- Standalone technical publications intended for direct external discovery should live under `docs/articles/<year>/<slug>.md`. Those pages form the append-only Articles archive and carry a deliberate permanent-URL contract.
+
+Publication metadata does not by itself make a curriculum page part of the permanent Articles archive. The stable publication contract comes from publishing the standalone document under `docs/articles/`.
+
+### Articles vs. Curriculum Material
+
+Use the distinction below when choosing where a new document belongs.
+
+| Curriculum material | Article |
+| --- | --- |
+| Part of a learning progression | Standalone technical argument |
+| May have prerequisites | Must be understandable without curriculum prerequisites |
+| Teaches a concept systematically | Makes one useful argument completely |
+| May move if the curriculum is reorganized | Keeps its published `/articles/<year>/<slug>` URL |
+| Optimized for teaching sequence and internal navigation | Optimized for direct discovery, citation, and external linking |
+
+An article may link to tutorials, samples, labs, ADRs, or implementation repositories for deeper study, but those references should not be required to understand the article itself.
+
+### Publication Metadata Contract
+
+Articles reuse the existing authored-publication metadata and RSS generator. Do not introduce a separate article feed, metadata format, CMS, or source-of-truth copy.
 
 The supported contract is:
 
@@ -417,6 +440,79 @@ The fields mean:
 - `feed` controls RSS participation explicitly. Only `feed: true` publishes an item.
 
 For a feed-enabled article, `title`, `author`, `published`, and `summary` are required. Publication remains opt-in even when some metadata is present. The feed generator validates required fields, date formats, canonical generated HTML targets, and writes `docs/_site/feed.xml`.
+
+### Permanent Article Paths
+
+Publish standalone articles with the intentionally simple year-and-slug structure:
+
+```text
+docs/articles/2026/authorization-check-runs-too-late.md
+        ↓
+https://asibackbone.github.io/Learning/articles/2026/authorization-check-runs-too-late.html
+```
+
+The year is the article's original publication year. A later substantive revision may add or change `updated`, but it does not move the article into a new year.
+
+Once a page has been publicly released under `/articles/<year>/<slug>`, treat that URL as append-only:
+
+- Do not rename the slug.
+- Do not move the article into another content category.
+- Do not renumber it.
+- Do not move it into another year.
+- Do not change its URL merely because the Learning curriculum is reorganized.
+
+If an exceptional move becomes unavoidable, preserve the old public address with the safest redirect or compatibility mechanism supported by the current DocFX and GitHub Pages setup. The normal rule is simpler: **published article URLs do not move**.
+
+Do not introduce category directories such as `articles/security/`, `articles/governance/`, or `articles/ai/` merely to mirror the documentation hierarchy. The year/slug structure is deliberately resistant to curriculum reorganization.
+
+### Problem-Oriented Titles and Slugs
+
+Lead with a developer problem rather than repository vocabulary. Use lowercase kebab-case slugs that remain meaningful outside the ASI Backbone organization.
+
+Prefer:
+
+```text
+authorization-check-runs-too-late
+ci-badge-does-not-prove-package-integrity
+when-a-short-lived-token-is-not-enough
+why-your-ai-tool-call-is-only-a-proposal
+```
+
+over:
+
+```text
+decision-before-execution-pattern
+governed-execution-model
+capability-scoped-authority
+asi-backbone-governance
+```
+
+Repository-specific terminology may appear after the practical problem has been established and should be distinguished from broader established concepts when that distinction matters.
+
+### Canonical Publication Host
+
+The canonical copy of an article is the version published by the Learning site under `https://asibackbone.github.io/Learning/`. If an article is later cross-posted elsewhere, keep Learning as the authoritative source and use canonical attribution back to the Learning URL when the external platform supports it.
+
+Do not maintain a second CMS or separately edited source-of-truth copy just to syndicate an article.
+
+### Article Publication Checklist
+
+Before publishing a new standalone article, normally confirm that:
+
+- [ ] The article has a visible byline.
+- [ ] `published` records the original publication date in `YYYY-MM-DD` format.
+- [ ] The article lives at a stable `docs/articles/<year>/<slug>.md` path.
+- [ ] The title and slug describe a recognizable developer problem rather than internal terminology.
+- [ ] `summary` is concise and useful when shown in the RSS feed or an external preview.
+- [ ] `feed: true` opts the article into the existing publication feed.
+- [ ] The article stands alone without requiring earlier tutorials or Learning-specific background.
+- [ ] The opening establishes a concrete technical problem before introducing repository-specific language.
+- [ ] The article does not assume that the reader adopts `AsiBackbone` or another ASI Backbone implementation.
+- [ ] Established concepts are distinguished from repository-specific terminology where appropriate.
+- [ ] Deeper tutorials, samples, labs, ADRs, or implementation material are linked rather than reproduced wholesale.
+- [ ] Scope boundaries and claim discipline remain intact.
+- [ ] The tone is educational and technical rather than product-launch or promotional framing.
+- [ ] The published year/slug URL is suitable to remain unchanged after external linking or indexing.
 
 Article participation and feed-surface validity are separate concerns. Individual documents opt in only with `feed: true`, but the repository's published RSS surface is expected to contain at least one feed-enabled article. Generation intentionally fails when zero feed-enabled documents are found so accidental removal or disablement of the entire feed is visible during validation.
 

@@ -28,6 +28,8 @@ Already using ASP.NET Core authorization and unsure whether you need a broader g
 
 Learning does not require installing an `AsiBackbone` package. The material is intended to be useful as independent .NET architecture education.
 
+Looking for standalone technical writing rather than a curriculum path? Browse [Articles](articles/index.md). Articles are designed for direct external discovery and keep permanent `/articles/<year>/<slug>` publication URLs.
+
 The material is organized around a recurring separation of responsibilities:
 
 ```text
