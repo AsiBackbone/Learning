@@ -20,6 +20,14 @@ The Learning site is the canonical publication host. Cross-posted copies should 
 
 ## 2026
 
+### [A Green CI Badge Does Not Prove Your .NET Package Is Trustworthy](2026/ci-badge-does-not-prove-package-integrity.md)
+
+**Christopher D. Cavell** · **August 23, 2026**
+
+A practical guide to tracing a NuGet package from reviewed source through build, publication, and verifiable release evidence.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/ci-badge-does-not-prove-package-integrity.html`
+
 ### [Your Authorization Check Runs Too Late](2026/authorization-check-runs-too-late.md)
 
 **Christopher D. Cavell** · **August 23, 2026**
