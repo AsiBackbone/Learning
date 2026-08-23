@@ -1,4 +1,6 @@
 - name: Articles
   href: index.md
+- name: A Green CI Badge Does Not Prove Your .NET Package Is Trustworthy
+  href: 2026/ci-badge-does-not-prove-package-integrity.md
 - name: Your Authorization Check Runs Too Late
   href: 2026/authorization-check-runs-too-late.md

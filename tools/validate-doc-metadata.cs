@@ -28,6 +28,10 @@ static class MetadataValidator
         new("index.html", SiteRoot.AbsoluteUri, Article: false),
         new("articles/index.html", new Uri(SiteRoot, "articles/").AbsoluteUri, Article: false),
         new(
+            "articles/2026/ci-badge-does-not-prove-package-integrity.html",
+            new Uri(SiteRoot, "articles/2026/ci-badge-does-not-prove-package-integrity.html").AbsoluteUri,
+            Article: true),
+        new(
             "articles/2026/authorization-check-runs-too-late.html",
             new Uri(SiteRoot, "articles/2026/authorization-check-runs-too-late.html").AbsoluteUri,
             Article: true),
