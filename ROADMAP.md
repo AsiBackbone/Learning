@@ -815,7 +815,7 @@ The central rule remains:
 
 ## Status
 
-**Started — two alternative-pattern comparisons published** ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#67](https://github.com/AsiBackbone/Learning/issues/67))
+**Started — three alternative-pattern comparisons published** ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#67](https://github.com/AsiBackbone/Learning/issues/67), [#174](https://github.com/AsiBackbone/Learning/issues/174))
 
 ## Goal
 
@@ -823,11 +823,11 @@ Help readers understand where demonstrated patterns fit relative to established 
 
 Potential comparison areas include:
 
-* [ ] Traditional role-based authorization. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
-* [ ] Claims-based authorization. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
+* [x] Traditional role-based authorization — [Role-Based, Claims-Based, and Capability-Based Authorization](docs/architecture/role-based-claims-based-and-capability-based-authorization.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#174](https://github.com/AsiBackbone/Learning/issues/174))
+* [x] Claims-based authorization — [Role-Based, Claims-Based, and Capability-Based Authorization](docs/architecture/role-based-claims-based-and-capability-based-authorization.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#174](https://github.com/AsiBackbone/Learning/issues/174))
 * [x] Policy-based authorization — [When ASP.NET Core Authorization Is Enough](docs/architecture/when-aspnet-core-authorization-is-enough.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7))
 * [x] Simple application-service boundary — [When a Simple Application Service Is Enough](docs/architecture/when-a-simple-application-service-is-enough.md). ([#67](https://github.com/AsiBackbone/Learning/issues/67))
-* [ ] Capability-based security. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
+* [x] Capability-based security — [Role-Based, Claims-Based, and Capability-Based Authorization](docs/architecture/role-based-claims-based-and-capability-based-authorization.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#174](https://github.com/AsiBackbone/Learning/issues/174))
 * [ ] API gateways.
 * [ ] Service meshes.
 * [ ] Workflow engines.
