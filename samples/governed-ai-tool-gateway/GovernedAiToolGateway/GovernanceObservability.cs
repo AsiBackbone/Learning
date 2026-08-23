@@ -17,6 +17,9 @@ public static class GovernanceObservabilityInstrumentation
     public const string ActivitySourceName =
         "AsiBackbone.Learning.GovernedAiToolGateway";
 
+    public const string CorrelationIdTagName =
+        "governance.correlation_id";
+
     private static readonly ActivitySource Source =
         new(ActivitySourceName, "1.0.0");
 
@@ -27,7 +30,7 @@ public static class GovernanceObservabilityInstrumentation
             ActivityKind.Internal);
 
         activity?.SetTag(
-            "governance.correlation_id",
+            CorrelationIdTagName,
             correlationId);
 
         return activity;
@@ -43,7 +46,7 @@ public static class GovernanceObservabilityInstrumentation
             ActivityKind.Internal);
 
         activity?.SetTag(
-            "governance.correlation_id",
+            CorrelationIdTagName,
             correlationId);
 
         if (!string.IsNullOrWhiteSpace(proposalId))
@@ -60,7 +63,7 @@ public static class GovernanceObservabilityInstrumentation
     {
         var tags = new ActivityTagsCollection
         {
-            { "governance.correlation_id", residue.CorrelationId },
+            { CorrelationIdTagName, residue.CorrelationId },
             { "governance.stage", residue.Stage },
             { "governance.outcome", residue.Outcome },
             { "governance.reason_code", residue.ReasonCode }
@@ -82,11 +85,22 @@ public static class GovernanceObservabilityInstrumentation
 
 public sealed class GovernanceTraceCollector : IDisposable
 {
+    private readonly object _sync = new();
     private readonly List<GovernanceObservedActivity> _activities = [];
+    private readonly string _correlationId;
     private readonly ActivityListener _listener;
 
-    public GovernanceTraceCollector()
+    public GovernanceTraceCollector(string correlationId)
     {
+        if (string.IsNullOrWhiteSpace(correlationId))
+        {
+            throw new ArgumentException(
+                "A correlation ID is required to scope collected activities.",
+                nameof(correlationId));
+        }
+
+        _correlationId = correlationId;
+
         _listener = new ActivityListener
         {
             ShouldListenTo = source => string.Equals(
@@ -101,6 +115,16 @@ public sealed class GovernanceTraceCollector : IDisposable
                 ActivitySamplingResult.AllDataAndRecorded,
             ActivityStopped = activity =>
             {
+                if (!string.Equals(
+                        activity.GetTagItem(
+                            GovernanceObservabilityInstrumentation
+                                .CorrelationIdTagName)?.ToString(),
+                        _correlationId,
+                        StringComparison.Ordinal))
+                {
+                    return;
+                }
+
                 Dictionary<string, string> tags = activity.TagObjects
                     .ToDictionary(
                         item => item.Key,
@@ -117,22 +141,30 @@ public sealed class GovernanceTraceCollector : IDisposable
                                 StringComparer.Ordinal)))
                     .ToArray();
 
-                _activities.Add(
-                    new GovernanceObservedActivity(
-                        Name: activity.OperationName,
-                        TraceId: activity.TraceId.ToString(),
-                        SpanId: activity.SpanId.ToString(),
-                        ParentSpanId: activity.ParentSpanId.ToString(),
-                        Tags: tags,
-                        Events: events));
+                lock (_sync)
+                {
+                    _activities.Add(
+                        new GovernanceObservedActivity(
+                            Name: activity.OperationName,
+                            TraceId: activity.TraceId.ToString(),
+                            SpanId: activity.SpanId.ToString(),
+                            ParentSpanId: activity.ParentSpanId.ToString(),
+                            Tags: tags,
+                            Events: events));
+                }
             }
         };
 
         ActivitySource.AddActivityListener(_listener);
     }
 
-    public IReadOnlyList<GovernanceObservedActivity> Snapshot() =>
-        _activities.ToArray();
+    public IReadOnlyList<GovernanceObservedActivity> Snapshot()
+    {
+        lock (_sync)
+        {
+            return _activities.ToArray();
+        }
+    }
 
     public void Dispose()
     {
@@ -213,7 +245,8 @@ public static class GovernanceObservabilityRunner
         GovernanceObservabilityScenario scenario,
         string correlationId)
     {
-        using var collector = new GovernanceTraceCollector();
+        using var collector =
+            new GovernanceTraceCollector(correlationId);
         SampleHost host = SampleComposition.Create();
         var model = new GovernanceObservabilityFakeModel();
         GatewayResult result;
