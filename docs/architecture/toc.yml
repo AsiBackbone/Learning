@@ -16,5 +16,8 @@
 - name: Role-Based, Claims-Based, and Capability-Based Authorization
   href: role-based-claims-based-and-capability-based-authorization.md
 
+- name: API Gateways, Service Meshes, Zero Trust, and Governed Execution
+  href: api-gateways-service-meshes-zero-trust-and-governed-execution.md
+
 - name: When a Simple Application Service Is Enough
   href: when-a-simple-application-service-is-enough.md

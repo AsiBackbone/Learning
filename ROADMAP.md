@@ -815,7 +815,7 @@ The central rule remains:
 
 ## Status
 
-**Started — three alternative-pattern comparisons published** ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#67](https://github.com/AsiBackbone/Learning/issues/67), [#174](https://github.com/AsiBackbone/Learning/issues/174))
+**Started — four alternative-pattern comparisons published** ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#67](https://github.com/AsiBackbone/Learning/issues/67), [#174](https://github.com/AsiBackbone/Learning/issues/174), [#175](https://github.com/AsiBackbone/Learning/issues/175))
 
 ## Goal
 
@@ -828,15 +828,15 @@ Potential comparison areas include:
 * [x] Policy-based authorization — [When ASP.NET Core Authorization Is Enough](docs/architecture/when-aspnet-core-authorization-is-enough.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7))
 * [x] Simple application-service boundary — [When a Simple Application Service Is Enough](docs/architecture/when-a-simple-application-service-is-enough.md). ([#67](https://github.com/AsiBackbone/Learning/issues/67))
 * [x] Capability-based security — [Role-Based, Claims-Based, and Capability-Based Authorization](docs/architecture/role-based-claims-based-and-capability-based-authorization.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#174](https://github.com/AsiBackbone/Learning/issues/174))
-* [ ] API gateways.
-* [ ] Service meshes.
+* [x] API gateways — [API Gateways, Service Meshes, Zero Trust, and Governed Execution](docs/architecture/api-gateways-service-meshes-zero-trust-and-governed-execution.md). ([#175](https://github.com/AsiBackbone/Learning/issues/175))
+* [x] Service meshes — [API Gateways, Service Meshes, Zero Trust, and Governed Execution](docs/architecture/api-gateways-service-meshes-zero-trust-and-governed-execution.md). ([#175](https://github.com/AsiBackbone/Learning/issues/175))
 * [ ] Workflow engines.
 * [ ] Policy engines. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
 * [ ] Agent/tool authorization models.
 * [ ] Human approval systems.
 * [ ] Event-sourced audit approaches.
 * [ ] Command/query separation.
-* [ ] Zero-trust architecture.
+* [x] Zero-trust architecture — [API Gateways, Service Meshes, Zero Trust, and Governed Execution](docs/architecture/api-gateways-service-meshes-zero-trust-and-governed-execution.md). ([#175](https://github.com/AsiBackbone/Learning/issues/175))
 * [ ] Rules engines. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
 * [ ] Distributed policy enforcement. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
 
