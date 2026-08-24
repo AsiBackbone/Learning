@@ -1,6 +1,6 @@
 {
   "title": "ASI Backbone Learning",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "upload_type": "lesson",
   "description": "ASI Backbone Learning is the educational layer of the ASI Backbone organization: an open, community-oriented, DocFX-published collection of tutorials and architectural comparisons covering practical .NET architecture for governed execution, secure applications, AI integration, and policy-driven systems. Material connects conceptual explanations to working implementations in the AsiBackbone and NetCoreApplicationTemplate repositories. Learning is an educational and architectural resource; it is not a compliance certification, legal standard, security guarantee, or AI/AGI/ASI implementation. Documentation and educational material are licensed under CC BY 4.0. Executable sample code added under samples/ is licensed under the MIT License. See LICENSING.md for component-specific licensing terms.",
   "creators": [
