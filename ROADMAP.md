@@ -815,7 +815,7 @@ The central rule remains:
 
 ## Status
 
-**Started — six alternative-pattern comparisons published** ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#67](https://github.com/AsiBackbone/Learning/issues/67), [#174](https://github.com/AsiBackbone/Learning/issues/174), [#175](https://github.com/AsiBackbone/Learning/issues/175), [#176](https://github.com/AsiBackbone/Learning/issues/176), [#177](https://github.com/AsiBackbone/Learning/issues/177))
+**Started — seven alternative-pattern comparisons published** ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#67](https://github.com/AsiBackbone/Learning/issues/67), [#174](https://github.com/AsiBackbone/Learning/issues/174), [#175](https://github.com/AsiBackbone/Learning/issues/175), [#176](https://github.com/AsiBackbone/Learning/issues/176), [#177](https://github.com/AsiBackbone/Learning/issues/177), [#178](https://github.com/AsiBackbone/Learning/issues/178))
 
 ## Goal
 
@@ -832,7 +832,7 @@ Potential comparison areas include:
 * [x] Service meshes — [API Gateways, Service Meshes, Zero Trust, and Governed Execution](docs/architecture/api-gateways-service-meshes-zero-trust-and-governed-execution.md). ([#175](https://github.com/AsiBackbone/Learning/issues/175))
 * [x] Workflow engines — [Workflow Engines, Human Approval Systems, and Governed Execution](docs/architecture/workflow-engines-human-approval-and-governed-execution.md). ([#176](https://github.com/AsiBackbone/Learning/issues/176))
 * [x] Policy engines — [Policy Engines, Rules Engines, and Distributed Policy Enforcement](docs/architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#177](https://github.com/AsiBackbone/Learning/issues/177))
-* [ ] Agent/tool authorization models.
+* [x] Agent/tool authorization models — [Agent and Tool Authorization Models and Host-Owned Execution](docs/architecture/agent-and-tool-authorization-models-and-host-owned-execution.md). ([#178](https://github.com/AsiBackbone/Learning/issues/178))
 * [x] Human approval systems — [Workflow Engines, Human Approval Systems, and Governed Execution](docs/architecture/workflow-engines-human-approval-and-governed-execution.md). ([#176](https://github.com/AsiBackbone/Learning/issues/176))
 * [ ] Event-sourced audit approaches.
 * [ ] Command/query separation.
