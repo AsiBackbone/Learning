@@ -815,7 +815,7 @@ The central rule remains:
 
 ## Status
 
-**Started — eight alternative-pattern comparisons published** ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#67](https://github.com/AsiBackbone/Learning/issues/67), [#174](https://github.com/AsiBackbone/Learning/issues/174), [#175](https://github.com/AsiBackbone/Learning/issues/175), [#176](https://github.com/AsiBackbone/Learning/issues/176), [#177](https://github.com/AsiBackbone/Learning/issues/177), [#178](https://github.com/AsiBackbone/Learning/issues/178), [#179](https://github.com/AsiBackbone/Learning/issues/179))
+**Complete — nine alternative-pattern comparisons published** ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#67](https://github.com/AsiBackbone/Learning/issues/67), [#174](https://github.com/AsiBackbone/Learning/issues/174), [#175](https://github.com/AsiBackbone/Learning/issues/175), [#176](https://github.com/AsiBackbone/Learning/issues/176), [#177](https://github.com/AsiBackbone/Learning/issues/177), [#178](https://github.com/AsiBackbone/Learning/issues/178), [#179](https://github.com/AsiBackbone/Learning/issues/179), [#180](https://github.com/AsiBackbone/Learning/issues/180))
 
 ## Goal
 
@@ -835,7 +835,7 @@ Potential comparison areas include:
 * [x] Agent/tool authorization models — [Agent and Tool Authorization Models and Host-Owned Execution](docs/architecture/agent-and-tool-authorization-models-and-host-owned-execution.md). ([#178](https://github.com/AsiBackbone/Learning/issues/178))
 * [x] Human approval systems — [Workflow Engines, Human Approval Systems, and Governed Execution](docs/architecture/workflow-engines-human-approval-and-governed-execution.md). ([#176](https://github.com/AsiBackbone/Learning/issues/176))
 * [x] Event-sourced audit approaches — [Event Sourcing, Audit Trails, and Governance Decision Provenance](docs/architecture/event-sourcing-audit-trails-and-governance-decision-provenance.md). ([#179](https://github.com/AsiBackbone/Learning/issues/179))
-* [ ] Command/query separation.
+* [x] Command/query separation — [CQRS, Command/Query Separation, and Governed Execution](docs/architecture/cqrs-command-query-separation-and-governed-execution.md). ([#180](https://github.com/AsiBackbone/Learning/issues/180))
 * [x] Zero-trust architecture — [API Gateways, Service Meshes, Zero Trust, and Governed Execution](docs/architecture/api-gateways-service-meshes-zero-trust-and-governed-execution.md). ([#175](https://github.com/AsiBackbone/Learning/issues/175))
 * [x] Rules engines — [Policy Engines, Rules Engines, and Distributed Policy Enforcement](docs/architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#177](https://github.com/AsiBackbone/Learning/issues/177))
 * [x] Distributed policy enforcement — [Policy Engines, Rules Engines, and Distributed Policy Enforcement](docs/architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#177](https://github.com/AsiBackbone/Learning/issues/177))

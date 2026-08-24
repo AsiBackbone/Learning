@@ -3,7 +3,6 @@ description: Compare rules engines, policy engines, and distributed policy enfor
 title: Policy Engines, Rules Engines, and Distributed Policy Enforcement
 author: Christopher D. Cavell
 published: 2026-08-24
-updated: 2026-08-24
 summary: Rules engines centralize decision logic, policy engines externalize policy evaluation, and distributed enforcement separates decision from enforcement across one or more system boundaries.
 feed: true
 ---
