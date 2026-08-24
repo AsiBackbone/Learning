@@ -113,6 +113,7 @@ Start with:
 * [Workflow Engines, Human Approval Systems, and Governed Execution](workflow-engines-human-approval-and-governed-execution.md) — separates durable process orchestration, bound human dispositions, current policy decisions, and scoped execution authority, including cases where a workflow engine already provides the required governance semantics and a second layer would only duplicate them.
 * [Policy Engines, Rules Engines, and Distributed Policy Enforcement](policy-engines-rules-engines-and-distributed-policy-enforcement.md) — distinguishes domain rule evaluation from externalized policy decisions and from the distributed placement of PDPs and PEPs, including policy distribution, stale-policy handling, partitions, local autonomy, and when broader governance lifecycle responsibilities remain separate.
 * [Agent and Tool Authorization Models and Host-Owned Execution](agent-and-tool-authorization-models-and-host-owned-execution.md) — compares model-visible tool selection, framework registration and per-agent permissions, schema validation, host-side authorization, and capability-scoped execution, including when framework-native tool controls are sufficient and when a separate execution-authority boundary is justified.
+* [Event Sourcing, Audit Trails, and Governance Decision Provenance](event-sourcing-audit-trails-and-governance-decision-provenance.md) — compares operational logs, ordinary audit history, governance decision receipts, and event sourcing, including denied decisions, replay, projections, tamper evidence, privacy/deletion tradeoffs, and historical policy reconstruction.
 
 The purpose of these comparisons is not to make adjacent approaches compete. It is to make their different responsibilities, trust boundaries, and operational costs visible.
 
@@ -134,7 +135,7 @@ An ASP.NET Core reference architecture demonstrating middleware organization, se
 
 ## Current Status
 
-The Architecture section is established as a learning area and now includes a governed-execution visual reference alongside seven concrete alternative-pattern comparisons. It will continue to grow through additional comparisons, diagrams, and cross-repository studies.
+The Architecture section is established as a learning area and now includes a governed-execution visual reference alongside eight concrete alternative-pattern comparisons. It will continue to grow through additional comparisons, diagrams, and cross-repository studies.
 
 For the current learning path, continue with the [Foundational Tutorials](../tutorials/index.md).
 

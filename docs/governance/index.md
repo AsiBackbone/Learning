@@ -118,6 +118,12 @@ Explains `EscalationRecommended` as a non-executable governance outcome with exp
 
 Explains stable policy identity, policy versions and fingerprints, decision-time provenance, policy drift, execution-freshness strategies, acknowledgment and capability continuity, rollback, composition across multiple policies, canonicalization before hashing, and the limits of what a policy hash can prove.
 
+### Event Sourcing, Audit Trails, and Governance Decision Provenance
+
+[Event Sourcing, Audit Trails, and Governance Decision Provenance](../architecture/event-sourcing-audit-trails-and-governance-decision-provenance.md)
+
+Compares operational logs, traditional audit trails, governance decision receipts, and event sourcing, including the important case where denied or deferred decisions leave governance evidence without creating a domain event. It also covers replay, projections, event immutability, privacy/deletion tradeoffs, tamper evidence, correlation, and historical policy reconstruction.
+
 ### Regional and Tenant Policy Overlays
 
 [Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md)

@@ -30,3 +30,6 @@
 
 - name: Agent and Tool Authorization Models and Host-Owned Execution
   href: agent-and-tool-authorization-models-and-host-owned-execution.md
+
+- name: Event Sourcing, Audit Trails, and Governance Decision Provenance
+  href: event-sourcing-audit-trails-and-governance-decision-provenance.md
