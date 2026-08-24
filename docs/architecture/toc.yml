@@ -21,3 +21,6 @@
 
 - name: When a Simple Application Service Is Enough
   href: when-a-simple-application-service-is-enough.md
+
+- name: Workflow Engines, Human Approval Systems, and Governed Execution
+  href: workflow-engines-human-approval-and-governed-execution.md
