@@ -33,3 +33,6 @@
 
 - name: Event Sourcing, Audit Trails, and Governance Decision Provenance
   href: event-sourcing-audit-trails-and-governance-decision-provenance.md
+
+- name: CQRS, Command/Query Separation, and Governed Execution
+  href: cqrs-command-query-separation-and-governed-execution.md

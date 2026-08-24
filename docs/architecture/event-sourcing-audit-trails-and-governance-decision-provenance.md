@@ -3,7 +3,6 @@ description: Compare operational logs, traditional audit trails, governance deci
 title: Event Sourcing, Audit Trails, and Governance Decision Provenance
 author: Christopher D. Cavell
 published: 2026-08-24
-updated: 2026-08-24
 summary: Event sourcing makes domain events the source of application state; governance evidence explains why authority was granted, denied, deferred, acknowledged, or exercised.
 feed: true
 ---
