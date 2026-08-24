@@ -4,6 +4,9 @@
 - name: Typed AI Proposed Intent and Schema-Validation Boundaries
   href: typed-ai-proposed-intent-and-schema-validation-boundaries.md
 
+- name: Agent and Tool Authorization Models and Host-Owned Execution
+  href: ../architecture/agent-and-tool-authorization-models-and-host-owned-execution.md
+
 - name: Deterministic and Probabilistic Inputs in Policy Evaluation
   href: ../governance/deterministic-and-probabilistic-inputs-in-policy-evaluation.md
 

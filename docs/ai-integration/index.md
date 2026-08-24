@@ -124,6 +124,10 @@ This advanced architecture explanation treats remembered information as scoped, 
 
 ## Host-Owned Tool Registry
 
+For a direct comparison of model-visible tool lists, framework registration, per-agent permissions, host-side authorization, and capability-scoped execution, see [Agent and Tool Authorization Models and Host-Owned Execution](../architecture/agent-and-tool-authorization-models-and-host-owned-execution.md).
+
+The comparison also explains when framework-native tool controls are already sufficient and when a separate execution-authority boundary protects a meaningful trust or delegation boundary.
+
 A model should not define its own unrestricted execution surface.
 
 The host can instead expose a deliberately constrained set of operations:

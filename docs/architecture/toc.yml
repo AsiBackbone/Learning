@@ -27,3 +27,6 @@
 
 - name: Policy Engines, Rules Engines, and Distributed Policy Enforcement
   href: policy-engines-rules-engines-and-distributed-policy-enforcement.md
+
+- name: Agent and Tool Authorization Models and Host-Owned Execution
+  href: agent-and-tool-authorization-models-and-host-owned-execution.md
