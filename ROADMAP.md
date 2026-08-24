@@ -815,7 +815,7 @@ The central rule remains:
 
 ## Status
 
-**Started — four alternative-pattern comparisons published** ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#67](https://github.com/AsiBackbone/Learning/issues/67), [#174](https://github.com/AsiBackbone/Learning/issues/174), [#175](https://github.com/AsiBackbone/Learning/issues/175))
+**Started — six alternative-pattern comparisons published** ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#67](https://github.com/AsiBackbone/Learning/issues/67), [#174](https://github.com/AsiBackbone/Learning/issues/174), [#175](https://github.com/AsiBackbone/Learning/issues/175), [#176](https://github.com/AsiBackbone/Learning/issues/176), [#177](https://github.com/AsiBackbone/Learning/issues/177))
 
 ## Goal
 
@@ -830,15 +830,15 @@ Potential comparison areas include:
 * [x] Capability-based security — [Role-Based, Claims-Based, and Capability-Based Authorization](docs/architecture/role-based-claims-based-and-capability-based-authorization.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#174](https://github.com/AsiBackbone/Learning/issues/174))
 * [x] API gateways — [API Gateways, Service Meshes, Zero Trust, and Governed Execution](docs/architecture/api-gateways-service-meshes-zero-trust-and-governed-execution.md). ([#175](https://github.com/AsiBackbone/Learning/issues/175))
 * [x] Service meshes — [API Gateways, Service Meshes, Zero Trust, and Governed Execution](docs/architecture/api-gateways-service-meshes-zero-trust-and-governed-execution.md). ([#175](https://github.com/AsiBackbone/Learning/issues/175))
-* [ ] Workflow engines.
-* [ ] Policy engines. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
+* [x] Workflow engines — [Workflow Engines, Human Approval Systems, and Governed Execution](docs/architecture/workflow-engines-human-approval-and-governed-execution.md). ([#176](https://github.com/AsiBackbone/Learning/issues/176))
+* [x] Policy engines — [Policy Engines, Rules Engines, and Distributed Policy Enforcement](docs/architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#177](https://github.com/AsiBackbone/Learning/issues/177))
 * [ ] Agent/tool authorization models.
-* [ ] Human approval systems.
+* [x] Human approval systems — [Workflow Engines, Human Approval Systems, and Governed Execution](docs/architecture/workflow-engines-human-approval-and-governed-execution.md). ([#176](https://github.com/AsiBackbone/Learning/issues/176))
 * [ ] Event-sourced audit approaches.
 * [ ] Command/query separation.
 * [x] Zero-trust architecture — [API Gateways, Service Meshes, Zero Trust, and Governed Execution](docs/architecture/api-gateways-service-meshes-zero-trust-and-governed-execution.md). ([#175](https://github.com/AsiBackbone/Learning/issues/175))
-* [ ] Rules engines. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
-* [ ] Distributed policy enforcement. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
+* [x] Rules engines — [Policy Engines, Rules Engines, and Distributed Policy Enforcement](docs/architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#177](https://github.com/AsiBackbone/Learning/issues/177))
+* [x] Distributed policy enforcement — [Policy Engines, Rules Engines, and Distributed Policy Enforcement](docs/architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#177](https://github.com/AsiBackbone/Learning/issues/177))
 
 Comparisons should not frame adjacent architectures as competitors simply because they solve related problems.
 
