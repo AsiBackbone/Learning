@@ -110,6 +110,7 @@ Start with:
 * [Role-Based, Claims-Based, and Capability-Based Authorization](role-based-claims-based-and-capability-based-authorization.md) — compares stable role membership, richer claims policies, and narrowly scoped capabilities, including when each model wins and when composition is preferable to replacement.
 * [API Gateways, Service Meshes, Zero Trust, and Governed Execution](api-gateways-service-meshes-zero-trust-and-governed-execution.md) — separates transport, workload identity, infrastructure security strategy, application-level decision semantics, and execution ownership, then shows how the boundaries can be layered without treating them as substitutes.
 * [When a Simple Application Service Is Enough](when-a-simple-application-service-is-enough.md) — examines the middle ground where authorization alone is not the whole use case, but an immediate application-service workflow still expresses the required validation, domain rules, persistence, execution, and audit boundaries without a broader governance lifecycle.
+* [Workflow Engines, Human Approval Systems, and Governed Execution](workflow-engines-human-approval-and-governed-execution.md) — separates durable process orchestration, bound human dispositions, current policy decisions, and scoped execution authority, including cases where a workflow engine already provides the required governance semantics and a second layer would only duplicate them.
 
 The purpose of these comparisons is not to make adjacent approaches compete. It is to make their different responsibilities, trust boundaries, and operational costs visible.
 
@@ -131,7 +132,7 @@ An ASP.NET Core reference architecture demonstrating middleware organization, se
 
 ## Current Status
 
-The Architecture section is established as a learning area and now includes a governed-execution visual reference alongside four concrete alternative-pattern comparisons. It will continue to grow through additional comparisons, diagrams, and cross-repository studies.
+The Architecture section is established as a learning area and now includes a governed-execution visual reference alongside five concrete alternative-pattern comparisons. It will continue to grow through additional comparisons, diagrams, and cross-repository studies.
 
 For the current learning path, continue with the [Foundational Tutorials](../tutorials/index.md).
 
