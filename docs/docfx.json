@@ -10,6 +10,7 @@
           "ai-integration/**/*.md",
           "architecture/**/*.md",
           "aspnetcore/**/*.md",
+          "case-studies/**/*.md",
           "getting-started/**/*.md",
           "governance/**/*.md",
           "labs/**/*.md",
@@ -24,7 +25,8 @@
         "files": [
           "images/**",
           "examples/**",
-          "public/**"
+          "public/**",
+          "indexnow-key.txt"
         ]
       }
     ],

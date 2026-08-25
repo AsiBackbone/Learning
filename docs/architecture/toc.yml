@@ -21,3 +21,18 @@
 
 - name: When a Simple Application Service Is Enough
   href: when-a-simple-application-service-is-enough.md
+
+- name: Workflow Engines, Human Approval Systems, and Governed Execution
+  href: workflow-engines-human-approval-and-governed-execution.md
+
+- name: Policy Engines, Rules Engines, and Distributed Policy Enforcement
+  href: policy-engines-rules-engines-and-distributed-policy-enforcement.md
+
+- name: Agent and Tool Authorization Models and Host-Owned Execution
+  href: agent-and-tool-authorization-models-and-host-owned-execution.md
+
+- name: Event Sourcing, Audit Trails, and Governance Decision Provenance
+  href: event-sourcing-audit-trails-and-governance-decision-provenance.md
+
+- name: CQRS, Command/Query Separation, and Governed Execution
+  href: cqrs-command-query-separation-and-governed-execution.md

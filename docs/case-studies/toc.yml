@@ -1,0 +1,23 @@
+- name: Overview
+  href: index.md
+
+- name: Governed Administrative Operation
+  href: governed-administrative-operation.md
+
+- name: Sensitive-Data Access Decision
+  href: sensitive-data-access-decision.md
+
+- name: Deployment Approval and Infrastructure Change Gates
+  href: deployment-approval-and-infrastructure-change-gates.md
+
+- name: AI-Assisted API and Governed Tool Gateway
+  href: ai-assisted-api-and-governed-tool-gateway.md
+
+- name: Multi-Tenant and Regional Policy Overlay
+  href: multi-tenant-and-regional-policy-overlay.md
+
+- name: Human Acknowledgment Workflow
+  href: human-acknowledgment-workflow.md
+
+- name: Capability-Scoped Background Operation
+  href: capability-scoped-background-operation.md

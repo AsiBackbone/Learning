@@ -815,7 +815,7 @@ The central rule remains:
 
 ## Status
 
-**Started — four alternative-pattern comparisons published** ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#67](https://github.com/AsiBackbone/Learning/issues/67), [#174](https://github.com/AsiBackbone/Learning/issues/174), [#175](https://github.com/AsiBackbone/Learning/issues/175))
+**Complete — nine alternative-pattern comparisons published** ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#67](https://github.com/AsiBackbone/Learning/issues/67), [#174](https://github.com/AsiBackbone/Learning/issues/174), [#175](https://github.com/AsiBackbone/Learning/issues/175), [#176](https://github.com/AsiBackbone/Learning/issues/176), [#177](https://github.com/AsiBackbone/Learning/issues/177), [#178](https://github.com/AsiBackbone/Learning/issues/178), [#179](https://github.com/AsiBackbone/Learning/issues/179), [#180](https://github.com/AsiBackbone/Learning/issues/180))
 
 ## Goal
 
@@ -830,15 +830,15 @@ Potential comparison areas include:
 * [x] Capability-based security — [Role-Based, Claims-Based, and Capability-Based Authorization](docs/architecture/role-based-claims-based-and-capability-based-authorization.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#174](https://github.com/AsiBackbone/Learning/issues/174))
 * [x] API gateways — [API Gateways, Service Meshes, Zero Trust, and Governed Execution](docs/architecture/api-gateways-service-meshes-zero-trust-and-governed-execution.md). ([#175](https://github.com/AsiBackbone/Learning/issues/175))
 * [x] Service meshes — [API Gateways, Service Meshes, Zero Trust, and Governed Execution](docs/architecture/api-gateways-service-meshes-zero-trust-and-governed-execution.md). ([#175](https://github.com/AsiBackbone/Learning/issues/175))
-* [ ] Workflow engines.
-* [ ] Policy engines. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
-* [ ] Agent/tool authorization models.
-* [ ] Human approval systems.
-* [ ] Event-sourced audit approaches.
-* [ ] Command/query separation.
+* [x] Workflow engines — [Workflow Engines, Human Approval Systems, and Governed Execution](docs/architecture/workflow-engines-human-approval-and-governed-execution.md). ([#176](https://github.com/AsiBackbone/Learning/issues/176))
+* [x] Policy engines — [Policy Engines, Rules Engines, and Distributed Policy Enforcement](docs/architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#177](https://github.com/AsiBackbone/Learning/issues/177))
+* [x] Agent/tool authorization models — [Agent and Tool Authorization Models and Host-Owned Execution](docs/architecture/agent-and-tool-authorization-models-and-host-owned-execution.md). ([#178](https://github.com/AsiBackbone/Learning/issues/178))
+* [x] Human approval systems — [Workflow Engines, Human Approval Systems, and Governed Execution](docs/architecture/workflow-engines-human-approval-and-governed-execution.md). ([#176](https://github.com/AsiBackbone/Learning/issues/176))
+* [x] Event-sourced audit approaches — [Event Sourcing, Audit Trails, and Governance Decision Provenance](docs/architecture/event-sourcing-audit-trails-and-governance-decision-provenance.md). ([#179](https://github.com/AsiBackbone/Learning/issues/179))
+* [x] Command/query separation — [CQRS, Command/Query Separation, and Governed Execution](docs/architecture/cqrs-command-query-separation-and-governed-execution.md). ([#180](https://github.com/AsiBackbone/Learning/issues/180))
 * [x] Zero-trust architecture — [API Gateways, Service Meshes, Zero Trust, and Governed Execution](docs/architecture/api-gateways-service-meshes-zero-trust-and-governed-execution.md). ([#175](https://github.com/AsiBackbone/Learning/issues/175))
-* [ ] Rules engines. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
-* [ ] Distributed policy enforcement. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
+* [x] Rules engines — [Policy Engines, Rules Engines, and Distributed Policy Enforcement](docs/architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#177](https://github.com/AsiBackbone/Learning/issues/177))
+* [x] Distributed policy enforcement — [Policy Engines, Rules Engines, and Distributed Policy Enforcement](docs/architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md). ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#177](https://github.com/AsiBackbone/Learning/issues/177))
 
 Comparisons should not frame adjacent architectures as competitors simply because they solve related problems.
 
@@ -860,22 +860,23 @@ What are the operational tradeoffs?
 
 # Milestone 11 — Reference Architecture Case Studies
 
+## Status
+
+**Started — governed administrative operation, sensitive-data access, deployment/infrastructure change, AI-assisted tool-gateway, multi-tenant/regional overlay, human-acknowledgment, and capability-scoped background-operation case studies published** ([#189](https://github.com/AsiBackbone/Learning/issues/189), [#190](https://github.com/AsiBackbone/Learning/issues/190), [#191](https://github.com/AsiBackbone/Learning/issues/191), [#192](https://github.com/AsiBackbone/Learning/issues/192), [#193](https://github.com/AsiBackbone/Learning/issues/193), [#194](https://github.com/AsiBackbone/Learning/issues/194), [#195](https://github.com/AsiBackbone/Learning/issues/195))
+
 ## Goal
 
 Show how multiple patterns interact in realistic scenarios without turning Learning into another production framework.
 
 Potential case studies include:
 
-* [ ] Governed administrative operation.
-* [ ] Sensitive-data access decision.
-* [ ] Deployment approval gateway.
-* [ ] Infrastructure change gate.
-* [ ] AI-assisted API operation.
-* [ ] Governed AI tool gateway.
-* [ ] Multi-tenant policy evaluation.
-* [ ] Human acknowledgment workflow.
-* [ ] Capability-scoped background operation.
-* [ ] Regional policy overlay.
+* [x] [Governed administrative operation](docs/case-studies/governed-administrative-operation.md). ([#189](https://github.com/AsiBackbone/Learning/issues/189))
+* [x] [Sensitive-data access decision](docs/case-studies/sensitive-data-access-decision.md). ([#190](https://github.com/AsiBackbone/Learning/issues/190))
+* [x] [Deployment approval and infrastructure change gates](docs/case-studies/deployment-approval-and-infrastructure-change-gates.md). ([#191](https://github.com/AsiBackbone/Learning/issues/191))
+* [x] [AI-assisted API operation and governed AI tool gateway](docs/case-studies/ai-assisted-api-and-governed-tool-gateway.md). ([#192](https://github.com/AsiBackbone/Learning/issues/192))
+* [x] [Multi-tenant and regional policy overlay](docs/case-studies/multi-tenant-and-regional-policy-overlay.md). ([#193](https://github.com/AsiBackbone/Learning/issues/193))
+* [x] [Human acknowledgment workflow](docs/case-studies/human-acknowledgment-workflow.md). ([#194](https://github.com/AsiBackbone/Learning/issues/194))
+* [x] [Capability-scoped background operation](docs/case-studies/capability-scoped-background-operation.md). ([#195](https://github.com/AsiBackbone/Learning/issues/195))
 * [ ] Simulated robotics-command governance boundary.
 
 Each case study should separate:

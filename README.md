@@ -132,6 +132,7 @@ Use the canonical project surfaces for deeper information rather than treating t
 **Questions and ideas → [Discussions](https://github.com/AsiBackbone/Learning/discussions) · Concrete work → [Issues](https://github.com/AsiBackbone/Learning/issues) · Changes → [Pull Requests](https://github.com/AsiBackbone/Learning/pulls)**
 
 - **Published documentation:** [asibackbone.github.io/Learning](https://asibackbone.github.io/Learning/)
+- **XML sitemap:** `https://asibackbone.github.io/Learning/sitemap.xml` — submit this canonical sitemap URL to Google Search Console and Bing Webmaster Tools.
 - **Contribution guidance:** [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Project status and planned work:** [ROADMAP.md](ROADMAP.md)
 - **Learning discussions:** [AsiBackbone/Learning Discussions](https://github.com/AsiBackbone/Learning/discussions)
@@ -140,6 +141,12 @@ Use the canonical project surfaces for deeper information rather than treating t
 - **Security policy:** [SECURITY.md](SECURITY.md)
 - **Citation metadata:** [CITATION.cff](CITATION.cff)
 - **Licensing details:** [LICENSING.md](LICENSING.md)
+
+### Search discovery and change notification
+
+The XML sitemap is the complete canonical discovery inventory for the published Learning site. IndexNow complements that inventory with a narrower post-deployment signal: after GitHub Pages deploys successfully, the publication workflow notifies participating search engines only about canonical Learning URLs that were added, modified, or removed since the previously deployed revision. IndexNow does not replace the sitemap and does not determine whether documentation is publishable.
+
+The site publishes `deployment-revision.txt` so the next publication can compare against the revision actually represented by GitHub Pages rather than assuming the immediately preceding commit was deployed. On the first run, the workflow falls back to the push base revision. The public `indexnow-key.txt` file verifies control of the `/Learning/` URL space through IndexNow `keyLocation`; it is intentionally public protocol verification material, not a private workflow credential. IndexNow service failures are reported as non-blocking warnings after deployment.
 
 Issues are best used for concrete repository work; Learning Discussions are better suited to exploratory architecture questions, tutorial proposals, alternatives, design debates, and community examples.
 

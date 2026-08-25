@@ -53,5 +53,5 @@ references:
         given-names: "Christopher D."
         orcid: "https://orcid.org/0009-0002-2113-0245"
     repository-code: "https://github.com/AsiBackbone/NetCoreApplicationTemplate"
-version: "0.8.0"
-date-released: "2026-08-23"
+version: "0.10.0"
+date-released: "2026-08-25"

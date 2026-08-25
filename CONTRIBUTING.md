@@ -408,6 +408,12 @@ Learning supports two related publication cases without creating a second publis
 
 Publication metadata does not by itself make a curriculum page part of the permanent Articles archive. The stable publication contract comes from publishing the standalone document under `docs/articles/`.
 
+### Problem-Oriented Article Planning
+
+Use the [Problem-Oriented Standalone Article Backlog](community/article-backlog.md) when selecting future standalone publications. The backlog prioritizes recognizable developer/search problems that already have substantial Learning material behind them; it is not a quota, publishing calendar, or substitute for the curriculum roadmap.
+
+A backlog candidate should become implementation work only after a dedicated issue is opened for that specific article. Use that issue to refine the reader problem, working title, permanent slug, supporting Learning sources, and the article's distinct contribution before drafting under `docs/articles/<year>/`. This keeps editorial prioritization separate from implementation tracking and avoids converting curriculum pages into articles merely to increase page count.
+
 ### Articles vs. Curriculum Material
 
 Use the distinction below when choosing where a new document belongs.
@@ -421,6 +427,36 @@ Use the distinction below when choosing where a new document belongs.
 | Optimized for teaching sequence and internal navigation | Optimized for direct discovery, citation, and external linking |
 
 An article may link to tutorials, samples, labs, ADRs, or implementation repositories for deeper study, but those references should not be required to understand the article itself.
+
+### Contextual Linking Convention
+
+Standalone articles and substantive curriculum pages should form small topical clusters through links that answer the reader's next likely question. This is contextual navigation inside the content, not another global navigation system.
+
+A useful progression is:
+
+```text
+Problem-oriented article
+       ↓
+Architecture explanation or comparison
+       ↓
+Tutorial
+       ↓
+Runnable sample / invariant tests
+       ↓
+Lab
+```
+
+Do not force every page through every stage. Add only destinations that materially deepen the page at the point where the reader is likely to need them.
+
+For contextual links:
+
+- Explain why the destination is relevant instead of using generic `Related` or `click here` anchor text.
+- Keep the cluster small; two to five strong destinations are usually more useful than a long list of loosely related pages.
+- Add reciprocal links only when the source page provides a useful problem-first entry point or genuinely clarifies the destination. Do not manufacture symmetry for search optimization.
+- Keep standalone articles understandable without following the links; contextual destinations deepen the argument rather than complete missing prerequisites.
+- Prefer relative links for Learning documentation and stable repository links for executable samples that live outside `docs/`.
+
+Avoid boilerplate blocks that enumerate whole site sections. The goal is to let a reader move naturally from a concrete problem into the most relevant explanation, comparison, runnable evidence, or exercise without returning to the site root.
 
 ### Publication Metadata Contract
 
@@ -519,6 +555,7 @@ Before publishing a new standalone article, normally confirm that:
 - [ ] The article does not assume that the reader adopts `AsiBackbone` or another ASI Backbone implementation.
 - [ ] Established concepts are distinguished from repository-specific terminology where appropriate.
 - [ ] Deeper tutorials, samples, labs, ADRs, or implementation material are linked rather than reproduced wholesale.
+- [ ] Contextual links identify a small number of natural next steps and explain why each destination is relevant; reciprocal links are added only where they improve reader flow.
 - [ ] Scope boundaries and claim discipline remain intact.
 - [ ] The tone is educational and technical rather than product-launch or promotional framing.
 - [ ] The published year/slug URL is suitable to remain unchanged after external linking or indexing.
