@@ -408,6 +408,12 @@ Learning supports two related publication cases without creating a second publis
 
 Publication metadata does not by itself make a curriculum page part of the permanent Articles archive. The stable publication contract comes from publishing the standalone document under `docs/articles/`.
 
+### Problem-Oriented Article Planning
+
+Use the [Problem-Oriented Standalone Article Backlog](community/article-backlog.md) when selecting future standalone publications. The backlog prioritizes recognizable developer/search problems that already have substantial Learning material behind them; it is not a quota, publishing calendar, or substitute for the curriculum roadmap.
+
+A backlog candidate should become implementation work only after a dedicated issue is opened for that specific article. Use that issue to refine the reader problem, working title, permanent slug, supporting Learning sources, and the article's distinct contribution before drafting under `docs/articles/<year>/`. This keeps editorial prioritization separate from implementation tracking and avoids converting curriculum pages into articles merely to increase page count.
+
 ### Articles vs. Curriculum Material
 
 Use the distinction below when choosing where a new document belongs.

@@ -10,6 +10,8 @@ If a topic repeatedly appears in Issues or Discussions, that is a strong signal 
 
 The presence of a topic here does not, by itself, mean that it is highly community-requested. Issues, Discussions, concrete use cases, and contributor interest are stronger signals of demand.
 
+Standalone article candidates are curated separately in the [Problem-Oriented Standalone Article Backlog](article-backlog.md). That backlog starts from externally recognizable reader/search problems and synthesizes existing Learning material; it does not replace this curriculum-topic intake surface.
+
 ## How to Request a Topic
 
 For a new topic request, prefer opening an [ASI Backbone Organization Discussion](https://github.com/orgs/AsiBackbone/discussions) when the subject is exploratory, architectural, or likely to benefit from community input.
