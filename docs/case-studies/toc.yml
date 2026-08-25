@@ -21,3 +21,6 @@
 
 - name: Capability-Scoped Background Operation
   href: capability-scoped-background-operation.md
+
+- name: Simulated Robotics-Command Governance Boundary
+  href: simulated-robotics-command-governance-boundary.md

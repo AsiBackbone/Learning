@@ -862,7 +862,7 @@ What are the operational tradeoffs?
 
 ## Status
 
-**Started — governed administrative operation, sensitive-data access, deployment/infrastructure change, AI-assisted tool-gateway, multi-tenant/regional overlay, human-acknowledgment, and capability-scoped background-operation case studies published** ([#189](https://github.com/AsiBackbone/Learning/issues/189), [#190](https://github.com/AsiBackbone/Learning/issues/190), [#191](https://github.com/AsiBackbone/Learning/issues/191), [#192](https://github.com/AsiBackbone/Learning/issues/192), [#193](https://github.com/AsiBackbone/Learning/issues/193), [#194](https://github.com/AsiBackbone/Learning/issues/194), [#195](https://github.com/AsiBackbone/Learning/issues/195))
+**Complete — all eight planned reference architecture case studies published** ([#189](https://github.com/AsiBackbone/Learning/issues/189), [#190](https://github.com/AsiBackbone/Learning/issues/190), [#191](https://github.com/AsiBackbone/Learning/issues/191), [#192](https://github.com/AsiBackbone/Learning/issues/192), [#193](https://github.com/AsiBackbone/Learning/issues/193), [#194](https://github.com/AsiBackbone/Learning/issues/194), [#195](https://github.com/AsiBackbone/Learning/issues/195), [#196](https://github.com/AsiBackbone/Learning/issues/196))
 
 ## Goal
 
@@ -877,7 +877,7 @@ Potential case studies include:
 * [x] [Multi-tenant and regional policy overlay](docs/case-studies/multi-tenant-and-regional-policy-overlay.md). ([#193](https://github.com/AsiBackbone/Learning/issues/193))
 * [x] [Human acknowledgment workflow](docs/case-studies/human-acknowledgment-workflow.md). ([#194](https://github.com/AsiBackbone/Learning/issues/194))
 * [x] [Capability-scoped background operation](docs/case-studies/capability-scoped-background-operation.md). ([#195](https://github.com/AsiBackbone/Learning/issues/195))
-* [ ] Simulated robotics-command governance boundary.
+* [x] [Simulated robotics-command governance boundary](docs/case-studies/simulated-robotics-command-governance-boundary.md). ([#196](https://github.com/AsiBackbone/Learning/issues/196))
 
 Each case study should separate:
 
