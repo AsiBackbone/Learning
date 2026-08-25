@@ -134,6 +134,7 @@ static class IndexNowPreparation
             "ai-integration",
             "architecture",
             "aspnetcore",
+            "case-studies",
             "getting-started",
             "governance",
             "labs",

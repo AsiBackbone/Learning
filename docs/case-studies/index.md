@@ -1,0 +1,42 @@
+---
+description: Study realistic, simulated reference architectures that compose multiple ASI Backbone Learning boundaries without prescribing a production framework or package design.
+---
+
+# Reference Architecture Case Studies
+
+Reference Architecture Case Studies show how several Learning patterns can coexist inside one realistic scenario.
+
+They are **educational architecture specimens**, not production blueprints. Each study keeps the architectural responsibilities visible while deliberately leaving product selection, deployment topology, persistence technology, credential management, and operational ownership open to the host application.
+
+Use a case study when the individual tutorials make sense on their own but you want to answer the harder question:
+
+> **What does this architecture look like when several of these responsibilities exist in one application?**
+
+## How to Read a Case Study
+
+Each case study separates six concerns that are easy to collapse when a diagram becomes implementation code:
+
+| Concern | Question |
+| --- | --- |
+| Architecture | Which components and trust or lifecycle boundaries exist? |
+| Implementation | How might the example be represented in .NET without prescribing one framework? |
+| Operations | Who deploys, monitors, retries, and supports the application? |
+| Security | Who authenticates actors, protects credentials, and enforces trust boundaries? |
+| Governance | Who establishes policy and produces the decision? |
+| Execution | Which component actually performs the protected side effect? |
+
+The studies prefer fictional, simulated, or dry-run consequential operations unless a real integration materially improves the lesson.
+
+## Available Case Studies
+
+### [Governed Administrative Operation](governed-administrative-operation.md)
+
+Follow a fictional `account.disable` request from authenticated administrative access through authoritative context, policy evaluation, explicit outcomes, acknowledgment or escalation, scoped execution authority, host-owned execution, and correlated evidence.
+
+The case includes both an allowed path and an escalated path, with explicit decision reason codes, policy identity, and executor-invocation evidence.
+
+## What Case Studies Do Not Replace
+
+Case studies do not replace the focused material that explains each boundary independently. Use them as composition maps, then follow the contextual links when one responsibility needs deeper treatment.
+
+For foundational reasoning, begin with [Decision Before Execution](../tutorials/decision-before-execution.md). For hands-on composition, use [Build a Governed API Operation](../labs/build-a-governed-api-operation.md).

@@ -74,6 +74,8 @@ Host-owned execution
 Audit residue
 ```
 
+**See the composition:** [Governed Administrative Operation](../case-studies/governed-administrative-operation.md) follows one fictional `account.disable` request through standing authorization, authoritative context, policy evaluation, acknowledgment or escalation, scoped authority, executor invocation, and correlated evidence.
+
 **Make it observable:** Use the related [executable sample guide](../samples/index.md), then complete [Build a Governed API Operation](../labs/build-a-governed-api-operation.md) to compose the boundaries around one consequential API action.
 
 **Prefer something simpler when:** Ordinary ASP.NET Core authorization plus a clear application service already answers the access and execution questions. Start with [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md) or [When a Simple Application Service Is Enough](../architecture/when-a-simple-application-service-is-enough.md) before adding governance machinery.

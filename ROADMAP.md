@@ -860,13 +860,17 @@ What are the operational tradeoffs?
 
 # Milestone 11 — Reference Architecture Case Studies
 
+## Status
+
+**Started — governed administrative operation case study published** ([#189](https://github.com/AsiBackbone/Learning/issues/189))
+
 ## Goal
 
 Show how multiple patterns interact in realistic scenarios without turning Learning into another production framework.
 
 Potential case studies include:
 
-* [ ] Governed administrative operation.
+* [x] [Governed administrative operation](docs/case-studies/governed-administrative-operation.md). ([#189](https://github.com/AsiBackbone/Learning/issues/189))
 * [ ] Sensitive-data access decision.
 * [ ] Deployment approval gateway.
 * [ ] Infrastructure change gate.
