@@ -862,7 +862,7 @@ What are the operational tradeoffs?
 
 ## Status
 
-**Started — governed administrative operation, sensitive-data access, deployment/infrastructure change, AI-assisted tool-gateway, and multi-tenant/regional overlay case studies published** ([#189](https://github.com/AsiBackbone/Learning/issues/189), [#190](https://github.com/AsiBackbone/Learning/issues/190), [#191](https://github.com/AsiBackbone/Learning/issues/191), [#192](https://github.com/AsiBackbone/Learning/issues/192), [#193](https://github.com/AsiBackbone/Learning/issues/193))
+**Started — governed administrative operation, sensitive-data access, deployment/infrastructure change, AI-assisted tool-gateway, multi-tenant/regional overlay, and human-acknowledgment case studies published** ([#189](https://github.com/AsiBackbone/Learning/issues/189), [#190](https://github.com/AsiBackbone/Learning/issues/190), [#191](https://github.com/AsiBackbone/Learning/issues/191), [#192](https://github.com/AsiBackbone/Learning/issues/192), [#193](https://github.com/AsiBackbone/Learning/issues/193), [#194](https://github.com/AsiBackbone/Learning/issues/194))
 
 ## Goal
 
@@ -875,7 +875,7 @@ Potential case studies include:
 * [x] [Deployment approval and infrastructure change gates](docs/case-studies/deployment-approval-and-infrastructure-change-gates.md). ([#191](https://github.com/AsiBackbone/Learning/issues/191))
 * [x] [AI-assisted API operation and governed AI tool gateway](docs/case-studies/ai-assisted-api-and-governed-tool-gateway.md). ([#192](https://github.com/AsiBackbone/Learning/issues/192))
 * [x] [Multi-tenant and regional policy overlay](docs/case-studies/multi-tenant-and-regional-policy-overlay.md). ([#193](https://github.com/AsiBackbone/Learning/issues/193))
-* [ ] Human acknowledgment workflow.
+* [x] [Human acknowledgment workflow](docs/case-studies/human-acknowledgment-workflow.md). ([#194](https://github.com/AsiBackbone/Learning/issues/194))
 * [ ] Capability-scoped background operation.
 * [ ] Simulated robotics-command governance boundary.
 

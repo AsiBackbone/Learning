@@ -15,3 +15,6 @@
 
 - name: Multi-Tenant and Regional Policy Overlay
   href: multi-tenant-and-regional-policy-overlay.md
+
+- name: Human Acknowledgment Workflow
+  href: human-acknowledgment-workflow.md

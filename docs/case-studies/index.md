@@ -59,6 +59,12 @@ Follow a fictional `document.export` operation through authoritative tenant and 
 
 The case compares the same operation under two tenants and two regions, surfaces conflicting constraints, preserves policy identity/version/fingerprint evidence, prevents clients from self-selecting a more permissive policy scope, and demonstrates side-effect-free candidate policy simulation.
 
+### [Human Acknowledgment Workflow](human-acknowledgment-workflow.md)
+
+Follow a fictional `accounts.bulk-suspend` operation from an acknowledgment-required policy decision through a durable challenge, explicit human acceptance or decline, expiry and cancellation, current-state re-evaluation, scoped execution authority, and host-owned synthetic execution.
+
+The case demonstrates that acknowledgment is neither approval nor execution authority, preserves decision/challenge/response/grant/execution evidence across time, and proves that an accepted acknowledgment without valid current authority still produces zero protected executor calls.
+
 ## What Case Studies Do Not Replace
 
 Case studies do not replace the focused material that explains each boundary independently. Use them as composition maps, then follow the contextual links when one responsibility needs deeper treatment.
