@@ -78,6 +78,8 @@ The central lesson is:
 
 > **Supply-chain integrity is a trust-chain property, not a collection of CI badges.**
 
+If your starting question is whether a green CI run proves the NuGet package you install is trustworthy, [A Green CI Badge Does Not Prove Your .NET Package Is Trustworthy](../articles/2026/ci-badge-does-not-prove-package-integrity.md) is the shorter problem-oriented entry point. This walkthrough expands that question across the full source-to-consumer trust chain.
+
 ---
 
 ## What This Walkthrough Uses as Working Specimens

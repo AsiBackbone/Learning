@@ -582,13 +582,13 @@ Before a consequential operation crosses into execution, ask:
 
 If those answers are clear, the execution boundary is probably clear too.
 
-## Further Reading
+## Continue from the Failure to the Boundary
 
-- [Decision Before Execution](../../tutorials/decision-before-execution.md) — the full foundational tutorial and implementation walkthrough.
-- [Decision Before Execution executable sample](https://github.com/AsiBackbone/Learning/tree/main/samples/decision-before-execution) — a small .NET sample with focused invariant tests.
-- [When ASP.NET Core Authorization Is Enough](../../architecture/when-aspnet-core-authorization-is-enough.md) — the simpler framework-native alternative and the boundary where the problem becomes larger than authorization.
-- [Terminology and Established Architecture Concepts](../../architecture/terminology-and-established-concepts.md) — mappings from Learning terminology to established authorization, policy, workflow, provenance, and mediation concepts.
-- [AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) — an optional working implementation reference. The article does not require adopting it.
+For the complete reusable boundary and its focused invariant tests, continue with [Decision Before Execution](../../tutorials/decision-before-execution.md). It turns the late-check failure into an explicit proposal → context → decision → host-owned execution pattern.
+
+If you are deciding whether that additional lifecycle model is warranted at all, compare [When ASP.NET Core Authorization Is Enough](../../architecture/when-aspnet-core-authorization-is-enough.md). It shows where policies, handlers, and resource-based authorization fully express the requirement and where richer workflow outcomes become a separate concern.
+
+To observe the boundary in running code, use the [Decision Before Execution executable sample](https://github.com/AsiBackbone/Learning/tree/main/samples/decision-before-execution). Its focused tests demonstrate that blocked decisions do not invoke the executor. Then use the [Decision Before Execution lab](../../labs/decision-before-execution.md) to change the scenario yourself and validate that the invariant still holds.
 
 ## The Rule to Keep
 

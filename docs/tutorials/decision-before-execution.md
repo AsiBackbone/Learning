@@ -34,6 +34,8 @@ The core idea is:
 
 > **A proposed action should become a governed decision before it becomes real-world execution.**
 
+If you are arriving from a concrete failure where authorization succeeds and a downstream rule blocks the operation only after side effects begin, [Your Authorization Check Runs Too Late](../articles/2026/authorization-check-runs-too-late.md) is the problem-first companion. This tutorial continues from that failure into the reusable boundary and the invariant that blocked decisions never reach the executor.
+
 ## The Problem
 
 Many applications move directly from a request to a side effect:

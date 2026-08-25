@@ -221,11 +221,14 @@ More YAML is not automatically more security. A control earns its place when a m
 
 If those questions have clear answers, the green badge has been placed in context instead of being asked to carry a claim it was never designed to prove.
 
-## Further Reading
+## Continue Through the Trust Chain
 
-- [Software Supply-Chain Integrity for .NET Repositories](https://asibackbone.github.io/Learning/security/software-supply-chain-integrity-for-dotnet-repositories.html) — the deeper Learning walkthrough of source, dependency, workflow, build, package, provenance, and publication boundaries.
-- [Signing, Verification, Key Custody, and Tamper Evidence](https://asibackbone.github.io/Learning/security/signing-verification-key-custody-and-tamper-evidence.html) — deeper treatment of hashes, signatures, trust anchors, key lifecycle, and verification policy.
-- [Secret Handling Across Trust Boundaries](https://asibackbone.github.io/Learning/security/secret-handling-across-trust-boundaries.html) — broader guidance for CI/CD secrets, short-lived identities, rotation, revocation, and compromise response.
-- [AsiBackbone package repository workflows](https://github.com/AsiBackbone/AsiBackbone/tree/main/.github/workflows) — an optional specimen for package validation, artifact handoff, SBOM, provenance, and publication-boundary patterns. It is not a specimen for NuGet author signing.
+To trace the complete source-to-consumer path, continue with [Software Supply-Chain Integrity for .NET Repositories](../../security/software-supply-chain-integrity-for-dotnet-repositories.md). It expands the badge question into source, dependency, workflow, build, package, provenance, and publication boundaries.
+
+When the unresolved question is what a hash, signature, or attestation actually proves, use [Signing, Verification, Key Custody, and Tamper Evidence](../../security/signing-verification-key-custody-and-tamper-evidence.md). It separates integrity, authenticity, trust anchors, key custody, and verification policy instead of treating "signed" as one undifferentiated claim.
+
+If publication authority depends on CI/CD credentials or federated identities, [Secret Handling Across Trust Boundaries](../../security/secret-handling-across-trust-boundaries.md) addresses scope, exposure, rotation, revocation, and compromise response at that boundary.
+
+To compare those ideas with a working package pipeline, inspect the [AsiBackbone package repository workflows](https://github.com/AsiBackbone/AsiBackbone/tree/main/.github/workflows). They are an optional specimen for package validation, artifact handoff, SBOM, provenance, and publication-boundary patterns; they are not a specimen for NuGet author signing.
 
 The point is not to copy one repository's release stack. The point is to explain, narrowly and verifiably, how reviewed source became the artifact a consumer received.
