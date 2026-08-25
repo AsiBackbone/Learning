@@ -889,16 +889,29 @@ static class IndexNowPreparation
             UrlList = urls.OrderBy(static value => value, StringComparer.Ordinal).ToArray()
         };
 
-        var options = new JsonSerializerOptions
+        using var stream = new MemoryStream();
+        using (var writer = new Utf8JsonWriter(
+            stream,
+            new JsonWriterOptions { Indented = true }))
         {
-            WriteIndented = true
-        };
+            writer.WriteStartObject();
+            writer.WriteString("host", payload.Host);
+            writer.WriteString("key", payload.Key);
+            writer.WriteString("keyLocation", payload.KeyLocation);
+            writer.WriteStartArray("urlList");
 
-        string json = JsonSerializer.Serialize(payload, options) + "\n";
-        File.WriteAllText(
-            outputPath,
-            json,
-            new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            foreach (string url in payload.UrlList)
+            {
+                writer.WriteStringValue(url);
+            }
+
+            writer.WriteEndArray();
+            writer.WriteEndObject();
+            writer.Flush();
+        }
+
+        stream.WriteByte((byte)'\n');
+        File.WriteAllBytes(outputPath, stream.ToArray());
     }
 
     private static void PrintSummary(string baseCommit, string headCommit, IReadOnlyCollection<SelectedUrl> selected)
