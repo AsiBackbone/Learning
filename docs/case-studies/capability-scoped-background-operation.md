@@ -1042,25 +1042,25 @@ The same atomic store also resolves a claim racing with expiry. A representative
 
 ```mermaid
 sequenceDiagram
-    participant O as "Operator / revoker"
+    participant O as Operator
     participant W as Worker
     participant S as Capability state store
 
-    Note over S: State = Issued, StateVersion = 12, ExpiresAt = 14:10:01Z
-    par Revocation attempt
-        O->>S: CAS Issued/v12 to Revoked
-    and Claim attempt
-        W->>S: CAS Issued/v12 to Claimed while unexpired
+    Note over S: Issued state version 12 expires at 14:10:01Z
+    par Revoke
+        O->>S: CAS Issued v12 to Revoked
+    and Claim
+        W->>S: CAS Issued v12 to Claimed before expiry
     end
     alt Revocation wins
         S-->>O: transition accepted
         S-->>W: claim rejected
     else Claim wins before expiry
-        S-->>W: Claimed(ExecutionId)
-        S-->>O: revocation rejected; use execution cancellation semantics
-    else Host time is past ExpiresAt before claim
+        S-->>W: claim accepted with ExecutionId
+        S-->>O: revocation rejected and execution cancellation rules apply
+    else Expiry wins before claim
         S-->>W: claim rejected as expired
-        Note over S: Issued authority may be materialized as Expired by claim path or sweeper
+        Note over S: Issued authority may be materialized as Expired
     end
 ```
 
