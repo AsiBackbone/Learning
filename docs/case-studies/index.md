@@ -53,6 +53,12 @@ Compare a conventional human API request with a deterministic fake-model proposa
 
 The case demonstrates typed proposal validation, unknown-tool and invalid-argument rejection, authoritative host context overriding model hints, acknowledgment, scoped authority, credential custody, end-to-end tracing, and zero executor calls after rejected or denied proposals.
 
+### [Multi-Tenant and Regional Policy Overlay](multi-tenant-and-regional-policy-overlay.md)
+
+Follow a fictional `document.export` operation through authoritative tenant and region resolution, base/regional/tenant/operation policy contributions, explicit composition, policy-set provenance, scoped authority, and host-owned synthetic execution.
+
+The case compares the same operation under two tenants and two regions, surfaces conflicting constraints, preserves policy identity/version/fingerprint evidence, prevents clients from self-selecting a more permissive policy scope, and demonstrates side-effect-free candidate policy simulation.
+
 ## What Case Studies Do Not Replace
 
 Case studies do not replace the focused material that explains each boundary independently. Use them as composition maps, then follow the contextual links when one responsibility needs deeper treatment.

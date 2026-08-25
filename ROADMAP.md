@@ -862,7 +862,7 @@ What are the operational tradeoffs?
 
 ## Status
 
-**Started — governed administrative operation, sensitive-data access, deployment/infrastructure change, and AI-assisted tool-gateway case studies published** ([#189](https://github.com/AsiBackbone/Learning/issues/189), [#190](https://github.com/AsiBackbone/Learning/issues/190), [#191](https://github.com/AsiBackbone/Learning/issues/191), [#192](https://github.com/AsiBackbone/Learning/issues/192))
+**Started — governed administrative operation, sensitive-data access, deployment/infrastructure change, AI-assisted tool-gateway, and multi-tenant/regional overlay case studies published** ([#189](https://github.com/AsiBackbone/Learning/issues/189), [#190](https://github.com/AsiBackbone/Learning/issues/190), [#191](https://github.com/AsiBackbone/Learning/issues/191), [#192](https://github.com/AsiBackbone/Learning/issues/192), [#193](https://github.com/AsiBackbone/Learning/issues/193))
 
 ## Goal
 
@@ -874,10 +874,9 @@ Potential case studies include:
 * [x] [Sensitive-data access decision](docs/case-studies/sensitive-data-access-decision.md). ([#190](https://github.com/AsiBackbone/Learning/issues/190))
 * [x] [Deployment approval and infrastructure change gates](docs/case-studies/deployment-approval-and-infrastructure-change-gates.md). ([#191](https://github.com/AsiBackbone/Learning/issues/191))
 * [x] [AI-assisted API operation and governed AI tool gateway](docs/case-studies/ai-assisted-api-and-governed-tool-gateway.md). ([#192](https://github.com/AsiBackbone/Learning/issues/192))
-* [ ] Multi-tenant policy evaluation.
+* [x] [Multi-tenant and regional policy overlay](docs/case-studies/multi-tenant-and-regional-policy-overlay.md). ([#193](https://github.com/AsiBackbone/Learning/issues/193))
 * [ ] Human acknowledgment workflow.
 * [ ] Capability-scoped background operation.
-* [ ] Regional policy overlay.
 * [ ] Simulated robotics-command governance boundary.
 
 Each case study should separate:
