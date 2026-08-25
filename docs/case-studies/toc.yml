@@ -12,3 +12,6 @@
 
 - name: AI-Assisted API and Governed Tool Gateway
   href: ai-assisted-api-and-governed-tool-gateway.md
+
+- name: Multi-Tenant and Regional Policy Overlay
+  href: multi-tenant-and-regional-policy-overlay.md
