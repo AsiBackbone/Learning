@@ -120,7 +120,7 @@ Every arrow is a blocking boundary. A rejection at any step produces zero simula
 
 ## 2. Boundary Summary
 
-The case separates eight responsibilities. This table is the shortest boundary map for the page. The [Compact Glossary](#compact-glossary) is the canonical vocabulary; later sections apply these terms rather than redefine them.
+The case separates eight responsibilities. This table is the shortest boundary map for the page. The [Compact Glossary](#36-compact-glossary) is the canonical vocabulary; later sections apply these terms rather than redefine them.
 
 | Boundary | Canonical responsibility | Blocking result |
 | --- | --- | --- |
@@ -1022,7 +1022,7 @@ If the Local Safety Boundary returns anything other than `Accepted`:
 Simulated movement calls = 0
 ```
 
-The acknowledgment rule is defined in [Acknowledgment Is a Continuation Requirement, Not a Safety Override](#acknowledgment-is-a-continuation-requirement-not-a-safety-override); satisfying it does not alter this boundary result.
+The acknowledgment rule is defined in [Acknowledgment Is a Continuation Requirement, Not a Safety Override](#11-acknowledgment-is-a-continuation-requirement-not-a-safety-override); satisfying it does not alter this boundary result.
 
 This architecture atomically claims the one-use command capability **before** the Local Safety Boundary check. A Local Safety Boundary rejection therefore consumes that command authority rather than returning it to `Issued`. If conditions later change and another attempt is appropriate, the host must create a fresh governed command and fresh authority. This conservative teaching choice prevents one capability from becoming a reusable stream of movement attempts.
 
@@ -1321,7 +1321,7 @@ flowchart TD
     D -->|"Yes"| E["Simulated movement"]
 ```
 
-The required scenarios use one compact form: **input → blocking/accepting boundary → movement count**. The [Decision and Execution Matrix](#decision-and-execution-matrix) carries the broader comparison set.
+The required scenarios use one compact form: **input → blocking/accepting boundary → movement count**. The [Decision and Execution Matrix](#31-decision-and-execution-matrix) carries the broader comparison set.
 
 ### Scenario A — Valid command
 
