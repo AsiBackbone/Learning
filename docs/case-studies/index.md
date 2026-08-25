@@ -65,6 +65,12 @@ Follow a fictional `accounts.bulk-suspend` operation from an acknowledgment-requ
 
 The case demonstrates that acknowledgment is neither approval nor execution authority, preserves decision/challenge/response/grant/execution evidence across time, and proves that an accepted acknowledgment without valid current authority still produces zero protected executor calls.
 
+### [Capability-Scoped Background Operation](capability-scoped-background-operation.md)
+
+Follow a fictional `report.generate` request from an allowed request-time decision through narrow capability issuance, durable job delivery, background-worker validation, replay/expiry/revocation controls, current policy and resource re-evaluation, and host-owned execution.
+
+The case demonstrates that a queue message is not authority, a worker identity is not broad operation authority, altered scope is rejected, delayed execution remains freshness-bound, and operational retry stays distinct from fresh governance.
+
 ## What Case Studies Do Not Replace
 
 Case studies do not replace the focused material that explains each boundary independently. Use them as composition maps, then follow the contextual links when one responsibility needs deeper treatment.

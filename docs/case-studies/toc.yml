@@ -18,3 +18,6 @@
 
 - name: Human Acknowledgment Workflow
   href: human-acknowledgment-workflow.md
+
+- name: Capability-Scoped Background Operation
+  href: capability-scoped-background-operation.md
