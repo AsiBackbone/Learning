@@ -6,3 +6,6 @@
 
 - name: Sensitive-Data Access Decision
   href: sensitive-data-access-decision.md
+
+- name: Deployment Approval and Infrastructure Change Gates
+  href: deployment-approval-and-infrastructure-change-gates.md
