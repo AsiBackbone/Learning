@@ -862,7 +862,7 @@ What are the operational tradeoffs?
 
 ## Status
 
-**Started — governed administrative operation, sensitive-data access, deployment/infrastructure change, AI-assisted tool-gateway, multi-tenant/regional overlay, and human-acknowledgment case studies published** ([#189](https://github.com/AsiBackbone/Learning/issues/189), [#190](https://github.com/AsiBackbone/Learning/issues/190), [#191](https://github.com/AsiBackbone/Learning/issues/191), [#192](https://github.com/AsiBackbone/Learning/issues/192), [#193](https://github.com/AsiBackbone/Learning/issues/193), [#194](https://github.com/AsiBackbone/Learning/issues/194))
+**Started — governed administrative operation, sensitive-data access, deployment/infrastructure change, AI-assisted tool-gateway, multi-tenant/regional overlay, human-acknowledgment, and capability-scoped background-operation case studies published** ([#189](https://github.com/AsiBackbone/Learning/issues/189), [#190](https://github.com/AsiBackbone/Learning/issues/190), [#191](https://github.com/AsiBackbone/Learning/issues/191), [#192](https://github.com/AsiBackbone/Learning/issues/192), [#193](https://github.com/AsiBackbone/Learning/issues/193), [#194](https://github.com/AsiBackbone/Learning/issues/194), [#195](https://github.com/AsiBackbone/Learning/issues/195))
 
 ## Goal
 
@@ -876,7 +876,7 @@ Potential case studies include:
 * [x] [AI-assisted API operation and governed AI tool gateway](docs/case-studies/ai-assisted-api-and-governed-tool-gateway.md). ([#192](https://github.com/AsiBackbone/Learning/issues/192))
 * [x] [Multi-tenant and regional policy overlay](docs/case-studies/multi-tenant-and-regional-policy-overlay.md). ([#193](https://github.com/AsiBackbone/Learning/issues/193))
 * [x] [Human acknowledgment workflow](docs/case-studies/human-acknowledgment-workflow.md). ([#194](https://github.com/AsiBackbone/Learning/issues/194))
-* [ ] Capability-scoped background operation.
+* [x] [Capability-scoped background operation](docs/case-studies/capability-scoped-background-operation.md). ([#195](https://github.com/AsiBackbone/Learning/issues/195))
 * [ ] Simulated robotics-command governance boundary.
 
 Each case study should separate:
