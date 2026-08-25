@@ -8,6 +8,7 @@ on:
       - 'docs/**'
       - 'docs/templates/**'
       - 'tools/generate-feed.cs'
+      - 'tools/generate-sitemap.cs'
       - 'tools/validate-docfx-template-baseline.cs'
       - '.config/dotnet-tools.json'
       - '.github/workflows/publish-docs.yml'
@@ -37,6 +38,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # File-level Git history provides stable sitemap lastmod dates.
+          fetch-depth: 0
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
@@ -51,6 +54,15 @@ jobs:
 
       - name: Build DocFX site
         run: dotnet tool run docfx docs/docfx.json --warningsAsErrors
+
+      - name: Validate XML sitemap generator contract
+        run: dotnet run --file tools/generate-sitemap.cs -- --self-test
+
+      - name: Generate XML sitemap
+        run: dotnet run --file tools/generate-sitemap.cs
+
+      - name: Validate generated XML sitemap
+        run: dotnet run --file tools/generate-sitemap.cs -- --validate
 
       - name: Validate RSS feed generator contract
         run: dotnet run --file tools/generate-feed.cs -- --self-test
