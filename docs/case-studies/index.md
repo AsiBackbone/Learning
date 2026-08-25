@@ -35,6 +35,12 @@ Follow a fictional `account.disable` request from authenticated administrative a
 
 The case includes both an allowed path and an escalated path, with explicit decision reason codes, policy identity, and executor-invocation evidence.
 
+### [Sensitive-Data Access Decision](sensitive-data-access-decision.md)
+
+Compare ordinary low-sensitivity access with a fictional `records.export` operation that requires current resource classification, tenant and purpose context, destination approval, policy evaluation, narrow resource-specific authority, and sensitive-data-safe evidence.
+
+The case includes acknowledgment, escalation, denial, short-lived export authority, zero-executor blocked paths, data minimization, safe logging, provenance, and partial-failure considerations without exposing real protected information.
+
 ## What Case Studies Do Not Replace
 
 Case studies do not replace the focused material that explains each boundary independently. Use them as composition maps, then follow the contextual links when one responsibility needs deeper treatment.

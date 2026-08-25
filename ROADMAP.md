@@ -862,7 +862,7 @@ What are the operational tradeoffs?
 
 ## Status
 
-**Started — governed administrative operation case study published** ([#189](https://github.com/AsiBackbone/Learning/issues/189))
+**Started — governed administrative operation and sensitive-data access decision case studies published** ([#189](https://github.com/AsiBackbone/Learning/issues/189), [#190](https://github.com/AsiBackbone/Learning/issues/190))
 
 ## Goal
 
@@ -871,7 +871,7 @@ Show how multiple patterns interact in realistic scenarios without turning Learn
 Potential case studies include:
 
 * [x] [Governed administrative operation](docs/case-studies/governed-administrative-operation.md). ([#189](https://github.com/AsiBackbone/Learning/issues/189))
-* [ ] Sensitive-data access decision.
+* [x] [Sensitive-data access decision](docs/case-studies/sensitive-data-access-decision.md). ([#190](https://github.com/AsiBackbone/Learning/issues/190))
 * [ ] Deployment approval gateway.
 * [ ] Infrastructure change gate.
 * [ ] AI-assisted API operation.
