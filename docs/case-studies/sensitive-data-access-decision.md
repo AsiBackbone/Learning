@@ -942,9 +942,9 @@ sequenceDiagram
         Note over H,E: executor remains at 0 until a fresh Allowed decision and valid grant exist
     else EscalationRecommended
         H->>A: route to review
-        Note over H,E: grant not issued; executor calls = 0
+        Note over H,E: grant not issued and executor calls = 0
     else Denied or Deferred
-        Note over H,E: stop or wait; grant not issued; executor calls = 0
+        Note over H,E: stop or wait, grant not issued, executor calls = 0
     end
 ```
 
