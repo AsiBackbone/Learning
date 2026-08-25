@@ -71,6 +71,12 @@ Follow a fictional `report.generate` request from an allowed request-time decisi
 
 The case demonstrates that a queue message is not authority, a worker identity is not broad operation authority, altered scope is rejected, delayed execution remains freshness-bound, and operational retry stays distinct from fresh governance.
 
+### [Simulated Robotics-Command Governance Boundary](simulated-robotics-command-governance-boundary.md)
+
+Follow a deterministic fake robot command from planner or AI proposal through semantic command validation, authoritative device and regional context, governance, narrow one-use command authority, simulated gateway enforcement, current local safety checks, and fake physical execution.
+
+The experimental case demonstrates that governance permission is not a robotics safety verdict: an out-of-scope, expired, replayed, or locally unsafe command produces zero simulated movement, and no model output is connected directly to an actuator or production robotics stack.
+
 ## What Case Studies Do Not Replace
 
 Case studies do not replace the focused material that explains each boundary independently. Use them as composition maps, then follow the contextual links when one responsibility needs deeper treatment.
