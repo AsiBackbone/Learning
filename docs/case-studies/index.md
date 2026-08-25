@@ -41,6 +41,12 @@ Compare ordinary low-sensitivity access with a fictional `records.export` operat
 
 The case includes acknowledgment, escalation, denial, short-lived export authority, zero-executor blocked paths, data minimization, safe logging, provenance, and partial-failure considerations without exposing real protected information.
 
+### [Deployment Approval and Infrastructure Change Gates](deployment-approval-and-infrastructure-change-gates.md)
+
+Compare application deployment and infrastructure-change variants where build or plan evidence, environment policy, human approval, short-lived authority, credential custody, and execution remain separate responsibilities.
+
+The case demonstrates artifact- and plan-bound approvals, separation of duties, expiry and freshness checks, plan-versus-apply, synthetic executors, rollback responsibility, and zero-executor blocked paths without connecting to a real deployment target or cloud provider.
+
 ## What Case Studies Do Not Replace
 
 Case studies do not replace the focused material that explains each boundary independently. Use them as composition maps, then follow the contextual links when one responsibility needs deeper treatment.
