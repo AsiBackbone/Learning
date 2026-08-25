@@ -18,6 +18,7 @@ on:
       - 'docs/templates/**'
       - 'tools/generate-feed.cs'
       - 'tools/generate-sitemap.cs'
+      - 'tools/prepare-indexnow.cs'
       - 'tools/validate-doc-metadata.cs'
       - 'tools/validate-docfx-template-baseline.cs'
       - '.config/dotnet-tools.json'
@@ -75,6 +76,14 @@ jobs:
 
       - name: Validate generated XML sitemap
         run: dotnet run --file tools/generate-sitemap.cs -- --validate
+
+      - name: Validate IndexNow URL-selection contract
+        run: dotnet run --file tools/prepare-indexnow.cs -- --self-test
+
+      - name: Validate IndexNow publication contract
+        run: >-
+          dotnet run --file tools/prepare-indexnow.cs --
+          --base HEAD --head HEAD --sitemap docs/_site/sitemap.xml --dry-run
 
       - name: Validate RSS feed generator contract
         run: dotnet run --file tools/generate-feed.cs -- --self-test
