@@ -132,8 +132,7 @@ Use the canonical project surfaces for deeper information rather than treating t
 **Questions and ideas → [Discussions](https://github.com/AsiBackbone/Learning/discussions) · Concrete work → [Issues](https://github.com/AsiBackbone/Learning/issues) · Changes → [Pull Requests](https://github.com/AsiBackbone/Learning/pulls)**
 
 - **Published documentation:** [asibackbone.github.io/Learning](https://asibackbone.github.io/Learning/)
-- **XML sitemap:** [asibackbone.github.io/Learning/sitemap.xml](https://asibackbone.github.io/Learning/sitemap.xml) — submit this canonical sitemap URL to Google Search Console and Bing Webmaster Tools.
-- **Contribution guidance:** [CONTRIBUTING.md](CONTRIBUTING.md)
+- **XML sitemap:** `https://asibackbone.github.io/Learning/sitemap.xml` — submit this canonical sitemap URL to Google Search Console and Bing Webmaster Tools.- **Contribution guidance:** [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Project status and planned work:** [ROADMAP.md](ROADMAP.md)
 - **Learning discussions:** [AsiBackbone/Learning Discussions](https://github.com/AsiBackbone/Learning/discussions)
 - **Organization-wide discussion:** [ASI Backbone Organization Discussions](https://github.com/orgs/AsiBackbone/discussions)
