@@ -862,7 +862,7 @@ What are the operational tradeoffs?
 
 ## Status
 
-**Started — governed administrative operation, sensitive-data access, and deployment/infrastructure change case studies published** ([#189](https://github.com/AsiBackbone/Learning/issues/189), [#190](https://github.com/AsiBackbone/Learning/issues/190), [#191](https://github.com/AsiBackbone/Learning/issues/191))
+**Started — governed administrative operation, sensitive-data access, deployment/infrastructure change, and AI-assisted tool-gateway case studies published** ([#189](https://github.com/AsiBackbone/Learning/issues/189), [#190](https://github.com/AsiBackbone/Learning/issues/190), [#191](https://github.com/AsiBackbone/Learning/issues/191), [#192](https://github.com/AsiBackbone/Learning/issues/192))
 
 ## Goal
 
@@ -873,8 +873,7 @@ Potential case studies include:
 * [x] [Governed administrative operation](docs/case-studies/governed-administrative-operation.md). ([#189](https://github.com/AsiBackbone/Learning/issues/189))
 * [x] [Sensitive-data access decision](docs/case-studies/sensitive-data-access-decision.md). ([#190](https://github.com/AsiBackbone/Learning/issues/190))
 * [x] [Deployment approval and infrastructure change gates](docs/case-studies/deployment-approval-and-infrastructure-change-gates.md). ([#191](https://github.com/AsiBackbone/Learning/issues/191))
-* [ ] AI-assisted API operation.
-* [ ] Governed AI tool gateway.
+* [x] [AI-assisted API operation and governed AI tool gateway](docs/case-studies/ai-assisted-api-and-governed-tool-gateway.md). ([#192](https://github.com/AsiBackbone/Learning/issues/192))
 * [ ] Multi-tenant policy evaluation.
 * [ ] Human acknowledgment workflow.
 * [ ] Capability-scoped background operation.
