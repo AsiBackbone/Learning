@@ -47,6 +47,12 @@ Compare application deployment and infrastructure-change variants where build or
 
 The case demonstrates artifact- and plan-bound approvals, separation of duties, expiry and freshness checks, plan-versus-apply, synthetic executors, rollback responsibility, and zero-executor blocked paths without connecting to a real deployment target or cloud provider.
 
+### [AI-Assisted API and Governed Tool Gateway](ai-assisted-api-and-governed-tool-gateway.md)
+
+Compare a conventional human API request with a deterministic fake-model proposal when both ultimately target the same fictional `case.add-note` operation and the same host-owned governance and execution boundary.
+
+The case demonstrates typed proposal validation, unknown-tool and invalid-argument rejection, authoritative host context overriding model hints, acknowledgment, scoped authority, credential custody, end-to-end tracing, and zero executor calls after rejected or denied proposals.
+
 ## What Case Studies Do Not Replace
 
 Case studies do not replace the focused material that explains each boundary independently. Use them as composition maps, then follow the contextual links when one responsibility needs deeper treatment.
