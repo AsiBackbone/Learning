@@ -1,38 +1,36 @@
 - name: Home
   href: index.md
 
-- name: Getting Started
-  href: getting-started/index.md
-
-- name: Articles
-  href: articles/index.md
+- name: Learn
+  items:
+  - name: Getting Started
+    href: getting-started/index.md
+  - name: Articles
+    href: articles/index.md
+  - name: Tutorials
+    href: tutorials/index.md
 
 - name: Architecture
-  href: architecture/index.md
+  items:
+  - name: Architecture Overview
+    href: architecture/index.md
+  - name: Governance
+    href: governance/index.md
+  - name: ASP.NET Core
+    href: aspnetcore/index.md
+  - name: Security
+    href: security/index.md
+  - name: AI Integration
+    href: ai-integration/index.md
 
-- name: Governance
-  href: governance/index.md
-
-- name: ASP.NET Core
-  href: aspnetcore/index.md
-
-- name: Security
-  href: security/index.md
-
-- name: AI Integration
-  href: ai-integration/index.md
-
-- name: Tutorials
-  href: tutorials/index.md
-
-- name: Executable Samples
-  href: samples/index.md
-
-- name: Labs
-  href: labs/index.md
-
-- name: Reference Architecture Case Studies
-  href: case-studies/index.md
+- name: Practice
+  items:
+  - name: Executable Samples
+    href: samples/index.md
+  - name: Labs
+    href: labs/index.md
+  - name: Reference Architecture Case Studies
+    href: case-studies/index.md
 
 - name: Advanced
   href: advanced/index.md

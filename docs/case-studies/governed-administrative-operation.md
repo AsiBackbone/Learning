@@ -814,11 +814,11 @@ sequenceDiagram
     else EscalationRecommended
         P-->>H: EscalationRecommended
         H->>R: Record decision receipt
-        Note over H,E: No grant; executor invocations = 0
+        Note over H,E: No grant and executor invocations = 0
     else Deferred
         P-->>H: Deferred
         H->>R: Record decision receipt
-        Note over H,E: Retry only through a fresh host-owned attempt; executor invocations = 0
+        Note over H,E: Retry only through a fresh host-owned attempt and executor invocations = 0
     else AcknowledgmentRequired
         P-->>H: AcknowledgmentRequired
         H->>R: Record decision receipt
@@ -838,7 +838,7 @@ sequenceDiagram
         else Still blocked / changed policy
             P-->>H: Deferred or EscalationRecommended
             H->>R: Record new decision receipt
-            Note over H,E: No grant; executor invocations = 0
+            Note over H,E: No grant and executor invocations = 0
         end
     end
 ```
