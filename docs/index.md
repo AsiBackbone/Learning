@@ -108,6 +108,12 @@ Move from reading to reasoning with hands-on exercises, incomplete implementatio
 
 [Browse Labs →](labs/index.md)
 
+### Reference Architecture Case Studies
+
+See several Learning boundaries composed inside realistic, simulated scenarios without treating the specimen as a production framework or prescribed application design.
+
+[Browse Reference Architecture Case Studies →](case-studies/index.md)
+
 ### Advanced
 
 Explore deeper architectural questions, alternative approaches, complex integration patterns, and topics that build on the foundational material.

@@ -31,5 +31,8 @@
 - name: Labs
   href: labs/index.md
 
+- name: Reference Architecture Case Studies
+  href: case-studies/index.md
+
 - name: Advanced
   href: advanced/index.md

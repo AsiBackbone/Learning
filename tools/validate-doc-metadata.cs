@@ -55,6 +55,10 @@ static class MetadataValidator
             Article: true),
         new("aspnetcore/index.html", new Uri(SiteRoot, "aspnetcore/").AbsoluteUri, Article: false),
         new(
+            "case-studies/governed-administrative-operation.html",
+            new Uri(SiteRoot, "case-studies/governed-administrative-operation.html").AbsoluteUri,
+            Article: false),
+        new(
             "tutorials/decision-before-execution.html",
             new Uri(SiteRoot, "tutorials/decision-before-execution.html").AbsoluteUri,
             Article: false),

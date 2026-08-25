@@ -53,6 +53,7 @@ static class SitemapGenerator
         new Uri(SiteRoot, "labs/").AbsoluteUri,
         new Uri(SiteRoot, "architecture/").AbsoluteUri,
         new Uri(SiteRoot, "aspnetcore/").AbsoluteUri,
+        new Uri(SiteRoot, "case-studies/").AbsoluteUri,
         new Uri(SiteRoot, "security/").AbsoluteUri,
         new Uri(SiteRoot, "governance/").AbsoluteUri,
         new Uri(SiteRoot, "ai-integration/").AbsoluteUri,
