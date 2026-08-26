@@ -20,6 +20,14 @@ The Learning site is the canonical publication host. Cross-posted copies should 
 
 ## 2026
 
+### [When ASP.NET Core Authorization Is Not Enough](2026/when-aspnet-core-authorization-is-not-enough.md)
+
+**Christopher D. Cavell** · **August 26, 2026**
+
+ASP.NET Core authorization is often the right answer; add a broader decision/execution lifecycle only when workflow, time, authority, or evidence crosses the request boundary.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/when-aspnet-core-authorization-is-not-enough.html`
+
 ### [How to Test That a Denied Operation Never Executes](2026/test-denied-operation-never-executes.md)
 
 **Christopher D. Cavell** · **August 26, 2026**
