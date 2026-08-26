@@ -141,6 +141,27 @@ The same executable includes a deterministic local observability demonstration u
 
 ## Governance and Policy Architecture Samples
 
+### Decision Pipeline Refactoring
+
+**Learning objective:** Diagnose governance logic scattered around protected side effects, then observe a reference refactor that makes authoritative context, explicit outcomes, continuation requirements, protected execution, and evidence distinct.
+
+**Difficulty:** Intermediate
+
+**Key invariant:**
+
+> **`Denied`, `Deferred`, `AcknowledgmentRequired`, and `EscalationRecommended` produce zero executor calls; `Allowed` produces exactly one.**
+
+Run from the repository root:
+
+```bash
+dotnet run --project samples/decision-pipeline-refactoring/DecisionPipelineRefactoring/DecisionPipelineRefactoring.csproj
+```
+
+- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-pipeline-refactoring/README.md)
+- [Read Decision Before Execution](../tutorials/decision-before-execution.md)
+- [Continue with the refactoring lab](../labs/refactor-scattered-governance-checks.md)
+- [Compare When a Simple Application Service Is Enough](../architecture/when-a-simple-application-service-is-enough.md)
+
 ### Minimal Policy Simulation Harness
 
 **Learning objective:** Compare deterministic governance outcomes for the same fictional proposed intent while region, tenant, risk, environment, or policy version changes, without invoking a protected executor.

@@ -544,8 +544,8 @@ rather than immediately invoking real external systems.
 **Foundational tutorial-aligned lab path established — advanced lab coverage expanding**
 
 Each foundational tutorial now has a learner exercise or lab. Replay-resistance,
-safe degraded-mode, and policy-simulation/change-impact exercises are established.
-Remaining dedicated lab work should deepen decision-pipeline refactoring,
+safe degraded-mode, policy-simulation/change-impact, and decision-pipeline refactoring
+exercises are established. Remaining dedicated lab work should deepen
 policy-architecture comparisons, regional/tenant policy exercises, deliberately
 flawed high-consequence workflows, and broader ASP.NET Core and security scenarios.
 
@@ -592,8 +592,7 @@ Potential initial labs:
 * [x] Preserve an audit receipt.
 * [x] Introduce capability-scoped execution. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [x] Build a governed API operation. ([#54](https://github.com/AsiBackbone/Learning/issues/54))
-* [ ] Refactor scattered governance logic into a decision pipeline. — **Still needed.**
-  Dedicated lab work is tracked by [#221](https://github.com/AsiBackbone/Learning/issues/221).
+* [x] Refactor scattered governance logic into a decision pipeline. ([#221](https://github.com/AsiBackbone/Learning/issues/221))
 * [x] Detect stale or mismatched execution authority. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [x] Add policy-version evidence to a decision path. ([#37](https://github.com/AsiBackbone/Learning/issues/37))
 
@@ -1163,17 +1162,17 @@ Versioned Learning releases are citable educational snapshots. They do not estab
 
 The highest-priority work now is:
 
-1. Complete the decision-pipeline refactoring lab tracked by
-   [#221](https://github.com/AsiBackbone/Learning/issues/221), then select the next
-   lab only where a dedicated learner exercise adds value beyond existing material.
-2. Develop cross-system capability exchange, including delegation, audience
+1. Develop cross-system capability exchange, including delegation, audience
    binding, revocation, replay resistance, and authority transfer across
    independently operated execution boundaries.
-3. Deepen federated and distributed governance beyond policy distribution:
+2. Deepen federated and distributed governance beyond policy distribution:
    multi-region authority coordination, independent governance domains, and
    distributed acknowledgment/continuation workflows.
-4. Add focused decision-explainability material that distinguishes human/operator
+3. Add focused decision-explainability material that distinguishes human/operator
    explanation from reason codes, provenance, telemetry, and audit evidence.
+4. Select the next dedicated advanced lab only where learner work adds value beyond
+   existing material; current candidates include competing policy architectures,
+   regional/tenant policy design, and high-consequence failure critique.
 5. Keep concrete good-first contribution opportunities visible when genuine starter
    work exists, and grow lab/topic reviewer participation as community activity
    justifies it.

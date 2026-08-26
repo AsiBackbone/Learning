@@ -29,6 +29,8 @@
       href: policy-simulation-and-change-impact-analysis.md
     - name: Build a Governed API Operation
       href: build-a-governed-api-operation.md
+    - name: Refactor Scattered Governance Checks
+      href: refactor-scattered-governance-checks.md
     - name: Write and Revisit an Architecture Decision Record
       href: write-and-revisit-an-architecture-decision-record.md
 

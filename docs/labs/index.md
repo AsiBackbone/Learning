@@ -51,11 +51,11 @@ Automated tests are useful evidence, but they are not the entire learning result
 
 ## Current Status
 
-The lab navigation foundation is established, with four beginner labs, seven intermediate labs, and two advanced labs now available.
+The lab navigation foundation is established, with four beginner labs, eight intermediate labs, and two advanced labs now available.
 
 Additional labs will appear in this section as the learning path expands into deeper architecture, security, and AI-governance topics.
 
-The foundational labs pair all five governance tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated boundaries. The governance lab path now also includes policy-version evidence and candidate-policy simulation, while the ASP.NET Core diagnostic lab begins the next learning area by requiring learners to predict, observe, repair, and explain middleware-ordering behavior; the ADR lab extends that application-architecture path by requiring learners to make, record, and revisit a decision under changed constraints.
+The foundational labs pair all five governance tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated boundaries. The governance lab path now also includes policy-version evidence, candidate-policy simulation, and decision-pipeline refactoring, while the ASP.NET Core diagnostic lab begins the next learning area by requiring learners to predict, observe, repair, and explain middleware-ordering behavior; the ADR lab extends that application-architecture path by requiring learners to make, record, and revisit a decision under changed constraints.
 
 ## Available Labs
 
@@ -197,6 +197,21 @@ Related material:
 - [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 - [ASP.NET Core learning area](../aspnetcore/index.md)
+
+### Refactor Scattered Governance Checks into an Explicit Decision Pipeline
+
+[Refactor Scattered Governance Checks into an Explicit Decision Pipeline](refactor-scattered-governance-checks.md)
+
+**Difficulty:** Intermediate
+
+Start from a deliberately flawed `account.disable` service where role checks, resource-dependent policy, mutation, notification, exception-driven escalation, acknowledgment, and event publication are interleaved. Diagnose the real side-effect boundary, refactor toward explicit context → decision → continuation → execution → evidence phases, and prove every blocked outcome leaves the protected executor at zero calls.
+
+Related material:
+
+- [Decision Before Execution tutorial](../tutorials/decision-before-execution.md)
+- [Decision Pipeline Refactoring sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-pipeline-refactoring/README.md)
+- [Identify and Remove a Hidden Execution Side Effect](hidden-execution-side-effect.md)
+- [When a Simple Application Service Is Enough](../architecture/when-a-simple-application-service-is-enough.md)
 
 ### Write and Revisit an Architecture Decision Record
 
