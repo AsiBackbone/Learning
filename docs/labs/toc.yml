@@ -42,3 +42,5 @@
       href: governed-ai-tool-gateway.md
     - name: Safe Degraded Mode and Fail-Safe Governance
       href: safe-degraded-mode-and-fail-safe-governance.md
+    - name: Compare Competing Policy Architectures
+      href: compare-competing-policy-architectures.md

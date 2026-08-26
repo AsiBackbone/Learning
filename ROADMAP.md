@@ -544,10 +544,10 @@ rather than immediately invoking real external systems.
 **Foundational tutorial-aligned lab path established — advanced lab coverage expanding**
 
 Each foundational tutorial now has a learner exercise or lab. Replay-resistance,
-safe degraded-mode, policy-simulation/change-impact, and decision-pipeline refactoring
-exercises are established. Remaining dedicated lab work should deepen
-policy-architecture comparisons, regional/tenant policy exercises, deliberately
-flawed high-consequence workflows, and broader ASP.NET Core and security scenarios.
+safe degraded-mode, policy-simulation/change-impact, decision-pipeline refactoring,
+and competing-policy-architecture comparison exercises are established. Remaining
+dedicated lab work should deepen regional/tenant policy exercises, deliberately flawed
+high-consequence workflows, and broader ASP.NET Core and security scenarios.
 
 Tutorials explain.
 
@@ -600,8 +600,7 @@ Potential initial labs:
 
 * [x] Govern an AI tool call. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 * [x] Design a replay-resistant capability workflow. ([#65](https://github.com/AsiBackbone/Learning/issues/65))
-* [ ] Compare competing policy architectures. — **Still needed as a dedicated lab.**
-  Architecture comparisons exist, but they do not replace a learner exercise.
+* [x] Compare competing policy architectures. ([#228](https://github.com/AsiBackbone/Learning/issues/228))
 * [x] Threat-model a governed execution gateway. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 * [ ] Design a regional or tenant-specific policy layer. — **Partially covered.**
   Advanced and case-study material exists; a dedicated lab remains useful.

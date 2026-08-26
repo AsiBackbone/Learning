@@ -1706,13 +1706,14 @@ Use these pages together when useful:
 
 1. [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — separates authoritative decision facts from the rules that interpret them and models outcomes richer than booleans.
 2. **Policy Engines, Rules Engines, and Distributed Policy Enforcement** — compares evaluation mechanisms, PDP/PEP placement, distribution, freshness, latency, partitions, and local autonomy.
-3. [Constraint Composition and Policy Precedence](../governance/constraint-composition-and-policy-precedence.md) — explains how multiple constraints compose without relying on incidental execution order.
-4. [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) — preserves policy identity, versions, fingerprints, and freshness evidence.
-5. [Practical Policy Testing and Decision-Table Strategies](../governance/practical-policy-testing-and-decision-table-strategies.md) — applies decision-table and policy-testing techniques to governance logic.
-6. [Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md) — extends policy composition across independently owned policy scopes and degraded operation.
-7. [Policy Simulation and Change-Impact Analysis](../labs/policy-simulation-and-change-impact-analysis.md) — exercises shadow evaluation, outcome diffs, and rollout reasoning.
-8. [Safe Degraded Mode and Fail-Safe Governance](../labs/safe-degraded-mode-and-fail-safe-governance.md) — exercises explicit dependency-failure and bounded degraded-operation choices.
-9. [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — covers narrow continuation authority when policy approval must cross a later execution boundary.
+3. [Compare Competing Policy Architectures](../labs/compare-competing-policy-architectures.md) — turns the comparison into a learner exercise requiring explicit architecture selection, rejection rationale, failure-model analysis, trust-boundary placement, and minimum decision evidence.
+4. [Constraint Composition and Policy Precedence](../governance/constraint-composition-and-policy-precedence.md) — explains how multiple constraints compose without relying on incidental execution order.
+5. [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) — preserves policy identity, versions, fingerprints, and freshness evidence.
+6. [Practical Policy Testing and Decision-Table Strategies](../governance/practical-policy-testing-and-decision-table-strategies.md) — applies decision-table and policy-testing techniques to governance logic.
+7. [Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md) — extends policy composition across independently owned policy scopes and degraded operation.
+8. [Policy Simulation and Change-Impact Analysis](../labs/policy-simulation-and-change-impact-analysis.md) — exercises shadow evaluation, outcome diffs, and rollout reasoning.
+9. [Safe Degraded Mode and Fail-Safe Governance](../labs/safe-degraded-mode-and-fail-safe-governance.md) — exercises explicit dependency-failure and bounded degraded-operation choices.
+10. [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — covers narrow continuation authority when policy approval must cross a later execution boundary.
 
 This is not a progression from rules engines to policy engines to a governance framework.
 

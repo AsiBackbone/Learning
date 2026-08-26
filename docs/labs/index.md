@@ -51,11 +51,11 @@ Automated tests are useful evidence, but they are not the entire learning result
 
 ## Current Status
 
-The lab navigation foundation is established, with four beginner labs, eight intermediate labs, and two advanced labs now available.
+The lab navigation foundation is established, with four beginner labs, eight intermediate labs, and three advanced labs now available.
 
 Additional labs will appear in this section as the learning path expands into deeper architecture, security, and AI-governance topics.
 
-The foundational labs pair all five governance tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated boundaries. The governance lab path now also includes policy-version evidence, candidate-policy simulation, and decision-pipeline refactoring, while the ASP.NET Core diagnostic lab begins the next learning area by requiring learners to predict, observe, repair, and explain middleware-ordering behavior; the ADR lab extends that application-architecture path by requiring learners to make, record, and revisit a decision under changed constraints.
+The foundational labs pair all five governance tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated boundaries. The governance lab path now also includes policy-version evidence, candidate-policy simulation, decision-pipeline refactoring, and competing-policy-architecture selection, while the ASP.NET Core diagnostic lab begins the next learning area by requiring learners to predict, observe, repair, and explain middleware-ordering behavior; the ADR lab extends that application-architecture path by requiring learners to make, record, and revisit a decision under changed constraints.
 
 ## Available Labs
 
@@ -256,6 +256,21 @@ Related material:
 - [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md)
 - [Centralized Error Handling and Problem Details](../aspnetcore/centralized-error-handling-and-problem-details.md)
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md)
+
+### Compare Competing Policy Architectures
+
+[Compare Competing Policy Architectures](compare-competing-policy-architectures.md)
+
+**Difficulty:** Advanced
+
+Choose among embedded rules, ASP.NET Core authorization, external policy evaluation, distributed enforcement, and richer governed-decision lifecycles across realistic scenarios. Defend each choice from explicit lifecycle, trust-boundary, availability, provenance, and operational constraints, then explain why a rejected alternative may be better under different requirements.
+
+Related material:
+
+- [Policy Engines, Rules Engines, and Distributed Policy Enforcement](../architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md)
+- [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md)
+- [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
+- [Safe Degraded Mode and Fail-Safe Governance](safe-degraded-mode-and-fail-safe-governance.md)
 
 ## Start with the Tutorials
 
