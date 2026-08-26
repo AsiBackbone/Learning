@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: When ASP.NET Core Authorization Is Not Enough
+  href: 2026/when-aspnet-core-authorization-is-not-enough.md
 - name: How to Test That a Denied Operation Never Executes
   href: 2026/test-denied-operation-never-executes.md
 - name: A Green CI Badge Does Not Prove Your .NET Package Is Trustworthy

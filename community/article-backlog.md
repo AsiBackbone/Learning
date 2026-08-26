@@ -41,8 +41,9 @@ A backlog item becomes implementation work only when a dedicated issue is opened
 ## 1. When ASP.NET Core Authorization Is Not Enough
 
 - **Priority:** P0
-- **Implementation issue:** Open separately when promoted
-- **Candidate slug:** `when-aspnet-core-authorization-is-not-enough`
+- **Implementation issue:** [#218](https://github.com/AsiBackbone/Learning/issues/218)
+- **Publication:** [Published August 26, 2026](../docs/articles/2026/when-aspnet-core-authorization-is-not-enough.md)
+- **Permanent slug:** `when-aspnet-core-authorization-is-not-enough`
 
 ### Reader / search problem
 

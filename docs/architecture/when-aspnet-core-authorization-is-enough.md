@@ -32,6 +32,8 @@ The goal is not to make one model defeat the other.
 
 The goal is to identify the boundary.
 
+Use this page as the **detailed reference comparison**. If you want the shorter practitioner decision guide—what to reach for first, which signals justify another lifecycle, and what that lifecycle costs—start with [When ASP.NET Core Authorization Is Not Enough](../articles/2026/when-aspnet-core-authorization-is-not-enough.md). The titles are intentionally complementary: this page asks how the models compare; the article asks when to stop at each boundary.
+
 For a failure-first example of why this distinction matters, [Your Authorization Check Runs Too Late](../articles/2026/authorization-check-runs-too-late.md) follows an authorized request that discovers a blocking workflow rule too late. Return here when deciding whether that rule belongs inside ASP.NET Core authorization or in a broader lifecycle decision.
 
 ## Start with the Main Difference
