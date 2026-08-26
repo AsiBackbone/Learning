@@ -20,6 +20,14 @@ The Learning site is the canonical publication host. Cross-posted copies should 
 
 ## 2026
 
+### [How to Test That a Denied Operation Never Executes](2026/test-denied-operation-never-executes.md)
+
+**Christopher D. Cavell** · **August 26, 2026**
+
+A denied result is useful evidence, but a denied result plus zero protected executor calls proves the execution boundary held.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/test-denied-operation-never-executes.html`
+
 ### [A Green CI Badge Does Not Prove Your .NET Package Is Trustworthy](2026/ci-badge-does-not-prove-package-integrity.md)
 
 **Christopher D. Cavell** · **August 23, 2026**
