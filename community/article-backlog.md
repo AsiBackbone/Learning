@@ -72,8 +72,9 @@ Lead readers first to the ASP.NET Core authorization comparison, then to Decisio
 ## 2. How to Test That a Denied Operation Never Executes
 
 - **Priority:** P0
-- **Implementation issue:** Open separately when promoted
-- **Candidate slug:** `test-denied-operation-never-executes`
+- **Implementation issue:** [#217](https://github.com/AsiBackbone/Learning/issues/217)
+- **Publication:** [Published August 26, 2026](../docs/articles/2026/test-denied-operation-never-executes.md)
+- **Permanent slug:** `test-denied-operation-never-executes`
 
 ### Reader / search problem
 

@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: How to Test That a Denied Operation Never Executes
+  href: 2026/test-denied-operation-never-executes.md
 - name: A Green CI Badge Does Not Prove Your .NET Package Is Trustworthy
   href: 2026/ci-badge-does-not-prove-package-integrity.md
 - name: Your Authorization Check Runs Too Late
