@@ -287,6 +287,36 @@ AcknowledgmentRequired
 
 Governance samples make policy behavior observable without turning simulation or evaluation into protected execution.
 
+### Decision Pipeline Refactoring
+
+Related learning material:
+
+- [Decision Before Execution](../docs/tutorials/decision-before-execution.md)
+- [Policy Context and Explicit Decision Outcomes](../docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
+- [Refactor Scattered Governance Checks lab](../docs/labs/refactor-scattered-governance-checks.md)
+
+Executable companion:
+
+[Decision Pipeline Refactoring sample](decision-pipeline-refactoring/README.md)
+
+The sample contrasts an intentionally flawed `account.disable` service with a reference decision pipeline. The flawed path mutates account state and sends a notification before later policy checks can return `Denied`, `Deferred`, `AcknowledgmentRequired`, or `EscalationRecommended`.
+
+The refactored path makes the boundary executable:
+
+```text
+Authoritative context
+   ↓
+Explicit decision
+   ↓
+Continuation requirements
+   ↓
+CanExecute?
+   ├── No  → evidence + return
+   └── Yes → protected executor exactly once
+```
+
+Focused tests verify zero executor calls for every blocked outcome and exactly one call for `Allowed`, while a diagnostic starter test preserves evidence of the original side-effect-before-decision defect.
+
 ### Minimal Policy Simulation Harness
 
 Related learning material:
