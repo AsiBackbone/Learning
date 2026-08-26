@@ -543,11 +543,11 @@ rather than immediately invoking real external systems.
 
 **Foundational tutorial-aligned lab path established — advanced lab coverage expanding**
 
-Each foundational tutorial now has a learner exercise or lab. Replay-resistance
-and safe degraded-mode exercises are established. Remaining work should deepen
-decision-pipeline refactoring, policy-architecture comparisons, regional/tenant
-policy exercises, deliberately flawed high-consequence workflows, and broader
-ASP.NET Core and security scenarios.
+Each foundational tutorial now has a learner exercise or lab. Replay-resistance,
+safe degraded-mode, and policy-simulation/change-impact exercises are established.
+Remaining dedicated lab work should deepen decision-pipeline refactoring,
+policy-architecture comparisons, regional/tenant policy exercises, deliberately
+flawed high-consequence workflows, and broader ASP.NET Core and security scenarios.
 
 Tutorials explain.
 
@@ -592,7 +592,8 @@ Potential initial labs:
 * [x] Preserve an audit receipt.
 * [x] Introduce capability-scoped execution. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [x] Build a governed API operation. ([#54](https://github.com/AsiBackbone/Learning/issues/54))
-* [ ] Refactor scattered governance logic into a decision pipeline.
+* [ ] Refactor scattered governance logic into a decision pipeline. — **Still needed.**
+  Dedicated lab work is tracked by [#221](https://github.com/AsiBackbone/Learning/issues/221).
 * [x] Detect stale or mismatched execution authority. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [x] Add policy-version evidence to a decision path. ([#37](https://github.com/AsiBackbone/Learning/issues/37))
 
@@ -600,12 +601,16 @@ Potential initial labs:
 
 * [x] Govern an AI tool call. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 * [x] Design a replay-resistant capability workflow. ([#65](https://github.com/AsiBackbone/Learning/issues/65))
-* [ ] Compare competing policy architectures.
+* [ ] Compare competing policy architectures. — **Still needed as a dedicated lab.**
+  Architecture comparisons exist, but they do not replace a learner exercise.
 * [x] Threat-model a governed execution gateway. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
-* [ ] Design a regional or tenant-specific policy layer.
-* [ ] Analyze a deliberately flawed high-consequence workflow.
+* [ ] Design a regional or tenant-specific policy layer. — **Partially covered.**
+  Advanced and case-study material exists; a dedicated lab remains useful.
+* [ ] Analyze a deliberately flawed high-consequence workflow. — **Still needed.**
 * [x] Design safe degraded-mode behavior. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 * [ ] Critique an architecture where an AI agent owns both proposal and execution authority.
+  — **Partially covered.** Existing governed-AI material teaches the boundary; a
+  focused critique lab remains unfinished.
 
 ## Lab Quality Standard
 
@@ -898,7 +903,7 @@ Case studies should prefer simulated or dry-run consequential operations unless 
 
 ## Status
 
-**Community foundation established; participation model still developing**
+**Established intake and contribution foundation — participation depth remains ongoing**
 
 ## Existing Community Artifacts
 
@@ -909,23 +914,50 @@ Case studies should prefer simulated or dry-run consequential operations unless 
 * [x] Governance guidance.
 * [x] Quick-start contribution path in `CONTRIBUTING.md`. ([#8](https://github.com/AsiBackbone/Learning/issues/8))
 
-## Future Community Work
+## Reconciled Community Work
 
-* [ ] Architecture-question template.
-* [ ] Tutorial-proposal template.
-* [ ] Sample-proposal guidance.
-* [ ] Lab-proposal template.
-* [ ] Alternative-pattern proposal guidance.
-* [ ] `good first tutorial` issues. ([#8](https://github.com/AsiBackbone/Learning/issues/8))
-* [ ] `good first sample` issues. ([#8](https://github.com/AsiBackbone/Learning/issues/8))
-* [ ] Documentation-only starter issues. ([#8](https://github.com/AsiBackbone/Learning/issues/8))
-* [ ] Diagram contribution opportunities. ([#8](https://github.com/AsiBackbone/Learning/issues/8))
-* [ ] Lab review contributors.
-* [ ] Topic-specific reviewers.
-* [ ] Contributor recognition.
-* [ ] Community-authored alternative patterns. ([#7](https://github.com/AsiBackbone/Learning/issues/7))
-* [ ] Additional maintainers if sustained contribution creates a practical need.
-* [ ] Translation support if demand emerges.
+The earlier future-work list mixed missing intake surfaces with participation goals.
+The current repository already has dedicated Discussion templates for Q&A,
+Architecture & Patterns, Tutorial Ideas, and Show and tell, plus bug,
+learning-content, and improvement Issue forms. The remaining work is therefore
+classified by what is actually missing rather than by creating more overlapping
+templates.
+
+* **Architecture-question template — Obsolete / superseded.** Q&A and Architecture
+  & Patterns Discussions now provide the intended intake paths.
+* **Tutorial-proposal template — Complete.** The Tutorial Ideas Discussion template
+  provides a dedicated proposal surface.
+* **Sample-proposal guidance — Complete.** `CONTRIBUTING.md` covers executable-sample
+  contributions, and Tutorial Ideas accepts example proposals.
+* **Lab-proposal template — Obsolete / superseded.** Tutorial Ideas and the
+  learning-content Issue form cover intake, while
+  `docs/templates/lab-acceptance-criteria-template.md` covers lab authoring.
+* **Alternative-pattern proposal guidance — Complete.** Architecture & Patterns
+  Discussions and the Alternatives Are Welcome guidance in `CONTRIBUTING.md`
+  cover this path.
+* **`good first tutorial` issues — Still needed when concrete starter work exists.**
+  Do not maintain a quota merely to satisfy a roadmap category.
+* **`good first sample` issues — Still needed when concrete starter work exists.**
+* **Documentation-only starter issues — Still needed when concrete starter work
+  exists.**
+* **Diagram contribution opportunities — Still needed when concrete starter work
+  exists.**
+* **Lab review contributors — Ongoing maintenance.** Grow reviewer participation as
+  contribution volume justifies it.
+* **Topic-specific reviewers — Ongoing maintenance.** Recruit by subject and need
+  rather than by roadmap checkbox.
+* **Contributor recognition — Ongoing maintenance.** `community/contributors.md`
+  provides the foundation; recognition should evolve with real participation.
+* **Community-authored alternative patterns — Still needed.** Existing
+  alternative-pattern material satisfies the learning need, but not the distinct
+  community-authorship goal.
+* **Additional maintainers if sustained contribution creates a practical need —
+  Ongoing maintenance / demand-driven.**
+* **Translation support if demand emerges — Ongoing maintenance / demand-driven.**
+
+The active community priority is to keep a small set of genuine starter
+opportunities visible when suitable work exists and to deepen reviewer and
+community-authored participation without manufacturing contribution work.
 
 ## Learning Feedback Cycle
 
@@ -958,29 +990,58 @@ Repeated misunderstandings should trigger refinement of existing material before
 
 ## Status
 
-**Started — governed agent-to-agent execution and partial-failure governance now have advanced or experimental learning material**
+**Reconciled — several proposed subjects now have substantial coverage; remaining work is concentrated in distributed/federated governance, cross-system authority, and explanation depth**
 
 ## Goal
 
 Provide a clearly labeled area for ideas that are worth exploring but should not yet be presented as established guidance.
 
-Possible subjects include:
+The original subject list is reconciled against dedicated curriculum, labs,
+samples, case studies, and architecture comparisons as follows:
 
-* [ ] Distributed governance.
-* [ ] Multi-region policy coordination.
-* [ ] Durable decision ledgers.
-* [ ] Cryptographic audit chains.
-* [ ] External policy providers.
-* [ ] Policy simulation.
-* [ ] Governance telemetry.
-* [ ] Decision explainability.
-* [ ] Adaptive risk context.
-* [ ] Robotics gateway patterns.
-* [x] Agent-to-agent governed execution. ([#75](https://github.com/AsiBackbone/Learning/issues/75))
-* [ ] Cross-system capability exchange.
-* [ ] Federated governance models.
-* [ ] Distributed acknowledgment workflows.
-* [x] Governance under partial system failure. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
+* **Distributed governance — Partially covered.** Distributed policy enforcement is
+  documented, but broader coordination across independent governance authorities
+  remains open.
+* **Multi-region policy coordination — Partially covered.** Regional and tenant
+  overlays are established; cross-region coordination and authority conflicts still
+  deserve focused treatment.
+* **Durable decision ledgers — Partially covered.** Decision provenance and
+  event-sourcing material cover durable evidence concepts, but a dedicated
+  decision-ledger lifecycle remains unfinished.
+* **Cryptographic audit chains — Partially covered.** Signing, verification, key
+  custody, and tamper-evidence are covered; chained append-only audit structures are
+  not yet a dedicated learning subject.
+* **External policy providers — Complete at the architecture-learning level.** The
+  policy-engine comparison covers externalized PDPs, local/sidecar/remote placement,
+  policy-as-code, and representative OPA/Rego, Cedar, and XACML anchors.
+  Provider-specific integration samples remain optional.
+* **Policy simulation — Complete.** A dedicated change-impact lab and executable
+  policy-simulation harness with tests now exist.
+* **Governance telemetry — Complete for the current learning intent.** Dedicated
+  decision-tracing/observability material and executable governed-gateway
+  instrumentation now cover the subject; broader telemetry refinements are ongoing.
+* **Decision explainability — Partially covered.** Reason codes, provenance, and
+  tracing exist, but explanation for human operators remains distinct from audit
+  evidence and deserves focused treatment.
+* **Adaptive risk context — Partially covered.** Risk-based decisions and
+  deterministic/probabilistic inputs are established; adaptive feedback, drift, and
+  changing risk context remain open.
+* **Robotics gateway patterns — Complete for the Learning scope.** The simulated
+  robotics command-governance case study teaches the gateway and host-owned
+  execution boundary without implying a production robotics controller.
+* **Agent-to-agent governed execution — Complete.**
+  ([#75](https://github.com/AsiBackbone/Learning/issues/75))
+* **Cross-system capability exchange — Still needed.** Delegation, audience binding,
+  revocation, replay, and authority transfer across independently operated systems
+  remain worthwhile advanced work.
+* **Federated governance models — Partially covered.** Distributed enforcement and
+  regional overlays provide foundations, but federation across independently
+  governed authorities remains unfinished.
+* **Distributed acknowledgment workflows — Still needed.** Existing acknowledgment
+  material does not yet cover continuation state and responsibility across
+  distributed boundaries.
+* **Governance under partial system failure — Complete.**
+  ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 
 Experimental material should clearly state:
 
@@ -1009,13 +1070,18 @@ As the repository grows, learning material should increasingly provide:
 * [x] Runnable companion samples.
 * [x] Executable tests. ([#2](https://github.com/AsiBackbone/Learning/issues/2))
 * [x] Consistent "When not to use this" guidance where it materially improves the lesson. ([#140](https://github.com/AsiBackbone/Learning/issues/140))
-* [ ] Stronger links to implementation repositories.
+* [ ] **Ongoing maintenance — implementation links:** Continue strengthening links to
+  working implementation repositories where they materially deepen the lesson.
 * [x] Links to relevant ADRs when they directly explain a working implementation decision. ([#140](https://github.com/AsiBackbone/Learning/issues/140))
 * [x] Related-tutorial links.
 * [x] Suggested labs.
 * [x] Clear canonical, alternative, or experimental status where relevant. ([#139](https://github.com/AsiBackbone/Learning/issues/139))
-* [ ] Accessibility review for diagrams and visual material.
-* [ ] Periodic technical review as .NET and implementation repositories evolve.
+* [ ] **Ongoing maintenance — accessibility:** Re-review diagrams and visual material
+  when substantial new visuals, media, interactive content, or theme changes are
+  introduced.
+* [ ] **Ongoing maintenance — technical currency:** Periodically review technical
+  guidance and implementation-repository cross-links as .NET and the implementation
+  repositories evolve.
 
 Issue #140 completed a representative cross-cutting pass rather than adding formulaic sections to every page. Usage boundaries remain explicit where over-application is a meaningful risk, and ADR links are added only when a working repository contains a directly relevant decision record.
 
@@ -1038,13 +1104,24 @@ Automation should support quality without making contribution unnecessarily diff
 * [x] Grouped Dependabot version-update automation for NuGet and GitHub Actions dependencies. ([#137](https://github.com/AsiBackbone/Learning/issues/137))
 * [x] Repository-maintained CodeQL scanning for the C# executable surface on relevant pull requests, pushes to `main`, and a weekly schedule. ([#137](https://github.com/AsiBackbone/Learning/issues/137))
 
-## Planned
+## Reconciled Follow-up
 
-* [ ] Markdown validation where it adds value beyond DocFX.
-* [ ] Review repository-setting controls such as secret scanning and push protection.
-* [ ] Pull request validation beyond the established targeted checks where it adds value.
-* [ ] Documentation artifact validation.
-* [ ] License-boundary validation where practical.
+* **Obsolete / superseded — standalone Markdown validation as a roadmap objective.**
+  DocFX warnings-as-errors, link validation, and metadata validation form the
+  current baseline. Add a separate Markdown linter only if it catches a
+  demonstrated gap.
+* **Ongoing maintenance — repository-setting controls.** Periodically review settings
+  such as secret scanning and push protection as repository capabilities and risk
+  change.
+* **Ongoing maintenance — pull request validation.** Extend the established targeted
+  checks only when a new failure mode justifies another required signal.
+* **Complete — documentation artifact validation.** Documentation validation now
+  covers the DocFX/template baseline, generated sitemap, RSS feed, IndexNow
+  publication contract, and generated metadata; the publish workflow produces and
+  uploads the GitHub Pages artifact.
+* **Still needed where practical — license-boundary validation.** Add automation only
+  when it can verify the documentation/sample licensing split without creating
+  noisy or burdensome checks.
 
 Source-controlled automation and repository-host controls should be reviewed separately. A committed workflow does not prove that branch rules, secret scanning, push protection, Dependabot alerts, or Dependabot security updates are enabled in GitHub settings.
 
@@ -1086,21 +1163,24 @@ Versioned Learning releases are citable educational snapshots. They do not estab
 
 The highest-priority work now is:
 
-1. Deepen Governance and Policy Architecture where dedicated coverage is still
-   missing: risk-based decisions, broader human-in-the-loop and escalation
-   workflows, deterministic/probabilistic inputs, and policy simulation.
-2. Refine the now-established AI Integration path through executable companions,
-   labs, threat-model exercises, and cross-links for multi-tool workflows, bounded
-   rejection and uncertainty, agent memory, and multi-agent boundaries.
-3. Add remaining intermediate and advanced labs where learner reasoning materially
-   improves the curriculum, especially decision-pipeline refactoring, competing
-   policy architectures, regional/tenant policy design, high-consequence failure
-   critique, and AI proposal/execution-authority separation.
-4. Continue strengthening tutorial → sample → lab → working implementation links
-   and expand architecture comparisons while preserving honest cases where simpler
-   or adjacent patterns win.
-5. Use community feedback and implementation changes to decide which advanced or
-   experimental subjects deserve promotion into the main learning path.
+1. Complete the decision-pipeline refactoring lab tracked by
+   [#221](https://github.com/AsiBackbone/Learning/issues/221), then select the next
+   lab only where a dedicated learner exercise adds value beyond existing material.
+2. Develop cross-system capability exchange, including delegation, audience
+   binding, revocation, replay resistance, and authority transfer across
+   independently operated execution boundaries.
+3. Deepen federated and distributed governance beyond policy distribution:
+   multi-region authority coordination, independent governance domains, and
+   distributed acknowledgment/continuation workflows.
+4. Add focused decision-explainability material that distinguishes human/operator
+   explanation from reason codes, provenance, telemetry, and audit evidence.
+5. Keep concrete good-first contribution opportunities visible when genuine starter
+   work exists, and grow lab/topic reviewer participation as community activity
+   justifies it.
+
+These are strategic curriculum and community priorities. Editorial publication
+planning remains in `community/article-backlog.md`; article candidates and their
+dedicated implementation issues should not be duplicated here as roadmap work.
 
 The short-term emphasis should remain:
 
