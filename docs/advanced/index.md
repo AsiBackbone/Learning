@@ -20,6 +20,7 @@ It means that the problem usually contains more interacting boundaries, assumpti
 | --- | --- | --- |
 | [Regional and Tenant Policy Overlays](regional-and-tenant-policy-overlays.md) | General learning material | Explicit policy scopes, narrowing and delegated override authority, conflict handling, provenance, drift, degraded mode, and overlay testing. |
 | [Federated Governance and Independent Authority Coordination](federated-governance-and-independent-authority-coordination.md) | Experimental | Independent governance domains, local autonomy, versioned coordination contracts, multi-authority conflict, partitions, region movement, bounded overrides, and federated provenance. |
+| [Distributed Acknowledgment and Continuation Workflows](distributed-acknowledgment-and-continuation-workflows.md) | General learning material | Bound challenge/evidence handoff, exact-intent and responder binding, durable continuation state, replay/out-of-order recovery, current re-evaluation, and host-owned continuation. |
 | [Cross-System Capability Exchange and Delegated Authority](cross-system-capability-exchange-and-delegated-authority.md) | General learning material | Issuer/audience/subject/scope binding, delegation versus transitive trust, replay, revocation, trust-anchor lifecycle, recipient-local policy, drift, and cross-system evidence. |
 | [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md) | Experimental | Multi-agent proposal provenance, delegation, authority narrowing, replay and revocation, agent loops, cross-service trust, and recovery boundaries. |
 
@@ -95,7 +96,6 @@ Future material may include:
 * Capability revocation and cancellation
 * Partial failure and recovery
 * Degraded-mode governance
-* Distributed acknowledgment workflows
 * Cross-boundary correlation
 * AI agent orchestration beyond the published experimental multi-agent treatment
 * Threat modeling governed AI gateways
@@ -172,6 +172,13 @@ governance domains. When multiple independently owned authorities must participa
 in one operation and no single policy source automatically owns the complete
 decision, continue with [Federated Governance and Independent Authority
 Coordination](federated-governance-and-independent-authority-coordination.md).
+
+A delayed acknowledgment adds another distributed lifecycle: the decision, response
+interaction, durable continuation state, current re-evaluation, and execution may
+all live in different systems. Continue with [Distributed Acknowledgment and
+Continuation Workflows](distributed-acknowledgment-and-continuation-workflows.md)
+for challenge/evidence binding, replay and duplicate handling, out-of-order recovery,
+and the rule that acknowledgment evidence is not portable execution authority.
 
 ## Delegated Authority
 
@@ -506,7 +513,7 @@ Each pattern still requires evaluation against the actual application's threat m
 
 ## Current Status
 
-The Advanced section is established and actively contains later-stage architectural material rather than serving only as a future destination. The published regional/tenant overlay and cross-system capability-exchange articles provide general advanced treatments of policy composition and independently operated trust boundaries, while the federated-governance and multi-agent articles are explicitly Experimental and explore authority-coordination boundaries that are not presented as standardized organization protocols.
+The Advanced section is established and actively contains later-stage architectural material rather than serving only as a future destination. The published regional/tenant overlay, distributed-acknowledgment, and cross-system capability-exchange articles provide general advanced treatments of policy composition, delayed continuation, and independently operated trust boundaries, while the federated-governance and multi-agent articles are explicitly Experimental and explore authority-coordination boundaries that are not presented as standardized organization protocols.
 
 Further expansion should remain selective and should preserve the same status discipline: canonical alignment, viable alternatives, experimental exploration, and general learning material should be distinguishable without readers having to infer intent from tone.
 
@@ -514,7 +521,7 @@ Recommended progression:
 
 * Complete the [Foundational Tutorials](../tutorials/index.md).
 * Use the [Hands-On Labs](../labs/index.md) to exercise the underlying boundaries.
-* Read the dedicated advanced articles when the corresponding multi-authority, cross-system authority, or multi-agent concerns are relevant.
+* Read the dedicated advanced articles when multi-authority, distributed-continuation, cross-system authority, or multi-agent concerns are relevant.
 * Compare the smaller teaching patterns with the working implementation repositories.
 
 ---

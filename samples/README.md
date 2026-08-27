@@ -8,7 +8,7 @@ It is intended to contain intentionally small .NET examples that complement the 
 
 ## Current Status
 
-**Foundational sample set established — five governance companions plus focused security, advanced trust, and ASP.NET Core architecture samples and invariant tests are available.**
+**Foundational sample set established — five governance companions plus focused security, advanced governance/trust, and ASP.NET Core architecture samples and invariant tests are available.**
 
 The `samples/` area pairs all five foundational tutorials with runnable companion projects and sibling xUnit test projects, culminating in the Governed AI Tool Gateway capstone. Focused ASP.NET Core samples now make middleware ordering and centralized error-handling behavior executable as the application-architecture path expands.
 
@@ -16,7 +16,7 @@ The security path now includes a replay-protection and bounded-use sample that m
 
 The advanced trust path now includes a cross-system capability-exchange sample that simulates independently operated issuer and recipient boundaries, recipient-owned trust, request binding, delegation rejection, replay resistance, resource drift, and local policy revalidation.
 
-The governance architecture path now also includes a federated-governance coordination sample that makes independent authority composition, order invariance, degraded coordination, and authority-set drift executable without external infrastructure.
+The governance architecture path includes a federated-governance coordination sample for independent authority composition and a distributed-acknowledgment sample for bound evidence, delayed continuation, current re-evaluation, replay resistance, and out-of-order recovery without external infrastructure.
 
 Future sample work can focus on refinement, additional invariants, alternative patterns, and new learning areas rather than filling a gap in the foundational sequence.
 
@@ -385,6 +385,46 @@ Explicit federated outcome
 Focused tests prove order-independent composition, `Unavailable` remaining distinct from both `Allowed` and `Denied`, explicit invalid-contribution handling, authority-set drift invalidating an old composite decision, coordinator outages preserving federated requirements, and legitimate local-only continuation only when current facts classified the operation as local before the outage.
 
 The sample stops at the federated decision boundary. It does not claim a production federation protocol, distributed consensus, cross-region durability, or protected external execution.
+
+### Distributed Acknowledgment and Continuation Workflows
+
+Related advanced learning material:
+
+[Distributed Acknowledgment and Continuation Workflows](../docs/advanced/distributed-acknowledgment-and-continuation-workflows.md)
+
+Executable companion:
+
+[Distributed Acknowledgment and Continuation sample](distributed-acknowledgment-continuation/README.md)
+
+The sample models a fictional `System A -> System B -> System C` acknowledgment lifecycle for `accounts.bulk-suspend` while keeping the original decision, bound challenge, response evidence, current context, current policy decision, continuation claim, narrow authority, and executor command distinct.
+
+Its central boundary is:
+
+```text
+Bound acknowledgment evidence
+        |
+        v
+Recipient trust + binding checks
+        |
+        v
+Current context reconstruction
+        |
+        v
+Current policy re-evaluation
+        |
+        v
+Single continuation claim
+        |
+        v
+Narrow local authority
+        |
+        v
+Host-owned dry-run executor
+```
+
+Focused tests cover intent and responder substitution, expiration, current-policy denial, replay, different duplicate responses, evidence-verifier unavailability, untrusted evidence, out-of-order challenge recovery, resource drift, and end-to-end lineage.
+
+The sample uses process-local teaching stores and simulated evidence trust. It does not claim production messaging, distributed atomic state, evidence cryptography, durable workflow recovery, or exactly-once external execution.
 
 ## Security and Trust Architecture Samples
 

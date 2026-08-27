@@ -988,7 +988,7 @@ Repeated misunderstandings should trigger refinement of existing material before
 
 ## Status
 
-**Reconciled — several proposed subjects now have substantial coverage; remaining work includes distributed acknowledgment/continuation, decision explainability, and selected deeper evidence/risk topics**
+**Reconciled — several proposed subjects now have substantial coverage; remaining work includes decision explainability and selected deeper evidence/risk topics**
 
 ## Goal
 
@@ -1045,9 +1045,12 @@ samples, case studies, and architecture comparisons as follows:
   contracts, legitimate composition strategies, conflict/defer outcomes, bounded
   overrides, partitions, multi-authority provenance, and resource-region movement.
   ([#234](https://github.com/AsiBackbone/Learning/issues/234))
-* **Distributed acknowledgment workflows — Still needed.** Existing acknowledgment
-  material does not yet cover continuation state and responsibility across
-  distributed boundaries.
+* **Distributed acknowledgment workflows — Complete at the advanced architecture-learning
+  level.** Dedicated advanced material and a runnable companion sample now cover
+  bound challenge/evidence handoff, exact-intent and responder binding, expiration,
+  replay/duplicate/out-of-order handling, current-context reconstruction,
+  re-evaluation, single-use continuation claims, lineage, and partial-failure behavior.
+  ([#235](https://github.com/AsiBackbone/Learning/issues/235))
 * **Governance under partial system failure — Complete.**
   ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 
@@ -1171,15 +1174,12 @@ Versioned Learning releases are citable educational snapshots. They do not estab
 
 The highest-priority work now is:
 
-1. Develop distributed acknowledgment and continuation workflows across trust
-   boundaries, including stale acknowledgment, resume authority, provenance, and
-   failure behavior when participating systems cannot all establish current state.
-2. Add focused decision-explainability material that distinguishes human/operator
+1. Add focused decision-explainability material that distinguishes human/operator
    explanation from reason codes, provenance, telemetry, and audit evidence.
-3. Select the next dedicated advanced lab only where learner work adds value beyond
+2. Select the next dedicated advanced lab only where learner work adds value beyond
    existing material; current candidates include competing policy architectures,
    regional/tenant policy design, and high-consequence failure critique.
-4. Keep concrete good-first contribution opportunities visible when genuine starter
+3. Keep concrete good-first contribution opportunities visible when genuine starter
    work exists, and grow lab/topic reviewer participation as community activity
    justifies it.
 
