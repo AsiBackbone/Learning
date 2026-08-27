@@ -2,7 +2,7 @@ namespace AdaptiveRiskContext;
 
 public static class Program
 {
-    public static void Main()
+    public static async Task Main()
     {
         RiskPolicyEvaluator evaluator = new();
         RiskGovernancePolicy policy = SampleScenarios.CreatePolicy();
@@ -52,11 +52,87 @@ public static class Program
                 policy,
                 SampleScenarios.BaselineUtc.AddMinutes(5)));
 
+        await RunExecutionBoundaryDemoAsync(evaluator, policy);
+
         Console.WriteLine("Teaching boundary:");
         Console.WriteLine("- risk observations are inputs, not execution credentials");
         Console.WriteLine("- new model output creates new evidence rather than rewriting history");
         Console.WriteLine("- stale/unavailable/drifted context requires explicit policy behavior");
-        Console.WriteLine("- only current scoped authority can reach the dry-run executor");
+        Console.WriteLine("- current scoped authority is single-use before dry-run execution");
+    }
+
+    private static async Task RunExecutionBoundaryDemoAsync(
+        RiskPolicyEvaluator evaluator,
+        RiskGovernancePolicy policy)
+    {
+        Console.WriteLine("Full execution-boundary demonstration");
+
+        PaymentContext payment = SampleScenarios.CreatePayment();
+        RiskSignalInput risk =
+            RiskSignalInput.Available(SampleScenarios.CreateObservation());
+        DateTimeOffset decisionTime =
+            SampleScenarios.BaselineUtc.AddMinutes(1);
+        DateTimeOffset executionTime =
+            SampleScenarios.BaselineUtc.AddMinutes(2);
+
+        GovernanceDecision decision = evaluator.Evaluate(
+            "decision-demo-execution",
+            payment,
+            risk,
+            policy,
+            decisionTime);
+
+        AuthorityIssueResult issue = new ExecutionAuthorityIssuer().TryIssue(
+            decision,
+            policy,
+            decisionTime);
+
+        Console.WriteLine($"  Authority issuance: {issue.ReasonCode}");
+
+        if (!issue.Issued || issue.Authority is not ExecutionAuthority authority)
+        {
+            Console.WriteLine("  Execution skipped because authority was not issued.");
+            Console.WriteLine();
+            return;
+        }
+
+        IExecutionAuthorityClaimStore claimStore =
+            new InMemoryExecutionAuthorityClaimStore();
+        RecordingPaymentExecutor executor = new();
+        RiskExecutionGateway gateway = new(
+            new ExecutionFreshnessEvaluator(),
+            claimStore,
+            executor);
+
+        ExecutionResult first = await gateway.TryExecuteAsync(
+            authority,
+            payment,
+            risk,
+            policy,
+            executionTime,
+            CancellationToken.None);
+
+        Console.WriteLine(
+            $"  First presentation: {first.ReasonCode}; " +
+            $"executed={first.Executed}; executorCalls={executor.InvocationCount}");
+        Console.WriteLine(
+            $"  Authority claims: {claimStore.GetClaimCount(authority.AuthorityId)}");
+
+        ExecutionResult replay = await gateway.TryExecuteAsync(
+            authority,
+            payment,
+            risk,
+            policy,
+            executionTime,
+            CancellationToken.None);
+
+        Console.WriteLine(
+            $"  Replay presentation: {replay.ReasonCode}; " +
+            $"executed={replay.Executed}; executorCalls={executor.InvocationCount}");
+        Console.WriteLine(
+            $"  Authority claims after replay: " +
+            $"{claimStore.GetClaimCount(authority.AuthorityId)}");
+        Console.WriteLine();
     }
 
     private static void Show(string title, GovernanceDecision decision)

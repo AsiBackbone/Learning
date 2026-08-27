@@ -48,7 +48,9 @@ The provider's `ProviderValidUntilUtc` is not local authorization. Effective fre
 
 Decision identity is also explicit. `RiskPolicyEvaluator` requires the caller to provide a `DecisionId`; it does not derive one from payment/policy/observation fields that can legitimately repeat across separate evaluation events.
 
-The stateful/external seams are represented by interfaces (`IExecutionAuthorityClaimStore` and `IPaymentExecutor`). The policy and freshness evaluators remain concrete because they are deterministic teaching functions with no external state.
+The stateful/external seams are represented by interfaces (`IExecutionAuthorityClaimStore` and `IPaymentExecutor`). The policy and freshness evaluators remain concrete because they are deterministic teaching functions with no external state. `GetClaimCount` is exposed on the teaching claim-store interface so diagnostics and tests use the same abstraction as the gateway rather than binding to the in-memory implementation.
+
+`AuthorityIssueResult` deliberately carries one host-internal `ReasonCode`. Issuance does not cross an audience boundary in this sample, so it does not need the internal/public reason split used by gateway results that may be projected outward. If authority issuance were exposed across a lower-trust API or UI boundary, the host should add an audience-safe public projection rather than returning internal reason codes directly.
 
 ## Run It
 
@@ -96,6 +98,32 @@ ModelVersion = risk-v8
 The old authority cannot execute under the changed state. Current context is reevaluated and the teaching policy returns `EscalationRecommended`.
 
 The original `0.21 / risk-v7` observation remains attached to the original decision. The new `0.76 / risk-v8` output is a new observation rather than a rewrite of history.
+
+The console also walks the successful execution boundary end to end:
+
+```text
+Allowed decision
+        |
+        v
+Bounded authority issuance
+        |
+        v
+Current freshness validation
+        |
+        v
+Single-use claim
+        |
+        v
+Validated command
+        |
+        v
+Dry-run executor
+        |
+        v
+Replay rejected as already claimed
+```
+
+This makes `dotnet run` demonstrate the same claim/executor boundary described in the article and README rather than stopping at policy evaluation.
 
 ## First-Match Freshness Ordering
 

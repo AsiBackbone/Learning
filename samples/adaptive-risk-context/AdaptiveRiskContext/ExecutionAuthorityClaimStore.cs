@@ -3,6 +3,8 @@ namespace AdaptiveRiskContext;
 public interface IExecutionAuthorityClaimStore
 {
     bool TryClaim(string authorityId);
+
+    int GetClaimCount(string authorityId);
 }
 
 public sealed class InMemoryExecutionAuthorityClaimStore

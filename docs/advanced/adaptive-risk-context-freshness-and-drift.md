@@ -903,7 +903,7 @@ The sample is local and deterministic. It models:
 - final executor validation of authority-command bindings;
 - a dry-run host-owned payment executor.
 
-It does **not** perform fraud inference or drift detection. Its purpose is to make freshness, bounded-use, provenance, and authority boundaries executable.
+It does **not** perform fraud inference or drift detection. Its purpose is to make freshness, bounded-use, provenance, and authority boundaries executable. The console demonstration also walks one `Allowed` decision through bounded authority issuance, freshness validation, single-use claim, validated command construction, dry-run execution, and a rejected replay so `dotnet run` reaches the same final boundary described here.
 
 ---
 

@@ -439,7 +439,8 @@ public sealed class AdaptiveRiskContextTests
     {
         RiskGovernancePolicy policy = SampleScenarios.CreatePolicy();
         ExecutionAuthority authority = SampleScenarios.CreateAuthority(policy);
-        InMemoryExecutionAuthorityClaimStore claimStore = new();
+        IExecutionAuthorityClaimStore claimStore =
+            new InMemoryExecutionAuthorityClaimStore();
         RecordingPaymentExecutor executor = new();
         RiskExecutionGateway gateway = CreateGateway(executor, claimStore);
 
@@ -471,7 +472,8 @@ public sealed class AdaptiveRiskContextTests
     {
         RiskGovernancePolicy policy = SampleScenarios.CreatePolicy();
         ExecutionAuthority authority = SampleScenarios.CreateAuthority(policy);
-        InMemoryExecutionAuthorityClaimStore claimStore = new();
+        IExecutionAuthorityClaimStore claimStore =
+            new InMemoryExecutionAuthorityClaimStore();
         CoordinatedPaymentExecutor executor = new();
         RiskExecutionGateway gateway = new(
             new ExecutionFreshnessEvaluator(),
@@ -533,7 +535,8 @@ public sealed class AdaptiveRiskContextTests
     {
         RiskGovernancePolicy policy = SampleScenarios.CreatePolicy();
         ExecutionAuthority authority = SampleScenarios.CreateAuthority(policy);
-        InMemoryExecutionAuthorityClaimStore claimStore = new();
+        IExecutionAuthorityClaimStore claimStore =
+            new InMemoryExecutionAuthorityClaimStore();
         RecordingPaymentExecutor executor = new(
             executionNowUtc: authority.ExpiresAtUtc);
         RiskExecutionGateway gateway = CreateGateway(executor, claimStore);
@@ -1003,7 +1006,7 @@ public sealed class AdaptiveRiskContextTests
 
     private static RiskExecutionGateway CreateGateway(
         RecordingPaymentExecutor executor,
-        InMemoryExecutionAuthorityClaimStore? claimStore = null) =>
+        IExecutionAuthorityClaimStore? claimStore = null) =>
         new(
             new ExecutionFreshnessEvaluator(),
             claimStore ?? new InMemoryExecutionAuthorityClaimStore(),
