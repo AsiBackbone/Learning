@@ -988,7 +988,7 @@ Repeated misunderstandings should trigger refinement of existing material before
 
 ## Status
 
-**Reconciled — several proposed subjects now have substantial coverage; remaining work includes decision explainability and selected deeper evidence/risk topics**
+**Reconciled — several proposed subjects now have substantial coverage; remaining work is concentrated in selected deeper evidence/risk topics**
 
 ## Goal
 
@@ -1022,9 +1022,12 @@ samples, case studies, and architecture comparisons as follows:
 * **Governance telemetry — Complete for the current learning intent.** Dedicated
   decision-tracing/observability material and executable governed-gateway
   instrumentation now cover the subject; broader telemetry refinements are ongoing.
-* **Decision explainability — Partially covered.** Reason codes, provenance, and
-  tracing exist, but explanation for human operators remains distinct from audit
-  evidence and deserves focused treatment.
+* **Decision explainability — Complete at the advanced governance-learning level.**
+  Dedicated material and a deterministic companion sample now distinguish reason
+  codes, provenance, audit evidence, telemetry, and human explanation; cover
+  audience-aware disclosure, multiple contributing reasons, policy-version history,
+  and grounded generated-summary boundaries; and preserve explanation as presentation
+  rather than authority. ([#236](https://github.com/AsiBackbone/Learning/issues/236))
 * **Adaptive risk context — Partially covered.** Risk-based decisions and
   deterministic/probabilistic inputs are established; adaptive feedback, drift, and
   changing risk context remain open.
@@ -1174,8 +1177,9 @@ Versioned Learning releases are citable educational snapshots. They do not estab
 
 The highest-priority work now is:
 
-1. Add focused decision-explainability material that distinguishes human/operator
-   explanation from reason codes, provenance, telemetry, and audit evidence.
+1. Select the next deeper evidence/risk subject where focused material adds value,
+   with durable decision ledgers, cryptographic audit chains, and adaptive risk
+   context remaining candidates from Milestone 13.
 2. Select the next dedicated advanced lab only where learner work adds value beyond
    existing material; current candidates include competing policy architectures,
    regional/tenant policy design, and high-consequence failure critique.

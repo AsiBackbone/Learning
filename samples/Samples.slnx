@@ -21,6 +21,8 @@
   <Project Path="federated-governance-coordination/FederatedGovernanceCoordination.Tests/FederatedGovernanceCoordination.Tests.csproj" />
   <Project Path="distributed-acknowledgment-continuation/DistributedAcknowledgmentContinuation/DistributedAcknowledgmentContinuation.csproj" />
   <Project Path="distributed-acknowledgment-continuation/DistributedAcknowledgmentContinuation.Tests/DistributedAcknowledgmentContinuation.Tests.csproj" />
+  <Project Path="decision-explainability/DecisionExplainability/DecisionExplainability.csproj" />
+  <Project Path="decision-explainability/DecisionExplainability.Tests/DecisionExplainability.Tests.csproj" />
   <Project Path="middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior/MiddlewareOrderingChangesBehavior.csproj" />
   <Project Path="middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior.Tests/MiddlewareOrderingChangesBehavior.Tests.csproj" />
   <Project Path="centralized-error-handling-and-problem-details/CentralizedErrorHandlingAndProblemDetails/CentralizedErrorHandlingAndProblemDetails.csproj" />
