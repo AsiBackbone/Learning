@@ -19,6 +19,7 @@ It means that the problem usually contains more interacting boundaries, assumpti
 | Article | Pattern classification | Focus |
 | --- | --- | --- |
 | [Regional and Tenant Policy Overlays](regional-and-tenant-policy-overlays.md) | General learning material | Explicit policy scopes, narrowing and delegated override authority, conflict handling, provenance, drift, degraded mode, and overlay testing. |
+| [Federated Governance and Independent Authority Coordination](federated-governance-and-independent-authority-coordination.md) | Experimental | Independent governance domains, local autonomy, versioned coordination contracts, multi-authority conflict, partitions, region movement, bounded overrides, and federated provenance. |
 | [Cross-System Capability Exchange and Delegated Authority](cross-system-capability-exchange-and-delegated-authority.md) | General learning material | Issuer/audience/subject/scope binding, delegation versus transitive trust, replay, revocation, trust-anchor lifecycle, recipient-local policy, drift, and cross-system evidence. |
 | [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md) | Experimental | Multi-agent proposal provenance, delegation, authority narrowing, replay and revocation, agent loops, cross-service trust, and recovery boundaries. |
 
@@ -164,6 +165,13 @@ Questions then include:
 * How are events correlated across services?
 
 The separation between **decision** and **execution** remains useful, but the trust boundary becomes more explicit.
+
+That service handoff is still different from authority federation. Several services
+can distribute or enforce one authority model without becoming independent
+governance domains. When multiple independently owned authorities must participate
+in one operation and no single policy source automatically owns the complete
+decision, continue with [Federated Governance and Independent Authority
+Coordination](federated-governance-and-independent-authority-coordination.md).
 
 ## Delegated Authority
 
@@ -324,6 +332,12 @@ Advanced questions include:
 These concerns become increasingly important when governance spans organizational or geographic boundaries.
 
 Continue with [Regional and Tenant Policy Overlays](regional-and-tenant-policy-overlays.md) for a dedicated treatment of policy authority, narrowing versus broadening, explicit override paths, conflict handling, multi-policy provenance, drift, degraded mode, and overlay testing.
+
+When regions are independently governed peers rather than layers inside one
+overlay authority model, continue with [Federated Governance and Independent
+Authority Coordination](federated-governance-and-independent-authority-coordination.md)
+for explicit federation contracts, local autonomy, cross-region conflicts,
+partitions, authority-set movement, and multi-authority provenance.
 
 ## AI Agent Orchestration
 
@@ -492,7 +506,7 @@ Each pattern still requires evaluation against the actual application's threat m
 
 ## Current Status
 
-The Advanced section is established and actively contains later-stage architectural material rather than serving only as a future destination. The published regional/tenant overlay and cross-system capability-exchange articles provide general advanced treatments of multi-authority policy composition and independently operated trust boundaries, while the multi-agent article is explicitly Experimental and explores boundaries that are not presented as an established organization protocol.
+The Advanced section is established and actively contains later-stage architectural material rather than serving only as a future destination. The published regional/tenant overlay and cross-system capability-exchange articles provide general advanced treatments of policy composition and independently operated trust boundaries, while the federated-governance and multi-agent articles are explicitly Experimental and explore authority-coordination boundaries that are not presented as standardized organization protocols.
 
 Further expansion should remain selective and should preserve the same status discipline: canonical alignment, viable alternatives, experimental exploration, and general learning material should be distinguishable without readers having to infer intent from tone.
 

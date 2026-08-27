@@ -17,6 +17,8 @@
   <Project Path="replay-protection-and-bounded-use/ReplayProtectionAndBoundedUse.Tests/ReplayProtectionAndBoundedUse.Tests.csproj" />
   <Project Path="cross-system-capability-exchange/CrossSystemCapabilityExchange/CrossSystemCapabilityExchange.csproj" />
   <Project Path="cross-system-capability-exchange/CrossSystemCapabilityExchange.Tests/CrossSystemCapabilityExchange.Tests.csproj" />
+  <Project Path="federated-governance-coordination/FederatedGovernanceCoordination/FederatedGovernanceCoordination.csproj" />
+  <Project Path="federated-governance-coordination/FederatedGovernanceCoordination.Tests/FederatedGovernanceCoordination.Tests.csproj" />
   <Project Path="middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior/MiddlewareOrderingChangesBehavior.csproj" />
   <Project Path="middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior.Tests/MiddlewareOrderingChangesBehavior.Tests.csproj" />
   <Project Path="centralized-error-handling-and-problem-details/CentralizedErrorHandlingAndProblemDetails/CentralizedErrorHandlingAndProblemDetails.csproj" />

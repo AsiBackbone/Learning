@@ -988,7 +988,7 @@ Repeated misunderstandings should trigger refinement of existing material before
 
 ## Status
 
-**Reconciled — several proposed subjects now have substantial coverage; remaining work is concentrated in distributed/federated governance and explanation depth**
+**Reconciled — several proposed subjects now have substantial coverage; remaining work includes distributed acknowledgment/continuation, decision explainability, and selected deeper evidence/risk topics**
 
 ## Goal
 
@@ -997,12 +997,16 @@ Provide a clearly labeled area for ideas that are worth exploring but should not
 The original subject list is reconciled against dedicated curriculum, labs,
 samples, case studies, and architecture comparisons as follows:
 
-* **Distributed governance — Partially covered.** Distributed policy enforcement is
-  documented, but broader coordination across independent governance authorities
-  remains open.
-* **Multi-region policy coordination — Partially covered.** Regional and tenant
-  overlays are established; cross-region coordination and authority conflicts still
-  deserve focused treatment.
+* **Distributed governance — Complete at the advanced architecture-learning level.**
+  Distributed policy enforcement provides the placement/enforcement foundation, and
+  dedicated federated-governance material now covers coordination across independent
+  governance authorities, local autonomy, conflicts, partitions, and provenance.
+  ([#234](https://github.com/AsiBackbone/Learning/issues/234))
+* **Multi-region policy coordination — Complete at the advanced architecture-learning
+  level.** Regional/tenant overlays cover layered policy scopes, while the federated
+  governance material covers peer regional authorities, authority-domain movement,
+  coordination failure, and explicit cross-region conflict semantics.
+  ([#234](https://github.com/AsiBackbone/Learning/issues/234))
 * **Durable decision ledgers — Partially covered.** Decision provenance and
   event-sourcing material cover durable evidence concepts, but a dedicated
   decision-ledger lifecycle remains unfinished.
@@ -1035,9 +1039,12 @@ samples, case studies, and architecture comparisons as follows:
   versus transitive trust, revocation, replay, trust-anchor lifecycle,
   recipient-local governance, drift, and cross-system evidence.
   ([#233](https://github.com/AsiBackbone/Learning/issues/233))
-* **Federated governance models — Partially covered.** Distributed enforcement and
-  regional overlays provide foundations, but federation across independently
-  governed authorities remains unfinished.
+* **Federated governance models — Complete at the advanced architecture-learning
+  level.** Dedicated Experimental material now distinguishes policy distribution
+  from authority federation and covers independent authority ownership, coordination
+  contracts, legitimate composition strategies, conflict/defer outcomes, bounded
+  overrides, partitions, multi-authority provenance, and resource-region movement.
+  ([#234](https://github.com/AsiBackbone/Learning/issues/234))
 * **Distributed acknowledgment workflows — Still needed.** Existing acknowledgment
   material does not yet cover continuation state and responsibility across
   distributed boundaries.
@@ -1164,9 +1171,9 @@ Versioned Learning releases are citable educational snapshots. They do not estab
 
 The highest-priority work now is:
 
-1. Deepen federated and distributed governance beyond policy distribution:
-   multi-region authority coordination, independent governance domains, and
-   distributed acknowledgment/continuation workflows.
+1. Develop distributed acknowledgment and continuation workflows across trust
+   boundaries, including stale acknowledgment, resume authority, provenance, and
+   failure behavior when participating systems cannot all establish current state.
 2. Add focused decision-explainability material that distinguishes human/operator
    explanation from reason codes, provenance, telemetry, and audit evidence.
 3. Select the next dedicated advanced lab only where learner work adds value beyond
