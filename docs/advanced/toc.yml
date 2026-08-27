@@ -7,6 +7,9 @@
 - name: Federated Governance and Independent Authority Coordination
   href: federated-governance-and-independent-authority-coordination.md
 
+- name: Distributed Acknowledgment and Continuation Workflows
+  href: distributed-acknowledgment-and-continuation-workflows.md
+
 - name: Cross-System Capability Exchange and Delegated Authority
   href: cross-system-capability-exchange-and-delegated-authority.md
 
