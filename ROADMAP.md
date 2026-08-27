@@ -1028,9 +1028,13 @@ samples, case studies, and architecture comparisons as follows:
   audience-aware disclosure, multiple contributing reasons, policy-version history,
   and grounded generated-summary boundaries; and preserve explanation as presentation
   rather than authority. ([#236](https://github.com/AsiBackbone/Learning/issues/236))
-* **Adaptive risk context — Partially covered.** Risk-based decisions and
-  deterministic/probabilistic inputs are established; adaptive feedback, drift, and
-  changing risk context remain open.
+* **Adaptive risk context — Complete at the advanced governance-learning level.**
+  Dedicated advanced material and a runnable companion sample now cover observation
+  freshness, provider/model/scoring/calibration identity, threshold-policy drift,
+  resource/environment drift, degraded risk-provider behavior, explicit reevaluation
+  triggers, historical risk provenance, bounded execution authority, and feedback-loop
+  risks without turning a score into authorization.
+  ([#237](https://github.com/AsiBackbone/Learning/issues/237))
 * **Robotics gateway patterns — Complete for the Learning scope.** The simulated
   robotics command-governance case study teaches the gateway and host-owned
   execution boundary without implying a production robotics controller.
@@ -1177,9 +1181,9 @@ Versioned Learning releases are citable educational snapshots. They do not estab
 
 The highest-priority work now is:
 
-1. Select the next deeper evidence/risk subject where focused material adds value,
-   with durable decision ledgers, cryptographic audit chains, and adaptive risk
-   context remaining candidates from Milestone 13.
+1. Select the next deeper evidence subject where focused material adds value, with
+   durable decision ledgers and cryptographic audit chains remaining candidates from
+   Milestone 13.
 2. Select the next dedicated advanced lab only where learner work adds value beyond
    existing material; current candidates include competing policy architectures,
    regional/tenant policy design, and high-consequence failure critique.

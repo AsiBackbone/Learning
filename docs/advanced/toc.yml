@@ -13,6 +13,9 @@
 - name: Decision Explainability for Human Operators
   href: decision-explainability-for-human-operators.md
 
+- name: Adaptive Risk Context, Freshness, and Drift
+  href: adaptive-risk-context-freshness-and-drift.md
+
 - name: Cross-System Capability Exchange and Delegated Authority
   href: cross-system-capability-exchange-and-delegated-authority.md
 
