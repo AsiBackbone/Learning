@@ -16,7 +16,7 @@ The security path now includes a replay-protection and bounded-use sample that m
 
 The advanced trust path now includes a cross-system capability-exchange sample that simulates independently operated issuer and recipient boundaries, recipient-owned trust, request binding, delegation rejection, replay resistance, resource drift, and local policy revalidation.
 
-The governance architecture path includes a federated-governance coordination sample for independent authority composition and a distributed-acknowledgment sample for bound evidence, delayed continuation, current re-evaluation, replay resistance, and out-of-order recovery without external infrastructure.
+The governance architecture path includes a federated-governance coordination sample for independent authority composition, a distributed-acknowledgment sample for bound evidence and delayed continuation, and a decision-explainability sample for deterministic audience-aware projection of structured governance evidence.
 
 Future sample work can focus on refinement, additional invariants, alternative patterns, and new learning areas rather than filling a gap in the foundational sequence.
 
@@ -425,6 +425,36 @@ Host-owned dry-run executor
 Focused tests cover intent and responder substitution, expiration, current-policy denial, replay, different duplicate responses, evidence-verifier unavailability, untrusted evidence, out-of-order challenge recovery, resource drift, and end-to-end lineage.
 
 The sample uses process-local teaching stores and simulated evidence trust. It does not claim production messaging, distributed atomic state, evidence cryptography, durable workflow recovery, or exactly-once external execution.
+
+### Decision Explainability for Human Operators
+
+Related advanced learning material:
+
+[Decision Explainability for Human Operators](../docs/advanced/decision-explainability-for-human-operators.md)
+
+Executable companion:
+
+[Decision Explainability sample](decision-explainability/README.md)
+
+The sample begins with fictional structured decision evidence and projects it into deterministic end-user or operator explanations. It keeps reason identity, policy provenance, disclosure state, and presentation separate.
+
+Its central boundary is:
+
+```text
+Structured decision evidence
+        |
+        v
+Versioned explanation rules
+        +
+Explicit audience
+        |
+        v
+Minimized human explanation
+```
+
+Focused tests verify safe regional data-residency wording, policy-version lineage, `Deferred` versus denial semantics, acknowledgment and escalation wording, deterministic multi-reason ordering, audience-specific withholding, unknown-reason fallback, projection-version identity, and historical policy-version preservation.
+
+The sample does not evaluate policy, authorize explanation viewers, call a generative model, or invoke protected execution. Explanation remains downstream presentation rather than governance authority.
 
 ## Security and Trust Architecture Samples
 
