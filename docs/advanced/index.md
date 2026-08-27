@@ -19,6 +19,7 @@ It means that the problem usually contains more interacting boundaries, assumpti
 | Article | Pattern classification | Focus |
 | --- | --- | --- |
 | [Regional and Tenant Policy Overlays](regional-and-tenant-policy-overlays.md) | General learning material | Explicit policy scopes, narrowing and delegated override authority, conflict handling, provenance, drift, degraded mode, and overlay testing. |
+| [Cross-System Capability Exchange and Delegated Authority](cross-system-capability-exchange-and-delegated-authority.md) | General learning material | Issuer/audience/subject/scope binding, delegation versus transitive trust, replay, revocation, trust-anchor lifecycle, recipient-local policy, drift, and cross-system evidence. |
 | [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md) | Experimental | Multi-agent proposal provenance, delegation, authority narrowing, replay and revocation, agent loops, cross-service trust, and recovery boundaries. |
 
 The Experimental label is intentional: it marks exploratory architecture whose assumptions and limits should remain visible. It does not imply lower quality, and it does not turn the material into a standardized protocol or production-ready platform.
@@ -83,7 +84,6 @@ The objective is to understand what additional complexity buys and what new fail
 Future material may include:
 
 * Policy composition and conflict resolution
-* Delegated and nested authority
 * Replay-resistant capability workflows
 * Distributed execution boundaries
 * Cross-service governance
@@ -191,6 +191,8 @@ A safe delegation model should consider whether authority is being:
 * Used more than once
 
 A derived capability should not silently become more powerful than the authority from which it originated.
+
+Continue with [Cross-System Capability Exchange and Delegated Authority](cross-system-capability-exchange-and-delegated-authority.md) for a dedicated treatment of independently operated systems, delegation versus transitive trust, recipient-local validation, drift, replay, revocation, and trust-anchor lifecycle.
 
 ## Replay, Revocation, and Bounded Use
 
@@ -490,7 +492,7 @@ Each pattern still requires evaluation against the actual application's threat m
 
 ## Current Status
 
-The Advanced section is established and actively contains later-stage architectural material rather than serving only as a future destination. The published regional/tenant overlay article provides a general advanced treatment of multi-authority policy composition, while the multi-agent article is explicitly Experimental and explores boundaries that are not presented as an established organization protocol.
+The Advanced section is established and actively contains later-stage architectural material rather than serving only as a future destination. The published regional/tenant overlay and cross-system capability-exchange articles provide general advanced treatments of multi-authority policy composition and independently operated trust boundaries, while the multi-agent article is explicitly Experimental and explores boundaries that are not presented as an established organization protocol.
 
 Further expansion should remain selective and should preserve the same status discipline: canonical alignment, viable alternatives, experimental exploration, and general learning material should be distinguishable without readers having to infer intent from tone.
 
@@ -498,7 +500,7 @@ Recommended progression:
 
 * Complete the [Foundational Tutorials](../tutorials/index.md).
 * Use the [Hands-On Labs](../labs/index.md) to exercise the underlying boundaries.
-* Read the dedicated advanced articles when the corresponding multi-authority or multi-agent concerns are relevant.
+* Read the dedicated advanced articles when the corresponding multi-authority, cross-system authority, or multi-agent concerns are relevant.
 * Compare the smaller teaching patterns with the working implementation repositories.
 
 ---

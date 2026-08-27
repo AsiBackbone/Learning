@@ -988,7 +988,7 @@ Repeated misunderstandings should trigger refinement of existing material before
 
 ## Status
 
-**Reconciled — several proposed subjects now have substantial coverage; remaining work is concentrated in distributed/federated governance, cross-system authority, and explanation depth**
+**Reconciled — several proposed subjects now have substantial coverage; remaining work is concentrated in distributed/federated governance and explanation depth**
 
 ## Goal
 
@@ -1029,9 +1029,12 @@ samples, case studies, and architecture comparisons as follows:
   execution boundary without implying a production robotics controller.
 * **Agent-to-agent governed execution — Complete.**
   ([#75](https://github.com/AsiBackbone/Learning/issues/75))
-* **Cross-system capability exchange — Still needed.** Delegation, audience binding,
-  revocation, replay, and authority transfer across independently operated systems
-  remain worthwhile advanced work.
+* **Cross-system capability exchange — Complete.** Dedicated advanced material and
+  a runnable companion sample with focused invariant tests now cover independently
+  operated-system handoff, issuer/audience/scope/freshness validation, delegation
+  versus transitive trust, revocation, replay, trust-anchor lifecycle,
+  recipient-local governance, drift, and cross-system evidence.
+  ([#233](https://github.com/AsiBackbone/Learning/issues/233))
 * **Federated governance models — Partially covered.** Distributed enforcement and
   regional overlays provide foundations, but federation across independently
   governed authorities remains unfinished.
@@ -1161,18 +1164,15 @@ Versioned Learning releases are citable educational snapshots. They do not estab
 
 The highest-priority work now is:
 
-1. Develop cross-system capability exchange, including delegation, audience
-   binding, revocation, replay resistance, and authority transfer across
-   independently operated execution boundaries.
-2. Deepen federated and distributed governance beyond policy distribution:
+1. Deepen federated and distributed governance beyond policy distribution:
    multi-region authority coordination, independent governance domains, and
    distributed acknowledgment/continuation workflows.
-3. Add focused decision-explainability material that distinguishes human/operator
+2. Add focused decision-explainability material that distinguishes human/operator
    explanation from reason codes, provenance, telemetry, and audit evidence.
-4. Select the next dedicated advanced lab only where learner work adds value beyond
+3. Select the next dedicated advanced lab only where learner work adds value beyond
    existing material; current candidates include competing policy architectures,
    regional/tenant policy design, and high-consequence failure critique.
-5. Keep concrete good-first contribution opportunities visible when genuine starter
+4. Keep concrete good-first contribution opportunities visible when genuine starter
    work exists, and grow lab/topic reviewer participation as community activity
    justifies it.
 
