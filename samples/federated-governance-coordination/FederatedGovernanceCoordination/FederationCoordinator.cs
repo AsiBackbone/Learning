@@ -45,7 +45,8 @@ public sealed class FederationCoordinator
         {
             if (!byDomain.TryGetValue(
                     requiredDomain,
-                    out AuthorityContribution contribution))
+                    out AuthorityContribution? contribution) ||
+                contribution is null)
             {
                 return Decision(
                     authoritySet,
