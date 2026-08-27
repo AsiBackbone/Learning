@@ -4,6 +4,9 @@
 - name: Regional and Tenant Policy Overlays
   href: regional-and-tenant-policy-overlays.md
 
+- name: Federated Governance and Independent Authority Coordination
+  href: federated-governance-and-independent-authority-coordination.md
+
 - name: Cross-System Capability Exchange and Delegated Authority
   href: cross-system-capability-exchange-and-delegated-authority.md
 

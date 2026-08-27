@@ -16,6 +16,8 @@ The security path now includes a replay-protection and bounded-use sample that m
 
 The advanced trust path now includes a cross-system capability-exchange sample that simulates independently operated issuer and recipient boundaries, recipient-owned trust, request binding, delegation rejection, replay resistance, resource drift, and local policy revalidation.
 
+The governance architecture path now also includes a federated-governance coordination sample that makes independent authority composition, order invariance, degraded coordination, and authority-set drift executable without external infrastructure.
+
 Future sample work can focus on refinement, additional invariants, alternative patterns, and new learning areas rather than filling a gap in the foundational sequence.
 
 For the current learning material, begin with the:
@@ -349,6 +351,41 @@ The central invariant is:
 > **Simulation evaluates decisions but never owns or invokes a protected executor.**
 
 Focused tests verify deterministic decision comparisons, explicit policy-version behavior, constraint evidence, unavailable-policy handling, and the non-execution boundary.
+
+### Federated Governance and Independent Authority Coordination
+
+Related advanced learning material:
+
+[Federated Governance and Independent Authority Coordination](../docs/advanced/federated-governance-and-independent-authority-coordination.md)
+
+Executable companion:
+
+[Federated Governance Coordination sample](federated-governance-coordination/README.md)
+
+The sample keeps two fictional authority domains in memory and makes federation composition behavior directly testable without network or policy-engine dependencies.
+
+Its central boundary is:
+
+```text
+Current host facts
+        |
+        v
+Authority-set resolution
+        |
+        v
+Independent contributions
+        |
+        v
+Versioned composition contract
+        |
+        v
+Explicit federated outcome
+```
+
+Focused tests prove order-independent composition, `Unavailable` remaining distinct from both `Allowed` and `Denied`, explicit invalid-contribution handling, authority-set drift invalidating an old composite decision, coordinator outages preserving federated requirements, and legitimate local-only continuation only when current facts classified the operation as local before the outage.
+
+The sample stops at the federated decision boundary. It does not claim a production federation protocol, distributed consensus, cross-region durability, or protected external execution.
+
 ## Security and Trust Architecture Samples
 
 Security samples isolate state, trust, and execution-boundary behavior that benefits from direct observation under failure or concurrency pressure.
