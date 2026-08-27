@@ -16,7 +16,7 @@ The security path now includes a replay-protection and bounded-use sample that m
 
 The advanced trust path now includes a cross-system capability-exchange sample that simulates independently operated issuer and recipient boundaries, recipient-owned trust, request binding, delegation rejection, replay resistance, resource drift, and local policy revalidation.
 
-The governance architecture path includes a federated-governance coordination sample for independent authority composition, a distributed-acknowledgment sample for bound evidence and delayed continuation, and a decision-explainability sample for deterministic audience-aware projection of structured governance evidence.
+The governance architecture path includes a federated-governance coordination sample for independent authority composition, a distributed-acknowledgment sample for bound evidence and delayed continuation, a decision-explainability sample for deterministic audience-aware projection of structured governance evidence, and an adaptive-risk sample for explicit freshness, drift, reevaluation, and execution-authority boundaries.
 
 Future sample work can focus on refinement, additional invariants, alternative patterns, and new learning areas rather than filling a gap in the foundational sequence.
 
@@ -455,6 +455,51 @@ Minimized human explanation
 Focused tests verify safe regional data-residency wording, policy-version lineage, `Deferred` versus denial semantics, acknowledgment and escalation wording, deterministic multi-reason ordering, audience-specific withholding, unknown-reason fallback, projection-version identity, and historical policy-version preservation.
 
 The sample does not evaluate policy, authorize explanation viewers, call a generative model, or invoke protected execution. Explanation remains downstream presentation rather than governance authority.
+
+### Adaptive Risk Context, Freshness, and Drift
+
+Related advanced learning material:
+
+[Adaptive Risk Context, Freshness, and Drift](../docs/advanced/adaptive-risk-context-freshness-and-drift.md)
+
+Executable companion:
+
+[Adaptive Risk Context sample](adaptive-risk-context/README.md)
+
+The sample models a fictional `payment.release` path with deterministic payment context, captured fraud-risk observations, explicit decision identity, versioned threshold/freshness policy, narrow execution authority, execution-time drift validation, an atomic in-process single-use claim, and final executor-side authority/command validation.
+
+Its central boundary is:
+
+```text
+Captured risk observation
+        +
+Current deterministic context
+        |
+        v
+Versioned governance policy
+        |
+        v
+Decision
+        |
+        v
+Narrow authority when allowed
+        |
+        v
+Current freshness/drift checks
+        |
+        v
+Atomic single-use claim
+        |
+        v
+Validated command
+        |
+        v
+Dry-run host-owned executor
+```
+
+Focused tests cover future/stale/unavailable and unapproved evidence, signal/provider/model/scoring/calibration drift, host-owned maximum age, threshold-policy changes, model-health uncertainty, distinct decision identity, resource/amount/destination/environment drift, hard payment substitution, audience/operation bindings, authority time bounds, sequential and actually concurrent replay, final executor binding checks, observation integrity, historical provenance, and the `0.21 / risk-v7` to `0.76 / risk-v8` reevaluation scenario.
+
+The sample does not perform real model inference, model/data drift detection, retraining, durable distributed replay coordination, payment execution, or production risk-provider integration. Risk remains an input to governance rather than an execution credential.
 
 ## Security and Trust Architecture Samples
 
