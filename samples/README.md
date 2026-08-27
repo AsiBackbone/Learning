@@ -8,11 +8,13 @@ It is intended to contain intentionally small .NET examples that complement the 
 
 ## Current Status
 
-**Foundational sample set established — five governance companions plus focused security and ASP.NET Core architecture samples and invariant tests are available.**
+**Foundational sample set established — five governance companions plus focused security, advanced trust, and ASP.NET Core architecture samples and invariant tests are available.**
 
 The `samples/` area pairs all five foundational tutorials with runnable companion projects and sibling xUnit test projects, culminating in the Governed AI Tool Gateway capstone. Focused ASP.NET Core samples now make middleware ordering and centralized error-handling behavior executable as the application-architecture path expands.
 
 The security path now includes a replay-protection and bounded-use sample that makes the check-then-act concurrency race, atomic consumption, replay evidence, and exactly-once boundary directly observable.
+
+The advanced trust path now includes a cross-system capability-exchange sample that simulates independently operated issuer and recipient boundaries, recipient-owned trust, request binding, delegation rejection, replay resistance, resource drift, and local policy revalidation.
 
 Future sample work can focus on refinement, additional invariants, alternative patterns, and new learning areas rather than filling a gap in the foundational sequence.
 
@@ -384,6 +386,38 @@ Companion lab:
 [Replay Protection and Bounded-Use Authority lab](../docs/labs/replay-protection-and-bounded-use.md)
 
 The lab begins from the deliberately unsafe implementation, requires the learner to repair the race, and then extends the reasoning into durable-store semantics, idempotency, and recovery.
+
+### Cross-System Capability Exchange and Delegated Authority
+
+Related advanced learning material:
+
+[Cross-System Capability Exchange and Delegated Authority](../docs/advanced/cross-system-capability-exchange-and-delegated-authority.md)
+
+Executable companion:
+
+[Cross-System Capability Exchange sample](cross-system-capability-exchange/README.md)
+
+The sample simulates a fictional `System A -> System B` handoff for `records.export` while keeping issuer trust, recipient-local policy, bounded use, and host-owned execution separate.
+
+Its central flow is:
+
+```text
+System A narrow grant
+        ↓
+System B verifies + validates
+        ↓
+System B current local policy
+        ↓
+Atomic single-use claim
+        ↓
+Validated local command
+        ↓
+Dry-run executor
+```
+
+Focused tests cover wrong audience, expiry, resource drift, request substitution, unexpected delegation chains, recipient-local denial, unknown trust anchors, replay, an actually concurrent single-use race, and the burned-grant behavior when execution fails after a successful claim.
+
+The proof and presenter bindings are deliberately simulated. The sample does not claim production cryptography, proof-of-possession, distributed replay guarantees, or exactly-once external execution.
 
 ## ASP.NET Core Architecture Samples
 

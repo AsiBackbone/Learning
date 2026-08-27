@@ -15,6 +15,8 @@
   <Project Path="scoped-capability-and-host-owned-execution/ScopedCapabilityAndHostOwnedExecution.Tests/ScopedCapabilityAndHostOwnedExecution.Tests.csproj" />
   <Project Path="replay-protection-and-bounded-use/ReplayProtectionAndBoundedUse/ReplayProtectionAndBoundedUse.csproj" />
   <Project Path="replay-protection-and-bounded-use/ReplayProtectionAndBoundedUse.Tests/ReplayProtectionAndBoundedUse.Tests.csproj" />
+  <Project Path="cross-system-capability-exchange/CrossSystemCapabilityExchange/CrossSystemCapabilityExchange.csproj" />
+  <Project Path="cross-system-capability-exchange/CrossSystemCapabilityExchange.Tests/CrossSystemCapabilityExchange.Tests.csproj" />
   <Project Path="middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior/MiddlewareOrderingChangesBehavior.csproj" />
   <Project Path="middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior.Tests/MiddlewareOrderingChangesBehavior.Tests.csproj" />
   <Project Path="centralized-error-handling-and-problem-details/CentralizedErrorHandlingAndProblemDetails/CentralizedErrorHandlingAndProblemDetails.csproj" />
