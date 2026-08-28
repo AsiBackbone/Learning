@@ -1335,7 +1335,7 @@ Learning keeps this article provider-neutral, but the ideas should be checked ag
 | [RFC 8949 §4.2 Deterministically Encoded CBOR](https://www.rfc-editor.org/rfc/rfc8949.html#section-4.2) | Reference requirements for deterministic CBOR encodings. | Deterministic CBOR still needs a protocol-level contract defining which representation is used. |
 | [Trillian transparent logging guide](https://github.com/google/trillian/blob/master/docs/TransparentLogging.md) | Generalizes CT-style verifiable append-only logging and makes application-specific admission/identity rules explicit. | Trillian solves the verifiable log substrate, not governance semantics for the application. |
 | [Sigstore Rekor](https://docs.sigstore.dev/logging/overview/) | Shows transparency logging, inclusion verification, monitoring, and auditing applied to software-supply-chain metadata. | Rekor's public-log threat model and disclosure model are not automatically appropriate for private governance evidence. |
-| [Amazon QLDB support notice](https://docs.aws.amazon.com/qldb/latest/developerguide/getting-started-step-7.html) | Historical managed-ledger example whose end of support on July 31, 2025 makes migration/export lifecycle risk concrete. | A provider-managed ledger never removes the need for retention, migration, and post-migration verification planning. |
+| [AWS services in full shutdown — Amazon QLDB](https://docs.aws.amazon.com/general/latest/gr/full_shutdown_services.html) | Historical managed-ledger example whose end of support on July 31, 2025 makes migration/export lifecycle risk concrete. | A provider-managed ledger never removes the need for retention, migration, and post-migration verification planning. |
 
 ### Runnable Learning companion
 
