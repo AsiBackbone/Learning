@@ -134,8 +134,9 @@ Use the role/claims/capability comparison for the full model, then Scoped Capabi
 ## 4. Why an AI Tool Call Is a Proposal, Not Authority
 
 - **Priority:** P0
-- **Implementation issue:** Open separately when promoted
-- **Candidate slug:** `why-ai-tool-call-is-only-a-proposal`
+- **Implementation issue:** [#219](https://github.com/AsiBackbone/Learning/issues/219)
+- **Publication:** [Published August 28, 2026](../docs/articles/2026/why-ai-tool-call-is-only-a-proposal.md)
+- **Permanent slug:** `why-ai-tool-call-is-only-a-proposal`
 
 ### Reader / search problem
 
