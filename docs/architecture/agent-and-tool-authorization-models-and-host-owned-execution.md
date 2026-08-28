@@ -21,6 +21,8 @@ feed: true
 
 > **Standalone-reader note:** In this article, **Learning** means the ASI Backbone Learning repository and tutorial series. Its recurring rule is: **The model may propose. The host retains execution authority.** The host may be a conventional application, an agent runtime that is deliberately trusted as the execution boundary, a background worker, a tool gateway, or another component that owns the real side effect.
 
+Use this page as the **detailed reference comparison** across tool visibility, framework registration, agent permissions, authorization, capabilities, credential custody, and host-owned execution. If you want the shorter standalone argument that isolates the proposal-versus-authority boundary around one minimal `case.add-note` loop, start with [Why an AI Tool Call Is a Proposal, Not Authority](../articles/2026/why-ai-tool-call-is-only-a-proposal.md).
+
 ## Executive Summary
 
 AI and agent controls operate at different boundaries:

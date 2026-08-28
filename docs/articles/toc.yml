@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: Why an AI Tool Call Is a Proposal, Not Authority
+  href: 2026/why-ai-tool-call-is-only-a-proposal.md
 - name: When ASP.NET Core Authorization Is Not Enough
   href: 2026/when-aspnet-core-authorization-is-not-enough.md
 - name: How to Test That a Denied Operation Never Executes

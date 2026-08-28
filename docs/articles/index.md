@@ -20,6 +20,14 @@ The Learning site is the canonical publication host. Cross-posted copies should 
 
 ## 2026
 
+### [Why an AI Tool Call Is a Proposal, Not Authority](2026/why-ai-tool-call-is-only-a-proposal.md)
+
+**Christopher D. Cavell** · **August 28, 2026**
+
+A model may propose a tool call, but valid JSON and a known tool do not create authority; the trusted host still owns context, authorization, credentials, and execution.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/why-ai-tool-call-is-only-a-proposal.html`
+
 ### [When ASP.NET Core Authorization Is Not Enough](2026/when-aspnet-core-authorization-is-not-enough.md)
 
 **Christopher D. Cavell** · **August 26, 2026**
