@@ -20,17 +20,32 @@ Working Repository
 
 The canonical sample source and detailed sample documentation remain under [`samples/`](https://github.com/AsiBackbone/Learning/tree/main/samples) in the GitHub repository. This page keeps the published DocFX learning path intact while giving you enough information to choose and run the right companion sample before following the canonical README for deeper explanation.
 
+## Complete Sample Catalog
+
+All executable sample projects currently under `samples/` are listed below, grouped by the same learning areas used throughout the site.
+
+| Area | Sample | Core boundary |
+| --- | --- | --- |
+| Foundational | [Decision Before Execution](#decision-before-execution) | A blocked decision never reaches the executor. |
+| Foundational | [Policy Context and Explicit Decision Outcomes](#policy-context-and-explicit-decision-outcomes) | Policy consumes explicit facts and returns a structured outcome without performing the side effect. |
+| Foundational | [Acknowledgment and Audit Residue](#acknowledgment-and-audit-residue) | Acknowledgment satisfies a governance requirement; it does not become execution authority. |
+| Foundational | [Scoped Capability and Host-Owned Execution](#scoped-capability-and-host-owned-execution) | Narrow authority is validated again at the host-owned execution boundary. |
+| Foundational | [Governed AI Tool Gateway](#governed-ai-tool-gateway) | The model may propose; the host retains execution authority. |
+| Governance and Policy Architecture | [Decision Pipeline Refactoring](#decision-pipeline-refactoring) | Explicit outcomes remain separate from protected execution. |
+| Governance and Policy Architecture | [Minimal Policy Simulation Harness](#minimal-policy-simulation-harness) | Simulation evaluates policy behavior without creating execution authority. |
+| Governance and Policy Architecture | [Federated Governance and Independent Authority Coordination](#federated-governance-and-independent-authority-coordination) | An outage cannot reclassify a federated operation as local-only. |
+| Governance and Policy Architecture | [Distributed Acknowledgment and Continuation Workflows](#distributed-acknowledgment-and-continuation-workflows) | Acknowledgment evidence is not portable execution authority. |
+| Governance and Policy Architecture | [Decision Explainability for Human Operators](#decision-explainability-for-human-operators) | Explanation projects governance evidence; it does not replace the evidence or create authority. |
+| Governance and Policy Architecture | [Adaptive Risk Context, Freshness, and Drift](#adaptive-risk-context-freshness-and-drift) | Changing risk evidence triggers explicit freshness and reevaluation rules. |
+| Security and Trust Architecture | [Replay Protection and Bounded-Use Authority](#replay-protection-and-bounded-use-authority) | Bounded-use authority needs an atomic state transition at the consumption boundary. |
+| Security and Trust Architecture | [Cross-System Capability Exchange and Delegated Authority](#cross-system-capability-exchange-and-delegated-authority) | A cross-system artifact is validated into a local executor contract rather than used as one directly. |
+| Security and Trust Architecture | [Durable Decision Ledger and Audit Chain](#durable-decision-ledger-and-audit-chain) | Local chain verification and independently retained checkpoints provide different evidence properties. |
+| ASP.NET Core Architecture | [Middleware Ordering Changes Behavior](#middleware-ordering-changes-behavior) | Middleware order changes which components can observe and handle a request or failure. |
+| ASP.NET Core Architecture | [Centralized Error Handling and Problem Details](#centralized-error-handling-and-problem-details) | Expected governance outcomes remain distinct from unexpected application failures. |
+
 ## Foundational Sample Set
 
 The five foundational tutorials each have an executable companion sample.
-
-| Sample | Difficulty | Core boundary |
-| --- | --- | --- |
-| [Decision Before Execution](#decision-before-execution) | Beginner | A blocked decision never reaches the executor. |
-| [Policy Context and Explicit Decision Outcomes](#policy-context-and-explicit-decision-outcomes) | Beginner | Policy consumes explicit facts and returns a structured outcome without performing the side effect. |
-| [Acknowledgment and Audit Residue](#acknowledgment-and-audit-residue) | Intermediate | Acknowledgment satisfies a governance requirement; it does not become execution authority. |
-| [Scoped Capability and Host-Owned Execution](#scoped-capability-and-host-owned-execution) | Intermediate | Narrow authority is validated again at the host-owned execution boundary. |
-| [Governed AI Tool Gateway](#governed-ai-tool-gateway) | Advanced | The model may propose; the host retains execution authority. |
 
 ### Decision Before Execution
 
@@ -184,6 +199,99 @@ dotnet run --project samples/policy-simulation-harness/PolicySimulationHarness/P
 - [Read Practical Policy Testing and Decision-Table Strategies](../governance/practical-policy-testing-and-decision-table-strategies.md)
 - [Read Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md)
 - [Compare Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md)
+
+### Federated Governance and Independent Authority Coordination
+
+**Learning objective:** Observe how independently operated governance authorities contribute to one deterministic decision while authority-set resolution, contribution health, disagreement handling, coordinator failure, and authority-set drift remain explicit.
+
+**Key invariant:**
+
+> **An outage cannot reclassify a federated operation as local-only.**
+
+Run from the repository root:
+
+```bash
+dotnet run --project samples/federated-governance-coordination/FederatedGovernanceCoordination/FederatedGovernanceCoordination.csproj
+```
+
+Run the focused tests:
+
+```bash
+dotnet test samples/federated-governance-coordination/FederatedGovernanceCoordination.Tests/FederatedGovernanceCoordination.Tests.csproj
+```
+
+- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/federated-governance-coordination/README.md)
+- [Read Federated Governance and Independent Authority Coordination](../advanced/federated-governance-and-independent-authority-coordination.md)
+
+### Distributed Acknowledgment and Continuation Workflows
+
+**Learning objective:** Observe acknowledgment evidence crossing system boundaries while recipient-owned trust validation, durable continuation binding, current-context reconstruction, current policy re-evaluation, a single-use continuation claim, and local execution authority remain separate.
+
+**Key invariant:**
+
+> **Acknowledgment evidence is not portable execution authority.**
+
+Run from the repository root:
+
+```bash
+dotnet run --project samples/distributed-acknowledgment-continuation/DistributedAcknowledgmentContinuation/DistributedAcknowledgmentContinuation.csproj
+```
+
+Run the focused tests:
+
+```bash
+dotnet test samples/distributed-acknowledgment-continuation/DistributedAcknowledgmentContinuation.Tests/DistributedAcknowledgmentContinuation.Tests.csproj
+```
+
+- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/distributed-acknowledgment-continuation/README.md)
+- [Read Distributed Acknowledgment and Continuation Workflows](../advanced/distributed-acknowledgment-and-continuation-workflows.md)
+
+### Decision Explainability for Human Operators
+
+**Learning objective:** Observe how structured governance evidence can be projected into deterministic, audience-aware human explanations without rewriting the source decision, disclosing protected context, or creating new policy or execution authority.
+
+**Key invariant:**
+
+> **Human explanation is a projection of structured governance evidence. It is not the evidence itself and it does not create policy or execution authority.**
+
+Run from the repository root:
+
+```bash
+dotnet run --project samples/decision-explainability/DecisionExplainability/DecisionExplainability.csproj
+```
+
+Run the focused tests:
+
+```bash
+dotnet test samples/decision-explainability/DecisionExplainability.Tests/DecisionExplainability.Tests.csproj
+```
+
+- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-explainability/README.md)
+- [Read Decision Explainability for Human Operators](../advanced/decision-explainability-for-human-operators.md)
+
+### Adaptive Risk Context, Freshness, and Drift
+
+**Learning objective:** Observe how a changing risk observation stays bound to its original decision while freshness rules, policy drift, current-context reconstruction, re-evaluation, bounded authority, and final host-owned execution remain explicit.
+
+**Key invariant:**
+
+> **A changing risk signal triggers explicit freshness and reevaluation rules. It does not silently mutate authorization or execution authority.**
+
+Run from the repository root:
+
+```bash
+dotnet run --project samples/adaptive-risk-context/AdaptiveRiskContext/AdaptiveRiskContext.csproj
+```
+
+Run the focused tests:
+
+```bash
+dotnet test samples/adaptive-risk-context/AdaptiveRiskContext.Tests/AdaptiveRiskContext.Tests.csproj
+```
+
+- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/adaptive-risk-context/README.md)
+- [Read Adaptive Risk Context, Freshness, and Drift](../advanced/adaptive-risk-context-freshness-and-drift.md)
+
 ## Security and Trust Architecture Samples
 
 ### Replay Protection and Bounded-Use Authority
@@ -207,6 +315,29 @@ dotnet run --project samples/replay-protection-and-bounded-use/ReplayProtectionA
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/replay-protection-and-bounded-use/README.md)
 - [Read Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md)
 - [Continue with the intermediate concurrency lab](../labs/replay-protection-and-bounded-use.md)
+
+### Cross-System Capability Exchange and Delegated Authority
+
+**Learning objective:** Observe how a recipient independently validates issuer/key trust, audience and presenter bindings, operation/resource/request bindings, lifetime, delegation policy, revocation, local policy, and bounded-use state before creating a local command for a host-owned executor.
+
+**Key invariant:**
+
+> **The raw cross-system artifact never becomes the executor contract.**
+
+Run from the repository root:
+
+```bash
+dotnet run --project samples/cross-system-capability-exchange/CrossSystemCapabilityExchange/CrossSystemCapabilityExchange.csproj
+```
+
+Run the focused tests:
+
+```bash
+dotnet test samples/cross-system-capability-exchange/CrossSystemCapabilityExchange.Tests/CrossSystemCapabilityExchange.Tests.csproj
+```
+
+- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/cross-system-capability-exchange/README.md)
+- [Read Cross-System Capability Exchange and Delegated Authority](../advanced/cross-system-capability-exchange-and-delegated-authority.md)
 
 ### Durable Decision Ledger and Audit Chain
 
@@ -261,6 +392,29 @@ Restart with `--PipelineMode=incorrect` to move the fault-producing middleware o
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/middleware-ordering-changes-behavior/README.md)
 - [Read Middleware Ordering Changes Behavior](../aspnetcore/middleware-ordering-changes-behavior.md)
 - [Inspect the fuller NetCoreApplicationTemplate pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/PipelineExtensions.cs)
+
+### Centralized Error Handling and Problem Details
+
+**Learning objective:** Observe how a small ASP.NET Core host keeps unexpected application failures inside a centralized exception boundary while expected governance outcomes are mapped explicitly by the host, with safe Problem Details and trace correlation across the public and operational surfaces.
+
+**Key invariant:**
+
+> **A denied decision is not an exception merely because execution does not proceed.**
+
+Run from the repository root:
+
+```bash
+dotnet run --project samples/centralized-error-handling-and-problem-details/CentralizedErrorHandlingAndProblemDetails/CentralizedErrorHandlingAndProblemDetails.csproj --urls http://127.0.0.1:5082
+```
+
+Run the focused integration tests:
+
+```bash
+dotnet test samples/centralized-error-handling-and-problem-details/CentralizedErrorHandlingAndProblemDetails.Tests/CentralizedErrorHandlingAndProblemDetails.Tests.csproj
+```
+
+- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/centralized-error-handling-and-problem-details/README.md)
+- [Read Centralized Error Handling and Problem Details](../aspnetcore/centralized-error-handling-and-problem-details.md)
 
 ## Run the Complete Sample Suite
 

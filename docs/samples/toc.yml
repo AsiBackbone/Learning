@@ -1,0 +1,59 @@
+- name: Executable Samples
+  href: index.md
+
+- name: Foundational
+  expanded: true
+  items:
+  - name: Decision Before Execution
+    href: index.md#decision-before-execution
+  - name: Policy Context and Explicit Decision Outcomes
+    href: index.md#policy-context-and-explicit-decision-outcomes
+  - name: Acknowledgment and Audit Residue
+    href: index.md#acknowledgment-and-audit-residue
+  - name: Scoped Capability and Host-Owned Execution
+    href: index.md#scoped-capability-and-host-owned-execution
+  - name: Governed AI Tool Gateway
+    href: index.md#governed-ai-tool-gateway
+
+- name: Governance and Policy Architecture
+  expanded: true
+  items:
+  - name: Decision Pipeline Refactoring
+    href: index.md#decision-pipeline-refactoring
+  - name: Minimal Policy Simulation Harness
+    href: index.md#minimal-policy-simulation-harness
+  - name: Federated Governance and Independent Authority Coordination
+    href: index.md#federated-governance-and-independent-authority-coordination
+  - name: Distributed Acknowledgment and Continuation Workflows
+    href: index.md#distributed-acknowledgment-and-continuation-workflows
+  - name: Decision Explainability for Human Operators
+    href: index.md#decision-explainability-for-human-operators
+  - name: Adaptive Risk Context, Freshness, and Drift
+    href: index.md#adaptive-risk-context-freshness-and-drift
+
+- name: Security and Trust Architecture
+  expanded: true
+  items:
+  - name: Replay Protection and Bounded-Use Authority
+    href: index.md#replay-protection-and-bounded-use-authority
+  - name: Cross-System Capability Exchange and Delegated Authority
+    href: index.md#cross-system-capability-exchange-and-delegated-authority
+  - name: Durable Decision Ledger and Audit Chain
+    href: index.md#durable-decision-ledger-and-audit-chain
+
+- name: ASP.NET Core Architecture
+  expanded: true
+  items:
+  - name: Middleware Ordering Changes Behavior
+    href: index.md#middleware-ordering-changes-behavior
+  - name: Centralized Error Handling and Problem Details
+    href: index.md#centralized-error-handling-and-problem-details
+
+- name: Run the Complete Sample Suite
+  href: index.md#run-the-complete-sample-suite
+- name: Sample Design Principles
+  href: index.md#sample-design-principles
+- name: Working Implementations
+  href: index.md#working-implementations
+- name: Source of Truth and Licensing
+  href: index.md#source-of-truth-and-licensing
