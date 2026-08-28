@@ -1,5 +1,6 @@
 ---
 description: Browse runnable companion samples that demonstrate ASI Backbone Learning patterns between the problem-first tutorials and hands-on architectural labs.
+_disableBreadcrumb: true
 ---
 
 # Executable Samples
