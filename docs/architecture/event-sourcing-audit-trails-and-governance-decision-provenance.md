@@ -1412,6 +1412,7 @@ Continue with:
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) for policy identity, historical evidence, fingerprints, and drift.
 - [Secure Logging Across Trust Boundaries](../security/secure-logging-across-trust-boundaries.md) for the operational-logging boundary, minimization, retention, and the limits of ordinary telemetry.
 - [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md) when the threat model requires integrity properties beyond ordinary durable persistence.
+- [Durable Decision Ledgers and Cryptographic Audit Chains](../advanced/durable-decision-ledgers-and-cryptographic-audit-chains.md) for the full append-oriented evidence lifecycle, including canonicalization, ordered linkage, checkpoints, key lifecycle, retention, migration, restore, and corrupted-chain handling.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) for the boundary between a decision and later execution authority.
 - [AI Governance Observability and End-to-End Decision Tracing](../ai-integration/ai-governance-observability-and-end-to-end-decision-tracing.md) for correlation across proposal, decision, acknowledgment, capability, and execution telemetry.
 
