@@ -23,6 +23,7 @@ It means that the problem usually contains more interacting boundaries, assumpti
 | [Distributed Acknowledgment and Continuation Workflows](distributed-acknowledgment-and-continuation-workflows.md) | General learning material | Bound challenge/evidence handoff, exact-intent and responder binding, durable continuation state, replay/out-of-order recovery, current re-evaluation, and host-owned continuation. |
 | [Decision Explainability for Human Operators](decision-explainability-for-human-operators.md) | General learning material | Reason codes versus explanations, audience-aware projection, disclosure/minimization, multi-reason presentation, historical policy provenance, and bounded generated summaries. |
 | [Adaptive Risk Context, Freshness, and Drift](adaptive-risk-context-freshness-and-drift.md) | General learning material | Time-bound risk observations, provider/model provenance, threshold and freshness policy, reevaluation triggers, degraded signals, context drift, historical reconstruction, and feedback-loop boundaries. |
+| [Durable Decision Ledgers and Cryptographic Audit Chains](durable-decision-ledgers-and-cryptographic-audit-chains.md) | General learning material | Append-oriented governance evidence lifecycle, deterministic canonicalization, hash links, checkpoints, split-view/truncation risk, trusted timestamping, key/algorithm lifecycle, Merkle alternatives, archival/recovery, and a runnable companion sample. |
 | [Cross-System Capability Exchange and Delegated Authority](cross-system-capability-exchange-and-delegated-authority.md) | General learning material | Issuer/audience/subject/scope binding, delegation versus transitive trust, replay, revocation, trust-anchor lifecycle, recipient-local policy, drift, and cross-system evidence. |
 | [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md) | Experimental | Multi-agent proposal provenance, delegation, authority narrowing, replay and revocation, agent loops, cross-service trust, and recovery boundaries. |
 
@@ -93,8 +94,6 @@ Future material may include:
 * Cross-service governance
 * Multi-tenant policy systems beyond the published overlay treatment
 * Policy-version drift
-* Durable governance evidence
-* Tamper-evident receipts
 * Capability revocation and cancellation
 * Partial failure and recovery
 * Degraded-mode governance
@@ -515,7 +514,7 @@ Each pattern still requires evaluation against the actual application's threat m
 
 ## Current Status
 
-The Advanced section is established and actively contains later-stage architectural material rather than serving only as a future destination. The published regional/tenant overlay, distributed-acknowledgment, decision-explainability, adaptive-risk, and cross-system capability-exchange articles provide general advanced treatments of policy composition, delayed continuation, human-facing evidence projection, changing risk context, and independently operated trust boundaries, while the federated-governance and multi-agent articles are explicitly Experimental and explore authority-coordination boundaries that are not presented as standardized organization protocols.
+The Advanced section is established and actively contains later-stage architectural material rather than serving only as a future destination. The published regional/tenant overlay, distributed-acknowledgment, decision-explainability, adaptive-risk, durable-decision-ledger, and cross-system capability-exchange articles provide general advanced treatments of policy composition, delayed continuation, human-facing evidence projection, changing risk context, durable governance evidence, and independently operated trust boundaries, while the federated-governance and multi-agent articles are explicitly Experimental and explore authority-coordination boundaries that are not presented as standardized organization protocols.
 
 Further expansion should remain selective and should preserve the same status discipline: canonical alignment, viable alternatives, experimental exploration, and general learning material should be distinguishable without readers having to infer intent from tone.
 
@@ -523,7 +522,7 @@ Recommended progression:
 
 * Complete the [Foundational Tutorials](../tutorials/index.md).
 * Use the [Hands-On Labs](../labs/index.md) to exercise the underlying boundaries.
-* Read the dedicated advanced articles when multi-authority, distributed-continuation, human-explanation, adaptive-risk, cross-system authority, or multi-agent concerns are relevant.
+* Read the dedicated advanced articles when multi-authority, distributed-continuation, human-explanation, adaptive-risk, durable-evidence lifecycle, cross-system authority, or multi-agent concerns are relevant.
 * Compare the smaller teaching patterns with the working implementation repositories.
 
 ---

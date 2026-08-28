@@ -16,6 +16,9 @@
 - name: Adaptive Risk Context, Freshness, and Drift
   href: adaptive-risk-context-freshness-and-drift.md
 
+- name: Durable Decision Ledgers and Cryptographic Audit Chains
+  href: durable-decision-ledgers-and-cryptographic-audit-chains.md
+
 - name: Cross-System Capability Exchange and Delegated Authority
   href: cross-system-capability-exchange-and-delegated-authority.md
 

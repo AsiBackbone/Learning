@@ -988,7 +988,7 @@ Repeated misunderstandings should trigger refinement of existing material before
 
 ## Status
 
-**Reconciled — several proposed subjects now have substantial coverage; remaining work is concentrated in selected deeper evidence/risk topics**
+**Reconciled — all originally listed subjects now have substantial coverage at the current Learning scope; future advanced work should be selective and evidence-driven**
 
 ## Goal
 
@@ -1007,12 +1007,20 @@ samples, case studies, and architecture comparisons as follows:
   governance material covers peer regional authorities, authority-domain movement,
   coordination failure, and explicit cross-region conflict semantics.
   ([#234](https://github.com/AsiBackbone/Learning/issues/234))
-* **Durable decision ledgers — Partially covered.** Decision provenance and
-  event-sourcing material cover durable evidence concepts, but a dedicated
-  decision-ledger lifecycle remains unfinished.
-* **Cryptographic audit chains — Partially covered.** Signing, verification, key
-  custody, and tamper-evidence are covered; chained append-only audit structures are
-  not yet a dedicated learning subject.
+* **Durable decision ledgers — Complete at the advanced governance-learning level.**
+  Dedicated material now covers append semantics, canonicalization, sequence identity,
+  hash linkage, checkpoints, retention, archival, migration, restore, corruption
+  handling, and the boundary between historical evidence and execution authority. A
+  runnable companion sample makes canonicalization, idempotent append,
+  mutation/reordering, streaming verification, and checkpoint-aware truncation
+  observable. ([#238](https://github.com/AsiBackbone/Learning/issues/238))
+* **Cryptographic audit chains — Complete at the advanced security-learning level.**
+  The same dedicated treatment separates hash chaining from signatures; covers
+  verification policy, key rotation and historical verification, modification,
+  insertion, deletion, reordering, tail truncation, split-view/equivocation, trusted
+  timestamping, and Merkle/segmented alternatives; and preserves tamper-evident rather
+  than immutable wording without requiring blockchain.
+  ([#238](https://github.com/AsiBackbone/Learning/issues/238))
 * **External policy providers — Complete at the architecture-learning level.** The
   policy-engine comparison covers externalized PDPs, local/sidecar/remote placement,
   policy-as-code, and representative OPA/Rego, Cedar, and XACML anchors.
@@ -1181,15 +1189,14 @@ Versioned Learning releases are citable educational snapshots. They do not estab
 
 The highest-priority work now is:
 
-1. Select the next deeper evidence subject where focused material adds value, with
-   durable decision ledgers and cryptographic audit chains remaining candidates from
-   Milestone 13.
-2. Select the next dedicated advanced lab only where learner work adds value beyond
+1. Select the next dedicated advanced lab only where learner work adds value beyond
    existing material; current candidates include competing policy architectures,
    regional/tenant policy design, and high-consequence failure critique.
-3. Keep concrete good-first contribution opportunities visible when genuine starter
+2. Keep concrete good-first contribution opportunities visible when genuine starter
    work exists, and grow lab/topic reviewer participation as community activity
    justifies it.
+3. Revisit completed Milestone 13 subjects when implementation experience, reader
+   feedback, or a concrete failure mode reveals a deeper learning gap.
 
 These are strategic curriculum and community priorities. Editorial publication
 planning remains in `community/article-backlog.md`; article candidates and their

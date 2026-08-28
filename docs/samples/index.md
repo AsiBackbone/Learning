@@ -208,6 +208,34 @@ dotnet run --project samples/replay-protection-and-bounded-use/ReplayProtectionA
 - [Read Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md)
 - [Continue with the intermediate concurrency lab](../labs/replay-protection-and-bounded-use.md)
 
+### Durable Decision Ledger and Audit Chain
+
+**Learning objective:** Observe how deterministic canonicalization, idempotent append semantics, predecessor linkage, streaming verification, and an independently retained checkpoint teaching model contribute different evidence properties without turning an in-memory chain into an immutable ledger.
+
+**Difficulty:** Advanced
+
+**Key invariants:**
+
+> **A verified local prefix does not prove the newest records are present.**
+
+> **An independently retained checkpoint can expose a missing checkpointed tail, while a single verifier still cannot detect every split view without cross-verifier comparison.**
+
+Run from the repository root:
+
+```bash
+dotnet run --project samples/durable-decision-ledger-audit-chain/DurableDecisionLedgerAuditChain/DurableDecisionLedgerAuditChain.csproj
+```
+
+Run the focused tests:
+
+```bash
+dotnet test samples/durable-decision-ledger-audit-chain/DurableDecisionLedgerAuditChain.Tests/DurableDecisionLedgerAuditChain.Tests.csproj
+```
+
+- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/durable-decision-ledger-audit-chain/README.md)
+- [Read Durable Decision Ledgers and Cryptographic Audit Chains](../advanced/durable-decision-ledgers-and-cryptographic-audit-chains.md)
+- [Compare Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md)
+
 ## ASP.NET Core Architecture Samples
 
 ### Middleware Ordering Changes Behavior
