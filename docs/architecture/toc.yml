@@ -22,6 +22,9 @@
 - name: Governance Spine and Capability Validation Diagrams
   href: governance-spine-and-capability-validation-diagrams.md
 
+- name: Growing Beyond a Simple Application Structure
+  href: growing-beyond-a-simple-application-structure.md
+
 - name: When ASP.NET Core Authorization Is Enough
   href: when-aspnet-core-authorization-is-enough.md
 
