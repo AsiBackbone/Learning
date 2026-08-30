@@ -7,6 +7,18 @@
 - name: Terminology and Established Architecture Concepts
   href: terminology-and-established-concepts.md
 
+- name: Accountable Systems Infrastructure and Governed Execution
+  href: accountable-systems-infrastructure-and-governed-execution.md
+
+- name: Intent to Execution Accountability Pattern
+  href: intent-to-execution-accountability-pattern.md
+
+- name: Constraint-Conditioned Decision Model
+  href: constraint-conditioned-decision-model.md
+
+- name: Governance Tool Selection and Composition
+  href: governance-tool-selection-and-composition.md
+
 - name: Governance Spine and Capability Validation Diagrams
   href: governance-spine-and-capability-validation-diagrams.md
 
