@@ -111,6 +111,10 @@ Future material in this section may examine questions such as:
 * Which architectural concerns belong in the host rather than a framework?
 * When is a governance pipeline unnecessary complexity?
 
+## Application Structure Growth
+
+For general application-layering guidance, see [Growing Beyond a Simple Application Structure](growing-beyond-a-simple-application-structure.md). It explains when a compact application is enough, what signals justify Application or Domain boundaries, how dependency direction should be reasoned about, and the tradeoffs around CQRS, MediatR, DDD, and premature layering. NetCoreApplicationTemplate is used as one working reference rather than a universal pattern.
+
 ## Alternative Patterns
 
 Architecture should be compared against viable alternatives rather than presented as a single prescribed design.
@@ -147,7 +151,7 @@ An ASP.NET Core reference architecture demonstrating middleware organization, se
 
 ## Current Status
 
-The Architecture section is established as a learning area and now includes a governed-execution visual reference alongside nine concrete alternative-pattern comparisons. It will continue to grow through additional comparisons, diagrams, and cross-repository studies.
+The Architecture section is established as a learning area and now includes general application-structure growth guidance, a governed-execution visual reference, and concrete alternative-pattern comparisons. It will continue to grow through additional comparisons, diagrams, and cross-repository studies.
 
 For the current learning path, continue with the [Foundational Tutorials](../tutorials/index.md).
 
