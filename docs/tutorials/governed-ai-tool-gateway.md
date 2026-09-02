@@ -1795,6 +1795,7 @@ Learning is intended to make those tradeoffs visible rather than prescribe one u
 - [Threat Modeling as Architecture Reasoning](../security/threat-modeling-as-architecture-reasoning.md) — use this gateway as the worked example for mapping model proposals, host authority, capabilities, dependencies, bypass paths, mitigations, and verification invariants.
 - [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) — run the capstone with a simulated proposal generator, host-built context, acknowledgment, scoped capability, dry-run execution, and invariant tests.
 - [Governed AI Tool Gateway advanced lab](../labs/governed-ai-tool-gateway.md) — deliberately weaken and repair the gateway, then threat-model its trust boundaries.
+- [Critique AI-Owned Proposal and Execution Authority lab](../labs/critique-ai-owned-proposal-and-execution-authority.md) — start from the opposite architecture, where one agent owns proposal, policy judgment, credentials, retries, and direct execution, then identify which authority-bearing responsibilities must move to a trusted host boundary.
 
 ---
 
