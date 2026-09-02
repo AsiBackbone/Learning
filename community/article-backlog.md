@@ -103,8 +103,9 @@ Send readers to the runnable sample for executable evidence and then to the lab 
 ## 3. Do You Need a Capability Token, or Are Roles and Claims Enough?
 
 - **Priority:** P0
-- **Implementation issue:** Open separately when promoted
-- **Candidate slug:** `roles-claims-or-capability-token-dotnet`
+- **Implementation issue:** [#220](https://github.com/AsiBackbone/Learning/issues/220)
+- **Publication:** [Published September 2, 2026](../docs/articles/2026/roles-claims-or-capability-token-dotnet.md)
+- **Permanent slug:** `roles-claims-or-capability-token-dotnet`
 
 ### Reader / search problem
 
