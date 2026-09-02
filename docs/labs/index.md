@@ -51,11 +51,11 @@ Automated tests are useful evidence, but they are not the entire learning result
 
 ## Current Status
 
-The lab navigation foundation is established, with four beginner labs, eight intermediate labs, and four advanced labs now available.
+The lab navigation foundation is established, with four beginner labs, eight intermediate labs, and five advanced labs now available.
 
 Additional labs will appear in this section as the learning path expands into deeper architecture, security, and AI-governance topics.
 
-The foundational labs pair all five governance tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated boundaries. The governance lab path now also includes policy-version evidence, candidate-policy simulation, decision-pipeline refactoring, competing-policy-architecture selection, and regional/tenant overlay design, while the ASP.NET Core diagnostic lab begins the next learning area by requiring learners to predict, observe, repair, and explain middleware-ordering behavior; the ADR lab extends that application-architecture path by requiring learners to make, record, and revisit a decision under changed constraints.
+The foundational labs pair all five governance tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated boundaries. The governance lab path now also includes policy-version evidence, candidate-policy simulation, decision-pipeline refactoring, competing-policy-architecture selection, regional/tenant overlay design, and a synthesis-oriented flawed high-consequence workflow analysis, while the ASP.NET Core diagnostic lab begins the next learning area by requiring learners to predict, observe, repair, and explain middleware-ordering behavior; the ADR lab extends that application-architecture path by requiring learners to make, record, and revisit a decision under changed constraints.
 
 ## Available Labs
 
@@ -285,6 +285,22 @@ Related material:
 - [Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md)
 - [Constraint Composition and Policy Precedence](../governance/constraint-composition-and-policy-precedence.md)
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md)
+- [Safe Degraded Mode and Fail-Safe Governance](safe-degraded-mode-and-fail-safe-governance.md)
+
+### Analyze a Deliberately Flawed High-Consequence Workflow
+
+[Analyze a Deliberately Flawed High-Consequence Workflow](analyze-flawed-high-consequence-workflow.md)
+
+**Difficulty:** Advanced
+
+Inspect a plausible but intentionally unsafe `account.disable` workflow without being given every defect up front. Trace caller-controlled facts, AI influence, policy, acknowledgment, cached approval, standing credentials, retry bypasses, replay, drift, dependency failure, and evidence paths; classify which findings can produce unauthorized or stale execution; then redesign the system around explicit current authority and host-owned execution invariants.
+
+Related material:
+
+- [Threat Modeling as Architecture Reasoning](../security/threat-modeling-as-architecture-reasoning.md)
+- [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md)
+- [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md)
+- [Build a Governed API Operation](build-a-governed-api-operation.md)
 - [Safe Degraded Mode and Fail-Safe Governance](safe-degraded-mode-and-fail-safe-governance.md)
 
 ## Start with the Tutorials

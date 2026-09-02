@@ -1825,6 +1825,7 @@ Application-specific review remains necessary.
 - [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md) — separate cryptographic evidence from authorization and current trust.
 - [Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md) — extend trust reasoning upstream into source, dependencies, workflows, artifacts, and publication.
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — review the full proposal-to-execution composition used by the worked example.
+- [Analyze a Deliberately Flawed High-Consequence Workflow lab](../labs/analyze-flawed-high-consequence-workflow.md) — apply threat-model reasoning to an unfamiliar account-disable workflow with hidden trust, authority, replay, drift, bypass, failure, evidence, and data-egress defects.
 - [Safe Degraded Mode and Fail-Safe Governance lab](../labs/safe-degraded-mode-and-fail-safe-governance.md) — practice reasoning about dependency failure without silently broadening authority.
 
 ---
