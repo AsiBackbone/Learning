@@ -51,11 +51,11 @@ Automated tests are useful evidence, but they are not the entire learning result
 
 ## Current Status
 
-The lab navigation foundation is established, with four beginner labs, eight intermediate labs, and five advanced labs now available.
+The lab navigation foundation is established, with four beginner labs, eight intermediate labs, and six advanced labs now available.
 
 Additional labs will appear in this section as the learning path expands into deeper architecture, security, and AI-governance topics.
 
-The foundational labs pair all five governance tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated boundaries. The governance lab path now also includes policy-version evidence, candidate-policy simulation, decision-pipeline refactoring, competing-policy-architecture selection, regional/tenant overlay design, and a synthesis-oriented flawed high-consequence workflow analysis, while the ASP.NET Core diagnostic lab begins the next learning area by requiring learners to predict, observe, repair, and explain middleware-ordering behavior; the ADR lab extends that application-architecture path by requiring learners to make, record, and revisit a decision under changed constraints.
+The foundational labs pair all five governance tutorials with executable companion samples and ask learners to modify, challenge, extend, and threat-model the demonstrated boundaries. The governance lab path now also includes policy-version evidence, candidate-policy simulation, decision-pipeline refactoring, competing-policy-architecture selection, regional/tenant overlay design, synthesis-oriented flawed high-consequence workflow analysis, and an explicit critique of AI-owned proposal-plus-execution authority, while the ASP.NET Core diagnostic lab begins the next learning area by requiring learners to predict, observe, repair, and explain middleware-ordering behavior; the ADR lab extends that application-architecture path by requiring learners to make, record, and revisit a decision under changed constraints.
 
 ## Available Labs
 
@@ -302,6 +302,22 @@ Related material:
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md)
 - [Build a Governed API Operation](build-a-governed-api-operation.md)
 - [Safe Degraded Mode and Fail-Safe Governance](safe-degraded-mode-and-fail-safe-governance.md)
+
+### Critique AI-Owned Proposal and Execution Authority
+
+[Critique AI-Owned Proposal and Execution Authority](critique-ai-owned-proposal-and-execution-authority.md)
+
+**Difficulty:** Advanced
+
+Critique a deliberately weak autonomous-operations agent that selects consequential tools, accepts policy facts from the prompt, self-approves, receives broad credentials, executes directly, retries autonomously, and records only a final explanation. Separate proposal autonomy from execution authority, restore host-owned registry/context/policy/credential/execution boundaries, and decide which controls can be omitted for lower-consequence or sandboxed scenarios.
+
+Related material:
+
+- [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md)
+- [Agent and Tool Authorization Models and Host-Owned Execution](../architecture/agent-and-tool-authorization-models-and-host-owned-execution.md)
+- [Typed AI Proposed Intent and Schema-Validation Boundaries](../ai-integration/typed-ai-proposed-intent-and-schema-validation-boundaries.md)
+- [AI Proposal Rejection, Uncertainty, and Recovery Patterns](../ai-integration/ai-proposal-rejection-uncertainty-and-recovery-patterns.md)
+- [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 
 ## Start with the Tutorials
 

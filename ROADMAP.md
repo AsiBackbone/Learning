@@ -541,14 +541,16 @@ rather than immediately invoking real external systems.
 
 ## Status
 
-**Foundational tutorial-aligned lab path established — advanced lab coverage expanding**
+**Complete at the currently listed lab scope — selective expansion remains**
 
 Each foundational tutorial now has a learner exercise or lab. Replay-resistance,
 safe degraded-mode, policy-simulation/change-impact, decision-pipeline refactoring,
-competing-policy-architecture comparison, regional/tenant policy-overlay design, and
-deliberately flawed high-consequence workflow analysis exercises are established.
-Remaining dedicated lab work should deepen focused AI-agent authority critique and
-broader ASP.NET Core and security scenarios only where distinct learning gaps remain.
+competing-policy-architecture comparison, regional/tenant policy-overlay design,
+deliberately flawed high-consequence workflow analysis, and focused AI proposal-versus-
+execution-authority critique exercises are established. All currently listed beginner,
+intermediate, and advanced lab objectives are complete. Future lab work should be added
+selectively when a distinct architecture, security, ASP.NET Core, or governance learning
+gap is demonstrated.
 
 Tutorials explain.
 
@@ -606,9 +608,7 @@ Potential initial labs:
 * [x] Design a regional or tenant-specific policy layer. ([#229](https://github.com/AsiBackbone/Learning/issues/229))
 * [x] Analyze a deliberately flawed high-consequence workflow. ([#230](https://github.com/AsiBackbone/Learning/issues/230))
 * [x] Design safe degraded-mode behavior. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
-* [ ] Critique an architecture where an AI agent owns both proposal and execution authority.
-  — **Partially covered.** Existing governed-AI material teaches the boundary; a
-  focused critique lab remains unfinished.
+* [x] Critique an architecture where an AI agent owns both proposal and execution authority. ([#231](https://github.com/AsiBackbone/Learning/issues/231))
 
 ## Lab Quality Standard
 
@@ -1189,10 +1189,9 @@ Versioned Learning releases are citable educational snapshots. They do not estab
 
 The highest-priority work now is:
 
-1. Select the next dedicated advanced lab only where learner work adds value beyond
-   existing material; the remaining listed candidate is a focused critique of architectures
-   where an AI agent owns both proposal and execution authority, with additional advanced
-   labs added only when a distinct learning gap emerges.
+1. Treat the currently listed Milestone 5 lab path as complete and add new labs only
+   when learner work exposes a distinct architecture, security, ASP.NET Core, governance,
+   or AI-integration gap that is not already served by existing tutorials, samples, or labs.
 2. Keep concrete good-first contribution opportunities visible when genuine starter
    work exists, and grow lab/topic reviewer participation as community activity
    justifies it.
