@@ -545,9 +545,10 @@ rather than immediately invoking real external systems.
 
 Each foundational tutorial now has a learner exercise or lab. Replay-resistance,
 safe degraded-mode, policy-simulation/change-impact, decision-pipeline refactoring,
-competing-policy-architecture comparison, and regional/tenant policy-overlay design
-exercises are established. Remaining dedicated lab work should deepen deliberately
-flawed high-consequence workflows and broader ASP.NET Core and security scenarios.
+competing-policy-architecture comparison, regional/tenant policy-overlay design, and
+deliberately flawed high-consequence workflow analysis exercises are established.
+Remaining dedicated lab work should deepen focused AI-agent authority critique and
+broader ASP.NET Core and security scenarios only where distinct learning gaps remain.
 
 Tutorials explain.
 
@@ -603,7 +604,7 @@ Potential initial labs:
 * [x] Compare competing policy architectures. ([#228](https://github.com/AsiBackbone/Learning/issues/228))
 * [x] Threat-model a governed execution gateway. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 * [x] Design a regional or tenant-specific policy layer. ([#229](https://github.com/AsiBackbone/Learning/issues/229))
-* [ ] Analyze a deliberately flawed high-consequence workflow. — **Still needed.**
+* [x] Analyze a deliberately flawed high-consequence workflow. ([#230](https://github.com/AsiBackbone/Learning/issues/230))
 * [x] Design safe degraded-mode behavior. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 * [ ] Critique an architecture where an AI agent owns both proposal and execution authority.
   — **Partially covered.** Existing governed-AI material teaches the boundary; a
@@ -1189,8 +1190,9 @@ Versioned Learning releases are citable educational snapshots. They do not estab
 The highest-priority work now is:
 
 1. Select the next dedicated advanced lab only where learner work adds value beyond
-   existing material; the current remaining candidate is high-consequence failure
-   critique, with additional advanced labs added only when a distinct learning gap emerges.
+   existing material; the remaining listed candidate is a focused critique of architectures
+   where an AI agent owns both proposal and execution authority, with additional advanced
+   labs added only when a distinct learning gap emerges.
 2. Keep concrete good-first contribution opportunities visible when genuine starter
    work exists, and grow lab/topic reviewer participation as community activity
    justifies it.

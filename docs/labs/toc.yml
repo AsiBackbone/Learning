@@ -46,3 +46,5 @@
       href: compare-competing-policy-architectures.md
     - name: Design a Regional and Tenant Policy Layer
       href: design-regional-and-tenant-policy-layer.md
+    - name: Analyze a Flawed High-Consequence Workflow
+      href: analyze-flawed-high-consequence-workflow.md
