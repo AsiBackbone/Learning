@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: Do You Need a Capability Token, or Are Roles and Claims Enough?
+  href: 2026/roles-claims-or-capability-token-dotnet.md
 - name: Why an AI Tool Call Is a Proposal, Not Authority
   href: 2026/why-ai-tool-call-is-only-a-proposal.md
 - name: When ASP.NET Core Authorization Is Not Enough
