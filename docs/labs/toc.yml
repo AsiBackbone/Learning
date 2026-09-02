@@ -44,3 +44,5 @@
       href: safe-degraded-mode-and-fail-safe-governance.md
     - name: Compare Competing Policy Architectures
       href: compare-competing-policy-architectures.md
+    - name: Design a Regional and Tenant Policy Layer
+      href: design-regional-and-tenant-policy-layer.md

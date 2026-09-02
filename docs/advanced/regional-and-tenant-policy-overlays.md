@@ -1338,6 +1338,7 @@ If those answers are unclear, the system may have multiple policy files without 
 - [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md) — resolve security-sensitive policy coordinates from authoritative host sources.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — revisit explicit decision-time facts and structured outcomes.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — carry bounded authority toward the execution boundary without giving policy ownership of the side effect.
+- [Design a Regional and Tenant Policy Layer lab](../labs/design-regional-and-tenant-policy-layer.md) — design the overlay contract, work contradictory cases, preserve composite provenance, and test conflict, missing-policy, drift, and execution-freshness invariants.
 - [Safe Degraded Mode and Fail-Safe Governance lab](../labs/safe-degraded-mode-and-fail-safe-governance.md) — practice explicit behavior when governance dependencies are unavailable.
 - [Policy-Version Evidence in Governance Decisions lab](../labs/policy-version-evidence-in-governance-decisions.md) — practice policy provenance, drift, and execution freshness.
 

@@ -545,9 +545,9 @@ rather than immediately invoking real external systems.
 
 Each foundational tutorial now has a learner exercise or lab. Replay-resistance,
 safe degraded-mode, policy-simulation/change-impact, decision-pipeline refactoring,
-and competing-policy-architecture comparison exercises are established. Remaining
-dedicated lab work should deepen regional/tenant policy exercises, deliberately flawed
-high-consequence workflows, and broader ASP.NET Core and security scenarios.
+competing-policy-architecture comparison, and regional/tenant policy-overlay design
+exercises are established. Remaining dedicated lab work should deepen deliberately
+flawed high-consequence workflows and broader ASP.NET Core and security scenarios.
 
 Tutorials explain.
 
@@ -602,8 +602,7 @@ Potential initial labs:
 * [x] Design a replay-resistant capability workflow. ([#65](https://github.com/AsiBackbone/Learning/issues/65))
 * [x] Compare competing policy architectures. ([#228](https://github.com/AsiBackbone/Learning/issues/228))
 * [x] Threat-model a governed execution gateway. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
-* [ ] Design a regional or tenant-specific policy layer. — **Partially covered.**
-  Advanced and case-study material exists; a dedicated lab remains useful.
+* [x] Design a regional or tenant-specific policy layer. ([#229](https://github.com/AsiBackbone/Learning/issues/229))
 * [ ] Analyze a deliberately flawed high-consequence workflow. — **Still needed.**
 * [x] Design safe degraded-mode behavior. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 * [ ] Critique an architecture where an AI agent owns both proposal and execution authority.
@@ -1190,8 +1189,8 @@ Versioned Learning releases are citable educational snapshots. They do not estab
 The highest-priority work now is:
 
 1. Select the next dedicated advanced lab only where learner work adds value beyond
-   existing material; current candidates include competing policy architectures,
-   regional/tenant policy design, and high-consequence failure critique.
+   existing material; the current remaining candidate is high-consequence failure
+   critique, with additional advanced labs added only when a distinct learning gap emerges.
 2. Keep concrete good-first contribution opportunities visible when genuine starter
    work exists, and grow lab/topic reviewer participation as community activity
    justifies it.
