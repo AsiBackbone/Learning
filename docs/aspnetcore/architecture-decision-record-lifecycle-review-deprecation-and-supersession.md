@@ -210,10 +210,10 @@ The useful history remains:
 
 A superseded ADR has been replaced by another ADR.
 
-For example:
+For example, using fictional record numbers:
 
 ```text
-ADR-0004
+ADR-0042
 Use an in-process queue
 Status: Accepted
 ```
@@ -221,7 +221,7 @@ Status: Accepted
 Later:
 
 ```text
-ADR-0009
+ADR-0047
 Use a durable external queue
 Status: Accepted
 ```
@@ -229,25 +229,25 @@ Status: Accepted
 The original record becomes:
 
 ```text
-ADR-0004
-Status: Superseded by ADR-0009
+ADR-0042
+Status: Superseded by ADR-0047
 ```
 
 Conceptually:
 
 ```text
-ADR-0004
+ADR-0042
 Accepted
    ↓
 Assumptions change
    ↓
 Decision reviewed
    ↓
-ADR-0009
+ADR-0047
 Accepted
    ↓
-ADR-0004
-Superseded by ADR-0009
+ADR-0042
+Superseded by ADR-0047
 ```
 
 A replacement relationship exists.
@@ -315,12 +315,12 @@ A reader can no longer tell:
 The better pattern is:
 
 ```text
-ADR-0004
+ADR-0042
 Original decision preserved
 Status changed to Superseded
-Link to ADR-0009
+Link to ADR-0047
 
-ADR-0009
+ADR-0047
 New context
 New alternatives
 New decision
@@ -612,10 +612,10 @@ It should not become a ritual that rewrites dates and status labels without new 
 
 Consider a fictional application that sends customer notifications.
 
-### ADR-0004 — Initial Decision
+### ADR-0042 — Initial Decision
 
 ```markdown
-# ADR-0004: Use an in-process notification queue
+# ADR-0042: Use an in-process notification queue
 
 ## Status
 
@@ -662,7 +662,7 @@ Operations reports lost notifications during rolling restarts.
 A managed durable queue is now available on the standard platform.
 ```
 
-Every important assumption in ADR-0004 deserves review.
+Every important assumption in ADR-0042 deserves review.
 
 ### Review
 
@@ -674,10 +674,10 @@ The team evaluates:
 
 The review is driven by changed requirements, operational evidence, and a new platform capability.
 
-### ADR-0009 — Replacement Decision
+### ADR-0047 — Replacement Decision
 
 ```markdown
-# ADR-0009: Use the managed durable queue for customer notifications
+# ADR-0047: Use the managed durable queue for customer notifications
 
 ## Status
 
@@ -708,10 +708,10 @@ Negative:
   controls must be managed.
 ```
 
-ADR-0004 is then updated only enough to make its lifecycle visible:
+ADR-0042 is then updated only enough to make its lifecycle visible:
 
 ```text
-Status: Superseded by ADR-0009
+Status: Superseded by ADR-0047
 ```
 
 The old context remains.
@@ -719,12 +719,12 @@ The old context remains.
 The repository now tells the full story:
 
 ```text
-ADR-0004
+ADR-0042
 Why in-process queueing once made sense
         ↓
 Changed requirements + observed loss + new platform capability
         ↓
-ADR-0009
+ADR-0047
 Why durable queueing became the new decision
 ```
 
@@ -779,11 +779,11 @@ A reader who opens the replacement should be able to discover the history it rep
 Useful links are:
 
 ```text
-ADR-0004
-Superseded by ADR-0009
+ADR-0042
+Superseded by ADR-0047
         ↕
-ADR-0009
-Supersedes ADR-0004
+ADR-0047
+Supersedes ADR-0042
 ```
 
 Bidirectional linkage is especially helpful in large repositories where file numbering alone does not explain relationships.
