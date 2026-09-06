@@ -24,8 +24,6 @@
       {
         "files": [
           "images/**",
-          "examples/**",
-          "public/**",
           "indexnow-key.txt"
         ]
       }
