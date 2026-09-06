@@ -929,7 +929,7 @@ templates.
   contributions, and Tutorial Ideas accepts example proposals.
 * **Lab-proposal template — Obsolete / superseded.** Tutorial Ideas and the
   learning-content Issue form cover intake, while
-  `docs/templates/lab-acceptance-criteria-template.md` covers lab authoring.
+  `community/lab-acceptance-criteria-template.md` covers lab authoring.
 * **Alternative-pattern proposal guidance — Complete.** Architecture & Patterns
   Discussions and the Alternatives Are Welcome guidance in `CONTRIBUTING.md`
   cover this path.

@@ -12,6 +12,9 @@ static class DocFxTemplateBaselineValidator
     private const string ToolManifestRelativePath = ".config/dotnet-tools.json";
     private const string BaselineRelativePath = "docs/templates/docfx-template-baseline.json";
     private const string DocFxConfigRelativePath = "docs/docfx.json";
+    private const string CustomStylesheetRelativePath = "docs/templates/public/main.css";
+    private const string LabAuthoringTemplateRelativePath = "community/lab-acceptance-criteria-template.md";
+    private const string LocalTemplateDirectoryRelativePath = "docs/templates";
 
     private static readonly Regex TemplateVersionRegex = new(
         @"DocFX modern template v(?<version>\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?)",
@@ -99,6 +102,8 @@ static class DocFxTemplateBaselineValidator
                 baseline.DocFxVersion,
                 errors);
         }
+
+        ValidateLocalTemplateLayout(repositoryRoot, errors);
 
         try
         {
@@ -231,6 +236,44 @@ static class DocFxTemplateBaselineValidator
         }
     }
 
+    private static void ValidateLocalTemplateLayout(
+        string repositoryRoot,
+        ICollection<string> errors)
+    {
+        if (!File.Exists(Path.Combine(
+                repositoryRoot,
+                CustomStylesheetRelativePath.Replace('/', Path.DirectorySeparatorChar))))
+        {
+            errors.Add(
+                $"The custom modern-template stylesheet must exist at '{CustomStylesheetRelativePath}'.");
+        }
+
+        if (!File.Exists(Path.Combine(
+                repositoryRoot,
+                LabAuthoringTemplateRelativePath.Replace('/', Path.DirectorySeparatorChar))))
+        {
+            errors.Add(
+                $"The reusable lab authoring template must exist at '{LabAuthoringTemplateRelativePath}'.");
+        }
+
+        string localTemplateDirectory = Path.Combine(
+            repositoryRoot,
+            LocalTemplateDirectoryRelativePath.Replace('/', Path.DirectorySeparatorChar));
+
+        foreach (string markdownPath in Directory.EnumerateFiles(
+                     localTemplateDirectory,
+                     "*.md",
+                     SearchOption.AllDirectories))
+        {
+            string relativePath = Path.GetRelativePath(repositoryRoot, markdownPath)
+                .Replace(Path.DirectorySeparatorChar, '/');
+
+            errors.Add(
+                $"DocFX runtime template directory '{LocalTemplateDirectoryRelativePath}' " +
+                $"must not contain Markdown authoring content: '{relativePath}'.");
+        }
+    }
+
     private static void ValidateDocFxConfiguration(
         string path,
         string upstreamTemplate,
@@ -262,6 +305,38 @@ static class DocFxTemplateBaselineValidator
         {
             errors.Add(
                 $"'{DocFxConfigRelativePath}' does not include the local 'templates' override directory.");
+        }
+
+        if (!build.TryGetProperty("resource", out JsonElement resources) ||
+            resources.ValueKind != JsonValueKind.Array)
+        {
+            throw new InvalidOperationException(
+                $"Could not find build.resource array in '{DocFxConfigRelativePath}'.");
+        }
+
+        string[] resourceGlobs = resources
+            .EnumerateArray()
+            .Where(static element => element.ValueKind == JsonValueKind.Object)
+            .SelectMany(static element =>
+                element.TryGetProperty("files", out JsonElement files) &&
+                files.ValueKind == JsonValueKind.Array
+                    ? files.EnumerateArray().ToArray()
+                    : Array.Empty<JsonElement>())
+            .Where(static element => element.ValueKind == JsonValueKind.String)
+            .Select(static element => element.GetString()!)
+            .ToArray();
+
+        if (resourceGlobs.Contains("examples/**", StringComparer.Ordinal))
+        {
+            errors.Add(
+                $"'{DocFxConfigRelativePath}' must not include the nonexistent 'examples/**' resource glob.");
+        }
+
+        if (resourceGlobs.Contains("public/**", StringComparer.Ordinal))
+        {
+            errors.Add(
+                $"'{DocFxConfigRelativePath}' must not copy 'public/**'; " +
+                $"custom modern-template assets belong under '{LocalTemplateDirectoryRelativePath}/public'.");
         }
     }
 

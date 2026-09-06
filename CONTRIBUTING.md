@@ -361,7 +361,7 @@ A good lab should clearly state:
 
 Labs should also define **architectural acceptance criteria** so learners can distinguish a program that merely runs from one that preserves the boundary the exercise is intended to teach.
 
-Use [docs/templates/lab-acceptance-criteria-template.md](docs/templates/lab-acceptance-criteria-template.md) as the reusable authoring starting point. Specialize the criteria to the lab rather than copying them mechanically.
+Use [community/lab-acceptance-criteria-template.md](community/lab-acceptance-criteria-template.md) as the reusable authoring starting point. Specialize the criteria to the lab rather than copying them mechanically.
 
 Useful criteria commonly verify that:
 
