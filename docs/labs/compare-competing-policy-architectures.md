@@ -8,7 +8,7 @@ description: Compare legitimate policy and governance architectures across reali
 
 **Difficulty:** Advanced
 
-**Pattern classification:** Comparison of multiple approaches
+**Pattern classification:** General learning material
 
 **Prerequisites:** Recommended — [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md), [Policy Engines, Rules Engines, and Distributed Policy Enforcement](../architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md), [Constraint Composition and Policy Precedence](../governance/constraint-composition-and-policy-precedence.md), [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md), and [Safe Degraded Mode and Fail-Safe Governance](safe-degraded-mode-and-fail-safe-governance.md). [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) is especially useful for Scenario C.
 

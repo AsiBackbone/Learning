@@ -8,7 +8,7 @@ description: Critique an AI-agent architecture that combines proposal, policy ju
 
 **Difficulty:** Advanced
 
-**Pattern classification:** Canonical pattern
+**Pattern classification:** Canonical Pattern
 
 **Prerequisites:** Recommended — [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md), [Typed AI Proposed Intent and Schema-Validation Boundaries](../ai-integration/typed-ai-proposed-intent-and-schema-validation-boundaries.md), [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md), [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md), and [AI Proposal Rejection, Uncertainty, and Recovery Patterns](../ai-integration/ai-proposal-rejection-uncertainty-and-recovery-patterns.md).
 

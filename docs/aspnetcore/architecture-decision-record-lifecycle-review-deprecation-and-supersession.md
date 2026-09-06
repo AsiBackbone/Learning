@@ -4,7 +4,7 @@ description: Learn how ADRs move through review, retention, deprecation, and sup
 
 # Architecture Decision Record Lifecycle, Review, Deprecation, and Supersession
 
-**Pattern classification:** General Learning Material
+**Pattern classification:** General learning material
 
 **Difficulty:** Intermediate
 

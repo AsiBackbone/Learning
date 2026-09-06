@@ -8,7 +8,7 @@ description: Extend an ASP.NET Core API into governed execution with explicit in
 
 **Difficulty:** Intermediate
 
-**Pattern classification:** Canonical pattern
+**Pattern classification:** Canonical Pattern
 
 **Prerequisites:** Complete [Decision Before Execution](../tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md), and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md). Read [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md) before starting so that the authorization/governance boundary is explicit.
 

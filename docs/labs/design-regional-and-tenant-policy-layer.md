@@ -8,7 +8,7 @@ description: Design and test a regional and tenant policy overlay with explicit 
 
 **Difficulty:** Advanced
 
-**Pattern classification:** Canonical pattern
+**Pattern classification:** Canonical Pattern
 
 **Prerequisites:** Recommended — [Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md), [Constraint Composition and Policy Precedence](../governance/constraint-composition-and-policy-precedence.md), [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md), [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), and [Safe Degraded Mode and Fail-Safe Governance](safe-degraded-mode-and-fail-safe-governance.md).
 

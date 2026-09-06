@@ -49,6 +49,18 @@ static class MetadataValidator
         @"^ {0,3}(?<marker>`{3,}|~{3,})",
         RegexOptions.Compiled);
 
+    private static readonly Regex PatternClassificationRegex = new(
+        @"^\*\*Pattern classification:\*\*[ \t]+(?<value>.*?)[ \t]*$",
+        RegexOptions.Compiled);
+
+    private static readonly HashSet<string> AllowedPatternClassifications = new(StringComparer.Ordinal)
+    {
+        "Canonical Pattern",
+        "Alternative Pattern",
+        "Experimental",
+        "General learning material"
+    };
+
     private static readonly ExpectedPage[] RepresentativePages =
     {
         new("index.html", SiteRoot.AbsoluteUri, Article: false),
@@ -101,7 +113,7 @@ static class MetadataValidator
 
         var errors = new List<string>();
 
-        ValidateMarkdownHeadingStructure(repositoryRoot, errors);
+        ValidateMarkdownSourceStructure(repositoryRoot, errors);
 
         string socialImagePath = Path.Combine(outputRoot, "images", "asibackbone-social.png");
         if (!File.Exists(socialImagePath))
@@ -137,7 +149,7 @@ static class MetadataValidator
         return 1;
     }
 
-    private static void ValidateMarkdownHeadingStructure(
+    private static void ValidateMarkdownSourceStructure(
         string repositoryRoot,
         ICollection<string> errors)
     {
@@ -186,6 +198,16 @@ static class MetadataValidator
                 if (fenceMarker is not null)
                 {
                     continue;
+                }
+
+                Match classification = PatternClassificationRegex.Match(line);
+                if (
+                    classification.Success &&
+                    !AllowedPatternClassifications.Contains(classification.Groups["value"].Value))
+                {
+                    errors.Add(
+                        $"{relativePath}:{lineNumber}: pattern classification " +
+                        $"'{classification.Groups["value"].Value}' is not an allowed value.");
                 }
 
                 Match heading = MarkdownHeadingRegex.Match(line);
