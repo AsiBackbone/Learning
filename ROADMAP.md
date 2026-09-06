@@ -1172,7 +1172,7 @@ The Learning repository uses a versioned educational-release model so that meani
 
 ## Ongoing Maintenance
 
-* [ ] Update the `CITATION.cff` release version/date and `.zenodo.json` version together for each future archived release.
+* [ ] Update the `CITATION.cff` release version/date, the `CITATION.cff` version DOI identifier, and the `.zenodo.json` version together for each future archived release. The version DOI is minted by the deposit, so it is recorded after the release rather than in the tagged snapshot; the concept DOI in the top-level `doi` key does not change.
 * [ ] Keep Zenodo project identity, licensing, and related identifiers current.
 * [ ] Preserve new versioned snapshots when a meaningful educational milestone warrants an archival release.
 * [ ] Re-check citation guidance, archival links, and the related-identifier graph when the publication workflow or related works change.

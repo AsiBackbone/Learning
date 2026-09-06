@@ -45,21 +45,21 @@
       "resource_type": "software"
     },
     {
-      "identifier": "https://doi.org/10.5281/zenodo.20777560",
+      "identifier": "10.5281/zenodo.20777560",
       "relation": "isDocumentedBy",
-      "scheme": "url",
+      "scheme": "doi",
       "resource_type": "publication-workingpaper"
     },
     {
-      "identifier": "https://doi.org/10.5281/zenodo.20546032",
+      "identifier": "10.5281/zenodo.20546032",
       "relation": "references",
-      "scheme": "url",
+      "scheme": "doi",
       "resource_type": "software"
     },
     {
-      "identifier": "https://doi.org/10.5281/zenodo.20373042",
+      "identifier": "10.5281/zenodo.20373042",
       "relation": "references",
-      "scheme": "url",
+      "scheme": "doi",
       "resource_type": "software"
     }
   ]
