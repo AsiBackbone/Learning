@@ -34,12 +34,6 @@ identifiers:
       Zenodo concept DOI for ASI Backbone Learning. Always resolves to the
       most recent archived version. Cite this when referring to the evolving
       work as a whole.
-  - type: doi
-    value: "10.5281/zenodo.22260898"
-    description: >-
-      Zenodo version DOI for the archived release named by the version field
-      below. Cite this when reproducibility depends on the exact material
-      reviewed. It changes with every archived release.
 repository-code: "https://github.com/AsiBackbone/Learning"
 url: "https://asibackbone.github.io/Learning/"
 keywords:
@@ -72,5 +66,5 @@ references:
         orcid: "https://orcid.org/0009-0002-2113-0245"
     doi: "10.5281/zenodo.20373042"
     repository-code: "https://github.com/AsiBackbone/NetCoreApplicationTemplate"
-version: "0.13.0"
-date-released: "2026-09-02"
+version: "0.14.0"
+date-released: "2026-09-06"
