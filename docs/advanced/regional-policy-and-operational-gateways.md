@@ -1,5 +1,5 @@
 ---
-description: Learn how upstream intent can pass through regional or tenant policy and an operational gateway before a trusted local executor performs a consequential side effect.
+description: Pass upstream intent through regional or tenant policy and an operational gateway before a trusted local executor performs a consequential side effect.
 ---
 
 # Regional Policy and Operational Gateways

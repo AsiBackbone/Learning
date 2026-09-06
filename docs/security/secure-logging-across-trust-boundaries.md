@@ -1,5 +1,5 @@
 ---
-description: Learn to treat operational logging as an outbound trust boundary by minimizing data before emission and reviewing provider, transport, storage, access, tenant, retention, and evidence boundaries.
+description: Treat logging as an outbound trust boundary by minimizing data before emission and reviewing provider, transport, access, tenant, and retention concerns.
 ---
 
 # Secure Logging Across Trust Boundaries

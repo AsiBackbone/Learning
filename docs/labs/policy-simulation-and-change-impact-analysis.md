@@ -1,5 +1,5 @@
 ---
-description: Practice replaying identical representative policy contexts against baseline and candidate policy versions, comparing decision changes, and preserving a no-execution simulation boundary.
+description: Replay representative policy contexts against baseline and candidate versions, compare decision changes, and preserve a no-execution simulation boundary.
 ---
 
 # Lab — Policy Simulation and Change-Impact Analysis

@@ -1,5 +1,5 @@
 ---
-description: Follow a fictional bulk administrative change through an acknowledgment-required policy decision, durable human response, current-state re-evaluation, scoped authority, cancellation, and host-owned execution.
+description: Follow a bulk change through an acknowledgment-required decision, durable response, current-state reevaluation, scoped authority, cancellation, and execution.
 ---
 
 # Human Acknowledgment Workflow

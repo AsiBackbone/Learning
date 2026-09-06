@@ -53,13 +53,13 @@ A topic may be **Published** here while a narrower follow-up, alternative treatm
 
 ---
 
-# Foundational Requests — Published
+## Foundational Requests — Published
 
 These topics shaped the initial Learning roadmap and now have published coverage in the foundational tutorial/sample/test/lab path. Their original questions and suggested formats are retained below as historical planning context.
 
 The published foundation consists of [Decision Before Execution](../docs/tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../docs/tutorials/policy-context-and-explicit-decision-outcomes.md), [Acknowledgment and Audit Residue](../docs/tutorials/acknowledgment-and-audit-residue.md), [Scoped Capability and Host-Owned Execution](../docs/tutorials/scoped-capability-and-host-owned-execution.md), and [Governed AI Tool Gateway](../docs/tutorials/governed-ai-tool-gateway.md), with corresponding runnable samples under [`samples/`](../samples/README.md) and learner labs under [`docs/labs/`](../docs/labs/index.md).
 
-## Decision Before Execution
+### Decision Before Execution
 
 **Status:** Published
 
@@ -82,7 +82,7 @@ Suggested format:
 
 ---
 
-## Policy Context
+### Policy Context
 
 **Status:** Published
 
@@ -105,7 +105,7 @@ Suggested format:
 
 ---
 
-## Explicit Decision Outcomes
+### Explicit Decision Outcomes
 
 **Status:** Published
 
@@ -137,7 +137,7 @@ Suggested format:
 
 ---
 
-## Acknowledgment Workflows
+### Acknowledgment Workflows
 
 **Status:** Published
 
@@ -160,7 +160,7 @@ Suggested format:
 
 ---
 
-## Audit Residue and Provenance
+### Audit Residue and Provenance
 
 **Status:** Published
 
@@ -183,7 +183,7 @@ Suggested format:
 
 ---
 
-## Scoped Capability
+### Scoped Capability
 
 **Status:** Published
 
@@ -206,7 +206,7 @@ Suggested format:
 
 ---
 
-## Host-Owned Execution
+### Host-Owned Execution
 
 **Status:** Published
 
@@ -228,7 +228,7 @@ Suggested format:
 
 ---
 
-## Governed AI Tool Gateway
+### Governed AI Tool Gateway
 
 **Status:** Published
 
@@ -258,9 +258,9 @@ Suggested format:
 
 ---
 
-# ASP.NET Core Architecture Requests
+## ASP.NET Core Architecture Requests
 
-## Middleware Ordering
+### Middleware Ordering
 
 **Status:** Published
 
@@ -289,7 +289,7 @@ Possible areas:
 
 ---
 
-## Secure-by-Default Configuration
+### Secure-by-Default Configuration
 
 **Status:** Requested
 
@@ -306,7 +306,7 @@ Possible areas:
 
 ---
 
-## Structured Logging
+### Structured Logging
 
 **Status:** Requested
 
@@ -324,7 +324,7 @@ Possible areas:
 
 ---
 
-## Centralized Error Handling
+### Centralized Error Handling
 
 **Status:** Requested
 
@@ -341,7 +341,7 @@ Possible areas:
 
 ---
 
-## EF Core Cross-Cutting Behavior
+### EF Core Cross-Cutting Behavior
 
 **Status:** Published
 
@@ -360,7 +360,7 @@ Possible areas:
 
 ---
 
-## Architecture Decision Records
+### Architecture Decision Records
 
 **Status:** Requested
 
@@ -376,9 +376,9 @@ Questions to address:
 
 ---
 
-# Security and Trust Architecture Requests
+## Security and Trust Architecture Requests
 
-## Authentication vs Authorization vs Governance
+### Authentication vs Authorization vs Governance
 
 **Status:** Requested
 
@@ -398,7 +398,7 @@ Suggested format:
 
 ---
 
-## Capability-Based Security
+### Capability-Based Security
 
 **Status:** Requested
 
@@ -415,7 +415,7 @@ Suggested areas:
 
 ---
 
-## Replay Protection
+### Replay Protection
 
 **Status:** Published
 
@@ -433,7 +433,7 @@ Possible examples:
 
 ---
 
-## Signing and Verification
+### Signing and Verification
 
 **Status:** Requested
 
@@ -449,7 +449,7 @@ Questions to address:
 
 ---
 
-## Tamper-Evident Audit Records
+### Tamper-Evident Audit Records
 
 **Status:** Requested
 
@@ -468,7 +468,7 @@ This topic should remain explicit about the difference between a conceptual patt
 
 ---
 
-## Software Supply-Chain Integrity
+### Software Supply-Chain Integrity
 
 **Status:** Published
 
@@ -493,7 +493,7 @@ Suggested format:
 
 ---
 
-## Threat Modeling as Architecture Reasoning
+### Threat Modeling as Architecture Reasoning
 
 **Status:** Published
 
@@ -518,9 +518,9 @@ Suggested format:
 
 ---
 
-# AI and Agent Governance Requests
+## AI and Agent Governance Requests
 
-## AI Proposed Intent
+### AI Proposed Intent
 
 **Status:** Requested
 
@@ -536,7 +536,7 @@ Possible areas:
 
 ---
 
-## Human-in-the-Loop Governance
+### Human-in-the-Loop Governance
 
 **Status:** Requested
 
@@ -551,7 +551,7 @@ Questions to address:
 
 ---
 
-## Tool Allowlists and Argument Constraints
+### Tool Allowlists and Argument Constraints
 
 **Status:** Requested
 
@@ -565,7 +565,7 @@ Suggested format:
 
 ---
 
-## Agent-to-Agent Requests
+### Agent-to-Agent Requests
 
 **Status:** Experimental
 
@@ -581,7 +581,7 @@ Potential questions:
 
 ---
 
-## AI Decision Explainability
+### AI Decision Explainability
 
 **Status:** Requested
 
@@ -596,9 +596,9 @@ The tutorial should avoid treating generated explanations as authoritative evide
 
 ---
 
-# Policy Architecture Requests
+## Policy Architecture Requests
 
-## Policy Composition
+### Policy Composition
 
 **Status:** Requested
 
@@ -615,7 +615,7 @@ Possible areas:
 
 ---
 
-## Policy Versioning
+### Policy Versioning
 
 **Status:** Published
 
@@ -633,7 +633,7 @@ Possible areas:
 
 ---
 
-## Regional and Tenant Policy Overlays
+### Regional and Tenant Policy Overlays
 
 **Status:** Requested
 
@@ -655,7 +655,7 @@ Decision
 
 ---
 
-## Degraded-Mode Governance
+### Degraded-Mode Governance
 
 **Status:** Requested
 
@@ -670,7 +670,7 @@ Questions to address:
 
 ---
 
-## Policy Testing
+### Policy Testing
 
 **Status:** Requested
 
@@ -687,9 +687,9 @@ Potential areas:
 
 ---
 
-# Architecture Comparison Requests
+## Architecture Comparison Requests
 
-## Boolean Authorization vs Explicit Decision Models
+### Boolean Authorization vs Explicit Decision Models
 
 **Status:** Requested
 
@@ -697,7 +697,7 @@ Compare simple authorization checks with structured governance decision results.
 
 ---
 
-## RBAC vs Claims vs Policy vs Capability
+### RBAC vs Claims vs Policy vs Capability
 
 **Status:** Requested
 
@@ -707,7 +707,7 @@ The goal should be comparison, not declaring one approach universally superior.
 
 ---
 
-## Policy Engines and Governance Pipelines
+### Policy Engines and Governance Pipelines
 
 **Status:** Requested
 
@@ -723,7 +723,7 @@ Intent → Context → Decision → Acknowledgment → Authority → Execution �
 
 ---
 
-## API Gateway vs Governance Gateway
+### API Gateway vs Governance Gateway
 
 **Status:** Requested
 
@@ -731,7 +731,7 @@ Explore how network/API routing concerns differ from consequential-operation gov
 
 ---
 
-## Workflow Engine vs Governance Pipeline
+### Workflow Engine vs Governance Pipeline
 
 **Status:** Requested
 
@@ -739,9 +739,9 @@ Clarify when orchestration and governance overlap and when they should remain se
 
 ---
 
-# Lab Requests
+## Lab Requests
 
-## Beginner
+### Beginner
 
 - [ ] Convert direct execution into decision-before-execution.
 - [ ] Replace boolean policy results with explicit outcomes.
@@ -749,7 +749,7 @@ Clarify when orchestration and governance overlap and when they should remain se
 - [ ] Identify missing reason codes in a sample system.
 - [ ] Correct an unsafe middleware order.
 
-## Intermediate
+### Intermediate
 
 - [ ] Add acknowledgment to a sensitive operation.
 - [ ] Generate an audit receipt.
@@ -757,7 +757,7 @@ Clarify when orchestration and governance overlap and when they should remain se
 - [ ] Refactor scattered policy checks into a governance pipeline.
 - [ ] Add tests for policy edge cases.
 
-## Advanced
+### Advanced
 
 - [ ] Build a governed AI tool gateway.
 - [ ] Threat-model a capability-based workflow.
@@ -768,7 +768,7 @@ Clarify when orchestration and governance overlap and when they should remain se
 
 ---
 
-# Diagram Requests
+## Diagram Requests
 
 Diagrams are especially useful for concepts where boundaries matter.
 
@@ -791,7 +791,7 @@ Mermaid is preferred when it can express the concept clearly because text-based 
 
 ---
 
-# Topics That Need Real-World Examples
+## Topics That Need Real-World Examples
 
 Some concepts are easier to understand with realistic but non-domain-sensitive scenarios.
 
@@ -811,7 +811,7 @@ Contributors are welcome to propose examples that demonstrate consequential deci
 
 ---
 
-# Experimental Topic Candidates
+## Experimental Topic Candidates
 
 These topics may be valuable but should remain clearly labeled until the project has enough implementation experience to teach them responsibly.
 
@@ -834,7 +834,7 @@ It is a signal that assumptions and unresolved questions should remain visible.
 
 ---
 
-# Suggesting Priorities
+## Suggesting Priorities
 
 Community members can help prioritize topics by:
 
@@ -857,7 +857,7 @@ Priority should generally reflect:
 
 ---
 
-# From Request to Published Material
+## From Request to Published Material
 
 A requested topic may evolve through the following path:
 
@@ -894,7 +894,7 @@ Sometimes the best result may be:
 
 ---
 
-# Submit a Topic
+## Submit a Topic
 
 If there is something you would like to understand better, request it.
 

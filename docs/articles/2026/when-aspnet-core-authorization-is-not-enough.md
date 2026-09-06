@@ -1,5 +1,5 @@
 ---
-description: A practical ASP.NET Core architecture article on choosing between built-in authorization, resource-based authorization, a simple application service, and a broader decision/execution lifecycle.
+description: Choose proportionally among ASP.NET Core authorization, resource-based checks, application services, and broader decision/execution lifecycles.
 title: When ASP.NET Core Authorization Is Not Enough
 author: Christopher D. Cavell
 published: "2026-08-26"
@@ -13,7 +13,7 @@ feed: true
 
 **Difficulty:** Intermediate
 
-**Prerequisites:** Familiarity with ASP.NET Core authentication and authorization is helpful; no ASI Backbone package or prior Learning material is required.
+**Prerequisites:** Familiarity with ASP.NET Core authentication and authorization is helpful; no AsiBackbone package or prior Learning material is required.
 
 ASP.NET Core authorization is powerful, familiar, and sufficient for a very large class of applications. Roles, claims, named policies, custom requirements and handlers, `IAuthorizationService`, and resource-based authorization already cover far more than a simple `[Authorize]` attribute.
 
@@ -45,7 +45,7 @@ Escalate
 
 or execution that occurs after the current request, current user session, or current policy evaluation has ended.
 
-The point of this article is proportionality: **start with ASP.NET Core authorization, and add another lifecycle only when the problem actually needs one.** No ASI Backbone package is required.
+The point of this article is proportionality: **start with ASP.NET Core authorization, and add another lifecycle only when the problem actually needs one.** No AsiBackbone package is required.
 
 This article is the **decision guide**: it helps you choose the smallest useful boundary for a concrete application requirement. [When ASP.NET Core Authorization Is Enough](../../architecture/when-aspnet-core-authorization-is-enough.md) is the deeper head-to-head reference that examines framework authorization and governed execution in more detail. The two pages are intentionally complementary rather than inverse duplicates.
 

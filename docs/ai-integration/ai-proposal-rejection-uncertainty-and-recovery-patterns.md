@@ -1,5 +1,5 @@
 ---
-description: Learn to classify rejected AI proposals, preserve model uncertainty, and apply bounded recovery without weakening host validation, policy, or execution authority.
+description: Classify rejected AI proposals, preserve uncertainty, and apply bounded recovery without weakening host validation, policy, or execution authority.
 ---
 
 # AI Proposal Rejection, Uncertainty, and Recovery Patterns

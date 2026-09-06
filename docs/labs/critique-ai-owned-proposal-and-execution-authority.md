@@ -1,5 +1,5 @@
 ---
-description: Critique an AI-agent architecture that combines proposal, policy judgment, credentials, retries, and consequential execution, then redesign it so model output remains proposed intent and the trusted host owns authority.
+description: Critique an AI-agent architecture that combines proposals, policy, credentials, retries, and execution, then redesign it around host-owned authority.
 ---
 
 # Lab — Critique AI-Owned Proposal and Execution Authority

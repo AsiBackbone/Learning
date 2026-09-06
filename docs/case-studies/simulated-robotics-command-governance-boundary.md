@@ -1,5 +1,5 @@
 ---
-description: Study a simulated robotics-command boundary where planner proposals, authoritative device and location context, policy, scoped command authority, gateway checks, and the Local Safety Boundary remain distinct before any simulated action occurs.
+description: Study a simulated robotics-command boundary that keeps planner proposals, device context, policy, scoped authority, gateway checks, and local safety distinct.
 ---
 
 # Simulated Robotics-Command Governance Boundary

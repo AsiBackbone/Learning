@@ -14,7 +14,7 @@ The project should continue to grow deliberately:
 
 ---
 
-# Current Project Status
+## Current Project Status
 
 **Active development — foundational tutorial/sample/test/lab path established**
 
@@ -75,7 +75,7 @@ cohesion.
 
 ---
 
-# Guiding Goals
+## Guiding Goals
 
 The Learning repository should become:
 
@@ -87,11 +87,11 @@ The Learning repository should become:
 * A place where canonical and alternative patterns can be compared.
 * A community contribution surface that is easier to enter than the core implementation repositories.
 * A durable record of lessons learned from the evolution of `AsiBackbone` and `NetCoreApplicationTemplate`.
-* A resource that remains valuable even to developers who never adopt an ASI Backbone package.
+* A resource that remains valuable even to developers who never adopt an AsiBackbone package.
 
 ---
 
-# Relationship to the Other Repositories
+## Relationship to the Other Repositories
 
 The three primary organization repositories serve different roles:
 
@@ -122,9 +122,9 @@ The working repositories should show how similar ideas appear in more complete s
 
 ---
 
-# Roadmap Principles
+## Roadmap Principles
 
-## Problem First
+### Problem First
 
 Learning material should begin with the problem being solved rather than with a package API.
 
@@ -146,13 +146,13 @@ Tradeoffs and alternatives
 Working implementation reference
 ```
 
-## Small Examples
+### Small Examples
 
 Teaching examples should remain intentionally smaller than production implementations.
 
 Complexity should be introduced only when it contributes directly to the lesson.
 
-## Runnable Where Practical
+### Runnable Where Practical
 
 Conceptual material should increasingly be paired with executable examples.
 
@@ -164,7 +164,7 @@ to:
 
 > “I can run the idea and observe the boundary.”
 
-## Test Architectural Invariants
+### Test Architectural Invariants
 
 Tests should demonstrate architectural behavior rather than merely object construction.
 
@@ -190,14 +190,14 @@ Host rejects proposal
 No execution occurs
 ```
 
-## Working References
+### Working References
 
 Where useful, tutorials and samples should point to real implementation files, tests, ADRs, or documentation in:
 
 * `AsiBackbone/AsiBackbone`
 * `AsiBackbone/NetCoreApplicationTemplate`
 
-## Explicit Tradeoffs
+### Explicit Tradeoffs
 
 Material should explain:
 
@@ -209,7 +209,7 @@ Material should explain:
 * Cases where a simpler architecture may be preferable
 * Cases where the demonstrated pattern should not be used
 
-## Clear Boundaries
+### Clear Boundaries
 
 For AI-related material, the central teaching boundary remains:
 
@@ -219,7 +219,7 @@ Prompt instructions, tool descriptions, and model behavior may influence proposa
 
 They do not replace host-side policy, validation, authorization, or execution controls.
 
-## Canonical Does Not Mean Universal
+### Canonical Does Not Mean Universal
 
 A canonical pattern represents an approach aligned with one or more current ASI Backbone organization implementations.
 
@@ -227,13 +227,13 @@ It does not mean that the approach is universally correct.
 
 Alternative architectures are welcome when they are technically grounded and their tradeoffs are explained.
 
-## Community Evolution
+### Community Evolution
 
 Questions, corrections, experiments, disagreements, and alternative implementations should influence future material.
 
 Repeated confusion is evidence that a lesson may need improvement.
 
-## Licensing Clarity
+### Licensing Clarity
 
 The repository intentionally uses component-specific licensing:
 
@@ -257,13 +257,13 @@ See [LICENSING.md](LICENSING.md) for the complete licensing policy.
 
 ---
 
-# Milestone 1 — Repository and Publication Foundation
+## Milestone 1 — Repository and Publication Foundation
 
-## Status
+### Status
 
 **Complete**
 
-## Completed Foundation
+### Completed Foundation
 
 * [x] Create root `README.md`.
 * [x] Add `CODE_OF_CONDUCT.md`.
@@ -291,11 +291,11 @@ See [LICENSING.md](LICENSING.md) for the complete licensing policy.
 * [x] Improve direct linking to organization Discussions.
 * [x] Add contribution pathways for tutorial, lab, sample, and alternative-pattern proposals.
 
-## Ongoing Maintenance
+### Ongoing Maintenance
 
 * [ ] Review repository metadata periodically as the project matures.
 
-## Contributor Label Taxonomy
+### Contributor Label Taxonomy
 
 Repository labels should remain composable rather than encoding every possible combination as a separate label.
 
@@ -330,13 +330,13 @@ The intent is to make Issues discoverable by **content area, architectural class
 
 ---
 
-# Milestone 2 — Documentation Platform ([#5](https://github.com/AsiBackbone/Learning/issues/5))
+## Milestone 2 — Documentation Platform ([#5](https://github.com/AsiBackbone/Learning/issues/5))
 
-## Status
+### Status
 
 **Complete — baseline documentation platform established**
 
-## Completed
+### Completed
 
 * [x] Add DocFX tooling configuration.
 * [x] Add `docs/docfx.json`.
@@ -358,11 +358,11 @@ The intent is to make Issues discoverable by **content area, architectural class
 * [x] Add difficulty and prerequisite metadata where useful.
 * [x] Review accessibility as diagrams and richer content are added.
 
-## Ongoing Maintenance
+### Ongoing Maintenance
 
 * [ ] Re-review accessibility when substantial new diagrams, media, interactive content, or theme customizations are introduced.
 
-## Documentation Goal
+### Documentation Goal
 
 The documentation site should provide a guided learning experience while GitHub remains the primary source-control and collaboration surface.
 
@@ -370,15 +370,15 @@ The repository Markdown remains canonical.
 
 ---
 
-# Milestone 3 — Foundational Architecture Learning Path
+## Milestone 3 — Foundational Architecture Learning Path
 
-## Status
+### Status
 
 **Complete — foundational five-tutorial sequence established**
 
 Quality and refinement now matter more than adding another foundational tutorial merely to increase tutorial count.
 
-## Tutorial 1 — Decision Before Execution
+### Tutorial 1 — Decision Before Execution
 
 * [x] Publish foundational tutorial.
 * [x] Explain intent versus execution.
@@ -390,7 +390,7 @@ Quality and refinement now matter more than adding another foundational tutorial
 * [x] Pair with beginner lab.
 * [x] Strengthen links to working implementation references.
 
-## Tutorial 2 — Policy Context and Explicit Decision Outcomes
+### Tutorial 2 — Policy Context and Explicit Decision Outcomes
 
 * [x] Publish foundational tutorial.
 * [x] Explain explicit policy context.
@@ -410,7 +410,7 @@ Escalate
 * [x] Pair with learner exercise.
 * [x] Strengthen links to working implementation references.
 
-## Tutorial 3 — Acknowledgment and Audit Residue
+### Tutorial 3 — Acknowledgment and Audit Residue
 
 * [x] Publish foundational tutorial.
 * [x] Explain acknowledgment as a governance boundary.
@@ -422,7 +422,7 @@ Escalate
 * [x] Pair with intermediate lab.
 * [x] Strengthen links to working implementation references.
 
-## Tutorial 4 — Scoped Capability and Host-Owned Execution
+### Tutorial 4 — Scoped Capability and Host-Owned Execution
 
 * [x] Publish foundational tutorial.
 * [x] Explain narrow execution authority.
@@ -434,7 +434,7 @@ Escalate
 * [x] Add capability-focused lab. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [x] Strengthen links to working implementation references. ([#18](https://github.com/AsiBackbone/Learning/issues/18))
 
-## Tutorial 5 — Governed AI Tool Gateway
+### Tutorial 5 — Governed AI Tool Gateway
 
 * [x] Publish end-to-end tutorial.
 * [x] Separate AI inference from execution authority.
@@ -452,9 +452,9 @@ Escalate
 
 ---
 
-# Milestone 4 — Executable Companion Samples
+## Milestone 4 — Executable Companion Samples
 
-## Status
+### Status
 
 **Foundational sample set complete — ongoing refinement remains**
 
@@ -462,7 +462,7 @@ The `samples/` area now contains executable companions for all five foundational
 
 Future work should refine coverage, improve cross-links, and add samples for new learning areas only where runnable code materially improves understanding.
 
-## Goal
+### Goal
 
 Each foundational tutorial should eventually have a companion sample where executable code materially improves understanding.
 
@@ -484,7 +484,7 @@ Samples are teaching artifacts.
 
 They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicationTemplate` implementations.
 
-## Foundational Sample Set
+### Foundational Sample Set
 
 * [x] Decision Before Execution sample.
 * [x] Policy Context and Explicit Decision Outcomes sample.
@@ -492,7 +492,7 @@ They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicati
 * [x] Scoped Capability and Host-Owned Execution sample. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [x] Governed AI Tool Gateway sample. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 
-## Sample Infrastructure
+### Sample Infrastructure
 
 * [x] Establish buildable sample solution structure. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
 * [x] Ensure repository-level `dotnet restore` works for samples. ([#1](https://github.com/AsiBackbone/Learning/issues/1))
@@ -505,7 +505,7 @@ They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicati
 * [x] Cross-link each tutorial to its sample. ([#6](https://github.com/AsiBackbone/Learning/issues/6))
 * [x] Link samples to fuller working repository implementations where useful. ([#18](https://github.com/AsiBackbone/Learning/issues/18))
 
-## Sample Design Standard
+### Sample Design Standard
 
 Samples should:
 
@@ -521,7 +521,7 @@ Samples should:
 * Avoid broad execution primitives unless they are specifically the lesson.
 * Keep external secrets and infrastructure authority host-owned.
 
-## Dry-Run Principle
+### Dry-Run Principle
 
 Consequential examples should generally begin with:
 
@@ -537,9 +537,9 @@ rather than immediately invoking real external systems.
 
 ---
 
-# Milestone 5 — Hands-On Labs
+## Milestone 5 — Hands-On Labs
 
-## Status
+### Status
 
 **Complete at the currently listed lab scope — selective expansion remains**
 
@@ -558,7 +558,7 @@ Samples demonstrate.
 
 Labs should require the learner to decide.
 
-## Goal
+### Goal
 
 Move learners from architectural recognition to architectural reasoning.
 
@@ -578,7 +578,7 @@ Validation
 Discussion / Solution
 ```
 
-## Beginner Labs
+### Beginner Labs
 
 Potential initial labs:
 
@@ -589,7 +589,7 @@ Potential initial labs:
 * [x] Identify a hidden execution side effect. ([#19](https://github.com/AsiBackbone/Learning/issues/19))
 * [x] Identify middleware ordering problems. ([#34](https://github.com/AsiBackbone/Learning/issues/34))
 
-## Intermediate Labs
+### Intermediate Labs
 
 * [x] Add acknowledgment to a consequential workflow.
 * [x] Preserve an audit receipt.
@@ -599,7 +599,7 @@ Potential initial labs:
 * [x] Detect stale or mismatched execution authority. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [x] Add policy-version evidence to a decision path. ([#37](https://github.com/AsiBackbone/Learning/issues/37))
 
-## Advanced Labs
+### Advanced Labs
 
 * [x] Govern an AI tool call. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 * [x] Design a replay-resistant capability workflow. ([#65](https://github.com/AsiBackbone/Learning/issues/65))
@@ -610,7 +610,7 @@ Potential initial labs:
 * [x] Design safe degraded-mode behavior. ([#66](https://github.com/AsiBackbone/Learning/issues/66))
 * [x] Critique an architecture where an AI agent owns both proposal and execution authority. ([#231](https://github.com/AsiBackbone/Learning/issues/231))
 
-## Lab Quality Standard
+### Lab Quality Standard
 
 Each lab should provide enough information to solve the problem without dictating a single implementation unnecessarily.
 
@@ -618,19 +618,19 @@ Where multiple valid solutions exist, the discussion should explain the tradeoff
 
 ---
 
-# Milestone 6 — ASP.NET Core Architecture Learning ([#5](https://github.com/AsiBackbone/Learning/issues/5))
+## Milestone 6 — ASP.NET Core Architecture Learning ([#5](https://github.com/AsiBackbone/Learning/issues/5))
 
-## Status
+### Status
 
 **Complete — ASP.NET Core runtime foundations and the ADR reasoning, case-study, and hands-on learning path are established**
 
-## Goal
+### Goal
 
 Use `NetCoreApplicationTemplate` as a working reference specimen for broader application-architecture lessons.
 
 These materials should remain useful independently of that repository.
 
-## Middleware Ordering ([#20](https://github.com/AsiBackbone/Learning/issues/20))
+### Middleware Ordering ([#20](https://github.com/AsiBackbone/Learning/issues/20))
 
 * [x] Why middleware order changes behavior.
 * [x] Exception handling boundaries.
@@ -644,7 +644,7 @@ These materials should remain useful independently of that repository.
 * [x] Pair with a runnable corrected/incorrect middleware-ordering sample.
 * [x] Add focused tests for request/response traversal and exception-boundary placement.
 
-## Secure Defaults ([#36](https://github.com/AsiBackbone/Learning/issues/36))
+### Secure Defaults ([#36](https://github.com/AsiBackbone/Learning/issues/36))
 
 * [x] Secure-by-default configuration.
 * [x] Explicit opt-in versus implicit exposure.
@@ -654,7 +654,7 @@ These materials should remain useful independently of that repository.
 * [x] Safer failure defaults.
 * [x] Configuration ownership boundaries.
 
-## Structured Logging ([#38](https://github.com/AsiBackbone/Learning/issues/38))
+### Structured Logging ([#38](https://github.com/AsiBackbone/Learning/issues/38))
 
 * [x] Events versus strings.
 * [x] Correlation.
@@ -663,7 +663,7 @@ These materials should remain useful independently of that repository.
 * [x] Logging boundaries.
 * [x] Distinguishing operational logs from audit records.
 
-## Error Handling ([#51](https://github.com/AsiBackbone/Learning/issues/51))
+### Error Handling ([#51](https://github.com/AsiBackbone/Learning/issues/51))
 
 * [x] Centralized exception handling.
 * [x] Problem Details.
@@ -673,7 +673,7 @@ These materials should remain useful independently of that repository.
 * [x] Safe failure behavior.
 * [x] Pair with a runnable sample and focused integration tests. ([#51](https://github.com/AsiBackbone/Learning/issues/51))
 
-## Data Access ([#55](https://github.com/AsiBackbone/Learning/issues/55))
+### Data Access ([#55](https://github.com/AsiBackbone/Learning/issues/55))
 
 * [x] EF Core boundaries.
 * [x] Persistence abstractions.
@@ -682,7 +682,7 @@ These materials should remain useful independently of that repository.
 * [x] Local versus production storage choices.
 * [x] Data-access failure boundaries.
 
-## Architecture Decision Records
+### Architecture Decision Records
 
 * [x] Why ADRs matter. ([#87](https://github.com/AsiBackbone/Learning/issues/87))
 * [x] How to write an ADR. ([#87](https://github.com/AsiBackbone/Learning/issues/87), [#90](https://github.com/AsiBackbone/Learning/issues/90))
@@ -695,17 +695,17 @@ The ADR learning path now covers why ADRs matter, when a decision merits a recor
 
 ---
 
-# Milestone 7 — Security and Trust Architecture ([#5](https://github.com/AsiBackbone/Learning/issues/5))
+## Milestone 7 — Security and Trust Architecture ([#5](https://github.com/AsiBackbone/Learning/issues/5))
 
-## Status
+### Status
 
 **Complete — dedicated Security and Trust Architecture foundation established**
 
-## Goal
+### Goal
 
 Teach security as an architectural property rather than a collection of isolated controls.
 
-## Planned Topics
+### Planned Topics
 
 * [x] Trust boundaries. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
 * [x] Least privilege. ([#21](https://github.com/AsiBackbone/Learning/issues/21))
@@ -736,17 +736,17 @@ Educational security examples should clearly distinguish demonstrated patterns f
 
 ---
 
-# Milestone 8 — Governance and Policy Architecture 
+## Milestone 8 — Governance and Policy Architecture
 
-## Status
+### Status
 
 **Complete — governance and policy architecture learning path established through composition, provenance, overlays, risk, deterministic/probabilistic inputs, human review, escalation, degraded-mode behavior, testing, simulation, and rollout/rollback reasoning**
 
-## Goal
+### Goal
 
 Expand the conceptual vocabulary around policy-governed systems after the foundational learning path is well supported by samples and labs.
 
-## Completed Topics
+### Completed Topics
 
 * [x] Policy pipeline design. ([#44](https://github.com/AsiBackbone/Learning/issues/44))
 * [x] Constraint composition. ([#44](https://github.com/AsiBackbone/Learning/issues/44))
@@ -772,17 +772,17 @@ candidate decisions before rollout while preserving a strict no-execution bounda
 
 ---
 
-# Milestone 9 — Expanded AI Integration ([#5](https://github.com/AsiBackbone/Learning/issues/5))
+## Milestone 9 — Expanded AI Integration ([#5](https://github.com/AsiBackbone/Learning/issues/5))
 
-## Status
+### Status
 
 **Complete — expanded AI integration boundaries established across typed proposals, authoritative context, scoped execution, multi-tool recovery, bounded rejection and uncertainty, agent memory, and experimental multi-agent execution**
 
-## Goal
+### Goal
 
 Build beyond the initial Governed AI Tool Gateway without turning Learning into an autonomous-agent framework.
 
-## Planned Topics
+### Planned Topics
 
 * [x] Tool proposal schemas. ([#73](https://github.com/AsiBackbone/Learning/issues/73))
 * [x] Tool allowlists. ([#73](https://github.com/AsiBackbone/Learning/issues/73))
@@ -814,13 +814,13 @@ The central rule remains:
 
 ---
 
-# Milestone 10 — Architecture Comparisons and Alternative Patterns
+## Milestone 10 — Architecture Comparisons and Alternative Patterns
 
-## Status
+### Status
 
 **Complete — nine alternative-pattern comparisons published** ([#7](https://github.com/AsiBackbone/Learning/issues/7), [#67](https://github.com/AsiBackbone/Learning/issues/67), [#174](https://github.com/AsiBackbone/Learning/issues/174), [#175](https://github.com/AsiBackbone/Learning/issues/175), [#176](https://github.com/AsiBackbone/Learning/issues/176), [#177](https://github.com/AsiBackbone/Learning/issues/177), [#178](https://github.com/AsiBackbone/Learning/issues/178), [#179](https://github.com/AsiBackbone/Learning/issues/179), [#180](https://github.com/AsiBackbone/Learning/issues/180))
 
-## Goal
+### Goal
 
 Help readers understand where demonstrated patterns fit relative to established and adjacent architectural approaches.
 
@@ -861,13 +861,13 @@ What are the operational tradeoffs?
 
 ---
 
-# Milestone 11 — Reference Architecture Case Studies
+## Milestone 11 — Reference Architecture Case Studies
 
-## Status
+### Status
 
 **Complete — all eight planned reference architecture case studies published** ([#189](https://github.com/AsiBackbone/Learning/issues/189), [#190](https://github.com/AsiBackbone/Learning/issues/190), [#191](https://github.com/AsiBackbone/Learning/issues/191), [#192](https://github.com/AsiBackbone/Learning/issues/192), [#193](https://github.com/AsiBackbone/Learning/issues/193), [#194](https://github.com/AsiBackbone/Learning/issues/194), [#195](https://github.com/AsiBackbone/Learning/issues/195), [#196](https://github.com/AsiBackbone/Learning/issues/196))
 
-## Goal
+### Goal
 
 Show how multiple patterns interact in realistic scenarios without turning Learning into another production framework.
 
@@ -897,13 +897,13 @@ Case studies should prefer simulated or dry-run consequential operations unless 
 
 ---
 
-# Milestone 12 — Community Learning Loop
+## Milestone 12 — Community Learning Loop
 
-## Status
+### Status
 
 **Established intake and contribution foundation — participation depth remains ongoing**
 
-## Existing Community Artifacts
+### Existing Community Artifacts
 
 * [x] `community/tutorial-ideas.md`
 * [x] `community/requested-topics.md`
@@ -912,7 +912,7 @@ Case studies should prefer simulated or dry-run consequential operations unless 
 * [x] Governance guidance.
 * [x] Quick-start contribution path in `CONTRIBUTING.md`. ([#8](https://github.com/AsiBackbone/Learning/issues/8))
 
-## Reconciled Community Work
+### Reconciled Community Work
 
 The earlier future-work list mixed missing intake surfaces with participation goals.
 The current repository already has dedicated Discussion templates for Q&A,
@@ -957,7 +957,7 @@ The active community priority is to keep a small set of genuine starter
 opportunities visible when suitable work exists and to deepen reviewer and
 community-authored participation without manufacturing contribution work.
 
-## Learning Feedback Cycle
+### Learning Feedback Cycle
 
 ```text
 Question
@@ -984,13 +984,13 @@ Repeated misunderstandings should trigger refinement of existing material before
 
 ---
 
-# Milestone 13 — Advanced and Experimental Material ([#5](https://github.com/AsiBackbone/Learning/issues/5))
+## Milestone 13 — Advanced and Experimental Material ([#5](https://github.com/AsiBackbone/Learning/issues/5))
 
-## Status
+### Status
 
 **Reconciled — all originally listed subjects now have substantial coverage at the current Learning scope; future advanced work should be selective and evidence-driven**
 
-## Goal
+### Goal
 
 Provide a clearly labeled area for ideas that are worth exploring but should not yet be presented as established guidance.
 
@@ -1081,7 +1081,7 @@ Experimental material should clearly state:
 
 ---
 
-# Documentation Quality Goals
+## Documentation Quality Goals
 
 As the repository grows, learning material should increasingly provide:
 
@@ -1113,11 +1113,11 @@ Issue #140 completed a representative cross-cutting pass rather than adding form
 
 ---
 
-# Repository Automation Goals
+## Repository Automation Goals
 
 Automation should support quality without making contribution unnecessarily difficult.
 
-## Established
+### Established
 
 * [x] DocFX build validation.
 * [x] Treat documentation warnings as errors.
@@ -1130,7 +1130,7 @@ Automation should support quality without making contribution unnecessarily diff
 * [x] Grouped Dependabot version-update automation for NuGet and GitHub Actions dependencies. ([#137](https://github.com/AsiBackbone/Learning/issues/137))
 * [x] Repository-maintained CodeQL scanning for the C# executable surface on relevant pull requests, pushes to `main`, and a weekly schedule. ([#137](https://github.com/AsiBackbone/Learning/issues/137))
 
-## Reconciled Follow-up
+### Reconciled Follow-up
 
 * **Obsolete / superseded — standalone Markdown validation as a roadmap objective.**
   DocFX warnings-as-errors, link validation, and metadata validation form the
@@ -1155,11 +1155,11 @@ Automation should be introduced when it provides meaningful protection, prevents
 
 ---
 
-# Citation and Archival Goals
+## Citation and Archival Goals
 
 The Learning repository uses a versioned educational-release model so that meaningful milestones can be archived and cited without treating the project as a versioned runtime package.
 
-## Established
+### Established
 
 * [x] Add `CITATION.cff`.
 * [x] Add Zenodo metadata.
@@ -1170,7 +1170,7 @@ The Learning repository uses a versioned educational-release model so that meani
 * [x] Document how readers should cite the evolving project versus a particular archived release. ([#136](https://github.com/AsiBackbone/Learning/issues/136))
 * [x] Keep archival cadence milestone-based rather than treating every documentation change as a release event. ([#136](https://github.com/AsiBackbone/Learning/issues/136))
 
-## Ongoing Maintenance
+### Ongoing Maintenance
 
 * [ ] Update the `CITATION.cff` release version/date, the `CITATION.cff` version DOI identifier, and the `.zenodo.json` version together for each future archived release. The version DOI is minted by the deposit, so it is recorded after the release rather than in the tagged snapshot; the concept DOI in the top-level `doi` key does not change.
 * [ ] Keep Zenodo project identity, licensing, and related identifiers current.
@@ -1185,7 +1185,7 @@ Versioned Learning releases are citable educational snapshots. They do not estab
 
 ---
 
-# Near-Term Priorities
+## Near-Term Priorities
 
 The highest-priority work now is:
 
@@ -1210,7 +1210,7 @@ A strong tutorial with a runnable sample, meaningful tests, a useful lab, and cl
 
 ---
 
-# Measuring Progress
+## Measuring Progress
 
 Progress should not be measured only by repository size, package adoption, stars, or raw page count.
 
@@ -1235,7 +1235,7 @@ The Learning repository succeeds when it helps people reason more clearly about 
 
 ---
 
-# What Is Not Currently a Roadmap Goal
+## What Is Not Currently a Roadmap Goal
 
 The Learning repository is not intended to become:
 
@@ -1258,7 +1258,7 @@ Its purpose is narrower:
 
 ---
 
-# Long-Term Direction
+## Long-Term Direction
 
 Over time, Learning may become the primary educational entry point into the ASI Backbone organization.
 
@@ -1309,7 +1309,7 @@ The intended cycle is:
 
 ---
 
-## Roadmap Status
+### Roadmap Status
 
 This roadmap is intentionally living.
 

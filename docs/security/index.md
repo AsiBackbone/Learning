@@ -1,5 +1,5 @@
 ---
-description: Explore security architecture for trust boundaries, least privilege, secret handling, secure logging, replay protection, cryptographic evidence, supply-chain integrity, threat modeling, and fail-safe behavior.
+description: Explore trust boundaries, least privilege, secrets, secure logging, replay protection, cryptographic evidence, supply-chain integrity, and threat modeling.
 ---
 
 # Security

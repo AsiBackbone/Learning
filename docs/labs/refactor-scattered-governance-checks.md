@@ -1,5 +1,5 @@
 ---
-description: Diagnose governance checks scattered around account mutation and external calls, then refactor the workflow into an explicit decision pipeline whose blocked outcomes cannot reach protected execution.
+description: Refactor scattered governance checks into an explicit decision pipeline whose blocked outcomes cannot reach account changes or external calls.
 ---
 
 # Lab — Refactor Scattered Governance Checks into an Explicit Decision Pipeline

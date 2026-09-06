@@ -1,5 +1,5 @@
 ---
-description: Follow a fictional records export through resource classification, actor and tenant context, policy evaluation, narrow export authority, synthetic execution, and sensitive-data-safe evidence.
+description: Follow a records export through classification, actor and tenant context, policy, narrow authority, synthetic execution, and data-safe evidence.
 ---
 
 # Sensitive-Data Access Decision

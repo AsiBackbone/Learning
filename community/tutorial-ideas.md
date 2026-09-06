@@ -18,7 +18,7 @@ Status labels here describe the state of the tutorial idea, not the level of com
 
 ---
 
-# What Makes a Good Tutorial Idea?
+## What Makes a Good Tutorial Idea?
 
 A strong tutorial idea usually has:
 
@@ -40,7 +40,7 @@ It should help the reader understand:
 
 ---
 
-# Suggested Tutorial Structure
+## Suggested Tutorial Structure
 
 Where practical, tutorials should follow a problem-first progression:
 
@@ -66,23 +66,23 @@ Not every tutorial needs every section, but the learning objective should remain
 
 ---
 
-# Foundation Tutorials
+## Foundation Tutorials
 
-## 1. Decision Before Execution
+### 1. Decision Before Execution
 
-### Working Title
+#### Working Title
 
 **Decision Before Execution: Why Consequential Actions Need a Governance Boundary**
 
-### Learning Objective
+#### Learning Objective
 
 Understand why a request to perform an operation should not automatically become execution authority.
 
-### Scenario
+#### Scenario
 
 An administrator clicks a button that performs a consequential operation directly inside a controller or service method.
 
-### Naive Flow
+#### Naive Flow
 
 ```text
 HTTP Request
@@ -94,7 +94,7 @@ Service Call
 Consequential Action
 ```
 
-### Governed Flow
+#### Governed Flow
 
 ```text
 Proposed Intent
@@ -114,7 +114,7 @@ Host-Owned Execution
 Audit Residue
 ```
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Intent versus execution.
 - Authorization versus governance.
@@ -122,7 +122,7 @@ Audit Residue
 - Why the host remains responsible for execution.
 - When the pattern is unnecessary.
 
-### Possible Lab
+#### Possible Lab
 
 Refactor a controller that performs a sensitive operation directly into a decision-before-execution workflow.
 
@@ -130,17 +130,17 @@ Refactor a controller that performs a sensitive operation directly into a decisi
 
 ---
 
-## 2. Beyond `bool`: Modeling Explicit Governance Outcomes
+### 2. Beyond `bool`: Modeling Explicit Governance Outcomes
 
-### Working Title
+#### Working Title
 
 **Beyond Allow or Deny: Designing Explicit Decision Results**
 
-### Learning Objective
+#### Learning Objective
 
 Understand when a boolean authorization result is too limited for consequential workflows.
 
-### Candidate Outcomes
+#### Candidate Outcomes
 
 ```text
 Allow
@@ -150,7 +150,7 @@ RequireAcknowledgment
 Escalate
 ```
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Why `true` and `false` lose important meaning.
 - Reason codes versus human-readable messages.
@@ -158,7 +158,7 @@ Escalate
 - Host behavior for each outcome.
 - Testing decision matrices.
 
-### Possible Exercise
+#### Possible Exercise
 
 Start with:
 
@@ -172,17 +172,17 @@ and evolve toward a structured decision result.
 
 ---
 
-## 3. Building a Policy Context
+### 3. Building a Policy Context
 
-### Working Title
+#### Working Title
 
 **Policy Context: Making Decision Inputs Explicit**
 
-### Learning Objective
+#### Learning Objective
 
 Understand how to represent the facts needed for policy evaluation without scattering them across services and middleware.
 
-### Possible Context Dimensions
+#### Possible Context Dimensions
 
 - Actor
 - Operation
@@ -194,7 +194,7 @@ Understand how to represent the facts needed for policy evaluation without scatt
 - Request metadata
 - Correlation information
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Strong typing versus dictionaries.
 - Context boundaries.
@@ -202,7 +202,7 @@ Understand how to represent the facts needed for policy evaluation without scatt
 - Avoiding context-object sprawl.
 - Separating facts from policy rules.
 
-### Possible Lab
+#### Possible Lab
 
 Given policy checks scattered across a controller, service, and helper, consolidate the relevant facts into a policy context.
 
@@ -210,17 +210,17 @@ Given policy checks scattered across a controller, service, and helper, consolid
 
 ---
 
-## 4. Reason Codes as an Architectural Contract
+### 4. Reason Codes as an Architectural Contract
 
-### Working Title
+#### Working Title
 
 **Reason Codes: Making Governance Decisions Reviewable**
 
-### Learning Objective
+#### Learning Objective
 
 Understand why stable reason codes are often more useful than free-form decision messages.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Machine-readable versus human-readable explanation.
 - Localization.
@@ -230,7 +230,7 @@ Understand why stable reason codes are often more useful than free-form decision
 - Backward compatibility.
 - Avoiding sensitive information in reasons.
 
-### Possible Example
+#### Possible Example
 
 Compare:
 
@@ -249,26 +249,26 @@ ReasonCode: Operation.NotPermittedInRegion
 
 ---
 
-# Acknowledgment and Human Responsibility
+## Acknowledgment and Human Responsibility
 
-## 5. Acknowledgment Is Not Authentication
+### 5. Acknowledgment Is Not Authentication
 
-### Working Title
+#### Working Title
 
 **Authentication, Approval, and Acknowledgment Are Different Boundaries**
 
-### Learning Objective
+#### Learning Objective
 
 Separate identity verification, authorization, approval, and acknowledgment.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Authentication proves identity.
 - Authorization grants access.
 - Approval may be a workflow decision.
 - Acknowledgment records conscious acceptance of a specific consequence or condition.
 
-### Possible Diagram
+#### Possible Diagram
 
 ```text
 Identity
@@ -282,7 +282,7 @@ Acknowledgment
 Execution Authority
 ```
 
-### Possible Lab
+#### Possible Lab
 
 Add acknowledgment to an already authenticated and authorized administrative workflow.
 
@@ -290,17 +290,17 @@ Add acknowledgment to an already authenticated and authorized administrative wor
 
 ---
 
-## 6. Designing an Acknowledgment Handshake
+### 6. Designing an Acknowledgment Handshake
 
-### Working Title
+#### Working Title
 
 **Building a Human Acknowledgment Boundary in ASP.NET Core**
 
-### Learning Objective
+#### Learning Objective
 
 Implement a workflow that pauses a consequential action until acknowledgment is explicitly captured.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Decision persistence.
 - Expiration.
@@ -309,7 +309,7 @@ Implement a workflow that pauses a consequential action until acknowledgment is 
 - Preventing stale acknowledgments.
 - Recording what was acknowledged.
 
-### Possible Scenario
+#### Possible Scenario
 
 A destructive administrative operation requires the operator to explicitly acknowledge the affected resource and consequence before proceeding.
 
@@ -317,17 +317,17 @@ A destructive administrative operation requires the operator to explicitly ackno
 
 ---
 
-## 7. When Human Approval Becomes Security Theater
+### 7. When Human Approval Becomes Security Theater
 
-### Working Title
+#### Working Title
 
 **Human in the Loop: Useful Control or Rubber Stamp?**
 
-### Learning Objective
+#### Learning Objective
 
 Explore when human review meaningfully reduces risk and when it simply adds friction.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Alert fatigue.
 - Repeated approvals.
@@ -337,7 +337,7 @@ Explore when human review meaningfully reduces risk and when it simply adds fric
 - Risk-based review.
 - Automation bias.
 
-### Possible Exercise
+#### Possible Exercise
 
 Review three approval dialogs and determine which one actually supports informed decision-making.
 
@@ -345,19 +345,19 @@ Review three approval dialogs and determine which one actually supports informed
 
 ---
 
-# Audit and Provenance Tutorials
+## Audit and Provenance Tutorials
 
-## 8. Logging Is Not an Audit Receipt
+### 8. Logging Is Not an Audit Receipt
 
-### Working Title
+#### Working Title
 
 **Operational Logs vs. Governance Evidence**
 
-### Learning Objective
+#### Learning Objective
 
 Understand why logs and audit residue serve different purposes.
 
-### Comparison Areas
+#### Comparison Areas
 
 | Operational Logging | Governance Audit |
 |---|---|
@@ -367,7 +367,7 @@ Understand why logs and audit residue serve different purposes.
 | Application-centric | Decision-centric |
 | Free-form context common | Stable fields and reason codes preferred |
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Correlation IDs.
 - Decision IDs.
@@ -377,7 +377,7 @@ Understand why logs and audit residue serve different purposes.
 - Retention.
 - Privacy.
 
-### Possible Lab
+#### Possible Lab
 
 Given a set of application logs, design the smallest useful governance receipt.
 
@@ -385,17 +385,17 @@ Given a set of application logs, design the smallest useful governance receipt.
 
 ---
 
-## 9. Designing an Audit Receipt
+### 9. Designing an Audit Receipt
 
-### Working Title
+#### Working Title
 
 **What Should Survive a Governance Decision?**
 
-### Learning Objective
+#### Learning Objective
 
 Design a structured record that explains what was requested, how it was evaluated, and what authority followed.
 
-### Possible Fields
+#### Possible Fields
 
 - Decision ID
 - Correlation ID
@@ -410,7 +410,7 @@ Design a structured record that explains what was requested, how it was evaluate
 - Capability reference
 - Execution result reference
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Evidence versus exhaustive logging.
 - Privacy boundaries.
@@ -421,17 +421,17 @@ Design a structured record that explains what was requested, how it was evaluate
 
 ---
 
-## 10. Tamper-Evident Does Not Mean Immutable
+### 10. Tamper-Evident Does Not Mean Immutable
 
-### Working Title
+#### Working Title
 
 **Tamper Evidence, Signing, and Durable Audit Storage**
 
-### Learning Objective
+#### Learning Objective
 
 Clarify commonly conflated security properties.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Durable storage.
 - Append-only semantics.
@@ -443,7 +443,7 @@ Clarify commonly conflated security properties.
 - Key custody.
 - What each mechanism actually proves.
 
-### Important Boundary
+#### Important Boundary
 
 The tutorial should avoid presenting a simplified demo as a production-grade tamper-proof ledger.
 
@@ -451,19 +451,19 @@ The tutorial should avoid presenting a simplified demo as a production-grade tam
 
 ---
 
-# Capability and Execution Tutorials
+## Capability and Execution Tutorials
 
-## 11. Approval Is Not Permanent Authority
+### 11. Approval Is Not Permanent Authority
 
-### Working Title
+#### Working Title
 
 **From Approval to Scoped Capability**
 
-### Learning Objective
+#### Learning Objective
 
 Understand why a successful decision may grant narrow, short-lived authority rather than broad standing permission.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Operation binding.
 - Resource binding.
@@ -474,7 +474,7 @@ Understand why a successful decision may grant narrow, short-lived authority rat
 - Proof requirements.
 - Replay protection.
 
-### Possible Lab
+#### Possible Lab
 
 Replace a broad "admin can execute" check with a grant scoped to one operation and resource.
 
@@ -482,17 +482,17 @@ Replace a broad "admin can execute" check with a grant scoped to one operation a
 
 ---
 
-## 12. Validate Again at the Execution Boundary
+### 12. Validate Again at the Execution Boundary
 
-### Working Title
+#### Working Title
 
 **Why Capability Validation Belongs Next to Execution**
 
-### Learning Objective
+#### Learning Objective
 
 Understand why authority should be checked where the consequential operation actually occurs.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Time-of-check/time-of-use.
 - Expiration.
@@ -502,7 +502,7 @@ Understand why authority should be checked where the consequential operation act
 - Stale decisions.
 - Distributed components.
 
-### Possible Sequence
+#### Possible Sequence
 
 ```text
 Decision Service
@@ -522,17 +522,17 @@ Operation Executes
 
 ---
 
-## 13. Host-Owned Execution
+### 13. Host-Owned Execution
 
-### Working Title
+#### Working Title
 
 **The Governance Layer Decides; the Host Executes**
 
-### Learning Objective
+#### Learning Objective
 
 Clarify why a policy framework should not silently become an execution engine.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Separation of responsibility.
 - Authentication and authorization remain host concerns.
@@ -540,7 +540,7 @@ Clarify why a policy framework should not silently become an execution engine.
 - Governance outcome does not guarantee operational success.
 - Execution failure should remain distinct from governance denial.
 
-### Possible Example
+#### Possible Example
 
 A governance decision permits a deployment operation, but the deployment system still owns credentials, environment controls, retries, rollback, and execution.
 
@@ -548,19 +548,19 @@ A governance decision permits a deployment operation, but the deployment system 
 
 ---
 
-# AI Governance Tutorials
+## AI Governance Tutorials
 
-## 14. The Model May Propose; the Host Executes
+### 14. The Model May Propose; the Host Executes
 
-### Working Title
+#### Working Title
 
 **Building a Governed AI Tool Gateway in ASP.NET Core**
 
-### Learning Objective
+#### Learning Objective
 
 Demonstrate an end-to-end AI tool-call flow where model output is treated as proposed intent rather than execution authority.
 
-### Flow
+#### Flow
 
 ```text
 User
@@ -586,7 +586,7 @@ Tool Execution
 Audit Residue
 ```
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Model output is untrusted input.
 - Tool allowlists.
@@ -597,7 +597,7 @@ Audit Residue
 - Audit.
 - Failure handling.
 
-### Possible Deliverables
+#### Possible Deliverables
 
 - Minimal ASP.NET Core application.
 - Mock model interface.
@@ -617,17 +617,17 @@ Published material:
 
 ---
 
-## 15. Treat AI Tool Arguments as Untrusted Input
+### 15. Treat AI Tool Arguments as Untrusted Input
 
-### Working Title
+#### Working Title
 
 **Schema Validation Before AI Tool Execution**
 
-### Learning Objective
+#### Learning Objective
 
 Show why a valid model response is not necessarily a valid application operation.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - JSON/schema validation.
 - Domain validation.
@@ -638,7 +638,7 @@ Show why a valid model response is not necessarily a valid application operation
 - Numeric bounds.
 - Host-side normalization.
 
-### Possible Lab
+#### Possible Lab
 
 Provide several plausible-looking AI tool calls and require the learner to identify which must be rejected before policy evaluation or execution.
 
@@ -646,24 +646,24 @@ Provide several plausible-looking AI tool calls and require the learner to ident
 
 ---
 
-## 16. Model Explanation vs. Governance Explanation
+### 16. Model Explanation vs. Governance Explanation
 
-### Working Title
+#### Working Title
 
 **Who Explains the Decision? AI Output vs. Policy Evidence**
 
-### Learning Objective
+#### Learning Objective
 
 Distinguish generated model explanations from authoritative policy reasons.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Generated explanations can be useful UI.
 - Policy reason codes should come from policy evaluation.
 - Execution results should come from the host.
 - Audit evidence should not depend on a model inventing its own rationale.
 
-### Possible Diagram
+#### Possible Diagram
 
 ```text
 Model:
@@ -681,17 +681,17 @@ ExecutionResult = Completed
 
 ---
 
-## 17. Tool Allowlists
+### 17. Tool Allowlists
 
-### Working Title
+#### Working Title
 
 **Giving an AI Fewer Things It Can Ask For**
 
-### Learning Objective
+#### Learning Objective
 
 Demonstrate how reducing the available tool surface can simplify governance.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Least capability.
 - Static allowlists.
@@ -704,17 +704,17 @@ Demonstrate how reducing the available tool surface can simplify governance.
 
 ---
 
-## 18. Agent-to-Agent Governance
+### 18. Agent-to-Agent Governance
 
-### Working Title
+#### Working Title
 
 **When One Automated System Requests Action From Another**
 
-### Learning Objective
+#### Learning Objective
 
 Explore how intent, authority, and provenance may cross automated-system boundaries.
 
-### Questions
+#### Questions
 
 - Who originated the intent?
 - Which system owns execution?
@@ -722,7 +722,7 @@ Explore how intent, authority, and provenance may cross automated-system boundar
 - How is context preserved?
 - How are chained decisions audited?
 
-### Classification
+#### Classification
 
 Experimental.
 
@@ -730,19 +730,19 @@ Experimental.
 
 ---
 
-# ASP.NET Core Architecture Tutorials
+## ASP.NET Core Architecture Tutorials
 
-## 19. Middleware Order Is Architecture
+### 19. Middleware Order Is Architecture
 
-### Working Title
+#### Working Title
 
 **ASP.NET Core Middleware Ordering: Why Sequence Changes Security and Behavior**
 
-### Learning Objective
+#### Learning Objective
 
 Understand middleware ordering as an architectural decision rather than boilerplate.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Exception handling.
 - Forwarded headers.
@@ -754,7 +754,7 @@ Understand middleware ordering as an architectural decision rather than boilerpl
 - Security headers.
 - Request logging.
 
-### Possible Lab
+#### Possible Lab
 
 Give the learner an intentionally misordered pipeline and require them to identify behavior and security problems.
 
@@ -770,17 +770,17 @@ Additional middleware-ordering ideas should add a distinct scenario, diagnostic 
 
 ---
 
-## 20. Secure Defaults as Active Constraints
+### 20. Secure Defaults as Active Constraints
 
-### Working Title
+#### Working Title
 
 **Secure by Default: Designing Configuration That Fails Safely**
 
-### Learning Objective
+#### Learning Objective
 
 Show how defaults constrain the set of behaviors an application can enter.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Opt-in versus opt-out.
 - Configuration validation.
@@ -788,7 +788,7 @@ Show how defaults constrain the set of behaviors an application can enter.
 - Dangerous development defaults.
 - Explicit production requirements.
 
-### Possible Connection
+#### Possible Connection
 
 Use `NetCoreApplicationTemplate` as the working implementation reference.
 
@@ -796,17 +796,17 @@ Use `NetCoreApplicationTemplate` as the working implementation reference.
 
 ---
 
-## 21. Structured Logging Without Logging Everything
+### 21. Structured Logging Without Logging Everything
 
-### Working Title
+#### Working Title
 
 **Useful Telemetry Without Sensitive-Data Sprawl**
 
-### Learning Objective
+#### Learning Objective
 
 Balance observability with privacy and maintainability.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Structured events.
 - Correlation.
@@ -822,17 +822,17 @@ Balance observability with privacy and maintainability.
 
 ---
 
-## 22. Centralized Error Handling
+### 22. Centralized Error Handling
 
-### Working Title
+#### Working Title
 
 **One Error Boundary, Many Failure Modes**
 
-### Learning Objective
+#### Learning Objective
 
 Show how centralized exception and status-code handling can improve consistency without hiding useful diagnostics.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Problem Details.
 - Error mapping.
@@ -845,17 +845,17 @@ Show how centralized exception and status-code handling can improve consistency 
 
 ---
 
-## 23. Architecture Decision Records
+### 23. Architecture Decision Records
 
-### Working Title
+#### Working Title
 
 **Writing ADRs That Future Maintainers Can Actually Use**
 
-### Learning Objective
+#### Learning Objective
 
 Teach ADRs through real repository examples.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Decision context.
 - Alternatives.
@@ -865,7 +865,7 @@ Teach ADRs through real repository examples.
 - ADRs versus comments.
 - ADRs versus tutorials.
 
-### Possible Exercise
+#### Possible Exercise
 
 Take an undocumented architectural choice and write a concise ADR for it.
 
@@ -873,19 +873,19 @@ Take an undocumented architectural choice and write a concise ADR for it.
 
 ---
 
-# Security and Supply-Chain Tutorials
+## Security and Supply-Chain Tutorials
 
-## 24. Why Pin GitHub Actions by SHA?
+### 24. Why Pin GitHub Actions by SHA?
 
-### Working Title
+#### Working Title
 
 **Immutable Workflow Dependencies: GitHub Actions SHA Pinning**
 
-### Learning Objective
+#### Learning Objective
 
 Understand the supply-chain value of immutable action references.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Tags are mutable references.
 - Commit SHAs are immutable references.
@@ -894,7 +894,7 @@ Understand the supply-chain value of immutable action references.
 - Detecting mismatched version comments.
 - Tradeoff between maintenance and integrity.
 
-### Possible Working Reference
+#### Possible Working Reference
 
 Use existing ASI Backbone workflow patterns as examples.
 
@@ -902,17 +902,17 @@ Use existing ASI Backbone workflow patterns as examples.
 
 ---
 
-## 25. Locked Restore
+### 25. Locked Restore
 
-### Working Title
+#### Working Title
 
 **Why Reproducible Builds Need Locked Dependencies**
 
-### Learning Objective
+#### Learning Objective
 
 Explain what lock files contribute to build reproducibility and dependency review.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Dependency drift.
 - Locked restore.
@@ -925,17 +925,17 @@ Explain what lock files contribute to build reproducibility and dependency revie
 
 ---
 
-## 26. SBOM and Provenance Are Different
+### 26. SBOM and Provenance Are Different
 
-### Working Title
+#### Working Title
 
 **What Was Built vs. How It Was Built**
 
-### Learning Objective
+#### Learning Objective
 
 Distinguish a Software Bill of Materials from build provenance.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Package contents and dependencies.
 - Build identity.
@@ -948,17 +948,17 @@ Distinguish a Software Bill of Materials from build provenance.
 
 ---
 
-## 27. Package Signing, Repository Signatures, and Provenance
+### 27. Package Signing, Repository Signatures, and Provenance
 
-### Working Title
+#### Working Title
 
 **Three Different Questions About Package Trust**
 
-### Learning Objective
+#### Learning Objective
 
 Separate several mechanisms that are often discussed as if they were equivalent.
 
-### Questions
+#### Questions
 
 - Who signed the package?
 - Which repository distributed it?
@@ -970,19 +970,19 @@ Separate several mechanisms that are often discussed as if they were equivalent.
 
 ---
 
-# Policy Architecture Tutorials
+## Policy Architecture Tutorials
 
-## 28. Policy Composition
+### 28. Policy Composition
 
-### Working Title
+#### Working Title
 
 **When Multiple Policies Disagree**
 
-### Learning Objective
+#### Learning Objective
 
 Explore how constraints can combine into one decision.
 
-### Possible Approaches
+#### Possible Approaches
 
 - Deny overrides.
 - Priority ordering.
@@ -991,7 +991,7 @@ Explore how constraints can combine into one decision.
 - Required acknowledgment.
 - Defer when information is missing.
 
-### Possible Lab
+#### Possible Lab
 
 Given five policies with conflicting outcomes, design an explicit composition strategy.
 
@@ -999,17 +999,17 @@ Given five policies with conflicting outcomes, design an explicit composition st
 
 ---
 
-## 29. Policy Versioning
+### 29. Policy Versioning
 
-### Working Title
+#### Working Title
 
 **Which Policy Made This Decision?**
 
-### Learning Objective
+#### Learning Objective
 
 Show why policy identity/version can be important for audit and reproducibility.
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Version IDs.
 - Hashes.
@@ -1022,17 +1022,17 @@ Show why policy identity/version can be important for audit and reproducibility.
 
 ---
 
-## 30. Fail Open, Fail Closed, or Defer?
+### 30. Fail Open, Fail Closed, or Defer?
 
-### Working Title
+#### Working Title
 
 **Governance During Dependency Failure**
 
-### Learning Objective
+#### Learning Objective
 
 Explore degraded-mode behavior when a policy dependency is unavailable.
 
-### Scenario
+#### Scenario
 
 A risk service times out during evaluation.
 
@@ -1046,7 +1046,7 @@ Escalate
 Fallback Policy
 ```
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Consequence-based failure policy.
 - Availability versus safety.
@@ -1058,17 +1058,17 @@ Fallback Policy
 
 ---
 
-## 31. Regional and Tenant Policy Layers
+### 31. Regional and Tenant Policy Layers
 
-### Working Title
+#### Working Title
 
 **Composing Global, Regional, and Tenant Constraints**
 
-### Learning Objective
+#### Learning Objective
 
 Understand layered policy without assuming that one layer always overrides another.
 
-### Possible Flow
+#### Possible Flow
 
 ```text
 Global Constraints
@@ -1082,7 +1082,7 @@ Operation Constraints
 Decision Composition
 ```
 
-### Teaching Opportunities
+#### Teaching Opportunities
 
 - Precedence.
 - Conflict.
@@ -1094,15 +1094,15 @@ Decision Composition
 
 ---
 
-# Comparison Tutorials
+## Comparison Tutorials
 
-## 32. Authentication vs. Authorization vs. Governance
+### 32. Authentication vs. Authorization vs. Governance
 
-### Working Title
+#### Working Title
 
 **Three Questions That Look Similar but Are Not**
 
-### Questions
+#### Questions
 
 ```text
 Authentication:
@@ -1115,7 +1115,7 @@ Governance:
 Under these conditions, should this consequential action proceed, and what must happen before execution?
 ```
 
-### Learning Objective
+#### Learning Objective
 
 Prevent architectural responsibilities from being collapsed into a single authorization check.
 
@@ -1123,17 +1123,17 @@ Prevent architectural responsibilities from being collapsed into a single author
 
 ---
 
-## 33. RBAC, Claims, Policy, and Capability
+### 33. RBAC, Claims, Policy, and Capability
 
-### Working Title
+#### Working Title
 
 **Choosing an Authority Model**
 
-### Learning Objective
+#### Learning Objective
 
 Compare common authority models without presenting one as universally superior.
 
-### Possible Dimensions
+#### Possible Dimensions
 
 - Identity coupling.
 - Delegation.
@@ -1147,17 +1147,17 @@ Compare common authority models without presenting one as universally superior.
 
 ---
 
-## 34. Policy Engine vs. Governance Pipeline
+### 34. Policy Engine vs. Governance Pipeline
 
-### Working Title
+#### Working Title
 
 **Evaluation Is Only One Stage of the Decision Lifecycle**
 
-### Learning Objective
+#### Learning Objective
 
 Clarify the difference between evaluating policy and governing a consequential operation end to end.
 
-### Comparison
+#### Comparison
 
 ```text
 Policy Engine:
@@ -1178,13 +1178,13 @@ Intent
 
 ---
 
-## 35. API Gateway vs. Governance Gateway
+### 35. API Gateway vs. Governance Gateway
 
-### Working Title
+#### Working Title
 
 **Routing Traffic Is Not the Same as Governing Action**
 
-### Learning Objective
+#### Learning Objective
 
 Compare network/API gateway responsibilities with decision/execution governance.
 
@@ -1192,13 +1192,13 @@ Compare network/API gateway responsibilities with decision/execution governance.
 
 ---
 
-## 36. Workflow Engine vs. Governance Pipeline
+### 36. Workflow Engine vs. Governance Pipeline
 
-### Working Title
+#### Working Title
 
 **Orchestration and Governance Solve Different Problems**
 
-### Learning Objective
+#### Learning Objective
 
 Explain where workflow orchestration overlaps with governance and where they should remain separate.
 
@@ -1206,11 +1206,11 @@ Explain where workflow orchestration overlaps with governance and where they sho
 
 ---
 
-# Failure-Mode Tutorials
+## Failure-Mode Tutorials
 
-## 37. The Boolean Authorization Trap
+### 37. The Boolean Authorization Trap
 
-### Scenario
+#### Scenario
 
 A system treats every consequential operation as:
 
@@ -1221,7 +1221,7 @@ if (user.CanDoThing)
 }
 ```
 
-### Learning Objective
+#### Learning Objective
 
 Identify information lost by collapsing policy, acknowledgment, authority, and execution into one boolean.
 
@@ -1229,13 +1229,13 @@ Identify information lost by collapsing policy, acknowledgment, authority, and e
 
 ---
 
-## 38. The Permanent Admin Token
+### 38. The Permanent Admin Token
 
-### Scenario
+#### Scenario
 
 A broad credential exists because creating scoped authority seemed inconvenient.
 
-### Learning Objective
+#### Learning Objective
 
 Explore the operational and security consequences of standing authority.
 
@@ -1243,13 +1243,13 @@ Explore the operational and security consequences of standing authority.
 
 ---
 
-## 39. The Audit Log That Cannot Explain the Decision
+### 39. The Audit Log That Cannot Explain the Decision
 
-### Scenario
+#### Scenario
 
 The application records requests and exceptions but cannot reconstruct why a sensitive operation was allowed.
 
-### Learning Objective
+#### Learning Objective
 
 Identify missing governance evidence.
 
@@ -1257,13 +1257,13 @@ Identify missing governance evidence.
 
 ---
 
-## 40. The Approval Button Everyone Clicks
+### 40. The Approval Button Everyone Clicks
 
-### Scenario
+#### Scenario
 
 A human approval step exists, but operators receive insufficient information and approve nearly every request.
 
-### Learning Objective
+#### Learning Objective
 
 Explore acknowledgment quality and automation bias.
 
@@ -1271,13 +1271,13 @@ Explore acknowledgment quality and automation bias.
 
 ---
 
-## 41. The AI Agent With Direct Database Access
+### 41. The AI Agent With Direct Database Access
 
-### Scenario
+#### Scenario
 
 A model can translate user language directly into database-changing operations.
 
-### Learning Objective
+#### Learning Objective
 
 Identify missing boundaries:
 
@@ -1292,9 +1292,9 @@ Identify missing boundaries:
 
 ---
 
-# Tutorial Series Ideas
+## Tutorial Series Ideas
 
-## Series A — Governed Execution Fundamentals
+### Series A — Governed Execution Fundamentals
 
 1. Decision Before Execution
 2. Policy Context
@@ -1304,13 +1304,13 @@ Identify missing boundaries:
 6. Scoped Capability
 7. Host-Owned Execution
 
-### Final Project
+#### Final Project
 
 Build a governed administrative operation from end to end.
 
 ---
 
-## Series B — Governed AI Tool Use
+### Series B — Governed AI Tool Use
 
 1. AI Output as Proposed Intent
 2. Tool Schema Validation
@@ -1320,13 +1320,13 @@ Build a governed administrative operation from end to end.
 6. Capability-Scoped Execution
 7. Audit and Execution Results
 
-### Final Project
+#### Final Project
 
 Build a governed AI tool gateway in ASP.NET Core.
 
 ---
 
-## Series C — Secure ASP.NET Core Architecture
+### Series C — Secure ASP.NET Core Architecture
 
 1. Middleware Ordering
 2. Secure Defaults
@@ -1337,13 +1337,13 @@ Build a governed AI tool gateway in ASP.NET Core.
 7. Data Access
 8. Architecture Decision Records
 
-### Working Reference
+#### Working Reference
 
 `AsiBackbone/NetCoreApplicationTemplate`
 
 ---
 
-## Series D — Software Supply-Chain Reasoning
+### Series D — Software Supply-Chain Reasoning
 
 1. Dependency Locking
 2. SHA-Pinned GitHub Actions
@@ -1356,7 +1356,7 @@ Build a governed AI tool gateway in ASP.NET Core.
 
 ---
 
-# Tutorial Formats to Encourage
+## Tutorial Formats to Encourage
 
 Not every contribution needs to be a long-form tutorial.
 
@@ -1400,7 +1400,7 @@ Uses failing tests to reveal an architectural requirement.
 
 ---
 
-# Ideas for Beginner-Friendly Tutorials
+## Ideas for Beginner-Friendly Tutorials
 
 Potential beginner contributions should avoid requiring deep familiarity with the complete ASI Backbone architecture.
 
@@ -1422,7 +1422,7 @@ These can provide easier entry points for contributors and readers.
 
 ---
 
-# Ideas for Advanced Tutorials
+## Ideas for Advanced Tutorials
 
 Advanced material may explore:
 
@@ -1441,13 +1441,13 @@ Advanced tutorials should clearly identify assumptions and avoid presenting expe
 
 ---
 
-# Ideas That Cross Both Working Repositories
+## Ideas That Cross Both Working Repositories
 
 Some of the strongest tutorials may connect concepts from both `AsiBackbone` and `NetCoreApplicationTemplate`.
 
 Examples:
 
-## Governed Administrative Endpoint
+### Governed Administrative Endpoint
 
 Use NCAT for:
 
@@ -1467,13 +1467,13 @@ Use AsiBackbone for:
 - Capability
 - Audit residue
 
-### Learning Goal
+#### Learning Goal
 
 Show how application architecture and governance architecture complement each other without collapsing into one framework.
 
 ---
 
-## Governed Deployment Request
+### Governed Deployment Request
 
 Use the application host to receive and authenticate the request.
 
@@ -1481,7 +1481,7 @@ Use governance patterns to decide whether deployment should proceed.
 
 Leave actual deployment execution with a separate host-owned executor.
 
-### Learning Goal
+#### Learning Goal
 
 Teach the distinction among:
 
@@ -1495,19 +1495,19 @@ Evidence
 
 ---
 
-## Governed AI Administrative Assistant
+### Governed AI Administrative Assistant
 
 Use an ASP.NET Core host with a simulated AI assistant proposing administrative operations.
 
 Apply governance before tool execution.
 
-### Learning Goal
+#### Learning Goal
 
 Provide a realistic end-to-end reference example without requiring a specific external AI provider.
 
 ---
 
-# Community-Sourced Tutorial Ideas
+## Community-Sourced Tutorial Ideas
 
 Contributors are encouraged to add ideas here or propose them through Discussions.
 
@@ -1555,7 +1555,7 @@ Idea / Discussing / Planned / In Progress
 
 ---
 
-# Tutorial Selection Criteria
+## Tutorial Selection Criteria
 
 When choosing what to build next, consider:
 
@@ -1572,7 +1572,7 @@ When choosing what to build next, consider:
 
 ---
 
-# Ideas That Should Usually Stay Elsewhere
+## Ideas That Should Usually Stay Elsewhere
 
 Some material may be useful but belong in another repository.
 
@@ -1598,7 +1598,7 @@ Learning should link to those sources rather than duplicating them.
 
 ---
 
-# From Idea to Tutorial
+## From Idea to Tutorial
 
 A tutorial idea may progress through:
 
@@ -1633,7 +1633,7 @@ An idea may be merged with another topic, reduced to a diagram, deferred, moved 
 
 ---
 
-# Published Foundation and Next Candidates
+## Published Foundation and Next Candidates
 
 The original recommended starting set is no longer entirely prospective. The governed-execution foundation and Middleware Ordering now have published coverage, while Architecture Decision Records remains a future learning candidate.
 
@@ -1656,7 +1656,7 @@ Future selection should therefore emphasize gaps, deeper tradeoffs, alternative 
 
 ---
 
-## Add an Idea
+### Add an Idea
 
 If you have a question that made you stop and think, it may be a tutorial.
 

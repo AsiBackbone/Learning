@@ -1,5 +1,5 @@
 ---
-description: Compare governed application deployment and infrastructure-change flows where CI evidence, human approval, scoped authority, credentials, and host-owned execution remain distinct responsibilities.
+description: Compare deployment and infrastructure-change flows that keep CI evidence, human approval, scoped authority, credentials, and execution distinct.
 ---
 
 # Deployment Approval and Infrastructure Change Gates

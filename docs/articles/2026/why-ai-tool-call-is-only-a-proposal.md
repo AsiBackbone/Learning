@@ -1,5 +1,5 @@
 ---
-description: A practical AI tool-calling architecture article showing why model-generated tool calls remain untrusted proposals until a trusted host validates context, authorization, and execution.
+description: See why model-generated tool calls remain untrusted proposals until a host validates their context, authorization, and execution.
 title: Why an AI Tool Call Is a Proposal, Not Authority
 author: Christopher D. Cavell
 published: "2026-08-28"
@@ -13,7 +13,7 @@ feed: true
 
 **Difficulty:** Advanced
 
-**Prerequisites:** Familiarity with C# and basic AI tool/function calling is helpful, but no AI provider, agent framework, ASI Backbone package, or prior Learning material is required. The code uses C# 12 primary constructors; use a .NET 8 or later SDK as written, or adapt the constructors for an older language version.
+**Prerequisites:** Familiarity with C# and basic AI tool/function calling is helpful, but no AI provider, agent framework, AsiBackbone package, or prior Learning material is required. The code uses C# 12 primary constructors; use a .NET 8 or later SDK as written, or adapt the constructors for an older language version.
 
 **What this article covers:** the proposal-versus-authority boundary; host-owned tool, argument, resource, policy, credential, and execution controls; zero-execution and concurrency-conflict tests; safe model feedback versus internal diagnostics; and when ordinary framework controls are sufficient without a larger governance lifecycle.
 

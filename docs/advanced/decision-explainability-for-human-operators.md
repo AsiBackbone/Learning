@@ -1,5 +1,5 @@
 ---
-description: Learn how to derive audience-appropriate human explanations from structured governance evidence without turning presentation text into policy truth or execution authority.
+description: Derive audience-appropriate explanations from structured governance evidence without turning presentation text into policy truth or execution authority.
 ---
 
 # Decision Explainability for Human Operators

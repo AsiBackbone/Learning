@@ -1,5 +1,5 @@
 ---
-description: Compare CQRS and command/query separation with governed execution, including when a command handler is enough, when policy belongs in the immediate handler path, and when decision and execution should be separated across time or process boundaries.
+description: Compare CQRS with governed execution, when command handlers are enough, where policy belongs, and when decisions and execution should separate.
 title: CQRS, Command/Query Separation, and Governed Execution
 author: Christopher D. Cavell
 published: "2026-08-24"

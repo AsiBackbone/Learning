@@ -10,6 +10,8 @@ return MetadataValidator.Run();
 
 static class MetadataValidator
 {
+    private const int MaximumDescriptionLength = 160;
+
     private static readonly Uri SiteRoot = new("https://asibackbone.github.io/Learning/");
     private static readonly Uri FeedUri = new(SiteRoot, "feed.xml");
     private static readonly Uri SocialImageUri = new(SiteRoot, "images/asibackbone-social.png");
@@ -56,6 +58,10 @@ static class MetadataValidator
 
     private static readonly Regex PublicationDateFrontMatterRegex = new(
         @"^(?<key>published|updated):[ \t]*(?<value>.*?)[ \t]*$",
+        RegexOptions.Compiled);
+
+    private static readonly Regex DescriptionFrontMatterRegex = new(
+        @"^description:[ \t]*(?<value>.*?)[ \t]*$",
         RegexOptions.Compiled);
 
     private static readonly Regex QuotedPublicationDateRegex = new(
@@ -163,8 +169,13 @@ static class MetadataValidator
         ICollection<string> errors)
     {
         string docsRoot = Path.Combine(repositoryRoot, "docs");
+        string communityRoot = Path.Combine(repositoryRoot, "community");
+        IEnumerable<string> markdownPaths = Directory
+            .EnumerateFiles(docsRoot, "*.md", SearchOption.AllDirectories)
+            .Concat(Directory.EnumerateFiles(communityRoot, "*.md", SearchOption.AllDirectories))
+            .Append(Path.Combine(repositoryRoot, "ROADMAP.md"));
 
-        foreach (string path in Directory.EnumerateFiles(docsRoot, "*.md", SearchOption.AllDirectories))
+        foreach (string path in markdownPaths)
         {
             string relativePath = NormalizePath(Path.GetRelativePath(repositoryRoot, path));
             if (relativePath.StartsWith("docs/_site/", StringComparison.OrdinalIgnoreCase))
@@ -198,6 +209,7 @@ static class MetadataValidator
                     }
 
                     ValidatePublicationDateFrontMatter(relativePath, lineNumber, line, errors);
+                    ValidateDescriptionFrontMatter(relativePath, lineNumber, line, errors);
                     continue;
                 }
 
@@ -264,6 +276,34 @@ static class MetadataValidator
             {
                 errors.Add($"{relativePath}: expected exactly one H1 heading, found {headingOneCount}.");
             }
+        }
+    }
+
+    private static void ValidateDescriptionFrontMatter(
+        string relativePath,
+        int lineNumber,
+        string line,
+        ICollection<string> errors)
+    {
+        Match metadata = DescriptionFrontMatterRegex.Match(line);
+        if (!metadata.Success)
+        {
+            return;
+        }
+
+        string description = metadata.Groups["value"].Value;
+        if (description.Length >= 2 &&
+            ((description[0] == '"' && description[^1] == '"') ||
+             (description[0] == '\'' && description[^1] == '\'')))
+        {
+            description = description[1..^1];
+        }
+
+        if (description.Length > MaximumDescriptionLength)
+        {
+            errors.Add(
+                $"{relativePath}:{lineNumber}: description is {description.Length} characters; " +
+                $"the maximum is {MaximumDescriptionLength}.");
         }
     }
 
