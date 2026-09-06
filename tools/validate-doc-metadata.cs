@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -51,6 +52,14 @@ static class MetadataValidator
 
     private static readonly Regex PatternClassificationRegex = new(
         @"^\*\*Pattern classification:\*\*[ \t]+(?<value>.*?)[ \t]*$",
+        RegexOptions.Compiled);
+
+    private static readonly Regex PublicationDateFrontMatterRegex = new(
+        @"^(?<key>published|updated):[ \t]*(?<value>.*?)[ \t]*$",
+        RegexOptions.Compiled);
+
+    private static readonly Regex QuotedPublicationDateRegex = new(
+        "^\"(?<date>\\d{4}-\\d{2}-\\d{2})\"$",
         RegexOptions.Compiled);
 
     private static readonly HashSet<string> AllowedPatternClassifications = new(StringComparer.Ordinal)
@@ -168,10 +177,30 @@ static class MetadataValidator
             int headingOneCount = 0;
             int previousHeadingLevel = 0;
             int lineNumber = 0;
+            bool inFrontMatter = false;
 
             foreach (string line in File.ReadLines(path))
             {
                 lineNumber++;
+
+                if (lineNumber == 1 && string.Equals(line.Trim(), "---", StringComparison.Ordinal))
+                {
+                    inFrontMatter = true;
+                    continue;
+                }
+
+                if (inFrontMatter)
+                {
+                    if (string.Equals(line.Trim(), "---", StringComparison.Ordinal))
+                    {
+                        inFrontMatter = false;
+                        continue;
+                    }
+
+                    ValidatePublicationDateFrontMatter(relativePath, lineNumber, line, errors);
+                    continue;
+                }
+
                 Match fence = MarkdownFenceRegex.Match(line);
 
                 if (fence.Success)
@@ -235,6 +264,33 @@ static class MetadataValidator
             {
                 errors.Add($"{relativePath}: expected exactly one H1 heading, found {headingOneCount}.");
             }
+        }
+    }
+
+    private static void ValidatePublicationDateFrontMatter(
+        string relativePath,
+        int lineNumber,
+        string line,
+        ICollection<string> errors)
+    {
+        Match metadata = PublicationDateFrontMatterRegex.Match(line);
+        if (!metadata.Success)
+        {
+            return;
+        }
+
+        string key = metadata.Groups["key"].Value;
+        Match quotedDate = QuotedPublicationDateRegex.Match(metadata.Groups["value"].Value);
+        if (!quotedDate.Success ||
+            !DateOnly.TryParseExact(
+                quotedDate.Groups["date"].Value,
+                "yyyy-MM-dd",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out _))
+        {
+            errors.Add(
+                $"{relativePath}:{lineNumber}: '{key}' must be a double-quoted YYYY-MM-DD date.");
         }
     }
 
@@ -410,7 +466,7 @@ static class MetadataValidator
 
         ExpectProperty(page.Path, article, "Article", "url", page.CanonicalUrl, errors);
         ExpectNonEmptyProperty(page.Path, article.Value, "Article", "headline", errors);
-        ExpectNonEmptyProperty(page.Path, article.Value, "Article", "datePublished", errors);
+        ExpectIsoDateProperty(page.Path, article.Value, "Article", "datePublished", errors);
 
         if (!article.Value.TryGetProperty("author", out JsonElement author) ||
             (author.ValueKind != JsonValueKind.Object && author.ValueKind != JsonValueKind.Array))
@@ -468,6 +524,26 @@ static class MetadataValidator
             string.IsNullOrWhiteSpace(value.GetString()))
         {
             errors.Add($"{path}: {type}.{property} must be a non-empty string.");
+        }
+    }
+
+    private static void ExpectIsoDateProperty(
+        string path,
+        JsonElement node,
+        string type,
+        string property,
+        ICollection<string> errors)
+    {
+        if (!node.TryGetProperty(property, out JsonElement value) ||
+            value.ValueKind != JsonValueKind.String ||
+            !DateOnly.TryParseExact(
+                value.GetString(),
+                "yyyy-MM-dd",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out _))
+        {
+            errors.Add($"{path}: {type}.{property} must be a YYYY-MM-DD date string.");
         }
     }
 

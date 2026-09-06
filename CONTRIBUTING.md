@@ -479,8 +479,8 @@ The supported contract is:
 ---
 title: When ASP.NET Core Authorization Is Enough
 author: Christopher D. Cavell
-published: 2026-08-14
-updated: 2026-08-20
+published: "2026-08-14"
+updated: "2026-08-20"
 summary: Built-in policies and handlers cover more than teams sometimes assume.
 feed: true
 ---
@@ -490,8 +490,8 @@ The fields mean:
 
 - `title` is the canonical article title.
 - `author` is the displayed author and RSS creator attribution.
-- `published` is the original publication date in `YYYY-MM-DD` format.
-- `updated` is optional, must not be earlier than `published`, and should be changed only for a substantive revision, not routine formatting or link maintenance. When present, the feed emits the date as an Atom `atom:updated` timestamp at `00:00:00Z`; RSS `pubDate` continues to represent the original `published` date.
+- `published` is the original publication date in double-quoted `"YYYY-MM-DD"` format so YAML processors preserve it as a string.
+- `updated` is optional, uses the same double-quoted date format, must not be earlier than `published`, and should be changed only for a substantive revision, not routine formatting or link maintenance. When present, the feed emits the date as an Atom `atom:updated` timestamp at `00:00:00Z`; RSS `pubDate` continues to represent the original `published` date.
 - `summary` is the concise article description used by the feed.
 - `feed` controls RSS participation explicitly. Only `feed: true` publishes an item.
 

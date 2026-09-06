@@ -2,7 +2,7 @@
 description: Compare model-visible tool lists, framework tool registration, agent permissions, host-side authorization, and capability-scoped execution, showing which mechanisms influence proposals and which establish execution authority.
 title: Agent and Tool Authorization Models and Host-Owned Execution
 author: Christopher D. Cavell
-published: 2026-08-24
+published: "2026-08-24"
 summary: Tool visibility and agent allowlists can reduce proposal and attack surface, but execution authority depends on where trusted context, credentials, policy, and side-effect ownership actually live.
 feed: true
 ---
