@@ -2,7 +2,7 @@
 description: Compare role-based, claims-based, and capability-based authority and learn when each model is sufficient, where each strains, and how they can be composed.
 title: Role-Based, Claims-Based, and Capability-Based Authorization
 author: Christopher D. Cavell
-published: 2026-08-23
+published: "2026-08-23"
 summary: Roles, claims, and capabilities represent authority differently; choose the smallest model whose trust boundary matches the operation.
 feed: true
 ---

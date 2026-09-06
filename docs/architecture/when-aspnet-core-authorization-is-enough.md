@@ -2,8 +2,8 @@
 description: Learn when ASP.NET Core authorization is sufficient and when a broader governed-execution workflow adds necessary architectural boundaries.
 title: When ASP.NET Core Authorization Is Enough
 author: Christopher D. Cavell
-published: 2026-08-14
-updated: 2026-08-20
+published: "2026-08-14"
+updated: "2026-08-20"
 summary: Built-in policies and handlers cover more than teams sometimes assume.
 feed: true
 ---

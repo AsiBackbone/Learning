@@ -2,7 +2,7 @@
 description: Learn when a simple application structure is enough, what signals justify Application or Domain boundaries, and how to add layers without turning architecture style into doctrine.
 title: Growing Beyond a Simple Application Structure
 author: Christopher D. Cavell
-published: 2026-08-30
+published: "2026-08-30"
 summary: Add application and domain boundaries only when they solve concrete complexity, dependency, testing, or reuse problems.
 feed: true
 ---
