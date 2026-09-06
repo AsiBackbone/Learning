@@ -113,7 +113,7 @@ Authority: May require escalation, but may not convert a denial into an executab
 
 ---
 
-# Part 1 — Define the Overlay Contract
+## Part 1 — Define the Overlay Contract
 
 Create an authority table before you implement composition.
 
@@ -152,7 +152,7 @@ Incidental execution order is not a policy model.
 
 ---
 
-# Part 2 — Model Policy Contributions Explicitly
+## Part 2 — Model Policy Contributions Explicitly
 
 Do not force every policy into a boolean.
 
@@ -188,7 +188,7 @@ The required invariant is:
 
 ---
 
-# Part 3 — Implement or Pseudocode Explicit Composition
+## Part 3 — Implement or Pseudocode Explicit Composition
 
 Separate the responsibilities:
 
@@ -254,7 +254,7 @@ Regional happened to run last.
 
 ---
 
-# Part 4 — Prove Registration Order Does Not Define Authority
+## Part 4 — Prove Registration Order Does Not Define Authority
 
 Evaluate the same logical contribution set in several orders:
 
@@ -286,7 +286,7 @@ Evaluation order may affect latency or diagnostics when deliberate short-circuit
 
 ---
 
-# Part 5 — Preserve Composite Decision Provenance
+## Part 5 — Preserve Composite Decision Provenance
 
 A single `PolicyVersion` value is insufficient once independently versioned authorities participate.
 
@@ -335,7 +335,7 @@ If you record policy fingerprints, describe them precisely. A fingerprint can id
 
 ---
 
-# Part 6 — Complete the Decision Matrix
+## Part 6 — Complete the Decision Matrix
 
 Use your documented overlay contract, not evaluator order.
 
@@ -356,7 +356,7 @@ Do not reduce the matrix to "the strongest enum wins." The final behavior must b
 
 ---
 
-# Part 7 — Handle an Explicit Policy Conflict
+## Part 7 — Handle an Explicit Policy Conflict
 
 Add two required peer authorities:
 
@@ -406,7 +406,7 @@ Executor invocation count = 0
 
 ---
 
-# Part 8 — Handle Missing Regional Policy
+## Part 8 — Handle Missing Regional Policy
 
 Simulate:
 
@@ -451,7 +451,7 @@ Fallback is policy. Treat it as policy.
 
 ---
 
-# Part 9 — Distinguish Missing Tenant Policy From No Tenant Customization
+## Part 9 — Distinguish Missing Tenant Policy From No Tenant Customization
 
 Model two different states.
 
@@ -463,7 +463,7 @@ No tenant customization exists
 Documented tenant-neutral behavior
 ```
 
-### Required tenant policy unavailable
+#### Required tenant policy unavailable
 
 ```text
 Tenant policy should exist
@@ -479,7 +479,7 @@ Your evidence and tests must distinguish intentional absence from unavailable re
 
 ---
 
-# Part 10 — Introduce Policy Drift
+## Part 10 — Introduce Policy Drift
 
 Create a decision under:
 
@@ -515,7 +515,7 @@ For this lab, explain why a required regional-policy change normally forces reev
 
 ---
 
-# Part 11 — Introduce Region and Tenant Drift
+## Part 11 — Introduce Region and Tenant Drift
 
 First change:
 
@@ -573,7 +573,7 @@ Policy set re-resolution required
 
 ---
 
-# Part 12 — Define Reevaluation Rules
+## Part 12 — Define Reevaluation Rules
 
 Complete this table.
 
@@ -595,7 +595,7 @@ Expiration can bound staleness. It cannot prove that policy content, region, ten
 
 ---
 
-# Part 13 — Test Determinism
+## Part 13 — Test Determinism
 
 Add the invariant:
 
@@ -620,7 +620,7 @@ If display order is intentionally preserved for evidence, keep presentation orde
 
 ---
 
-# Part 14 — Prove the Host-Owned Execution Boundary
+## Part 14 — Prove the Host-Owned Execution Boundary
 
 Use a fake or recording export executor.
 
@@ -664,7 +664,7 @@ If acknowledgment or escalation is required, prove those outcomes also stop exec
 
 ---
 
-# Part 15 — Required Invariant Tests
+## Part 15 — Required Invariant Tests
 
 Your solution must include focused tests for these properties:
 
@@ -695,7 +695,7 @@ enterprise-overlay v1
 
 ---
 
-# Part 16 — Keep Technical Enforcement Separate From Legal Compliance
+## Part 16 — Keep Technical Enforcement Separate From Legal Compliance
 
 Regional and jurisdiction-specific policy may encode rules intended to reflect legal, regulatory, contractual, or organizational requirements.
 
@@ -720,7 +720,7 @@ Add one paragraph to your submission explaining that boundary.
 
 ---
 
-# Submission Artifacts
+## Submission Artifacts
 
 A complete submission contains:
 
@@ -736,7 +736,7 @@ A complete submission contains:
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can answer:
 
@@ -766,7 +766,7 @@ You have completed the lab when you can answer:
 
 ---
 
-## Optional Extension — Explicit Delegated Override
+### Optional Extension — Explicit Delegated Override
 
 Add a global **default deny** that may be broadened only through a named exception grant.
 
@@ -812,7 +812,7 @@ The real rule is:
 
 ---
 
-## Related Content
+### Related Content
 
 - [Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md)
 - [Constraint Composition and Policy Precedence](../governance/constraint-composition-and-policy-precedence.md)

@@ -51,7 +51,7 @@ This lab focuses on **consequential business or external side effects**. Operati
 
 ---
 
-# Part 1 — Create the Deliberately Flawed Starting Point
+## Part 1 — Create the Deliberately Flawed Starting Point
 
 Use a disposable scratch directory so that the intentionally failing exercise does not affect the repository's normal sample tests.
 
@@ -195,7 +195,7 @@ The failing test is the evidence you need for the next step.
 
 ---
 
-# Part 2 — Diagnose the Architectural Failure
+## Part 2 — Diagnose the Architectural Failure
 
 Read `DeploymentPolicy.CheckAsync` as if you were reviewing unfamiliar application code.
 
@@ -224,7 +224,7 @@ That responsibility coupling is the defect.
 
 ---
 
-# Part 3 — Reject the Superficial Fix
+## Part 3 — Reject the Superficial Fix
 
 The easiest repair is tempting:
 
@@ -262,7 +262,7 @@ from:
 
 ---
 
-# Part 4 — Refactor to an Explicit Decision Boundary
+## Part 4 — Refactor to an Explicit Decision Boundary
 
 Refactor the exercise under these constraints:
 
@@ -308,7 +308,7 @@ Make the smallest refactor that enforces the responsibility boundary.
 
 ---
 
-# Part 5 — Make the Invariant Observable in Tests
+## Part 5 — Make the Invariant Observable in Tests
 
 After refactoring, preserve the original denied test and add an allowed-path test.
 
@@ -352,7 +352,7 @@ Blocked decision + zero consequential execution
 
 ---
 
-# Part 6 — Inspect for Side-Effect Camouflage
+## Part 6 — Inspect for Side-Effect Camouflage
 
 Now imagine the original external call had been hidden behind a more innocent name:
 
@@ -380,7 +380,7 @@ They are not enforcement boundaries.
 
 ---
 
-# Reference Solution — Read After Attempting the Refactor
+## Reference Solution — Read After Attempting the Refactor
 
 One compact solution is to make the policy observational and let a workflow enforce the transition from decision to execution.
 
@@ -479,7 +479,7 @@ All blocked paths should leave `StartCount` at zero.
 
 ---
 
-# Discussion — Does Evaluation Need to Be Mathematically Pure?
+## Discussion — Does Evaluation Need to Be Mathematically Pure?
 
 Not necessarily.
 
@@ -519,7 +519,7 @@ Governed External Operation Invocations = 0
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can demonstrate all of the following:
 
@@ -548,7 +548,7 @@ Explicit execution boundary
 Host-owned external operation
 ```
 
-## Optional Extension
+### Optional Extension
 
 Add a third decision outcome such as `Deferred`.
 
@@ -568,7 +568,7 @@ Then answer:
 
 ---
 
-## Related Content
+### Related Content
 
 - [Decision Before Execution tutorial](../tutorials/decision-before-execution.md) — review the architectural boundary this lab diagnoses from a different direction.
 - [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md) — compare the corrected sample flow with the flawed starter code in this exercise.

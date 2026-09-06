@@ -94,7 +94,7 @@ You should be able to explain which component decides, which component describes
 
 ---
 
-# Part 1 — Turn a Narrow Decision into Standing Permission
+## Part 1 — Turn a Narrow Decision into Standing Permission
 
 Temporarily replace the capability handoff with a broad flag such as:
 
@@ -120,7 +120,7 @@ Resource: user-999
 
 while keeping the broad approval flag.
 
-## Explain the Failure
+### Explain the Failure
 
 Answer:
 
@@ -138,7 +138,7 @@ The lesson is:
 
 ---
 
-# Part 2 — Break Expiration Enforcement
+## Part 2 — Break Expiration Enforcement
 
 Remove or bypass the validator's expiration check:
 
@@ -170,7 +170,7 @@ The sample intentionally uses an exclusive expiration boundary:
 NowUtc < ExpiresUtc
 ```
 
-## Reason About Clock Skew
+### Reason About Clock Skew
 
 Do not solve clock disagreement by silently extending the capability lifetime.
 
@@ -182,7 +182,7 @@ If you add clock-skew tolerance, make the tolerance explicit and answer:
 
 ---
 
-# Part 3 — Remove Resource-State Binding
+## Part 3 — Remove Resource-State Binding
 
 The sample binds both:
 
@@ -213,7 +213,7 @@ Without a state binding, stale authority may execute
 
 Restore the comparison before continuing.
 
-## Choose a Production-Oriented Binding
+### Choose a Production-Oriented Binding
 
 For a system you know, choose one possible replacement for the sample's integer version:
 
@@ -232,7 +232,7 @@ The objective is to recognize that resource identity and resource freshness are 
 
 ---
 
-# Part 4 — Broaden the Operation or Scope
+## Part 4 — Broaden the Operation or Scope
 
 The sample capability is limited to:
 
@@ -257,7 +257,7 @@ account.reset-password
 account.change-owner
 ```
 
-## Evaluate the Authority Expansion
+### Evaluate the Authority Expansion
 
 Answer:
 
@@ -272,7 +272,7 @@ The capability should grant only what the decision actually justified.
 
 ---
 
-# Part 5 — Move Validation Too Far Upstream
+## Part 5 — Move Validation Too Far Upstream
 
 Create an intentionally weak flow:
 
@@ -304,7 +304,7 @@ The lesson is:
 
 ---
 
-# Part 6 — Add Another Binding Failure
+## Part 6 — Add Another Binding Failure
 
 Choose one capability binding not yet represented by a focused test and add coverage for it.
 
@@ -337,7 +337,7 @@ The architectural contract is that the mismatched authority cannot cross the hos
 
 ---
 
-# Part 7 — Add Single-Use State
+## Part 7 — Add Single-Use State
 
 Before implementing the exercise, use [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) as the canonical explanation of durable replay state, atomic consumption, distributed races, and failure windows. This lab intentionally keeps the implementation local and in-memory.
 
@@ -376,7 +376,7 @@ Add a stable reason code such as:
 capability.already-consumed
 ```
 
-## Identify the Limit
+### Identify the Limit
 
 Now create a **new** in-memory use store and attempt the same capability again.
 
@@ -394,7 +394,7 @@ A production guarantee depends on durable state, concurrency behavior, deploymen
 
 ---
 
-# Part 8 — Preserve Separate Evidence Events
+## Part 8 — Preserve Separate Evidence Events
 
 Add a minimal evidence timeline for:
 
@@ -429,7 +429,7 @@ That is more informative than rewriting the original decision as denied.
 
 ---
 
-# Final Validation
+## Final Validation
 
 Run the sample and test project again.
 
@@ -470,7 +470,7 @@ Standing permission
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can explain why each statement answers a different question:
 
@@ -491,7 +491,7 @@ You should also be able to answer:
 5. Why does validation belong near execution?
 6. What production guarantees are still host-owned?
 
-## Optional Extension — Add Revocation
+### Optional Extension — Add Revocation
 
 Introduce a host-owned revocation store keyed by `CapabilityId`.
 
@@ -511,7 +511,7 @@ Execution blocked
 
 This reinforces the distinction between artifact validity and current operational acceptability.
 
-## Resetting the Sample
+### Resetting the Sample
 
 If you created a temporary branch only for the exercise, inspect your work before discarding it:
 
@@ -530,7 +530,7 @@ Use `git status` first so you understand which local work will be affected.
 
 ---
 
-## Related Content
+### Related Content
 
 - [Scoped Capability and Host-Owned Execution tutorial](../tutorials/scoped-capability-and-host-owned-execution.md) — review the architectural reasoning behind the lab.
 - [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/README.md#scoped-capability-and-host-owned-execution) — return to the executable baseline used by the exercise.

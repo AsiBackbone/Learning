@@ -28,7 +28,7 @@ The central lesson is:
 
 ---
 
-# Scenario — Account Disablement
+## Scenario — Account Disablement
 
 You maintain an internal administration API for a fictional SaaS platform.
 
@@ -67,7 +67,7 @@ Trace the architecture first.
 
 ---
 
-# Part 1 — Read the Starting Workflow Without Fixing It
+## Part 1 — Read the Starting Workflow Without Fixing It
 
 Assume the following code is a reduced teaching sketch of the production design.
 
@@ -411,7 +411,7 @@ Read the flow as a reviewer would.
 
 ---
 
-# Part 2 — Observe Why Happy-Path Tests Are Weak Evidence
+## Part 2 — Observe Why Happy-Path Tests Are Weak Evidence
 
 The current test suite contains tests conceptually similar to these:
 
@@ -481,7 +481,7 @@ from:
 
 ---
 
-# Part 3 — Draw the Actual Authority Flow
+## Part 3 — Draw the Actual Authority Flow
 
 Do not draw the flow the team intended.
 
@@ -534,7 +534,7 @@ For each arrow, record:
 
 ---
 
-# Part 4 — Inventory Every Consequential Execution Path
+## Part 4 — Inventory Every Consequential Execution Path
 
 Find every location from which:
 
@@ -568,7 +568,7 @@ The exercise is to show that a security diagram is incomplete until you compare 
 
 ---
 
-# Part 5 — Mark Caller-Controlled and Host-Authoritative Facts
+## Part 5 — Mark Caller-Controlled and Host-Authoritative Facts
 
 Classify each value.
 
@@ -593,7 +593,7 @@ If yes, identify the trust boundary that should establish or verify that fact.
 
 ---
 
-# Part 6 — Separate Identity, Authorization, Governance, and Execution Authority
+## Part 6 — Separate Identity, Authorization, Governance, and Execution Authority
 
 For the starting design, answer each question independently.
 
@@ -627,7 +627,7 @@ If the starting architecture cannot keep those states distinct, record that as a
 
 ---
 
-# Part 7 — Analyze the AI Boundary
+## Part 7 — Analyze the AI Boundary
 
 Do not begin with the question:
 
@@ -677,7 +677,7 @@ Execution authority
 
 ---
 
-# Part 8 — Analyze Acknowledgment and Escalation
+## Part 8 — Analyze Acknowledgment and Escalation
 
 The starting workflow treats:
 
@@ -717,7 +717,7 @@ If not, describe the authority that should resolve an escalation and what eviden
 
 ---
 
-# Part 9 — Analyze Approval Caching
+## Part 9 — Analyze Approval Caching
 
 The cache key is:
 
@@ -766,7 +766,7 @@ For each change, decide whether the original approval should still influence cur
 
 ---
 
-# Part 10 — Analyze the Standing Administrator Token
+## Part 10 — Analyze the Standing Administrator Token
 
 The workflow requests:
 
@@ -808,7 +808,7 @@ The requirement is narrow current authority, not a particular token format.
 
 ---
 
-# Part 11 — Analyze Replay and the Check-Then-Act Window
+## Part 11 — Analyze Replay and the Check-Then-Act Window
 
 The workflow reads an account snapshot before policy evaluation.
 
@@ -851,7 +851,7 @@ T2 account state changes materially
 T3 old path executes disablement
 ```
 
-### Timeline B — replay/concurrency
+#### Timeline B — replay/concurrency
 
 ```text
 Request A checks approval
@@ -873,7 +873,7 @@ Do not treat all of those controls as interchangeable.
 
 ---
 
-# Part 12 — Analyze Failure Behavior
+## Part 12 — Analyze Failure Behavior
 
 Find every `catch` block and unavailable dependency.
 
@@ -931,7 +931,7 @@ Do not rewrite an execution failure into a historical policy denial merely becau
 
 ---
 
-# Part 13 — Analyze Evidence and Diagnosability
+## Part 13 — Analyze Evidence and Diagnosability
 
 The starting design writes:
 
@@ -976,7 +976,7 @@ Evidence should be sufficient without becoming an uncontrolled data sink.
 
 ---
 
-# Part 14 — Classify Findings by Consequence
+## Part 14 — Classify Findings by Consequence
 
 Create a finding table.
 
@@ -1010,7 +1010,7 @@ Choose the primary consequence and note secondary effects.
 
 ---
 
-# Part 15 — Build Abuse and Failure Cases
+## Part 15 — Build Abuse and Failure Cases
 
 Write at least eight cases before redesigning the system.
 
@@ -1090,7 +1090,7 @@ For each case, record:
 
 ---
 
-# Part 16 — Redesign Around Explicit Stages
+## Part 16 — Redesign Around Explicit Stages
 
 Only after completing the diagnostic work should you redesign the flow.
 
@@ -1139,7 +1139,7 @@ with more than one production execution boundary unless you deliberately model s
 
 ---
 
-# Part 17 — Rebuild Authoritative Context
+## Part 17 — Rebuild Authoritative Context
 
 Define a host-owned context model.
 
@@ -1177,7 +1177,7 @@ Defend the choice.
 
 ---
 
-# Part 18 — Define Explicit Decision Outcomes
+## Part 18 — Define Explicit Decision Outcomes
 
 Choose outcomes that match the workflow.
 
@@ -1235,7 +1235,7 @@ without rewriting history.
 
 ---
 
-# Part 19 — Design Acknowledgment and Escalation Continuations
+## Part 19 — Design Acknowledgment and Escalation Continuations
 
 If acknowledgment is required, define a challenge/evidence pair or equivalent workflow state.
 
@@ -1265,7 +1265,7 @@ Do not let acknowledgment silently act as reviewer authority.
 
 ---
 
-# Part 20 — Design the Final Execution Boundary
+## Part 20 — Design the Final Execution Boundary
 
 Choose one production boundary responsible for invoking:
 
@@ -1309,7 +1309,7 @@ If the external provider only supports a broad administrative credential, record
 
 ---
 
-# Part 21 — Eliminate or Govern Alternate Execution Paths
+## Part 21 — Eliminate or Govern Alternate Execution Paths
 
 The retry endpoint is part of the production attack and failure surface.
 
@@ -1327,7 +1327,7 @@ Re-establish current context and authority
 Single execution boundary
 ```
 
-### Option B — Keep a separate recovery path
+#### Option B — Keep a separate recovery path
 
 If business requirements truly require a distinct recovery path, model it as its own high-consequence operation with:
 
@@ -1355,7 +1355,7 @@ Recovery is not exemption from governance.
 
 ---
 
-# Part 22 — Define Repaired Invariants
+## Part 22 — Define Repaired Invariants
 
 At minimum, your redesigned system must prove these invariants.
 
@@ -1367,7 +1367,7 @@ Decision = Denied
 Executor calls = 0
 ```
 
-### Missing acknowledgment blocks execution
+#### Missing acknowledgment blocks execution
 
 ```text
 Decision = AcknowledgmentRequired
@@ -1377,7 +1377,7 @@ No valid bound acknowledgment
 Executor calls = 0
 ```
 
-### Escalation is not acknowledgment
+#### Escalation is not acknowledgment
 
 ```text
 Decision = EscalationRecommended
@@ -1387,7 +1387,7 @@ Only caller acknowledgment exists
 Executor calls = 0
 ```
 
-### Expired or mismatched authority blocks execution
+#### Expired or mismatched authority blocks execution
 
 ```text
 Authority expired
@@ -1396,7 +1396,7 @@ or actor/resource/operation/audience mismatch
 Executor calls = 0
 ```
 
-### Resource drift invalidates stale authority
+#### Resource drift invalidates stale authority
 
 ```text
 Material resource state changed
@@ -1404,7 +1404,7 @@ Material resource state changed
 Old approval/authority not silently reused
 ```
 
-### Governance dependency failure does not manufacture authority
+#### Governance dependency failure does not manufacture authority
 
 ```text
 Required policy unavailable
@@ -1414,7 +1414,7 @@ No implicit Allow
 Executor calls = 0
 ```
 
-### Replay is bounded
+#### Replay is bounded
 
 ```text
 Single-use authority already consumed
@@ -1422,7 +1422,7 @@ Single-use authority already consumed
 Second execution call = 0
 ```
 
-### AI recommendation cannot broaden authority
+#### AI recommendation cannot broaden authority
 
 ```text
 Policy = Denied
@@ -1432,7 +1432,7 @@ AI = Approve
 Executor calls = 0
 ```
 
-### Alternate endpoint cannot bypass governance
+#### Alternate endpoint cannot bypass governance
 
 ```text
 Retry/recovery entry point
@@ -1442,7 +1442,7 @@ Same required current authority semantics
 No direct standing-token bypass
 ```
 
-### Decision and execution remain distinct
+#### Decision and execution remain distinct
 
 ```text
 Decision = Allowed
@@ -1455,7 +1455,7 @@ Execution = Failed / Unavailable
 
 ---
 
-# Part 23 — Write Focused Tests
+## Part 23 — Write Focused Tests
 
 Your test suite should be adversarial and failure-oriented, not just happy-path oriented.
 
@@ -1487,7 +1487,7 @@ The important property is whether the protected side effect occurred.
 
 ---
 
-# Part 24 — Distinguish Defect Severity From Repair Complexity
+## Part 24 — Distinguish Defect Severity From Repair Complexity
 
 For each finding, record:
 
@@ -1515,7 +1515,7 @@ Do not assume the most complicated control produces the largest safety improveme
 
 ---
 
-# Part 25 — Consider a Simpler Architecture
+## Part 25 — Consider a Simpler Architecture
 
 The repaired flow does not need every advanced governance mechanism merely because this is an advanced lab.
 
@@ -1549,7 +1549,7 @@ If you retain each advanced component, explain the requirement it satisfies.
 
 ---
 
-# Reflection
+## Reflection
 
 Answer all of these after completing the redesign.
 
@@ -1568,7 +1568,7 @@ Answer all of these after completing the redesign.
 
 ---
 
-# Diagnostic Self-Check — Read Only After Your First Pass
+## Diagnostic Self-Check — Read Only After Your First Pass
 
 This section is not intended as a line-by-line answer key.
 
@@ -1602,7 +1602,7 @@ The objective is to identify the defects that materially change trust, authority
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can demonstrate all of the following:
 
@@ -1640,7 +1640,7 @@ What evidence survives?
 
 ---
 
-## Related Content
+### Related Content
 
 - [Decision Before Execution](../tutorials/decision-before-execution.md) — separate the decision from the side effect.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — rebuild policy context from explicit authoritative facts and preserve meaningful outcomes.
