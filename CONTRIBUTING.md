@@ -215,6 +215,17 @@ Do not combine statuses into ad hoc labels such as `General learning material â€
 
 These labels are descriptive, not quality rankings. Canonical does not mean universally correct, Alternative does not mean inferior, Experimental does not mean low quality, and General learning material does not mean unimportant. An alternative does not need to be treated as incorrect merely because it differs from the canonical implementation.
 
+### Page Orientation Metadata
+
+Substantive learning pages should place orientation metadata immediately after the page title in this canonical order:
+
+1. **Learning objective**
+2. **Pattern classification**
+3. **Difficulty**
+4. **Prerequisites**
+
+Write each field as its own bold-labeled paragraph, with a blank line between fields. Use `None` when a page is a suitable starting point, and link directly to prerequisite material when prior reading is expected. Navigation pages, indexes, labs, exercises, or other documents may omit fields that would add no useful guidance.
+
 ### 6. Preserve Project Boundaries
 
 Do not present the Learning repository as:

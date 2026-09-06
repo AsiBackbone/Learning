@@ -4,7 +4,13 @@ description: Learn how upstream intent can pass through regional or tenant polic
 
 # Regional Policy and Operational Gateways
 
+**Learning objective:** Understand how authoritative regional or tenant context, explicit constraints, scoped authority, and gateway validation mediate upstream intent before trusted local execution.
+
 **Pattern classification:** General learning material
+
+**Difficulty:** Advanced
+
+**Prerequisites:** [Regional and Tenant Policy Overlays](regional-and-tenant-policy-overlays.md), [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md), and [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md)
 
 High-level intent should not automatically become edge execution simply because an upstream planner, model, workflow, or global service proposed it.
 

@@ -4,7 +4,13 @@ description: Learn the Accountable Systems Infrastructure framing and how govern
 
 # Accountable Systems Infrastructure and Governed Execution
 
+**Learning objective:** Understand the Accountable Systems Infrastructure framing and how it separates intent, context, decision, acknowledgment, authority, execution, and evidence without assuming every application needs the pattern.
+
 **Pattern classification:** General learning material
+
+**Difficulty:** Beginner
+
+**Prerequisites:** None. [Decision Before Execution](../tutorials/decision-before-execution.md) is a useful next step for applying the framing.
 
 Within the ASI Backbone organization, **ASI** means **Accountable Systems Infrastructure**.
 

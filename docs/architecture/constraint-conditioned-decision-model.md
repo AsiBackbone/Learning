@@ -4,7 +4,13 @@ description: Use a constraint-conditioned decision model to reason about how act
 
 # Constraint-Conditioned Decision Model
 
+**Learning objective:** Use constraint-conditioned narrowing as a conceptual aid for reasoning about how active policy and context turn proposed actions into explicit governed outcomes.
+
 **Pattern classification:** General learning material
+
+**Difficulty:** Intermediate
+
+**Prerequisites:** [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) and [Constraint Composition and Policy Precedence](../governance/constraint-composition-and-policy-precedence.md)
 
 A recurring ASI Backbone teaching idea is that open intent should not become arbitrary action.
 

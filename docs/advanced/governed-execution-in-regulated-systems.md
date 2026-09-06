@@ -4,7 +4,13 @@ description: Learn how governed execution can contribute decision evidence in re
 
 # Governed Execution in Regulated Systems
 
+**Learning objective:** Understand how governed execution can contribute traceable decision and lifecycle evidence in regulated or public-sector systems while keeping compliance interpretation, legal conclusions, and control ownership outside the architecture pattern.
+
 **Pattern classification:** General learning material
+
+**Difficulty:** Advanced
+
+**Prerequisites:** [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md), [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md), and [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md)
 
 Public-sector and regulated systems often need more than proof that an action happened.
 

@@ -4,7 +4,13 @@ description: Follow a stack-neutral accountability pattern from proposed intent 
 
 # Intent to Execution: An Accountability Pattern
 
+**Learning objective:** Trace a consequential operation from proposed intent through authoritative context, explicit decision, optional acknowledgment, scoped authority, host-owned execution, and reconciliation evidence.
+
 **Pattern classification:** General learning material
+
+**Difficulty:** Intermediate
+
+**Prerequisites:** [Decision Before Execution](../tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), and [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
 
 Most systems can answer two questions well:
 

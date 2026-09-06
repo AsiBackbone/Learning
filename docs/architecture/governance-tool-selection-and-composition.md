@@ -4,7 +4,13 @@ description: Compare policy, gateway, agent-governance, authorization, and gover
 
 # Governance Tool Selection and Composition
 
+**Learning objective:** Compare cloud governance, policy and rules engines, agent or tool governance, authorization, and governed execution so each responsibility is assigned to the appropriate boundary.
+
 **Pattern classification:** Alternative Pattern
+
+**Difficulty:** Advanced
+
+**Prerequisites:** [When ASP.NET Core Authorization Is Enough](when-aspnet-core-authorization-is-enough.md), [Policy Engines, Rules Engines, and Distributed Policy Enforcement](policy-engines-rules-engines-and-distributed-policy-enforcement.md), and [Decision Before Execution](../tutorials/decision-before-execution.md)
 
 Governance architecture often becomes confusing because several tools can all appear to answer the question:
 
