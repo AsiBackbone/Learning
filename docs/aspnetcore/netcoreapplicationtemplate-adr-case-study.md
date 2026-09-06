@@ -4,7 +4,7 @@ description: Trace two NetCoreApplicationTemplate ADRs from architectural constr
 
 # Working Repository ADR Case Study: NetCoreApplicationTemplate
 
-**Pattern classification:** Working Repository Walkthrough
+**Pattern classification:** General learning material
 
 **Difficulty:** Intermediate
 

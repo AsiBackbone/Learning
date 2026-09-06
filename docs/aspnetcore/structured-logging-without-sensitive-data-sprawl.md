@@ -4,7 +4,7 @@ description: Design structured ASP.NET Core logging with stable event identity, 
 
 # Structured Logging Without Sensitive-Data Sprawl
 
-**Pattern classification:** General Learning Material
+**Pattern classification:** General learning material
 
 **Difficulty:** Intermediate
 

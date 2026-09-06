@@ -8,7 +8,7 @@ description: Identify a hidden side effect inside validation or policy code, the
 
 **Difficulty:** Beginner  
 
-**Pattern classification:** Canonical pattern  
+**Pattern classification:** Canonical Pattern
 
 **Prerequisites:** Complete the [Decision Before Execution tutorial](../tutorials/decision-before-execution.md). Running the [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md) first is recommended.
 

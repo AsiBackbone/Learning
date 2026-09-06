@@ -8,7 +8,7 @@ description: Diagnose a deliberately misordered ASP.NET Core pipeline, predict b
 
 **Difficulty:** Beginner  
 
-**Pattern classification:** Canonical pattern  
+**Pattern classification:** Canonical Pattern
 
 **Prerequisites:** Complete [Middleware Ordering Changes Behavior](../aspnetcore/middleware-ordering-changes-behavior.md). Run the [Middleware Ordering Changes Behavior sample](https://github.com/AsiBackbone/Learning/blob/main/samples/middleware-ordering-changes-behavior/README.md) before starting the repair exercise.
 
