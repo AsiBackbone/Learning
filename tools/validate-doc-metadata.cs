@@ -292,10 +292,18 @@ static class MetadataValidator
 
         MatchCollection rssLinks = RssAutodiscoveryRegex.Matches(html);
         ExpectCount(page.Path, "RSS autodiscovery link", rssLinks.Count, 1, errors);
-        if (rssLinks.Count == 1 &&
-            !string.Equals(rssLinks[0].Groups["href"].Value, FeedUri.AbsolutePath, StringComparison.Ordinal))
+        if (rssLinks.Count == 1)
         {
-            errors.Add($"{page.Path}: RSS autodiscovery URL must be '{FeedUri.AbsolutePath}'.");
+            // The link is template-relative so the site also previews correctly
+            // from a local server root; resolve it against the page to confirm
+            // it still points at the published feed.
+            string href = rssLinks[0].Groups["href"].Value;
+
+            if (!Uri.TryCreate(new Uri(SiteRoot, page.Path), href, out Uri? resolvedFeedUri) ||
+                !string.Equals(resolvedFeedUri.AbsoluteUri, FeedUri.AbsoluteUri, StringComparison.Ordinal))
+            {
+                errors.Add($"{page.Path}: RSS autodiscovery URL '{href}' must resolve to '{FeedUri.AbsoluteUri}'.");
+            }
         }
 
         MatchCollection openGraphUrls = OpenGraphUrlRegex.Matches(html);

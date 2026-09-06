@@ -10,6 +10,7 @@ on:
       - 'tools/generate-feed.cs'
       - 'tools/generate-sitemap.cs'
       - 'tools/prepare-indexnow.cs'
+      - 'tools/validate-doc-metadata.cs'
       - 'tools/validate-docfx-template-baseline.cs'
       - '.config/dotnet-tools.json'
       - '.github/workflows/publish-docs.yml'
