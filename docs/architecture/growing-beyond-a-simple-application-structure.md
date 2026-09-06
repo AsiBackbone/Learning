@@ -9,7 +9,13 @@ feed: true
 
 # Growing Beyond a Simple Application Structure
 
+**Learning objective:** Decide when a simple application structure remains sufficient, recognize signals that justify Application or Domain boundaries, and add layers only for concrete needs.
+
 **Pattern classification:** General learning material
+
+**Difficulty:** Intermediate
+
+**Prerequisites:** Basic familiarity with ASP.NET Core projects and dependency direction. See [When a Simple Application Service Is Enough](when-a-simple-application-service-is-enough.md) for the simpler starting point.
 
 A small application can be well designed without having many projects.
 
