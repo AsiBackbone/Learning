@@ -140,7 +140,7 @@ Evidence
 
 ---
 
-# Part 1 — Let the Model Define the Tool Surface
+## Part 1 — Let the Model Define the Tool Surface
 
 The baseline host uses a fixed registry containing the narrow semantic operation:
 
@@ -168,7 +168,7 @@ finance.transfer_unlimited
 
 or invent another operation that should not exist in the teaching host.
 
-## Explain the Failure
+### Explain the Failure
 
 Answer:
 
@@ -186,7 +186,7 @@ The lesson is:
 
 ---
 
-# Part 2 — Trust Model-Supplied Security Context
+## Part 2 — Trust Model-Supplied Security Context
 
 The sample deliberately allows a proposal to contain:
 
@@ -221,7 +221,7 @@ classification = internal
 
 Observe whether the external-recipient acknowledgment requirement disappears.
 
-## Explain the Trust Error
+### Explain the Trust Error
 
 Answer:
 
@@ -239,7 +239,7 @@ The lesson is:
 
 ---
 
-# Part 3 — Treat Prompt Text as Enforcement
+## Part 3 — Treat Prompt Text as Enforcement
 
 Imagine the system prompt contains:
 
@@ -269,7 +269,7 @@ If the host no longer checks the destination, what prevents the operation from p
 
 Restore the host-side rule.
 
-## Compare the Two Controls
+### Compare the Two Controls
 
 Document the difference between:
 
@@ -301,7 +301,7 @@ They should not be confused.
 
 ---
 
-# Part 4 — Let the Model Satisfy Acknowledgment
+## Part 4 — Let the Model Satisfy Acknowledgment
 
 The baseline external flow requires a host-owned acknowledgment response associated with the actor.
 
@@ -317,7 +317,7 @@ and the gateway treats that as equivalent to the actor accepting the host challe
 
 Try an external recipient again.
 
-## Explain the Responsibility Collapse
+### Explain the Responsibility Collapse
 
 Answer:
 
@@ -341,7 +341,7 @@ The lesson is:
 
 ---
 
-# Part 5 — Turn Acknowledgment into a Policy Override
+## Part 5 — Turn Acknowledgment into a Policy Override
 
 The baseline flow is:
 
@@ -371,7 +371,7 @@ Denied
 
 Then bypass re-evaluation.
 
-## Explain the Failure
+### Explain the Failure
 
 An acknowledgment can satisfy a specific condition.
 
@@ -391,7 +391,7 @@ The lesson is:
 
 ---
 
-# Part 6 — Broaden the Capability
+## Part 6 — Broaden the Capability
 
 The baseline capability is bound to:
 
@@ -427,7 +427,7 @@ Compare that answer with the original approved action.
 
 Restore narrow bindings.
 
-## Required Experiment — Recipient Substitution
+### Required Experiment — Recipient Substitution
 
 Issue a capability for:
 
@@ -455,7 +455,7 @@ The lesson is:
 
 ---
 
-# Part 7 — Move Capability Validation Away from the Side Effect
+## Part 7 — Move Capability Validation Away from the Side Effect
 
 Create a weak flow:
 
@@ -489,7 +489,7 @@ The lesson is:
 
 ---
 
-# Part 8 — Break Single-Use Enforcement
+## Part 8 — Break Single-Use Enforcement
 
 Use [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) for the canonical distributed-state treatment. The sample's `InMemoryCapabilityUseStore` demonstrates the state transition but does not provide a durable or cross-instance replay guarantee.
 
@@ -507,7 +507,7 @@ The same capability identity should now be able to reach the handler more than o
 
 Restore the use store.
 
-## Identify the Remaining Production Gap
+### Identify the Remaining Production Gap
 
 The in-memory store is intentionally not a production replay guarantee.
 
@@ -534,7 +534,7 @@ Production replay guarantees require host-owned durable atomic state.
 
 ---
 
-# Part 9 — Move Credentials into the Proposal Path
+## Part 9 — Move Credentials into the Proposal Path
 
 The baseline model proposal contains no infrastructure secret.
 
@@ -554,7 +554,7 @@ Do not use a real credential.
 
 Use a fictional placeholder only.
 
-## Evaluate the Expansion
+### Evaluate the Expansion
 
 Answer:
 
@@ -573,7 +573,7 @@ The lesson is:
 
 ---
 
-# Part 10 — Create a Fail-Open Gateway
+## Part 10 — Create a Fail-Open Gateway
 
 The teaching sample uses local deterministic components, so simulate an unavailable governance dependency.
 
@@ -593,7 +593,7 @@ Execute anyway to preserve availability
 
 Run a consequential external proposal.
 
-## Compare Failure Policies
+### Compare Failure Policies
 
 Consider these alternatives:
 
@@ -617,7 +617,7 @@ The lesson is:
 
 ---
 
-# Part 11 — Threat-Model the Complete Gateway
+## Part 11 — Threat-Model the Complete Gateway
 
 Now model the gateway as a set of trust boundaries rather than as one method.
 
@@ -649,11 +649,11 @@ Residual risk
 Failure behavior
 ```
 
-## Minimum Threat Cases
+### Minimum Threat Cases
 
 Your threat model should include at least these cases.
 
-### A. Prompt Injection Influences the Proposal
+#### A. Prompt Injection Influences the Proposal
 
 Example:
 
@@ -669,7 +669,7 @@ Ask:
 - Can it satisfy acknowledgment?
 - Can it access host credentials?
 
-### B. Hallucinated Tool Name
+#### B. Hallucinated Tool Name
 
 Example:
 
@@ -685,7 +685,7 @@ Unknown tool
 Rejected before execution
 ```
 
-### C. Argument Substitution
+#### C. Argument Substitution
 
 Example:
 
@@ -702,7 +702,7 @@ Capability resource mismatch
 No handler invocation
 ```
 
-### D. Stolen Capability
+#### D. Stolen Capability
 
 Assume the capability artifact leaks.
 
@@ -716,7 +716,7 @@ Ask:
 - How many uses?
 - What production proof mechanism is missing from the teaching sample?
 
-### E. Replay
+#### E. Replay
 
 Assume a valid request is captured and retried.
 
@@ -734,7 +734,7 @@ External operation idempotency
 
 A single-use capability does not by itself prove that a remote provider will never perform a duplicate side effect after ambiguous failures.
 
-### F. Audit Sink Failure
+#### F. Audit Sink Failure
 
 Suppose the execution decision is valid but audit persistence fails.
 
@@ -753,7 +753,7 @@ Do not silently assume that logging success is equivalent to governance success.
 
 ---
 
-# Part 12 — Compare a Simpler Architecture
+## Part 12 — Compare a Simpler Architecture
 
 Not every tool needs this entire sequence.
 
@@ -791,7 +791,7 @@ The lesson is:
 
 ---
 
-# Final Validation
+## Final Validation
 
 Restore the baseline implementation and run:
 
@@ -837,7 +837,7 @@ Also confirm:
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can answer:
 
@@ -856,7 +856,7 @@ You have completed the lab when you can answer:
 13. Which threats remain outside the scope of this teaching sample?
 14. When would a simpler architecture be preferable?
 
-## Optional Extension — Add a Second Narrow Tool
+### Optional Extension — Add a Second Narrow Tool
 
 Add a second semantic operation such as:
 
@@ -888,7 +888,7 @@ case.note.create
 
 This reinforces the relationship between tool design and least authority.
 
-## Optional Extension — Simulate Policy Failure
+### Optional Extension — Simulate Policy Failure
 
 Introduce a policy provider abstraction that can return:
 
@@ -907,7 +907,7 @@ Unavailable = Allowed
 
 unless you are deliberately demonstrating a fail-open design and documenting the consequence.
 
-## Optional Extension — Durable Replay Design
+### Optional Extension — Durable Replay Design
 
 Do not implement a production database solely for this lab.
 
@@ -925,7 +925,7 @@ Address:
 
 Then compare that design with the teaching `HashSet`.
 
-## Resetting the Sample
+### Resetting the Sample
 
 Inspect your work before discarding lab changes:
 
@@ -942,7 +942,7 @@ git restore samples/governed-ai-tool-gateway
 
 ---
 
-## Related Content
+### Related Content
 
 - [Governed AI Tool Gateway tutorial](../tutorials/governed-ai-tool-gateway.md) — review the complete architectural reasoning behind the capstone pattern.
 - [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) — return to the executable baseline used by this lab.

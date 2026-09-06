@@ -93,7 +93,7 @@ Before changing code, explain which test represents the intended invariant and w
 
 ---
 
-# Part 1 — Observe the Check-Then-Act Failure
+## Part 1 — Observe the Check-Then-Act Failure
 
 Start with `DeliberatelyUnsafeCheckThenActCapabilityUseStore`.
 
@@ -131,7 +131,7 @@ Observed store count = 1
 Actual accepted executions = 2
 ```
 
-## Explain the Race
+### Explain the Race
 
 Answer:
 
@@ -148,7 +148,7 @@ A good answer has the shape:
 
 ---
 
-# Part 2 — Repair the Consumption Boundary
+## Part 2 — Repair the Consumption Boundary
 
 Create a temporary learner implementation named something like:
 
@@ -206,7 +206,7 @@ Executor invocation count = 1
 
 After your test passes, compare your approach with `AtomicInMemoryCapabilityUseStore`.
 
-## Review the Atomicity Scope
+### Review the Atomicity Scope
 
 State precisely what you proved.
 
@@ -222,7 +222,7 @@ That broader claim requires deployment and persistence evidence you have not yet
 
 ---
 
-# Part 3 — Race for the Final Use of a Bounded Grant
+## Part 3 — Race for the Final Use of a Bounded Grant
 
 Change the scenario to:
 
@@ -252,7 +252,7 @@ The purpose is to show that one-time authority is not a separate mechanism.
 
 It is the smallest bounded-use case.
 
-## Optional Stress Extension
+### Optional Stress Extension
 
 Start a larger number of concurrent consumers against:
 
@@ -268,7 +268,7 @@ Use it only to exercise the implementation more aggressively inside the process.
 
 ---
 
-# Part 4 — Keep Static Validation Separate from Consumption
+## Part 4 — Keep Static Validation Separate from Consumption
 
 Use an expired capability or change one binding such as:
 
@@ -293,7 +293,7 @@ Executor invocation count = 0
 
 Add or extend a test that proves both **no consumption** and **no execution**.
 
-## Explain Why Order Matters
+### Explain Why Order Matters
 
 Suppose the host consumed authority before checking whether the capability targeted the correct resource.
 
@@ -305,7 +305,7 @@ The exact validation sequence can vary by host, but invalid authority should not
 
 ---
 
-# Part 5 — Preserve Evidence for the Rejected Replay
+## Part 5 — Preserve Evidence for the Rejected Replay
 
 Inspect `InMemoryReplayEvidenceSink`.
 
@@ -335,7 +335,7 @@ Execution attempted and failed
 
 Do not add the entire raw authority artifact merely to make debugging easier.
 
-## Correlation Extension
+### Correlation Extension
 
 Optionally add a separate `CorrelationId` to the evidence.
 
@@ -351,7 +351,7 @@ A single broader operation may issue more than one capability, and retries may s
 
 ---
 
-# Part 6 — Exercise Cancellation and Store Failure
+## Part 6 — Exercise Cancellation and Store Failure
 
 The teaching atomic store accepts a cancellation token while waiting for its per-capability gate.
 
@@ -387,7 +387,7 @@ with:
 Executor invocation count = 0
 ```
 
-## Choose a Production Failure Posture
+### Choose a Production Failure Posture
 
 For one replay-sensitive mutation, choose one:
 
@@ -418,7 +418,7 @@ Then answer:
 
 ---
 
-# Part 7 — Observe the Consume-Before-Execute Failure Window
+## Part 7 — Observe the Consume-Before-Execute Failure Window
 
 Run:
 
@@ -457,7 +457,7 @@ The executor may have:
 
 Do not automatically refund a use after an execution exception. Doing so can reopen authority after a side effect that may actually have occurred.
 
-## Design Recovery State
+### Design Recovery State
 
 Sketch a separate operation-state model such as:
 
@@ -475,7 +475,7 @@ Explain which component owns that state.
 
 ---
 
-# Part 8 — Separate Replay Protection from Idempotency
+## Part 8 — Separate Replay Protection from Idempotency
 
 Create two distinct identifiers on paper or in code:
 
@@ -513,7 +513,7 @@ Exactly-once claims
 
 ---
 
-# Part 9 — Design a Durable `TryConsumeAsync`
+## Part 9 — Design a Durable `TryConsumeAsync`
 
 Do not implement a full production database unless you want the extension.
 
@@ -531,7 +531,7 @@ Unique constraint wins once
 Competing insert rejected
 ```
 
-### Conditional Counter Update
+#### Conditional Counter Update
 
 ```text
 UPDATE capability_use
@@ -542,7 +542,7 @@ WHERE capability_id = @id
 
 Then interpret affected-row count as the consume result.
 
-### Serializable / Locked Transaction
+#### Serializable / Locked Transaction
 
 ```text
 Begin transaction
@@ -569,7 +569,7 @@ The persistence abstraction should expose the semantic operation `TryConsumeAsyn
 
 ---
 
-# Part 10 — Test the Boundary You Actually Claim
+## Part 10 — Test the Boundary You Actually Claim
 
 Your final local test suite should include at least:
 
@@ -622,7 +622,7 @@ A process-local unit test cannot prove those distributed properties.
 
 ---
 
-# Final Validation
+## Final Validation
 
 Run the complete sample suite:
 
@@ -667,7 +667,7 @@ Mark used
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can:
 
@@ -685,7 +685,7 @@ You have completed the lab when you can:
 12. Describe what a durable provider must add before stronger production claims are justified.
 13. Avoid claiming exactly-once external execution from successful capability consumption.
 
-## Resetting the Sample
+### Resetting the Sample
 
 If you created a temporary branch only for the exercise, inspect your changes before discarding them:
 
@@ -704,7 +704,7 @@ Use `git status` first so you understand which local work will be affected.
 
 ---
 
-## Related Content
+### Related Content
 
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — canonical explanation of replay state, atomic consumption, failure windows, idempotency, and distributed scope.
 - [Replay Protection and Bounded-Use Authority sample](https://github.com/AsiBackbone/Learning/blob/main/samples/replay-protection-and-bounded-use/README.md) — runnable safe and deliberately unsafe implementations used by this lab.

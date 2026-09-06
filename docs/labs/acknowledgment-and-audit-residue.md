@@ -113,7 +113,7 @@ You should be able to explain which parts represent **policy**, which represent 
 
 ---
 
-# Part 1 — Turn Acknowledgment into a Policy Bypass
+## Part 1 — Turn Acknowledgment into a Policy Bypass
 
 The current sample validates a successful acknowledgment and then reconstructs current context before evaluating policy again.
 
@@ -149,7 +149,7 @@ If the host treats acknowledgment as permission, the executor can be reached eve
 
 The sample's invariant verification should fail rather than silently accepting that behavior.
 
-## Explain the Failure
+### Explain the Failure
 
 Answer:
 
@@ -167,7 +167,7 @@ The lesson is:
 
 ---
 
-# Part 2 — Add Another Binding Failure
+## Part 2 — Add Another Binding Failure
 
 The sample already rejects a response from the wrong actor and an expired challenge.
 
@@ -192,7 +192,7 @@ Reason code: acknowledgment.correlation-mismatch
 
 Run the sample and verify that the executor remains untouched.
 
-## Why Correlation Is Not Just Logging Metadata
+### Why Correlation Is Not Just Logging Metadata
 
 Discuss:
 
@@ -207,7 +207,7 @@ It does not replace actor binding, challenge identity, acknowledgment code, expi
 
 ---
 
-# Part 3 — Expose Replay as a State Problem
+## Part 3 — Expose Replay as a State Problem
 
 The sample validates a response as data, but it intentionally omits durable challenge-consumption state.
 
@@ -223,7 +223,7 @@ That does not mean the validator is incorrect for the current teaching scope.
 
 It demonstrates that replay resistance requires state outside the pure field comparisons.
 
-## Add One-Time Consumption
+### Add One-Time Consumption
 
 Introduce a small in-memory abstraction for challenge consumption.
 
@@ -266,7 +266,7 @@ The store answers whether the acknowledgment challenge may be consumed.
 
 Policy and the host still determine whether execution may occur.
 
-## Reason About Process Restart
+### Reason About Process Restart
 
 Now create a **new** in-memory consumption store and ask:
 
@@ -286,7 +286,7 @@ You do not need a database for this lab. The objective is to identify where pers
 
 ---
 
-# Part 4 — Preserve Audit Residue Behind a Store Boundary
+## Part 4 — Preserve Audit Residue Behind a Store Boundary
 
 The sample currently builds a local `List<AuditResidue>` inside each workflow.
 
@@ -327,7 +327,7 @@ You may still return a timeline from `RunScenario` for easy display.
 
 The important change is that the evidence has an explicit storage boundary.
 
-## Validate the Evidence
+### Validate the Evidence
 
 For the valid acknowledgment scenario, read the stored records by correlation identifier and confirm the expected order:
 
@@ -347,7 +347,7 @@ re-evaluation
 
 and contains no `execution-completed` residue.
 
-## Do Not Overclaim the Store
+### Do Not Overclaim the Store
 
 Answer:
 
@@ -363,7 +363,7 @@ It does not magically create persistence guarantees.
 
 ---
 
-# Part 5 — Separate an Allowed Decision from Execution Failure
+## Part 5 — Separate an Allowed Decision from Execution Failure
 
 The sample currently records:
 
@@ -414,7 +414,7 @@ Do **not** rewrite the prior `Allowed` decision as `Denied` merely because the e
 
 Those events answer different questions.
 
-## Explain the Distinction
+### Explain the Distinction
 
 Answer:
 
@@ -428,7 +428,7 @@ The governed path is a timeline, not a single final sentence.
 
 ---
 
-# Part 6 — Reason About Policy Identity Drift
+## Part 6 — Reason About Policy Identity Drift
 
 The challenge currently carries:
 
@@ -462,13 +462,13 @@ Require the challenge policy identity to match the current policy identity befor
 
 This favors tight binding but may create more user friction during policy deployment.
 
-### Option B — Accept the Acknowledgment, Re-evaluate Under Current Policy
+#### Option B — Accept the Acknowledgment, Re-evaluate Under Current Policy
 
 Treat the acknowledgment as evidence that the actor accepted the condition presented under 3.2, then evaluate the operation under 3.3 before execution.
 
 This preserves the acknowledgment history while allowing current policy to remain authoritative.
 
-### Option C — Risk-Based Choice
+#### Option C — Risk-Based Choice
 
 Allow the policy to determine whether a version change invalidates the challenge based on operation risk or the nature of the policy change.
 
@@ -488,7 +488,7 @@ A single mutable `PolicyVersion` field may no longer be enough if those identiti
 
 ---
 
-# Part 7 — Review the Evidence Surface
+## Part 7 — Review the Evidence Surface
 
 Inspect the final `AuditResidue` model and your in-memory store.
 
@@ -525,7 +525,7 @@ Governance evidence should be useful and intentional, not exhaustive by default.
 
 ---
 
-# Final Validation
+## Final Validation
 
 Run the modified sample and confirm all of the following:
 
@@ -562,7 +562,7 @@ Automatic execution
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can demonstrate and explain this progression:
 
@@ -599,7 +599,7 @@ The operation completed successfully.
 
 A trustworthy governance timeline preserves those distinctions rather than collapsing them into one boolean or one log message.
 
-## Optional Extension — Simulate Restart Boundaries
+### Optional Extension — Simulate Restart Boundaries
 
 Create three separate in-memory stores:
 
@@ -621,7 +621,7 @@ Ask:
 
 This exercise prepares for production-oriented persistence patterns without requiring a database or external service.
 
-## Resetting the Sample
+### Resetting the Sample
 
 If you created a temporary branch only for the exercise, inspect your changes before discarding them:
 
@@ -640,7 +640,7 @@ Use `git status` first so you understand which local work will be affected.
 
 ---
 
-## Related Content
+### Related Content
 
 - [Acknowledgment and Audit Residue tutorial](../tutorials/acknowledgment-and-audit-residue.md) — review the architectural reasoning behind the lab.
 - [Acknowledgment and Audit Residue sample](https://github.com/AsiBackbone/Learning/blob/main/samples/acknowledgment-and-audit-residue/README.md) — return to the executable baseline used by this exercise.

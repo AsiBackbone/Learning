@@ -104,7 +104,7 @@ No real external action should occur during this lab.
 
 ---
 
-# Part 1 — Classify the Operation Before Classifying the Failure
+## Part 1 — Classify the Operation Before Classifying the Failure
 
 Do not begin with:
 
@@ -165,7 +165,7 @@ The point is to make the assumptions that drive degraded-mode behavior visible.
 
 ---
 
-# Part 2 — Separate Dependency Health from Governance Outcome
+## Part 2 — Separate Dependency Health from Governance Outcome
 
 Create a small availability model for the exercise.
 
@@ -223,7 +223,7 @@ It does not answer:
 Should this governed operation execute?
 ```
 
-## Required Exercise
+### Required Exercise
 
 Create a failure-injection seam that can make these dependencies report an explicit state:
 
@@ -243,7 +243,7 @@ Do not add real network dependencies merely to simulate unavailability.
 
 ---
 
-# Part 3 — Preserve "Cannot Determine" as a Real State
+## Part 3 — Preserve "Cannot Determine" as a Real State
 
 Start with the policy provider.
 
@@ -302,7 +302,7 @@ Your choice should depend on the operation and deployment policy.
 
 Do not represent a temporary inability to evaluate as a permanent policy rejection unless that is the intended contract.
 
-## Required Test
+### Required Test
 
 Create a test with this shape:
 
@@ -326,7 +326,7 @@ Use a reason code appropriate to your implementation.
 
 ---
 
-# Part 4 — Design a Bounded Cached-Policy Degraded Mode
+## Part 4 — Design a Bounded Cached-Policy Degraded Mode
 
 Now examine a case where a low-consequence read-only operation may legitimately continue while the primary policy source is unavailable.
 
@@ -369,7 +369,7 @@ The important property is:
 
 > **Degraded-mode authority must be explicit, narrow, and freshness-bounded.**
 
-## Required Experiments
+### Required Experiments
 
 Test all three cases:
 
@@ -410,7 +410,7 @@ Do not make the degraded path indistinguishable from the ordinary healthy path.
 
 ---
 
-# Part 5 — Make Replay-State Failure Non-Permissive When Replay State Is Required
+## Part 5 — Make Replay-State Failure Non-Permissive When Replay State Is Required
 
 Use the [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) tutorial and companion sample as the canonical replay reference.
 
@@ -457,7 +457,7 @@ Queue for later validation
 
 The exact answer is part of the exercise.
 
-## Contrast With an Operation That Does Not Need Replay State
+### Contrast With an Operation That Does Not Need Replay State
 
 For the low-consequence read-only operation, decide whether replay state is relevant at all.
 
@@ -475,7 +475,7 @@ does not mean:
 Every operation must depend on it.
 ```
 
-## Required Test
+### Required Test
 
 Prove:
 
@@ -493,11 +493,11 @@ Prove that the protected side effect boundary was not crossed.
 
 ---
 
-# Part 6 — Separate Signing Failure From Verification Failure
+## Part 6 — Separate Signing Failure From Verification Failure
 
 Signing and verification fail at different stages.
 
-## Signing Provider Unavailable
+### Signing Provider Unavailable
 
 Suppose a valid decision has already been produced but a signed capability is required before authority may cross a trust boundary.
 
@@ -535,7 +535,7 @@ Model that as its own later-stage failure.
 
 A retry may be appropriate after the signing dependency recovers.
 
-## Verification Provider or Trust Anchor Unavailable
+### Verification Provider or Trust Anchor Unavailable
 
 Now simulate a capability arriving at the execution boundary when required verification cannot be completed.
 
@@ -567,7 +567,7 @@ Verified
 
 Do not accept a caller-supplied public key as an emergency trust root.
 
-## Required Tests
+### Required Tests
 
 Add tests that prove:
 
@@ -593,7 +593,7 @@ Also verify that the failure is not reported as an ordinary policy denial unless
 
 ---
 
-# Part 7 — Do Not Treat Missing Acknowledgment State as Satisfied Acknowledgment
+## Part 7 — Do Not Treat Missing Acknowledgment State as Satisfied Acknowledgment
 
 Simulate:
 
@@ -636,7 +636,7 @@ and does not require acknowledgment.
 
 Do not make acknowledgment storage a mandatory dependency for operations whose decision path never required acknowledgment.
 
-## Required Test
+### Required Test
 
 For a path requiring acknowledgment, prove:
 
@@ -652,7 +652,7 @@ No execution
 
 ---
 
-# Part 8 — Distinguish Telemetry Failure From Governance-Evidence Failure
+## Part 8 — Distinguish Telemetry Failure From Governance-Evidence Failure
 
 Simulate two different failures:
 
@@ -684,7 +684,7 @@ Evidence requirement satisfied
 
 A log line is not automatically a durable governance record.
 
-## Design Two Evidence Policies
+### Design Two Evidence Policies
 
 For the low-consequence operation, you may choose something like:
 
@@ -718,7 +718,7 @@ Do not call an in-memory queue a durable buffer.
 
 Do not invent a fallback store whose integrity, retention, or ownership is weaker than the requirement it replaces without documenting that reduction.
 
-## Required Test
+### Required Test
 
 Your test should reflect the policy you chose.
 
@@ -748,7 +748,7 @@ It requires you to make the guarantee visible.
 
 ---
 
-# Part 9 — Keep Executor Failure Separate From Governance Denial
+## Part 9 — Keep Executor Failure Separate From Governance Denial
 
 Now let every governance dependency succeed.
 
@@ -794,7 +794,7 @@ depending on the failure point.
 
 This distinction is critical for recovery.
 
-## Failure Before the External Call
+### Failure Before the External Call
 
 ```text
 Capability validated
@@ -806,7 +806,7 @@ External call never attempted
 
 The host may be able to retry later, subject to fresh policy and authority.
 
-## Failure After the External Call Becomes Ambiguous
+### Failure After the External Call Becomes Ambiguous
 
 ```text
 External call sent
@@ -826,7 +826,7 @@ Side effect did not occur
 
 Use reconciliation, provider idempotency, operation identity, or a new governed recovery path as appropriate.
 
-## Required Test
+### Required Test
 
 Prove that executor unavailability preserves the distinction:
 
@@ -839,7 +839,7 @@ Do not force the failure through the policy engine merely to obtain a `Denied` v
 
 ---
 
-# Part 10 — Build the Scenario Matrix
+## Part 10 — Build the Scenario Matrix
 
 Complete this matrix before finalizing your implementation.
 
@@ -874,7 +874,7 @@ The matrix is the main design artifact of the lab.
 
 ---
 
-# Part 11 — Encode the Failure Policy in Tests
+## Part 11 — Encode the Failure Policy in Tests
 
 Do not leave degraded-mode behavior only in comments or runbooks.
 
@@ -944,7 +944,7 @@ That positive test is important.
 
 Otherwise the system may accidentally become "deny everything during an outage" rather than implementing the degraded mode you intended.
 
-## Test the Boundary, Not Only the Mapper
+### Test the Boundary, Not Only the Mapper
 
 A test that proves only:
 
@@ -966,7 +966,7 @@ The contract is behavioral.
 
 ---
 
-# Part 12 — Add Recovery and Reconciliation
+## Part 12 — Add Recovery and Reconciliation
 
 A degraded-mode policy is incomplete without a return path.
 
@@ -1009,7 +1009,7 @@ Recovery should therefore ask:
 
 ---
 
-# Part 13 — Threat-Model the Fallback Path
+## Part 13 — Threat-Model the Fallback Path
 
 A degraded mode is itself a security-sensitive execution path.
 
@@ -1077,7 +1077,7 @@ Those questions are not interchangeable.
 
 ---
 
-# Final Validation
+## Final Validation
 
 Run the focused gateway tests again:
 
@@ -1126,7 +1126,7 @@ Also confirm:
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can answer:
 
@@ -1155,7 +1155,7 @@ A good result is one where another engineer can inspect the operation profile, d
 
 ---
 
-## Optional Extension — Add a Degraded-Mode Receipt
+### Optional Extension — Add a Degraded-Mode Receipt
 
 Create a small evidence record for any path that continues while a normally used dependency is unavailable.
 
@@ -1184,7 +1184,7 @@ Then answer:
 
 ---
 
-## Optional Extension — Circuit Breaker Versus Governance Policy
+### Optional Extension — Circuit Breaker Versus Governance Policy
 
 Add a simple circuit-breaker state around the simulated policy provider.
 
@@ -1212,7 +1212,7 @@ It does not grant execution authority.
 
 ---
 
-## Resetting the Sample
+### Resetting the Sample
 
 Inspect your changes first:
 
@@ -1231,7 +1231,7 @@ If you added temporary files under the sample directory, remove only the files y
 
 ---
 
-## Related Content
+### Related Content
 
 - [Governed AI Tool Gateway advanced lab](governed-ai-tool-gateway.md) — begin with the broader composed gateway threat model before specializing in failure policy.
 - [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) — use the existing deterministic host-owned execution boundary as the main lab surface.

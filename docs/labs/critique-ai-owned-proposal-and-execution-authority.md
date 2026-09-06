@@ -58,7 +58,7 @@ Your task is to identify which authority-bearing responsibilities must move outs
 
 ---
 
-# Scenario — Autonomous Operations Agent
+## Scenario — Autonomous Operations Agent
 
 A fictional SaaS company has built an internal **Operations Agent**.
 
@@ -121,7 +121,7 @@ Trace the architecture first.
 
 ---
 
-# Part 1 — Inspect the Deliberately Weak Starting Point
+## Part 1 — Inspect the Deliberately Weak Starting Point
 
 Assume the application exposes the following teaching sketch.
 
@@ -261,7 +261,7 @@ Do not repair the code yet.
 
 ---
 
-# Part 2 — Draw the Real Authority Flow
+## Part 2 — Draw the Real Authority Flow
 
 Draw what the code actually permits.
 
@@ -310,7 +310,7 @@ The point is to identify **which model-produced values are being treated as auth
 
 ---
 
-# Part 3 — Inventory the Authorities the Agent Currently Owns
+## Part 3 — Inventory the Authorities the Agent Currently Owns
 
 Complete this table.
 
@@ -354,7 +354,7 @@ If the answer is "none," record that explicitly.
 
 ---
 
-# Part 4 — Separate Convenience From Authority
+## Part 4 — Separate Convenience From Authority
 
 Not every model-owned responsibility is inherently unsafe.
 
@@ -410,7 +410,7 @@ The exercise is to identify **where model autonomy crosses into authority**.
 
 ---
 
-# Part 5 — Explain Why Valid JSON Does Not Mean Valid Execution
+## Part 5 — Explain Why Valid JSON Does Not Mean Valid Execution
 
 Assume the model produces perfectly valid structured output:
 
@@ -464,7 +464,7 @@ Write a short explanation of which stage owns each question.
 
 ---
 
-# Part 6 — Explain Why Prompt Instructions Are Not an Independent Enforcement Boundary
+## Part 6 — Explain Why Prompt Instructions Are Not an Independent Enforcement Boundary
 
 The system instruction says:
 
@@ -511,7 +511,7 @@ The critique is narrower:
 
 ---
 
-# Part 7 — Analyze Prompt Injection and Context Manipulation
+## Part 7 — Analyze Prompt Injection and Context Manipulation
 
 Assume the user says:
 
@@ -553,7 +553,7 @@ Passing a fact to the model does not mean the model becomes the authority that e
 
 ---
 
-# Part 8 — Remove Credentials From the Model Boundary
+## Part 8 — Remove Credentials From the Model Boundary
 
 The starting code includes:
 
@@ -596,7 +596,7 @@ Record residual risk if the provider itself cannot express narrow operation/reso
 
 ---
 
-# Part 9 — Introduce a Host-Owned Tool Registry
+## Part 9 — Introduce a Host-Owned Tool Registry
 
 The starting runtime exposes:
 
@@ -656,7 +656,7 @@ Executor calls = 0
 
 ---
 
-# Part 10 — Add Structural and Semantic Validation
+## Part 10 — Add Structural and Semantic Validation
 
 For each exposed tool, define a typed proposal contract.
 
@@ -700,7 +700,7 @@ Executor calls = 0
 
 ---
 
-# Part 11 — Rebuild Policy Context From Host-Authoritative Facts
+## Part 11 — Rebuild Policy Context From Host-Authoritative Facts
 
 Create a conceptual context model.
 
@@ -750,7 +750,7 @@ If the model-visible explanation still says "the user is an administrator," that
 
 ---
 
-# Part 12 — Introduce Explicit Governance Outcomes
+## Part 12 — Introduce Explicit Governance Outcomes
 
 Do not ask the model to reduce every safety question to:
 
@@ -785,7 +785,7 @@ The exercise is to connect workflow states to real requirements rather than maki
 
 ---
 
-# Part 13 — Keep Acknowledgment and Escalation Outside AI Self-Approval
+## Part 13 — Keep Acknowledgment and Escalation Outside AI Self-Approval
 
 Suppose policy returns:
 
@@ -834,7 +834,7 @@ No execution
 
 ---
 
-# Part 14 — Decide Whether Scoped Authority Is Actually Needed
+## Part 14 — Decide Whether Scoped Authority Is Actually Needed
 
 Do not add a capability token mechanically.
 
@@ -889,7 +889,7 @@ The lesson is:
 
 ---
 
-# Part 15 — Make the Host Own the Protected Side Effect
+## Part 15 — Make the Host Own the Protected Side Effect
 
 Your redesigned flow should have a trusted boundary that decides whether a protected handler may run.
 
@@ -947,7 +947,7 @@ even when both live in the same application process.
 
 ---
 
-# Part 16 — Redesign Retry Behavior
+## Part 16 — Redesign Retry Behavior
 
 The starting architecture retries a failed consequential tool automatically.
 
@@ -985,7 +985,7 @@ Retry does not receive broader authority
 
 ---
 
-# Part 17 — Replace Natural-Language-Only Audit With Decision Provenance
+## Part 17 — Replace Natural-Language-Only Audit With Decision Provenance
 
 The starting system records only:
 
@@ -1039,7 +1039,7 @@ It is not the source of execution authority.
 
 ---
 
-# Part 18 — Threat-Model the Weak and Repaired Architectures
+## Part 18 — Threat-Model the Weak and Repaired Architectures
 
 Create two threat tables.
 
@@ -1059,7 +1059,7 @@ Include at least:
 - policy changes after an earlier reasoning step;
 - external dependency failure creates ambiguous outcome.
 
-### Repaired architecture
+#### Repaired architecture
 
 For each threat, record:
 
@@ -1078,7 +1078,7 @@ A strong result should be able to say:
 
 ---
 
-# Part 19 — Required Invariant Tests
+## Part 19 — Required Invariant Tests
 
 Define focused tests for the repaired design.
 
@@ -1094,7 +1094,7 @@ Registry rejects
 Executor calls = 0
 ```
 
-### Schema-valid policy denial
+#### Schema-valid policy denial
 
 ```text
 Proposal schema valid
@@ -1106,7 +1106,7 @@ host policy = Denied
 Executor calls = 0
 ```
 
-### Host fact beats model claim
+#### Host fact beats model claim
 
 ```text
 Model claims privileged role
@@ -1116,7 +1116,7 @@ host context says ordinary support role
 Policy sees host role
 ```
 
-### Missing acknowledgment
+#### Missing acknowledgment
 
 ```text
 Decision = AcknowledgmentRequired
@@ -1126,7 +1126,7 @@ valid acknowledgment absent
 Executor calls = 0
 ```
 
-### Invalid delegated authority
+#### Invalid delegated authority
 
 ```text
 Authority expired
@@ -1136,7 +1136,7 @@ or wrong resource
 Executor calls = 0
 ```
 
-### AI approval is not authority
+#### AI approval is not authority
 
 ```text
 AI recommends execution
@@ -1146,7 +1146,7 @@ host policy denies
 Executor calls = 0
 ```
 
-### Credential isolation
+#### Credential isolation
 
 ```text
 Model-visible context
@@ -1154,7 +1154,7 @@ Model-visible context
 Contains no provider credential
 ```
 
-### Retry cannot broaden authority
+#### Retry cannot broaden authority
 
 ```text
 First attempt rejected / stale / expired
@@ -1162,7 +1162,7 @@ First attempt rejected / stale / expired
 Retry does not bypass validation or governance
 ```
 
-### Decision and execution remain distinct
+#### Decision and execution remain distinct
 
 ```text
 Decision = Allowed
@@ -1179,7 +1179,7 @@ Do not prove only that an error object was returned.
 
 ---
 
-# Part 20 — Compare Security, Governance, and Operational Controls
+## Part 20 — Compare Security, Governance, and Operational Controls
 
 Classify each control.
 
@@ -1206,7 +1206,7 @@ The point is to explain **what failure each control prevents or makes observable
 
 ---
 
-# Part 21 — Is Direct AI Execution Always Wrong?
+## Part 21 — Is Direct AI Execution Always Wrong?
 
 No.
 
@@ -1228,7 +1228,7 @@ needs the same ceremony as `account.disable`.
 
 Probably not.
 
-### Scenario B — Low-consequence same-process note creation
+#### Scenario B — Low-consequence same-process note creation
 
 The application exposes only:
 
@@ -1249,13 +1249,13 @@ In this design, the runtime may call the tool directly after ordinary checks.
 
 A separate capability service may be disproportionate.
 
-### Scenario C — High-consequence external disablement
+#### Scenario C — High-consequence external disablement
 
 The operation disables a customer account, crosses an external provider boundary, and may require acknowledgment, escalation, or delayed continuation.
 
 The richer boundary is more defensible.
 
-### Scenario D — Trusted agent runtime
+#### Scenario D — Trusted agent runtime
 
 An "agent" framework owns:
 
@@ -1278,7 +1278,7 @@ Enforcement does.
 
 ---
 
-# Part 22 — Design the Minimum Sufficient Architecture
+## Part 22 — Design the Minimum Sufficient Architecture
 
 Choose one of the four tools and design the smallest architecture that preserves the required invariants.
 
@@ -1330,7 +1330,7 @@ If you cannot answer, the component may be unnecessary ceremony.
 
 ---
 
-# Part 23 — Critique the Repaired Architecture Too
+## Part 23 — Critique the Repaired Architecture Too
 
 Do not stop after moving authority out of the model.
 
@@ -1368,7 +1368,7 @@ rather than relying only on model self-restraint.
 
 ---
 
-# Reflection
+## Reflection
 
 Answer all of these.
 
@@ -1396,7 +1396,7 @@ Answer all of these.
 
 ---
 
-# Diagnostic Self-Check — Read After Your First Critique
+## Diagnostic Self-Check — Read After Your First Critique
 
 Use this section only after completing your own authority map.
 
@@ -1424,7 +1424,7 @@ Prioritize the findings that change what the model can cause when it is wrong, m
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can demonstrate:
 
@@ -1457,7 +1457,7 @@ Authority to execute
 
 ---
 
-## Related Content
+### Related Content
 
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — study the canonical model/host boundary before or after critiquing its absence.
 - [Governed AI Tool Gateway lab](governed-ai-tool-gateway.md) — break and repair the existing gateway sample rather than starting from a fully collapsed authority model.

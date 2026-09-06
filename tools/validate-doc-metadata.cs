@@ -41,6 +41,14 @@ static class MetadataValidator
         "<script\\s+type=\\\"application/ld\\+json\\\">(?<json>.*?)</script>",
         RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
 
+    private static readonly Regex MarkdownHeadingRegex = new(
+        @"^ {0,3}(?<marks>#{1,6})[ \t]+\S",
+        RegexOptions.Compiled);
+
+    private static readonly Regex MarkdownFenceRegex = new(
+        @"^ {0,3}(?<marker>`{3,}|~{3,})",
+        RegexOptions.Compiled);
+
     private static readonly ExpectedPage[] RepresentativePages =
     {
         new("index.html", SiteRoot.AbsoluteUri, Article: false),
@@ -93,6 +101,8 @@ static class MetadataValidator
 
         var errors = new List<string>();
 
+        ValidateMarkdownHeadingStructure(repositoryRoot, errors);
+
         string socialImagePath = Path.Combine(outputRoot, "images", "asibackbone-social.png");
         if (!File.Exists(socialImagePath))
         {
@@ -125,6 +135,85 @@ static class MetadataValidator
         }
 
         return 1;
+    }
+
+    private static void ValidateMarkdownHeadingStructure(
+        string repositoryRoot,
+        ICollection<string> errors)
+    {
+        string docsRoot = Path.Combine(repositoryRoot, "docs");
+
+        foreach (string path in Directory.EnumerateFiles(docsRoot, "*.md", SearchOption.AllDirectories))
+        {
+            string relativePath = NormalizePath(Path.GetRelativePath(repositoryRoot, path));
+            if (relativePath.StartsWith("docs/_site/", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            char? fenceMarker = null;
+            int fenceLength = 0;
+            int headingOneCount = 0;
+            int previousHeadingLevel = 0;
+            int lineNumber = 0;
+
+            foreach (string line in File.ReadLines(path))
+            {
+                lineNumber++;
+                Match fence = MarkdownFenceRegex.Match(line);
+
+                if (fence.Success)
+                {
+                    string marker = fence.Groups["marker"].Value;
+
+                    if (fenceMarker is null)
+                    {
+                        fenceMarker = marker[0];
+                        fenceLength = marker.Length;
+                    }
+                    else if (
+                        marker[0] == fenceMarker &&
+                        marker.Length >= fenceLength &&
+                        string.IsNullOrWhiteSpace(line[fence.Length..]))
+                    {
+                        fenceMarker = null;
+                        fenceLength = 0;
+                    }
+
+                    continue;
+                }
+
+                if (fenceMarker is not null)
+                {
+                    continue;
+                }
+
+                Match heading = MarkdownHeadingRegex.Match(line);
+                if (!heading.Success)
+                {
+                    continue;
+                }
+
+                int level = heading.Groups["marks"].Value.Length;
+                if (level == 1)
+                {
+                    headingOneCount++;
+                }
+
+                if (previousHeadingLevel > 0 && level > previousHeadingLevel + 1)
+                {
+                    errors.Add(
+                        $"{relativePath}:{lineNumber}: heading level jumps from H{previousHeadingLevel} to H{level}.");
+                }
+
+                previousHeadingLevel = level;
+            }
+
+            if (headingOneCount != 1)
+            {
+                errors.Add($"{relativePath}: expected exactly one H1 heading, found {headingOneCount}.");
+            }
+        }
     }
 
     private static int ValidateCanonicalUrls(string outputRoot, ICollection<string> errors)
