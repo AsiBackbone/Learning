@@ -14,7 +14,7 @@ For a typo, broken link, or narrow wording fix, the contribution path is intenti
 2. Open a focused pull request describing the correction.
 3. Let the automated checks run:
    - **Documentation Validation (`docs-validation`)** builds the DocFX site with warnings treated as errors.
-   - **Link Validation (`link-validation`)** checks Markdown links for broken or invalid targets.
+   - **Link Validation (`link-validation`)** checks Markdown links for broken or invalid targets, including the `#anchor` part, so renaming a heading also means updating the links that point at it.
    - **Sample Validation (`samples-validation`)** restores, builds, and tests the executable samples; it runs on every pull request.
 4. Address review comments if needed. Once the checks and review are satisfied, the change can be merged.
 
