@@ -1,5 +1,5 @@
 ---
-description: Learn to use threat modeling as architecture reasoning by tracing assets, authority, trust boundaries, abuse paths, mitigations, invariants, and residual risk before implementation choices harden.
+description: Use threat modeling to trace assets, authority, trust boundaries, abuse paths, mitigations, invariants, and residual risk before design choices harden.
 ---
 
 # Threat Modeling as Architecture Reasoning

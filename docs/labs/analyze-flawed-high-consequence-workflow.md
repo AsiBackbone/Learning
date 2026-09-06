@@ -1,5 +1,5 @@
 ---
-description: Diagnose a deliberately flawed high-consequence account-disable workflow by tracing trust, authority, execution, replay, drift, failure, and evidence paths before redesigning it around explicit boundaries.
+description: Diagnose a flawed account-disable workflow across trust, authority, execution, replay, drift, failure, and evidence before redesigning explicit boundaries.
 ---
 
 # Lab — Analyze a Deliberately Flawed High-Consequence Workflow

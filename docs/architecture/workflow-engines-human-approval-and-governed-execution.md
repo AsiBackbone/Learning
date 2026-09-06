@@ -1,5 +1,5 @@
 ---
-description: Compare workflow engines, human approval systems, and governed execution, including where orchestration is sufficient and where policy and scoped execution authority remain separate concerns.
+description: Compare workflow engines, human approval, and governed execution, including where orchestration ends and scoped execution authority begins.
 title: Workflow Engines, Human Approval Systems, and Governed Execution
 author: Christopher D. Cavell
 published: "2026-08-24"

@@ -1,5 +1,5 @@
 ---
-description: Visualize the recommended ASI Backbone Learning progression, optional problem-first entry points, advanced-topic lead-ins, and hands-on reinforcement across tutorials, samples, tests, and labs.
+description: Visualize the recommended Learning progression, problem-first entry points, advanced topics, and hands-on reinforcement across tutorials, samples, and labs.
 ---
 
 # Learning Path Map

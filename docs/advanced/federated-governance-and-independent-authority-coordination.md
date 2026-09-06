@@ -1,5 +1,5 @@
 ---
-description: Learn how independently governed authorities can coordinate one operation without turning policy distribution, network topology, or a shared coordinator into implicit global precedence.
+description: Coordinate independent authorities without turning policy distribution, network topology, or a shared coordinator into implicit global precedence.
 ---
 
 # Federated Governance and Independent Authority Coordination

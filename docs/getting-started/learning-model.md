@@ -1,5 +1,5 @@
 ---
-description: Understand ASI Backbone Learning's problem-first teaching model, the relationship among tutorials, samples, tests, and labs, and how canonical and alternative patterns are presented.
+description: Understand Learning's problem-first model, the roles of tutorials, samples, tests, and labs, and how canonical and alternative patterns are presented.
 ---
 
 # Learning Model

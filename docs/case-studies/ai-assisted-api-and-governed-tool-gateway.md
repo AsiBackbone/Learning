@@ -1,5 +1,5 @@
 ---
-description: Compare a conventional human API request with an AI-proposed tool operation while preserving host-owned validation, governance, scoped authority, execution, credentials, and evidence.
+description: Compare human API requests with AI-proposed operations while preserving validation, governance, scoped authority, credentials, execution, and evidence.
 ---
 
 # AI-Assisted API and Governed Tool Gateway

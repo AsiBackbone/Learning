@@ -1,5 +1,5 @@
 ---
-description: Trace AI-generated proposals through validation, governance, acknowledgment, scoped authority, host-owned execution, and audit evidence without treating telemetry as authorization.
+description: Trace AI proposals through validation, governance, acknowledgment, scoped authority, execution, and audit evidence without treating telemetry as authorization.
 ---
 
 # AI Governance Observability and End-to-End Decision Tracing

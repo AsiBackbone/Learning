@@ -1,5 +1,5 @@
 ---
-description: Compare API gateways, service meshes, zero-trust architecture, and governed execution, including the distinct trust boundaries each protects and how they can be layered.
+description: Compare API gateways, service meshes, zero-trust architecture, and governed execution by the distinct trust boundaries each protects.
 title: API Gateways, Service Meshes, Zero Trust, and Governed Execution
 author: Christopher D. Cavell
 published: "2026-08-24"

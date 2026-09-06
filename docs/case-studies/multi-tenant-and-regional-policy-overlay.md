@@ -1,5 +1,5 @@
 ---
-description: Study a fictional multi-tenant SaaS document export where base, regional, tenant, and operation policy layers compose through explicit authority, precedence, provenance, simulation, and host-owned execution boundaries.
+description: Study a multi-tenant export where base, regional, tenant, and operation policies compose through explicit precedence, provenance, and host-owned execution.
 ---
 
 # Multi-Tenant and Regional Policy Overlay

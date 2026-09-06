@@ -1,5 +1,5 @@
 ---
-description: Learn how to coordinate multi-step AI-proposed workflows while keeping validation, policy, authority, recovery, and execution scoped to each host-controlled step.
+description: Coordinate multi-step AI-proposed workflows while keeping validation, policy, authority, recovery, and execution scoped to each host-controlled step.
 ---
 
 # Governed Multi-Tool Workflows and Recovery Boundaries

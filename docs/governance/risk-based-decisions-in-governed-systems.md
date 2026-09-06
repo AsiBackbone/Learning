@@ -1,5 +1,5 @@
 ---
-description: Learn to use explicit, reviewable risk information as one input to governance decisions without turning a score or model into hidden authorization or execution authority.
+description: Use explicit, reviewable risk information in governance decisions without turning a score or model into hidden authorization or execution authority.
 ---
 
 # Risk-Based Decisions in Governed Systems

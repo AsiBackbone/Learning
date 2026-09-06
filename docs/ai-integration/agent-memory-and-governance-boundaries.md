@@ -1,5 +1,5 @@
 ---
-description: Learn how agent memory can preserve useful context without turning remembered information, prior approvals, stale observations, or model-generated notes into current execution authority.
+description: Preserve useful agent context without turning remembered information, prior approvals, stale observations, or model notes into current execution authority.
 ---
 
 # Agent Memory and Governance Boundaries

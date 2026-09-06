@@ -1,5 +1,5 @@
 ---
-description: Compare model-visible tool lists, framework tool registration, agent permissions, host-side authorization, and capability-scoped execution, showing which mechanisms influence proposals and which establish execution authority.
+description: Compare tool visibility, registration, agent permissions, host authorization, and capability-scoped execution across proposal and authority boundaries.
 title: Agent and Tool Authorization Models and Host-Owned Execution
 author: Christopher D. Cavell
 published: "2026-08-24"

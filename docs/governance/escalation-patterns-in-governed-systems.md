@@ -1,5 +1,5 @@
 ---
-description: Learn to treat escalation as a non-executable governance outcome that transfers a decision problem to another authority while preserving context, provenance, and host-owned execution.
+description: Treat escalation as a non-executable outcome that transfers a decision to another authority while preserving context, provenance, and host-owned execution.
 ---
 
 # Escalation Patterns in Governed Systems

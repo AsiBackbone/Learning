@@ -425,7 +425,7 @@ It is not:
 - An AGI or ASI implementation
 - A robotics controller
 - A replacement for application-specific security review
-- A requirement to use any ASI Backbone package
+- A requirement to use any AsiBackbone package
 - A claim that one architecture is universally correct
 
 Examples are teaching artifacts.

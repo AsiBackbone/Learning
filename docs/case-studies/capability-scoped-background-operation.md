@@ -1,5 +1,5 @@
 ---
-description: Follow a fictional report-generation request across a queue and worker boundary while keeping operation authority narrow, time-bounded, replay-resistant, current, and separate from worker identity or message delivery.
+description: Follow report generation across queue and worker boundaries while keeping authority narrow, time-bounded, replay-resistant, current, and distinct from delivery.
 ---
 
 # Capability-Scoped Background Operation

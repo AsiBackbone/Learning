@@ -1,5 +1,5 @@
 ---
-description: Compare legitimate policy and governance architectures across realistic scenarios, then defend the smallest design that satisfies the required lifecycle, trust boundaries, evidence needs, and failure model.
+description: Compare policy and governance architectures, then defend the smallest design that satisfies its lifecycle, trust boundaries, evidence, and failure model.
 ---
 
 # Lab — Compare Competing Policy Architectures

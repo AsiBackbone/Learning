@@ -1,5 +1,5 @@
 ---
-description: Treat secrets as authority-bearing values and reason about custody, delivery, runtime use, rotation, revocation, compromise, and removal across trust boundaries.
+description: Treat secrets as authority-bearing values across custody, delivery, runtime use, rotation, revocation, compromise, and removal boundaries.
 ---
 
 # Secret Handling Across Trust Boundaries

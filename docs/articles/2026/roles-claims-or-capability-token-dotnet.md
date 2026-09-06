@@ -1,5 +1,5 @@
 ---
-description: A practical .NET architecture guide for choosing among roles, claims/resource authorization, and separately issued capability authority without treating capabilities as a maturity upgrade.
+description: Choose among roles, claims-based resource authorization, and separately issued capabilities without treating capabilities as a maturity upgrade.
 title: Do You Need a Capability Token, or Are Roles and Claims Enough?
 author: Christopher D. Cavell
 published: "2026-09-02"
