@@ -98,6 +98,32 @@ The repository owner and designated maintainers are responsible for:
 
 As the contributor community grows, this model may evolve.
 
+### Bootstrap solo-maintainer operation
+
+The repository currently has one active maintainer, `@cdcavell`. While fewer than
+two active maintainers are available, GitHub review controls should not imply
+independent review that cannot occur in practice.
+
+During this bootstrap posture:
+
+- changes to `main` still require a pull request;
+- stale reviews are dismissed when reviewable content changes;
+- required documentation, link, sample, and CodeQL checks remain blocking;
+- review threads must be resolved;
+- the required approving-review count remains `0`;
+- Code Owner approval and last-push approval remain disabled because both require
+  another reviewer to provide independent approval;
+- the emergency ruleset bypass is repository-specific, limited to `@cdcavell`,
+  and available only through a pull request rather than as a direct-push path.
+
+Required signed commits are also deferred until local Visual Studio commits and
+relevant automation identities are consistently signed and verified without
+turning normal pull requests into bypass-only merges.
+
+The first repository-control change after a second active maintainer is appointed
+should reevaluate required approvals, Code Owner review, last-push approval,
+signed commits, and bypass membership.
+
 Future governance may introduce additional maintainers, reviewers, topic owners, or other shared responsibilities when there is sustained participation and a practical need for them.
 
 ## Decision Making

@@ -33,6 +33,19 @@ These controls create maintenance and static-analysis signals. They do **not** e
 
 Some security controls remain repository- or organization-setting concerns rather than source-controlled workflow concerns. Secret scanning, push protection, Dependabot alerts and security updates, branch/ruleset enforcement, and related hosting controls must be verified in GitHub settings; their state cannot be inferred from committed YAML alone.
 
+The repository-specific desired state and administrator audit/apply procedure are
+documented in [Repository Host Security Controls](docs/security/repository-host-security-controls.md)
+and represented by `eng/repository-controls/main-branch-ruleset.json`.
+
+Audit the live GitHub settings with:
+
+```powershell
+./scripts/Manage-RepositorySecurityControls.ps1
+```
+
+The script is read-only by default. Use `-Apply -WhatIf` before the explicit
+`-Apply` path so repository-host mutations can be reviewed before they are made.
+
 The committed CodeQL workflow is an advanced-setup configuration. If CodeQL default setup is currently enabled for the repository, switch CodeQL to advanced setup so GitHub does not disable the workflow or block its analysis uploads.
 
 For the architectural reasoning behind these distinctions, see [Software Supply-Chain Integrity for .NET Repositories](docs/security/software-supply-chain-integrity-for-dotnet-repositories.md).
