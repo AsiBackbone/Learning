@@ -54,6 +54,7 @@ Current and future material may examine:
 - Failure behavior
 - Degraded-mode operation
 - [Software supply-chain integrity for .NET repositories](software-supply-chain-integrity-for-dotnet-repositories.md)
+- [Repository-host security controls](repository-host-security-controls.md)
 - [Threat modeling as architecture reasoning](threat-modeling-as-architecture-reasoning.md)
 - AI tool-execution risks
 

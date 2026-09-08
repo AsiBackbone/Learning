@@ -1,0 +1,24 @@
+# Repository ownership
+#
+# Learning currently operates with one active maintainer. CODEOWNERS records
+# ownership and review routing without pretending that self-review is independent
+# review. The canonical main-branch ruleset therefore requires a pull request,
+# dismisses stale reviews, requires review-thread resolution and required CI, but
+# does not require Code Owner approval or a positive approval count while the
+# solo-maintainer bootstrap posture applies.
+#
+# Revisit the review-count, Code Owner, last-push, and bypass settings when a
+# second active maintainer is appointed.
+
+* @cdcavell
+
+# Security-sensitive repository automation and host-control manifests
+/.github/ @cdcavell
+/eng/repository-controls/ @cdcavell
+/scripts/ @cdcavell
+
+# Executable teaching samples
+/samples/ @cdcavell
+
+# Published learning material
+/docs/ @cdcavell
