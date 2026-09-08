@@ -2,7 +2,7 @@
 description: Compare role-based, claims-based, and capability-based authority and learn when each model is sufficient, where each strains, and how they can be composed.
 title: Role-Based, Claims-Based, and Capability-Based Authorization
 author: Christopher D. Cavell
-published: 2026-08-23
+published: "2026-08-23"
 summary: Roles, claims, and capabilities represent authority differently; choose the smallest model whose trust boundary matches the operation.
 feed: true
 ---
@@ -16,6 +16,8 @@ feed: true
 **Prerequisites:** [When ASP.NET Core Authorization Is Enough](when-aspnet-core-authorization-is-enough.md) and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 
 > **Terminology note:** This comparison uses `role`, `claim`, `policy`, `scoped capability`, `execution authority`, and `host-owned execution` as architectural terms. See the [Architecture Glossary](glossary.md) and [Terminology and Established Architecture Concepts](terminology-and-established-concepts.md) for the broader vocabulary used throughout Learning.
+
+> **Standalone-reader path:** This page is the deeper semantic comparison. If you want the shorter scenario-driven selection guide—when roles clearly win, when claims/resource authorization clearly win, and when a capability handoff is justified—start with [Do You Need a Capability Token, or Are Roles and Claims Enough?](../articles/2026/roles-claims-or-capability-token-dotnet.md).
 
 Role-based authorization, claims-based authorization, and capability-based authority all help answer questions about what an actor or component may do.
 

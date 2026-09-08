@@ -1,5 +1,5 @@
 ---
-description: Compare governed application deployment and infrastructure-change flows where CI evidence, human approval, scoped authority, credentials, and host-owned execution remain distinct responsibilities.
+description: Compare deployment and infrastructure-change flows that keep CI evidence, human approval, scoped authority, credentials, and execution distinct.
 ---
 
 # Deployment Approval and Infrastructure Change Gates
@@ -192,9 +192,9 @@ For deeper source-to-artifact reasoning, use [Software Supply-Chain Integrity fo
 
 ---
 
-# Variant A — Application Deployment
+## Variant A — Application Deployment
 
-## 4. Build Current Environment Context
+### 4. Build Current Environment Context
 
 Assume the release candidate targets a fictional production environment:
 
@@ -239,7 +239,7 @@ SeparationOfDutiesRequired
 
 A request saying `incidentFreeze=false` is not authoritative merely because it is valid JSON.
 
-### Representative Deployment Policy
+#### Representative Deployment Policy
 
 | Current condition | Outcome | Reason code | Executor call? |
 | --- | --- | --- | --- |
@@ -268,7 +268,7 @@ The exact ordering is illustrative. The requirement is that precedence be explic
 
 ---
 
-## 5. Use a Structured Deployment Decision
+### 5. Use a Structured Deployment Decision
 
 A deployment decision should be machine-readable and reconstructable without making human-facing text the control surface.
 
@@ -301,7 +301,7 @@ The decision records what policy concluded at a point in time. It does not prove
 
 ---
 
-## 6. Bind Human Approval to the Exact Release
+### 6. Bind Human Approval to the Exact Release
 
 When policy requires approval, create a durable review request that identifies exactly what is being reviewed.
 
@@ -362,7 +362,7 @@ A reviewer disposition is evidence for governance. It is not a reusable producti
 
 ---
 
-## 7. Issue Short-Lived Deployment Authority
+### 7. Issue Short-Lived Deployment Authority
 
 Once the current decision permits execution, the host may issue narrow authority for the deployment worker.
 
@@ -414,7 +414,7 @@ A stale or mismatched grant produces zero executor calls.
 
 ---
 
-## 8. Keep Deployment Credentials Executor-Owned
+### 8. Keep Deployment Credentials Executor-Owned
 
 The governance component should not need the credential that can change production.
 
@@ -441,7 +441,7 @@ Long-lived credentials in approval records, policy results, workflow variables, 
 
 ---
 
-## 9. Synthetic Deployment Executor
+### 9. Synthetic Deployment Executor
 
 The protected executor is intentionally fake:
 
@@ -471,9 +471,9 @@ That keeps the lesson on authority transfer and evidence rather than provider co
 
 ---
 
-# Variant B — Infrastructure Change Gate
+## Variant B — Infrastructure Change Gate
 
-## 10. Separate Plan from Apply
+### 10. Separate Plan from Apply
 
 The infrastructure variant begins with a proposed change and a synthetic plan:
 
@@ -509,7 +509,7 @@ A plan can be safely generated in a dry-run stage using only the read privileges
 
 ---
 
-## 11. Evaluate the Plan Against Current Constraints
+### 11. Evaluate the Plan Against Current Constraints
 
 A representative infrastructure context adds host-owned facts:
 
@@ -565,7 +565,7 @@ Re-plan + re-evaluate
 
 ---
 
-## 12. Bind Approval and Apply Authority to the Plan
+### 12. Bind Approval and Apply Authority to the Plan
 
 Infrastructure approval should identify the exact plan rather than a generic statement such as:
 
@@ -623,7 +623,7 @@ If the plan digest or state version changes, the grant is rejected.
 
 ---
 
-## 13. Synthetic Infrastructure Executor
+### 13. Synthetic Infrastructure Executor
 
 The infrastructure executor is also fake:
 
@@ -656,7 +656,7 @@ Dry run is not a hidden path to production authority. It is an observation mode 
 
 ---
 
-## 14. Separation of Duties Is a Policy Property
+### 14. Separation of Duties Is a Policy Property
 
 Separation of duties is stronger when expressed as a review constraint instead of a UI convention.
 
@@ -682,7 +682,7 @@ A workflow engine may coordinate assignment and timing. Governance still owns th
 
 ---
 
-## 15. Correlate the Change Without Turning Evidence into a Secret Store
+### 15. Correlate the Change Without Turning Evidence into a Secret Store
 
 Both variants need reconstructable lineage.
 
@@ -734,9 +734,9 @@ Operational logs may carry a correlation identifier and high-level result code. 
 
 ---
 
-## 16. Four Representative Traces
+### 16. Four Representative Traces
 
-### Trace A — Development Deployment Allowed Without Human Review
+#### Trace A — Development Deployment Allowed Without Human Review
 
 ```text
 Artifact digest verified
@@ -756,7 +756,7 @@ Execution receipt records success
 
 The green build is evidence. The allowed decision is what permits grant issuance.
 
-### Trace B — Production Deployment Waits for Independent Approval
+#### Trace B — Production Deployment Waits for Independent Approval
 
 ```text
 Artifact digest verified
@@ -782,7 +782,7 @@ Synthetic deployment executor calls = 1
 
 Approval is a bound input to continuation, not an unlimited deployment credential.
 
-### Trace C — Approved Artifact Changes Before Deployment
+#### Trace C — Approved Artifact Changes Before Deployment
 
 ```text
 Approval binds artifact digest A
@@ -797,7 +797,7 @@ Synthetic deployment executor calls = 0
 
 The workflow may still say the stage was previously approved. The exact approved artifact no longer matches.
 
-### Trace D — Infrastructure Plan Becomes Stale
+#### Trace D — Infrastructure Plan Becomes Stale
 
 ```text
 Plan P generated against state version 92
@@ -819,7 +819,7 @@ This is the infrastructure equivalent of artifact or environment drift after rev
 
 ---
 
-## 17. Execution Failure Does Not Rewrite the Decision
+### 17. Execution Failure Does Not Rewrite the Decision
 
 A valid decision and valid grant mean that execution **may** be attempted.
 
@@ -855,7 +855,7 @@ Never assume that network failure means no side effect happened.
 
 ---
 
-## 18. Rollback Is Its Own Consequential Operation
+### 18. Rollback Is Its Own Consequential Operation
 
 Operations owns rollback coordination, but rollback authority still needs an explicit boundary.
 
@@ -894,7 +894,7 @@ Emergency or break-glass procedures can exist, but they should be explicit, narr
 
 ---
 
-## 19. Why the Governance Service Should Not Become the Deployment Engine
+### 19. Why the Governance Service Should Not Become the Deployment Engine
 
 It is technically possible to put everything in one service:
 
@@ -928,7 +928,7 @@ The executor can still run in the same product or process when the trust model p
 
 ---
 
-## 20. Failure Modes to Review
+### 20. Failure Modes to Review
 
 | Failure mode | Why it is dangerous | Safer boundary |
 | --- | --- | --- |
@@ -945,11 +945,11 @@ The executor can still run in the same product or process when the trust model p
 
 ---
 
-## 21. Test the Architectural Invariants
+### 21. Test the Architectural Invariants
 
 The highest-value tests verify absence of protected execution on blocked paths.
 
-### Approval Pending Means Zero Deployment Calls
+#### Approval Pending Means Zero Deployment Calls
 
 ```csharp
 DeploymentDecision decision = policy.Evaluate(context);
@@ -960,7 +960,7 @@ Assert.Equal(
 Assert.Equal(0, fakeDeploymentExecutor.Invocations.Count);
 ```
 
-### Changed Artifact Invalidates Approval
+#### Changed Artifact Invalidates Approval
 
 ```csharp
 Assert.NotEqual(
@@ -972,7 +972,7 @@ Assert.False(
 Assert.Equal(0, fakeDeploymentExecutor.Invocations.Count);
 ```
 
-### Stale Plan Means Zero Infrastructure Apply Calls
+#### Stale Plan Means Zero Infrastructure Apply Calls
 
 ```csharp
 Assert.NotEqual(
@@ -997,7 +997,7 @@ Other useful assertions include:
 
 ---
 
-## 22. When a Simpler Delivery Workflow Is Enough
+### 22. When a Simpler Delivery Workflow Is Enough
 
 Not every deployment needs a separate governance layer or custom capability format.
 
@@ -1026,7 +1026,7 @@ Why did execution proceed or stop?
 
 ---
 
-## 23. Review Checklist
+### 23. Review Checklist
 
 Before calling a deployment or infrastructure gate "governed," ask:
 
@@ -1053,7 +1053,7 @@ If several answers are unclear, the problem is usually not that the pipeline nee
 
 ---
 
-## Related Learning
+### Related Learning
 
 - [Human-in-the-Loop Governance Workflows](../governance/human-in-the-loop-governance-workflows.md) — bind delayed reviewer dispositions to exact intents and revalidate before continuation.
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) — preserve policy identity and reason about drift between decision and execution.

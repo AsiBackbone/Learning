@@ -1,5 +1,5 @@
 ---
-description: Practice replaying identical representative policy contexts against baseline and candidate policy versions, comparing decision changes, and preserving a no-execution simulation boundary.
+description: Replay representative policy contexts against baseline and candidate versions, compare decision changes, and preserve a no-execution simulation boundary.
 ---
 
 # Lab — Policy Simulation and Change-Impact Analysis
@@ -150,7 +150,7 @@ Then replace `Program.cs` as you work through the lab.
 
 ---
 
-# Part 1 — Define the Policy Vocabulary
+## Part 1 — Define the Policy Vocabulary
 
 Start with explicit outcomes:
 
@@ -217,7 +217,7 @@ The policy identity is evidence. It is not execution authority.
 
 ---
 
-## Add a Policy Contract
+### Add a Policy Contract
 
 ```csharp
 public interface IAccountDisablePolicy
@@ -235,7 +235,7 @@ A simulator needs evaluation capability. It does not need side-effect capability
 
 ---
 
-# Part 2 — Implement the Baseline Policy
+## Part 2 — Implement the Baseline Policy
 
 ```csharp
 public sealed class BaselinePolicy
@@ -322,7 +322,7 @@ Allowed
 
 ---
 
-# Part 3 — Implement the Candidate Policy
+## Part 3 — Implement the Candidate Policy
 
 Create a candidate that changes only the protected-resource rule:
 
@@ -399,7 +399,7 @@ Use a candidate label such as `2.0-candidate` rather than a production-looking v
 
 ---
 
-# Part 4 — Build Representative Contexts
+## Part 4 — Build Representative Contexts
 
 Use synthetic contexts first:
 
@@ -461,7 +461,7 @@ That is an example of simulation exposing precedence impact rather than only cha
 
 ---
 
-# Part 5 — Build the Simulation Runner
+## Part 5 — Build the Simulation Runner
 
 ```csharp
 public sealed record SimulationComparison(
@@ -498,7 +498,7 @@ The runner does not receive an account executor, HTTP client, queue publisher, d
 
 ---
 
-## Replay Identical Contexts
+### Replay Identical Contexts
 
 The comparison must isolate the policy variable:
 
@@ -516,7 +516,7 @@ Otherwise input drift can be mistaken for policy impact.
 
 ---
 
-# Part 6 — Classify Differences
+## Part 6 — Classify Differences
 
 ```csharp
 public enum ChangeKind
@@ -587,7 +587,7 @@ Do not classify every row as changed merely because baseline and candidate polic
 
 ---
 
-# Part 7 — Produce the Difference Report
+## Part 7 — Produce the Difference Report
 
 ```csharp
 IAccountDisablePolicy baseline =
@@ -642,7 +642,7 @@ Do not translate that into a claim that 30% of future production traffic will ch
 
 ---
 
-## Preserve Reasons and Policy Identities
+### Preserve Reasons and Policy Identities
 
 For changed rows, print:
 
@@ -677,7 +677,7 @@ This is comparison evidence. It does not make the candidate authoritative.
 
 ---
 
-# Part 8 — Distinguish Expected Changes from Regressions
+## Part 8 — Distinguish Expected Changes from Regressions
 
 Create an expected-change plan before judging the candidate:
 
@@ -711,7 +711,7 @@ Unexpected unchanged
 
 ---
 
-## Examine the Surprising Unchanged Case
+### Examine the Surprising Unchanged Case
 
 `protected-maintenance` remains `Deferred` because maintenance precedence is unchanged.
 
@@ -727,7 +727,7 @@ The simulator exposes the behavior. It does not decide which policy is correct.
 
 ---
 
-# Part 9 — Prove Newly Allowed Regression Detection
+## Part 9 — Prove Newly Allowed Regression Detection
 
 Temporarily introduce a candidate bug:
 
@@ -759,7 +759,7 @@ Then repair the candidate.
 
 ---
 
-# Part 10 — Add a Tenant-Specific Candidate Overlay
+## Part 10 — Add a Tenant-Specific Candidate Overlay
 
 Add a candidate tenant rule:
 
@@ -835,7 +835,7 @@ Keep the input fact `IsProtected = true` unchanged. Let the overlay make its own
 
 ---
 
-# Part 11 — Add Boundary Contexts
+## Part 11 — Add Boundary Contexts
 
 Add a candidate threshold:
 
@@ -865,7 +865,7 @@ Which rule wins depends on candidate precedence. Simulation should reveal the be
 
 ---
 
-# Part 12 — Prove Simulation Never Executes
+## Part 12 — Prove Simulation Never Executes
 
 Define a protected executor only as a guard:
 
@@ -925,7 +925,7 @@ Executor invocation count = 0
 
 ---
 
-## Prefer Architectural Non-Reachability
+### Prefer Architectural Non-Reachability
 
 Weaker:
 
@@ -954,7 +954,7 @@ If a production design reuses shared orchestration, add explicit tests proving s
 
 ---
 
-# Part 13 — Preserve Deterministic Simulation Inputs
+## Part 13 — Preserve Deterministic Simulation Inputs
 
 A minimal replay record can be:
 
@@ -977,7 +977,7 @@ Avoid rebuilding historical contexts from current state if the original decision
 
 ---
 
-# Part 14 — Compare Historical and Synthetic Data
+## Part 14 — Compare Historical and Synthetic Data
 
 | Source | Strengths | Limitations |
 | --- | --- | --- |
@@ -998,7 +998,7 @@ It does not prove:
 
 ---
 
-# Part 15 — Treat Simulation Data as Potentially Sensitive
+## Part 15 — Treat Simulation Data as Potentially Sensitive
 
 Historical policy context may contain user, tenant, resource, location, transaction, classification, risk, or security information.
 
@@ -1017,7 +1017,7 @@ A simulation environment can become a secondary sensitive-data store if this is 
 
 ---
 
-# Part 16 — Compare Reason-Code Changes
+## Part 16 — Compare Reason-Code Changes
 
 Temporarily keep the same outcome but change:
 
@@ -1041,7 +1041,7 @@ Ask whether downstream reporting, tests, dashboards, or integrations treat the r
 
 ---
 
-# Part 17 — Preserve Contributor Identity
+## Part 17 — Preserve Contributor Identity
 
 A useful report row can contain:
 
@@ -1070,7 +1070,7 @@ That creates a bridge between simulation and decision provenance.
 
 ---
 
-# Part 18 — Add an Expected-Impact Check
+## Part 18 — Add an Expected-Impact Check
 
 ```csharp
 HashSet<string> expectedChangedCases =
@@ -1091,7 +1091,7 @@ Expected behavior for the corpus is useful evidence. It is not proof of producti
 
 ---
 
-# Part 19 — Connect Simulation to Rollout and Rollback
+## Part 19 — Connect Simulation to Rollout and Rollback
 
 Produce a compact summary:
 
@@ -1140,7 +1140,7 @@ Rollback is also a policy change. You can use the same harness to compare a curr
 
 ---
 
-# Part 20 — Optional Probabilistic Extension
+## Part 20 — Optional Probabilistic Extension
 
 After [Deterministic and Probabilistic Inputs in Policy Evaluation](../governance/deterministic-and-probabilistic-inputs-in-policy-evaluation.md), add a captured signal:
 
@@ -1156,7 +1156,7 @@ Do not call a live model separately for each policy if the objective is to isola
 
 ---
 
-# Part 21 — Write Focused Tests
+## Part 21 — Write Focused Tests
 
 At minimum, verify:
 
@@ -1167,14 +1167,14 @@ Same CaseId
 Same context values
 ```
 
-### Protected Cases Change as Intended
+#### Protected Cases Change as Intended
 
 ```text
 Baseline = AcknowledgmentRequired
 Candidate = EscalationRecommended
 ```
 
-### Maintenance Precedence Is Visible
+#### Maintenance Precedence Is Visible
 
 ```text
 Protected + Maintenance
@@ -1182,14 +1182,14 @@ Baseline = Deferred
 Candidate = Deferred
 ```
 
-### Cross-Tenant Does Not Become Allowed
+#### Cross-Tenant Does Not Become Allowed
 
 ```text
 Baseline = Denied
 Candidate = Denied
 ```
 
-### Newly Allowed Regression Is Detectable
+#### Newly Allowed Regression Is Detectable
 
 The temporary candidate bug returns:
 
@@ -1197,7 +1197,7 @@ The temporary candidate bug returns:
 NewlyAllowed
 ```
 
-### Reason-Only Change Is Detectable
+#### Reason-Only Change Is Detectable
 
 Same outcome, changed reason code:
 
@@ -1205,11 +1205,11 @@ Same outcome, changed reason code:
 ReasonChangedOnly
 ```
 
-### Tenant Overlay Contributor Is Preserved
+#### Tenant Overlay Contributor Is Preserved
 
 Candidate report contains both candidate policy identities.
 
-### Simulation Never Executes
+#### Simulation Never Executes
 
 ```text
 Allowed case exists
@@ -1223,7 +1223,7 @@ Use named expected cases rather than reimplementing policy logic inside the test
 
 ---
 
-# Part 22 — Review False Confidence
+## Part 22 — Review False Confidence
 
 Simulation can look rigorous while still be weak.
 
@@ -1233,19 +1233,19 @@ Examples:
 
 No protected, cross-tenant, maintenance, missing-reason, or boundary cases are included.
 
-### Historical Corpus Has a Blind Spot
+#### Historical Corpus Has a Blind Spot
 
 No tenant-b traffic existed in the replay period, so the tenant overlay is effectively untested.
 
-### Baseline and Candidate Call Different Live Dependencies
+#### Baseline and Candidate Call Different Live Dependencies
 
 Input drift is mistaken for policy impact.
 
-### Historical Context Is Rebuilt from Current Facts
+#### Historical Context Is Rebuilt from Current Facts
 
 The replay no longer represents the historical decision-time state.
 
-### Exact Match Is Treated as Approval
+#### Exact Match Is Treated as Approval
 
 The report matches expectations, so normal review is skipped.
 
@@ -1253,7 +1253,7 @@ Simulation is evidence for a decision. It is not the decision authority.
 
 ---
 
-# Part 23 — Produce the Change-Impact Summary
+## Part 23 — Produce the Change-Impact Summary
 
 Your final summary should include:
 
@@ -1285,7 +1285,7 @@ because maintenance precedence is unchanged.
 
 ---
 
-# Part 24 — Make the Rollout Recommendation
+## Part 24 — Make the Rollout Recommendation
 
 Choose one:
 
@@ -1311,7 +1311,7 @@ A candidate that increases escalation may also change reviewer load, queue depth
 
 ---
 
-## Historical Replay Checklist
+### Historical Replay Checklist
 
 If you repeat the lab with historical data, verify:
 
@@ -1330,7 +1330,7 @@ If you repeat the lab with historical data, verify:
 
 ---
 
-## Candidate Policy Review Checklist
+### Candidate Policy Review Checklist
 
 Before recommending rollout, ask:
 
@@ -1359,7 +1359,7 @@ If several answers are unclear, run additional simulation or revise the candidat
 
 ---
 
-## What Simulation Does Not Prove
+### What Simulation Does Not Prove
 
 Policy simulation does not automatically prove:
 
@@ -1383,7 +1383,7 @@ The lab makes a narrower claim:
 
 ---
 
-## Working Implementation References
+### Working Implementation References
 
 This lab is framework-neutral.
 
@@ -1400,7 +1400,7 @@ Learning does not require a particular simulation service, policy-management pro
 
 ---
 
-## Related Content
+### Related Content
 
 - [Practical Policy Testing and Decision-Table Strategies](../governance/practical-policy-testing-and-decision-table-strategies.md) — establish current-policy expectations, equivalence classes, boundary cases, and execution invariants before comparing policy versions.
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) — preserve baseline, candidate, and contributing policy identities in comparison evidence.

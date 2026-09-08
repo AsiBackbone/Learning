@@ -1,5 +1,5 @@
 ---
-description: Study realistic, simulated reference architectures that compose multiple ASI Backbone Learning boundaries without prescribing a production framework or package design.
+description: Study simulated reference architectures that compose multiple Learning boundaries without prescribing a production framework or package design.
 ---
 
 # Reference Architecture Case Studies

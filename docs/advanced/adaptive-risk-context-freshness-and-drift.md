@@ -1,5 +1,5 @@
 ---
-description: Learn how changing risk observations, model versions, thresholds, and context trigger explicit reevaluation without turning risk signals into authorization or execution authority.
+description: Use changing risk observations, model versions, thresholds, and context to trigger reevaluation without turning risk signals into execution authority.
 ---
 
 # Adaptive Risk Context, Freshness, and Drift

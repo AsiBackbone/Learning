@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -9,6 +10,8 @@ return MetadataValidator.Run();
 
 static class MetadataValidator
 {
+    private const int MaximumDescriptionLength = 160;
+
     private static readonly Uri SiteRoot = new("https://asibackbone.github.io/Learning/");
     private static readonly Uri FeedUri = new(SiteRoot, "feed.xml");
     private static readonly Uri SocialImageUri = new(SiteRoot, "images/asibackbone-social.png");
@@ -40,6 +43,38 @@ static class MetadataValidator
     private static readonly Regex JsonLdRegex = new(
         "<script\\s+type=\\\"application/ld\\+json\\\">(?<json>.*?)</script>",
         RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
+
+    private static readonly Regex MarkdownHeadingRegex = new(
+        @"^ {0,3}(?<marks>#{1,6})[ \t]+\S",
+        RegexOptions.Compiled);
+
+    private static readonly Regex MarkdownFenceRegex = new(
+        @"^ {0,3}(?<marker>`{3,}|~{3,})",
+        RegexOptions.Compiled);
+
+    private static readonly Regex PatternClassificationRegex = new(
+        @"^\*\*Pattern classification:\*\*[ \t]+(?<value>.*?)[ \t]*$",
+        RegexOptions.Compiled);
+
+    private static readonly Regex PublicationDateFrontMatterRegex = new(
+        @"^(?<key>published|updated):[ \t]*(?<value>.*?)[ \t]*$",
+        RegexOptions.Compiled);
+
+    private static readonly Regex DescriptionFrontMatterRegex = new(
+        @"^description:[ \t]*(?<value>.*?)[ \t]*$",
+        RegexOptions.Compiled);
+
+    private static readonly Regex QuotedPublicationDateRegex = new(
+        "^\"(?<date>\\d{4}-\\d{2}-\\d{2})\"$",
+        RegexOptions.Compiled);
+
+    private static readonly HashSet<string> AllowedPatternClassifications = new(StringComparer.Ordinal)
+    {
+        "Canonical Pattern",
+        "Alternative Pattern",
+        "Experimental",
+        "General learning material"
+    };
 
     private static readonly ExpectedPage[] RepresentativePages =
     {
@@ -93,6 +128,8 @@ static class MetadataValidator
 
         var errors = new List<string>();
 
+        ValidateMarkdownSourceStructure(repositoryRoot, errors);
+
         string socialImagePath = Path.Combine(outputRoot, "images", "asibackbone-social.png");
         if (!File.Exists(socialImagePath))
         {
@@ -125,6 +162,176 @@ static class MetadataValidator
         }
 
         return 1;
+    }
+
+    private static void ValidateMarkdownSourceStructure(
+        string repositoryRoot,
+        ICollection<string> errors)
+    {
+        string docsRoot = Path.Combine(repositoryRoot, "docs");
+        string communityRoot = Path.Combine(repositoryRoot, "community");
+        IEnumerable<string> markdownPaths = Directory
+            .EnumerateFiles(docsRoot, "*.md", SearchOption.AllDirectories)
+            .Concat(Directory.EnumerateFiles(communityRoot, "*.md", SearchOption.AllDirectories))
+            .Append(Path.Combine(repositoryRoot, "ROADMAP.md"));
+
+        foreach (string path in markdownPaths)
+        {
+            string relativePath = NormalizePath(Path.GetRelativePath(repositoryRoot, path));
+            if (relativePath.StartsWith("docs/_site/", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            char? fenceMarker = null;
+            int fenceLength = 0;
+            int headingOneCount = 0;
+            int previousHeadingLevel = 0;
+            int lineNumber = 0;
+            bool inFrontMatter = false;
+
+            foreach (string line in File.ReadLines(path))
+            {
+                lineNumber++;
+
+                if (lineNumber == 1 && string.Equals(line.Trim(), "---", StringComparison.Ordinal))
+                {
+                    inFrontMatter = true;
+                    continue;
+                }
+
+                if (inFrontMatter)
+                {
+                    if (string.Equals(line.Trim(), "---", StringComparison.Ordinal))
+                    {
+                        inFrontMatter = false;
+                        continue;
+                    }
+
+                    ValidatePublicationDateFrontMatter(relativePath, lineNumber, line, errors);
+                    ValidateDescriptionFrontMatter(relativePath, lineNumber, line, errors);
+                    continue;
+                }
+
+                Match fence = MarkdownFenceRegex.Match(line);
+
+                if (fence.Success)
+                {
+                    string marker = fence.Groups["marker"].Value;
+
+                    if (fenceMarker is null)
+                    {
+                        fenceMarker = marker[0];
+                        fenceLength = marker.Length;
+                    }
+                    else if (
+                        marker[0] == fenceMarker &&
+                        marker.Length >= fenceLength &&
+                        string.IsNullOrWhiteSpace(line[fence.Length..]))
+                    {
+                        fenceMarker = null;
+                        fenceLength = 0;
+                    }
+
+                    continue;
+                }
+
+                if (fenceMarker is not null)
+                {
+                    continue;
+                }
+
+                Match classification = PatternClassificationRegex.Match(line);
+                if (
+                    classification.Success &&
+                    !AllowedPatternClassifications.Contains(classification.Groups["value"].Value))
+                {
+                    errors.Add(
+                        $"{relativePath}:{lineNumber}: pattern classification " +
+                        $"'{classification.Groups["value"].Value}' is not an allowed value.");
+                }
+
+                Match heading = MarkdownHeadingRegex.Match(line);
+                if (!heading.Success)
+                {
+                    continue;
+                }
+
+                int level = heading.Groups["marks"].Value.Length;
+                if (level == 1)
+                {
+                    headingOneCount++;
+                }
+
+                if (previousHeadingLevel > 0 && level > previousHeadingLevel + 1)
+                {
+                    errors.Add(
+                        $"{relativePath}:{lineNumber}: heading level jumps from H{previousHeadingLevel} to H{level}.");
+                }
+
+                previousHeadingLevel = level;
+            }
+
+            if (headingOneCount != 1)
+            {
+                errors.Add($"{relativePath}: expected exactly one H1 heading, found {headingOneCount}.");
+            }
+        }
+    }
+
+    private static void ValidateDescriptionFrontMatter(
+        string relativePath,
+        int lineNumber,
+        string line,
+        ICollection<string> errors)
+    {
+        Match metadata = DescriptionFrontMatterRegex.Match(line);
+        if (!metadata.Success)
+        {
+            return;
+        }
+
+        string description = metadata.Groups["value"].Value;
+        if (description.Length >= 2 &&
+            ((description[0] == '"' && description[^1] == '"') ||
+             (description[0] == '\'' && description[^1] == '\'')))
+        {
+            description = description[1..^1];
+        }
+
+        if (description.Length > MaximumDescriptionLength)
+        {
+            errors.Add(
+                $"{relativePath}:{lineNumber}: description is {description.Length} characters; " +
+                $"the maximum is {MaximumDescriptionLength}.");
+        }
+    }
+
+    private static void ValidatePublicationDateFrontMatter(
+        string relativePath,
+        int lineNumber,
+        string line,
+        ICollection<string> errors)
+    {
+        Match metadata = PublicationDateFrontMatterRegex.Match(line);
+        if (!metadata.Success)
+        {
+            return;
+        }
+
+        string key = metadata.Groups["key"].Value;
+        Match quotedDate = QuotedPublicationDateRegex.Match(metadata.Groups["value"].Value);
+        if (!quotedDate.Success ||
+            !DateOnly.TryParseExact(
+                quotedDate.Groups["date"].Value,
+                "yyyy-MM-dd",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out _))
+        {
+            errors.Add(
+                $"{relativePath}:{lineNumber}: '{key}' must be a double-quoted YYYY-MM-DD date.");
+        }
     }
 
     private static int ValidateCanonicalUrls(string outputRoot, ICollection<string> errors)
@@ -181,10 +388,18 @@ static class MetadataValidator
 
         MatchCollection rssLinks = RssAutodiscoveryRegex.Matches(html);
         ExpectCount(page.Path, "RSS autodiscovery link", rssLinks.Count, 1, errors);
-        if (rssLinks.Count == 1 &&
-            !string.Equals(rssLinks[0].Groups["href"].Value, FeedUri.AbsolutePath, StringComparison.Ordinal))
+        if (rssLinks.Count == 1)
         {
-            errors.Add($"{page.Path}: RSS autodiscovery URL must be '{FeedUri.AbsolutePath}'.");
+            // The link is template-relative so the site also previews correctly
+            // from a local server root; resolve it against the page to confirm
+            // it still points at the published feed.
+            string href = rssLinks[0].Groups["href"].Value;
+
+            if (!Uri.TryCreate(new Uri(SiteRoot, page.Path), href, out Uri? resolvedFeedUri) ||
+                !string.Equals(resolvedFeedUri.AbsoluteUri, FeedUri.AbsoluteUri, StringComparison.Ordinal))
+            {
+                errors.Add($"{page.Path}: RSS autodiscovery URL '{href}' must resolve to '{FeedUri.AbsoluteUri}'.");
+            }
         }
 
         MatchCollection openGraphUrls = OpenGraphUrlRegex.Matches(html);
@@ -291,7 +506,7 @@ static class MetadataValidator
 
         ExpectProperty(page.Path, article, "Article", "url", page.CanonicalUrl, errors);
         ExpectNonEmptyProperty(page.Path, article.Value, "Article", "headline", errors);
-        ExpectNonEmptyProperty(page.Path, article.Value, "Article", "datePublished", errors);
+        ExpectIsoDateProperty(page.Path, article.Value, "Article", "datePublished", errors);
 
         if (!article.Value.TryGetProperty("author", out JsonElement author) ||
             (author.ValueKind != JsonValueKind.Object && author.ValueKind != JsonValueKind.Array))
@@ -349,6 +564,26 @@ static class MetadataValidator
             string.IsNullOrWhiteSpace(value.GetString()))
         {
             errors.Add($"{path}: {type}.{property} must be a non-empty string.");
+        }
+    }
+
+    private static void ExpectIsoDateProperty(
+        string path,
+        JsonElement node,
+        string type,
+        string property,
+        ICollection<string> errors)
+    {
+        if (!node.TryGetProperty(property, out JsonElement value) ||
+            value.ValueKind != JsonValueKind.String ||
+            !DateOnly.TryParseExact(
+                value.GetString(),
+                "yyyy-MM-dd",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out _))
+        {
+            errors.Add($"{path}: {type}.{property} must be a YYYY-MM-DD date string.");
         }
     }
 

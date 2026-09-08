@@ -1,5 +1,5 @@
 {{!Licensed to the .NET Foundation under one or more agreements. The .NET Foundation licenses this file to you under the MIT license.}}
-{{!This file is based on the DocFX modern template v2.78.5. It is overridden only because that template does not expose a head partial; keep it aligned when the pinned DocFX version changes.}}
+{{!This file is based on the DocFX modern template v2.78.5. It is overridden because that template does not expose a head partial and because the footer needs a template-relative feed link; keep it aligned when the pinned DocFX version changes.}}
 {{!include(/^public/.*/)}}
 {{!include(favicon.ico)}}
 {{!include(logo.svg)}}
@@ -42,7 +42,7 @@
       {{#_socialImageAlt}}<meta name="twitter:image:alt" content="{{_socialImageAlt}}">{{/_socialImageAlt}}
       {{#_structuredDataJson}}<script type="application/ld+json">{{{_structuredDataJson}}}</script>{{/_structuredDataJson}}
       <link rel="icon" href="{{_rel}}{{{_appFaviconPath}}}{{^_appFaviconPath}}favicon.ico{{/_appFaviconPath}}">
-      <link rel="alternate" type="application/rss+xml" title="ASI Backbone Learning" href="/Learning/feed.xml">
+      <link rel="alternate" type="application/rss+xml" title="ASI Backbone Learning" href="{{_rel}}feed.xml">
       <link rel="stylesheet" href="{{_rel}}public/docfx.min.css">
       <link rel="stylesheet" href="{{_rel}}public/main.css">
       <meta name="docfx:navrel" content="{{_navRel}}">
@@ -177,7 +177,7 @@
     <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
-          {{{_appFooter}}}{{^_appFooter}}<span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>{{/_appFooter}}
+          <span>ASI Backbone Learning · <a href="{{_rel}}feed.xml">Subscribe via RSS</a> · Made with <a href="https://dotnet.github.io/docfx">DocFX</a></span>
         </div>
       </div>
     </footer>

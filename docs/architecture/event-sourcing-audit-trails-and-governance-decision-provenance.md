@@ -1,8 +1,8 @@
 ---
-description: Compare operational logs, traditional audit trails, governance decision receipts, and event sourcing, showing how diagnostic history, accountability evidence, authority provenance, and state reconstruction solve different problems.
+description: Compare logs, audit trails, governance receipts, and event sourcing across diagnostics, accountability, authority provenance, and state reconstruction.
 title: Event Sourcing, Audit Trails, and Governance Decision Provenance
 author: Christopher D. Cavell
-published: 2026-08-24
+published: "2026-08-24"
 summary: Event sourcing makes domain events the source of application state; governance evidence explains why authority was granted, denied, deferred, acknowledged, or exercised.
 feed: true
 ---

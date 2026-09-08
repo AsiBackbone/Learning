@@ -1,5 +1,5 @@
 ---
-description: Follow a fictional account-disable request through standing authorization, authoritative context, policy evaluation, acknowledgment or escalation, scoped authority, host-owned execution, and correlated evidence.
+description: Follow an account-disable request through authorization, trusted context, policy, acknowledgment, scoped authority, execution, and correlated evidence.
 ---
 
 # Governed Administrative Operation

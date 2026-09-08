@@ -117,7 +117,7 @@ GovernanceDecision does not
 
 ---
 
-# Part 1 — Preserve a Decision Without Policy Evidence
+## Part 1 — Preserve a Decision Without Policy Evidence
 
 Create a small record representing evidence that might survive after the in-memory context is gone:
 
@@ -155,7 +155,7 @@ It does not necessarily identify the complete policy artifact that produced it.
 
 ---
 
-# Part 2 — Add Stable Policy Identity
+## Part 2 — Add Stable Policy Identity
 
 Introduce a small policy-evidence model:
 
@@ -236,7 +236,7 @@ Current version written onto old decision
 
 The second path rewrites history.
 
-## Verify the Binding
+### Verify the Binding
 
 Add a focused verification that confirms the record contains:
 
@@ -257,7 +257,7 @@ Which workflow did the decision belong to?
 
 ---
 
-# Part 3 — Change Policy After the Decision
+## Part 3 — Change Policy After the Decision
 
 Now create the changed-policy scenario required by this lab.
 
@@ -299,13 +299,13 @@ It is also:
 Is authority created under 2.0 still acceptable under 2.1?
 ```
 
-## Choose an Execution-Freshness Rule
+### Choose an Execution-Freshness Rule
 
 There is no universal rule for every system.
 
 Choose and document one of these approaches.
 
-### Option A — Exact Version Match
+#### Option A — Exact Version Match
 
 ```text
 Decision policy version
@@ -317,7 +317,7 @@ A mismatch blocks execution and requires re-evaluation.
 
 This is simple and conservative, but frequent policy deployments can invalidate otherwise harmless in-flight work.
 
-### Option B — Explicit Compatibility
+#### Option B — Explicit Compatibility
 
 A policy deployment can declare that authority created under selected prior versions remains compatible.
 
@@ -330,7 +330,7 @@ Compatible decision versions = [2.0, 2.1]
 
 This reduces unnecessary retries but introduces a new governed artifact: the compatibility rule itself.
 
-### Option C — Risk-Based Freshness
+#### Option C — Risk-Based Freshness
 
 Low-risk operations may tolerate a compatible older decision while high-risk operations require exact current-policy evaluation.
 
@@ -356,7 +356,7 @@ Execute automatically
 
 ---
 
-# Part 4 — Carry Policy Evidence Across Acknowledgment
+## Part 4 — Carry Policy Evidence Across Acknowledgment
 
 Now extend the reasoning beyond the initial decision.
 
@@ -407,7 +407,7 @@ The operation is now being evaluated under policy 2.1.
 
 Those facts may legitimately differ.
 
-## Reason About Stale Acknowledgment
+### Reason About Stale Acknowledgment
 
 Choose and defend one behavior:
 
@@ -421,7 +421,7 @@ A valid acknowledgment can satisfy a specific requirement without freezing all p
 
 ---
 
-# Part 5 — Bind Capability Issuance to Decision Evidence
+## Part 5 — Bind Capability Issuance to Decision Evidence
 
 Now consider a later stage:
 
@@ -469,7 +469,7 @@ This distinction matters when policy can change faster than the capability lifet
 
 ---
 
-# Part 6 — Correlate Policy Evidence with Audit Residue
+## Part 6 — Correlate Policy Evidence with Audit Residue
 
 Create a small audit record for the changed-policy execution attempt.
 
@@ -514,7 +514,7 @@ Decision B created under 2.1
 
 That is more informative than overwriting Decision A with current-state information.
 
-## Reproducibility Is Not Perfect Replay
+### Reproducibility Is Not Perfect Replay
 
 Policy evidence improves later interpretation, but it does not automatically recreate the entire historical decision environment.
 
@@ -540,7 +540,7 @@ unless the required historical artifacts are actually preserved.
 
 ---
 
-# Part 7 — Add a Policy Fingerprint Without Overclaiming It
+## Part 7 — Add a Policy Fingerprint Without Overclaiming It
 
 A version string is useful, but a team may also want a compact fingerprint of the policy artifact that was evaluated.
 
@@ -569,7 +569,7 @@ Store the result in `PolicyFingerprint`.
 
 Then change one character in the canonical representation and confirm that the fingerprint changes.
 
-## State the Boundary Precisely
+### State the Boundary Precisely
 
 A recorded digest can help answer:
 
@@ -598,7 +598,7 @@ Those controls are intentionally outside this lab.
 
 ---
 
-# Part 8 — Minimize the Evidence Surface
+## Part 8 — Minimize the Evidence Surface
 
 It is easy to react to audit requirements by copying everything into every decision record.
 
@@ -629,7 +629,7 @@ Avoid copying unrelated sensitive material such as:
 
 Policy provenance should make a decision easier to interpret without turning the decision record into an unnecessary duplicate of every input and artifact.
 
-## Retention Questions
+### Retention Questions
 
 Answer:
 
@@ -643,7 +643,7 @@ Data minimization is part of governance design, not an obstacle to it.
 
 ---
 
-# Final Validation
+## Final Validation
 
 Run the modified sample and confirm all of the following:
 
@@ -682,7 +682,7 @@ Current execution automatically permitted
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can explain the difference between each of these statements:
 
@@ -720,7 +720,7 @@ The goal is not to preserve every historical byte inside every decision.
 
 The goal is to preserve enough stable provenance that a later system or reviewer can understand which policy produced the decision and make an explicit choice when that policy is no longer current.
 
-## Optional Extension — Model a Compatible Rollout
+### Optional Extension — Model a Compatible Rollout
 
 Add a tiny compatibility function:
 
@@ -757,7 +757,7 @@ Then answer:
 
 This extension exposes an important recursive point: once policy compatibility affects execution, **the compatibility rule is itself governance policy** and needs its own ownership and evidence model.
 
-## Resetting the Sample
+### Resetting the Sample
 
 If you created a temporary branch only for the exercise, inspect your changes before discarding them:
 
@@ -776,7 +776,7 @@ Use `git status` first so you understand which local work will be affected.
 
 ---
 
-## Related Content
+### Related Content
 
 - [Policy Versioning and Decision Provenance tutorial](../governance/policy-versioning-and-decision-provenance.md) — review the conceptual model this lab puts into practice, including stable policy identity, drift, freshness, fingerprints, and evidence boundaries.
 - [Policy Context and Explicit Decision Outcomes tutorial](../tutorials/policy-context-and-explicit-decision-outcomes.md) — review explicit decision inputs, outputs, reason codes, and policy identity.

@@ -41,12 +41,20 @@ jobs:
         with:
           persist-credentials: false
 
+      # Documentation links to this repository are written as absolute
+      # github.com URLs so they work on GitHub, on the published DocFX site, and
+      # in a local clone. Checking them live would validate main rather than the
+      # revision under test, so a pull request that adds a file or directory
+      # would fail until it is merged. Both remaps resolve those links against
+      # the checked-out tree instead: blob/main for files, tree/main for
+      # directories.
       - name: Validate Markdown links
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           args: >-
             --root-dir "${{ github.workspace }}"
             --remap "^https://github\.com/AsiBackbone/Learning/blob/main file://${{ github.workspace }}"
+            --remap "^https://github\.com/AsiBackbone/Learning/tree/main file://${{ github.workspace }}"
             './**/*.md'
           token: ${{ secrets.GITHUB_TOKEN }}
           fail: true

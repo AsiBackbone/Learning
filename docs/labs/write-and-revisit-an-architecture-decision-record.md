@@ -40,7 +40,7 @@ In the second stage, the environment changes and you decide what should happen t
 
 ---
 
-# Part 1 — Scenario: Operational Logging for Harbor API
+## Part 1 — Scenario: Operational Logging for Harbor API
 
 You maintain a fictional ASP.NET Core service called **Harbor API**.
 
@@ -50,7 +50,7 @@ The current application uses `ILogger<T>`, but most events are effectively human
 
 The team agrees that logging now requires an architectural decision rather than another local formatting change.
 
-## Current Constraints
+### Current Constraints
 
 Treat the following as facts for the first stage:
 
@@ -71,7 +71,7 @@ If you believe another fact is necessary, record it as an assumption rather than
 
 ---
 
-# Part 2 — Identify the Architectural Decision
+## Part 2 — Identify the Architectural Decision
 
 Before comparing products or packages, write one sentence that describes the decision the team actually needs to make.
 
@@ -100,13 +100,13 @@ Your decision scope should be broad enough that at least two reasonable implemen
 
 ---
 
-# Part 3 — Compare Credible Alternatives
+## Part 3 — Compare Credible Alternatives
 
 Evaluate at least **two** reasonable alternatives.
 
 You may use the following three, replace one, or add another option if you can explain it.
 
-## Alternative A — `ILogger<T>` with Built-In Structured Console Output
+### Alternative A — `ILogger<T>` with Built-In Structured Console Output
 
 Application code continues to use `ILogger<T>`.
 
@@ -125,7 +125,7 @@ Possible costs:
 - The platform ingestion path becomes important to production usefulness.
 - Teams may need conventions for event identity, scopes, correlation, and property naming.
 
-## Alternative B — `ILogger<T>` with Serilog as the Host Logging Provider
+### Alternative B — `ILogger<T>` with Serilog as the Host Logging Provider
 
 Application code continues to use `ILogger<T>` while the host integrates Serilog and owns provider configuration.
 
@@ -141,7 +141,7 @@ Possible costs:
 - Sink choices can increase operational coupling and patch surface.
 - The team must avoid treating provider capabilities as permission to log more data than necessary.
 
-## Alternative C — `ILogger<T>` with OpenTelemetry Log Export
+### Alternative C — `ILogger<T>` with OpenTelemetry Log Export
 
 Application code continues to use `ILogger<T>` while the host configures OpenTelemetry logging export to a collector or compatible backend.
 
@@ -157,7 +157,7 @@ Possible costs:
 - Local development can become less convenient if the design assumes external telemetry infrastructure.
 - The team must still design stable, minimized events; OpenTelemetry does not solve event quality automatically.
 
-## Build a Decision Matrix
+### Build a Decision Matrix
 
 Use a table like this in your notes:
 
@@ -177,7 +177,7 @@ A numeric total should not decide the architecture automatically.
 
 The purpose of the matrix is to make the tradeoffs visible.
 
-### Required Reasoning
+#### Required Reasoning
 
 For each alternative you seriously consider, write:
 
@@ -190,7 +190,7 @@ Do not include an obviously unsuitable option only to make your preferred choice
 
 ---
 
-# Part 4 — Select an Approach
+## Part 4 — Select an Approach
 
 Choose one alternative.
 
@@ -230,7 +230,7 @@ The evidence matters more than the brand name.
 
 ---
 
-# Part 5 — Write the Initial ADR
+## Part 5 — Write the Initial ADR
 
 Write a concise ADR for your decision.
 
@@ -277,7 +277,7 @@ The exact heading order is not important.
 
 The reasoning is.
 
-## Context Requirements
+### Context Requirements
 
 Your context should preserve at least these categories:
 
@@ -301,7 +301,7 @@ Stronger:
 
 The stronger version leaves room to evaluate multiple answers.
 
-## Consequence Requirements
+### Consequence Requirements
 
 Record both positive and negative consequences.
 
@@ -318,7 +318,7 @@ Examples include:
 - migration cost;
 - local-development divergence.
 
-## Review-Condition Requirements
+### Review-Condition Requirements
 
 Write at least **three** review conditions.
 
@@ -341,7 +341,7 @@ A date can prompt a review, but it does not explain what architectural assumptio
 
 ---
 
-# Part 6 — Validate the Initial ADR
+## Part 6 — Validate the Initial ADR
 
 Before reading the second-stage change, review your ADR using this rubric.
 
@@ -362,7 +362,7 @@ Formatting, heading names, sentence length, and ADR numbering are not part of th
 
 ---
 
-# Part 7 — Stage Two: Conditions Change
+## Part 7 — Stage Two: Conditions Change
 
 Six months later, the organization changes its telemetry platform.
 
@@ -385,7 +385,7 @@ The answer depends partly on what your original ADR actually decided.
 
 ---
 
-# Part 8 — Identify What Actually Changed
+## Part 8 — Identify What Actually Changed
 
 Re-read your initial ADR before choosing a lifecycle action.
 
@@ -412,7 +412,7 @@ That last question is especially important.
 
 ---
 
-# Part 9 — Choose the Lifecycle Outcome
+## Part 9 — Choose the Lifecycle Outcome
 
 Choose one of these outcomes and defend it:
 
@@ -428,7 +428,7 @@ Make an implementation/configuration change without changing the ADR
 
 The labels are not interchangeable.
 
-## Retain
+### Retain
 
 Retain the ADR when the decision still fits the changed conditions.
 
@@ -436,7 +436,7 @@ A review can conclude that the original direction remains appropriate.
 
 You may record a review note or related pull request without creating a replacement ADR.
 
-## Deprecate
+### Deprecate
 
 Deprecate when a recorded decision is being retired and there is no direct replacement architectural decision.
 
@@ -444,7 +444,7 @@ For example, a separate ADR that authorized **production rolling-file logs** mig
 
 Do not use `Deprecated` merely as a softer word for `Superseded`.
 
-## Supersede
+### Supersede
 
 Supersede when a later ADR replaces the architectural direction.
 
@@ -456,7 +456,7 @@ and the team now adopts a materially different provider or transport strategy fo
 
 Preserve the old context and link the records.
 
-## Implementation or Configuration Change Only
+### Implementation or Configuration Change Only
 
 A provider or exporter change does not automatically require a new ADR.
 
@@ -472,11 +472,11 @@ It is respecting the scope of the original decision.
 
 ---
 
-# Part 10 — Produce the Stage-Two Artifact
+## Part 10 — Produce the Stage-Two Artifact
 
 Create the artifact appropriate to your chosen lifecycle outcome.
 
-## If You Retain the ADR
+### If You Retain the ADR
 
 Write a short review note containing:
 
@@ -490,7 +490,7 @@ Date or related issue/PR reference if your repository uses one
 
 Do not rewrite the original context as if the collector existed when the ADR was first accepted.
 
-## If You Deprecate the ADR
+### If You Deprecate the ADR
 
 Record:
 
@@ -503,7 +503,7 @@ Related issue or implementation reference
 
 Preserve the original decision and context.
 
-## If You Supersede the ADR
+### If You Supersede the ADR
 
 Write a short replacement ADR containing:
 
@@ -525,7 +525,7 @@ Status: Superseded by ADR-NNNN
 
 Do not replace the old context with the new context.
 
-## If the Change Is Implementation-Only
+### If the Change Is Implementation-Only
 
 Write a short implementation note or pull-request rationale explaining:
 
@@ -554,7 +554,7 @@ record was never updated
 
 ---
 
-# Part 11 — Discussion: Several Answers Can Be Correct
+## Part 11 — Discussion: Several Answers Can Be Correct
 
 The second-stage facts do not create one universal answer because your original ADR may have been scoped differently.
 
@@ -577,7 +577,7 @@ It is:
 
 ---
 
-# Part 12 — Example Initial ADR
+## Part 12 — Example Initial ADR
 
 The following is one defensible answer for the first-stage scenario.
 
@@ -651,7 +651,7 @@ It records why the smaller dependency surface won **under the original condition
 
 ---
 
-# Part 13 — Example Stage-Two Review
+## Part 13 — Example Stage-Two Review
 
 For the example ADR above, the managed OpenTelemetry platform fires one of the explicit review conditions.
 
@@ -692,7 +692,7 @@ The lab therefore validates lifecycle reasoning against **your actual original d
 
 ---
 
-# Part 14 — Architecture-Reasoning Rubric
+## Part 14 — Architecture-Reasoning Rubric
 
 Use this rubric to evaluate your completed work.
 
@@ -720,7 +720,7 @@ That is intentional.
 
 ---
 
-# Part 15 — Compare with a Working Repository
+## Part 15 — Compare with a Working Repository
 
 After completing your own ADR and lifecycle review, inspect the ADR material in `AsiBackbone/NetCoreApplicationTemplate`:
 
@@ -744,7 +744,7 @@ The working repository is a specimen, not the answer key.
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can demonstrate all of the following:
 
@@ -779,7 +779,7 @@ recoverable context
 
 ---
 
-## Optional Extension — Write the Superseding ADR
+### Optional Extension — Write the Superseding ADR
 
 If your stage-two answer did not require supersession, create a hypothetical third-stage condition that **would** invalidate the architectural direction you selected.
 
@@ -802,7 +802,7 @@ The exercise is complete only if the old ADR still explains why the earlier desi
 
 ---
 
-## Related Content
+### Related Content
 
 - [Architecture Decision Records Preserve Architectural Reasoning](../aspnetcore/architecture-decision-records-preserve-architectural-reasoning.md)
 - [Architecture Decision Record Lifecycle, Review, Deprecation, and Supersession](../aspnetcore/architecture-decision-record-lifecycle-review-deprecation-and-supersession.md)

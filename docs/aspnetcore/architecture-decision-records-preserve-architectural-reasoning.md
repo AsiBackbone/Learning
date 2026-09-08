@@ -4,7 +4,7 @@ description: Learn when an architectural decision deserves an ADR and how to pre
 
 # Architecture Decision Records Preserve Architectural Reasoning
 
-**Pattern classification:** General Learning Material
+**Pattern classification:** General learning material
 
 **Difficulty:** Beginner
 

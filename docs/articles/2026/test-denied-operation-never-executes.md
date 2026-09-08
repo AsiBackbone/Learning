@@ -1,5 +1,5 @@
 ---
-description: A practical .NET testing article on proving that blocked decisions stop before repositories, external APIs, event publishers, or other protected side effects execute.
+description: Prove with .NET tests that blocked decisions stop before repositories, external APIs, event publishers, or other protected side effects execute.
 title: How to Test That a Denied Operation Never Executes
 author: Christopher D. Cavell
 published: "2026-08-26"
@@ -60,7 +60,7 @@ Protected executor invocation count = 0
 
 In this article, **protected operation** means the consequential state change or externally visible action that must not occur on a blocked path. **Executor** is the example host-owned boundary used to reach that operation; some systems will have several protected boundaries instead of one executor method.
 
-This article uses ordinary C# and xUnit-style tests. No ASI Backbone package is required.
+This article uses ordinary C# and xUnit-style tests. No AsiBackbone package is required.
 
 A minimal decision model for the examples is:
 

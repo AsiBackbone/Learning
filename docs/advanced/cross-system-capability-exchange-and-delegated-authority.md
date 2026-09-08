@@ -1,5 +1,5 @@
 ---
-description: Learn how independently operated systems can exchange narrow delegated authority without turning signatures, token possession, or sender trust into implicit recipient authorization.
+description: Exchange narrow delegated authority between independent systems without treating signatures, token possession, or sender trust as recipient authorization.
 ---
 
 # Cross-System Capability Exchange and Delegated Authority

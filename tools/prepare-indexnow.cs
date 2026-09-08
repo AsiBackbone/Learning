@@ -339,11 +339,27 @@ static class IndexNowPreparation
         }
         finally
         {
-            if (Directory.Exists(temporaryRoot))
+            DeleteTemporaryDirectory(temporaryRoot);
+        }
+    }
+
+    private static void DeleteTemporaryDirectory(string path)
+    {
+        if (!Directory.Exists(path))
+        {
+            return;
+        }
+
+        foreach (string filePath in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
+        {
+            FileAttributes attributes = File.GetAttributes(filePath);
+            if ((attributes & FileAttributes.ReadOnly) != 0)
             {
-                Directory.Delete(temporaryRoot, recursive: true);
+                File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
             }
         }
+
+        Directory.Delete(path, recursive: true);
     }
 
     private static bool InitializeSyntheticRepository(

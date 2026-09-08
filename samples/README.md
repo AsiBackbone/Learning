@@ -571,6 +571,36 @@ Focused tests cover wrong audience, expiry, resource drift, request substitution
 
 The proof and presenter bindings are deliberately simulated. The sample does not claim production cryptography, proof-of-possession, distributed replay guarantees, or exactly-once external execution.
 
+### Durable Decision Ledger and Audit Chain
+
+Related advanced learning material:
+
+[Durable Decision Ledgers and Cryptographic Audit Chains](../docs/advanced/durable-decision-ledgers-and-cryptographic-audit-chains.md)
+
+Executable companion:
+
+[Durable Decision Ledger and Audit Chain sample](durable-decision-ledger-audit-chain/README.md)
+
+The sample uses an in-memory append store to isolate deterministic canonicalization, idempotent append semantics, predecessor linkage, streaming verification, and independently retained checkpoint behavior.
+
+Its central evidence boundary is:
+
+```text
+Governance receipts
+        ↓
+Canonical record fingerprints
+        ↓
+Predecessor-linked local chain
+        ↓
+Independent checkpoint expectation
+        ↓
+Integrity and completeness results
+```
+
+Focused tests cover stable canonical bytes and fingerprints, concurrent append ordering, idempotent retry, mutation and reorder detection, truncated-tail handling, checkpoint comparison, resumed verification, unsupported format claims, invalid canonical input, alternate internally valid histories, and streaming verification.
+
+The sample uses process-local memory and simulated checkpoint custody. It does not claim durable append-only storage, production cryptography, cross-verifier consistency, immutable history, or current execution authority.
+
 ## ASP.NET Core Architecture Samples
 
 The sample area also supports focused ASP.NET Core architecture lessons beyond the five foundational governance tutorials.

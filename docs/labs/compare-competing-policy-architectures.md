@@ -1,5 +1,5 @@
 ---
-description: Compare legitimate policy and governance architectures across realistic scenarios, then defend the smallest design that satisfies the required lifecycle, trust boundaries, evidence needs, and failure model.
+description: Compare policy and governance architectures, then defend the smallest design that satisfies its lifecycle, trust boundaries, evidence, and failure model.
 ---
 
 # Lab — Compare Competing Policy Architectures
@@ -8,7 +8,7 @@ description: Compare legitimate policy and governance architectures across reali
 
 **Difficulty:** Advanced
 
-**Pattern classification:** Comparison of multiple approaches
+**Pattern classification:** General learning material
 
 **Prerequisites:** Recommended — [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md), [Policy Engines, Rules Engines, and Distributed Policy Enforcement](../architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md), [Constraint Composition and Policy Precedence](../governance/constraint-composition-and-policy-precedence.md), [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md), and [Safe Degraded Mode and Fail-Safe Governance](safe-degraded-mode-and-fail-safe-governance.md). [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) is especially useful for Scenario C.
 
@@ -240,13 +240,13 @@ Use it when the lifecycle actually requires those responsibilities.
 
 ---
 
-# Part 1 — Build the Comparison Lens Before Reading the Scenarios
+## Part 1 — Build the Comparison Lens Before Reading the Scenarios
 
 Do not start by choosing a favorite tool.
 
 Create a worksheet with these decision dimensions.
 
-## Problem Shape
+### Problem Shape
 
 Ask:
 
@@ -256,7 +256,7 @@ Ask:
 - Is the primary problem distributed enforcement?
 - Is the primary problem a consequential multi-stage lifecycle?
 
-## Policy Ownership and Change Control
+### Policy Ownership and Change Control
 
 Ask:
 
@@ -270,7 +270,7 @@ Ask:
 
 Policy authorship and release cadence are often sharper architecture discriminators than the policy language itself.
 
-## Decision Lifecycle
+### Decision Lifecycle
 
 Record whether the system needs:
 
@@ -291,7 +291,7 @@ Then ask:
 - Does execution happen later or in another host?
 - Must approval be transformed into narrower execution authority?
 
-## Trust Boundaries
+### Trust Boundaries
 
 Identify who owns:
 
@@ -308,7 +308,7 @@ Identify who owns:
 
 Do not treat caller-provided facts as authoritative merely because a policy engine accepts them.
 
-## Operational Constraints
+### Operational Constraints
 
 Record:
 
@@ -326,7 +326,7 @@ Record:
 - Migration cost.
 - Vendor or tool coupling.
 
-## Failure Model
+### Failure Model
 
 Ask what should happen when:
 
@@ -346,7 +346,7 @@ A circuit breaker state is not a governance decision.
 
 Fallback behavior is part of the architecture.
 
-## Evidence Requirements
+### Evidence Requirements
 
 Decide what must survive to reconstruct an important decision.
 
@@ -381,7 +381,7 @@ Treat evidence as a budget, not a trophy list. Every retained field should answe
 
 ---
 
-# Part 2 — Complete the Incomplete Decision Matrix
+## Part 2 — Complete the Incomplete Decision Matrix
 
 Start with this matrix.
 
@@ -432,7 +432,7 @@ A score of `8` versus `7` does not decide a trust boundary.
 
 ---
 
-# Part 3 — Scenario A: One ASP.NET Core Application, Ordinary Access Control
+## Part 3 — Scenario A: One ASP.NET Core Application, Ordinary Access Control
 
 You maintain **Harbor Admin**, one ASP.NET Core application used by internal operators.
 
@@ -457,7 +457,7 @@ Treat these as facts:
 10. A policy failure in Harbor Admin must not become a shared dependency outage for unrelated applications; no shared policy runtime exists today.
 11. Current compliance needs are satisfied by normal security and operational logs. If you introduce a separate durable governance receipt, justify the reconstruction question that requires it.
 
-## Your Task
+### Your Task
 
 Choose the primary architecture for Scenario A.
 
@@ -471,7 +471,7 @@ Also explain whether embedded domain rules could still exist beside authorizatio
 
 If you conclude that no deferred state or portable execution capability is needed, derive that conclusion from the workflow and trust boundaries rather than from an explicit "not required" fact.
 
-### Failure Prompt
+#### Failure Prompt
 
 Choose the failure that most influenced your architecture decision.
 
@@ -490,7 +490,7 @@ Do not collapse those states unnecessarily.
 
 ---
 
-# Part 4 — Scenario B: Shared Policy Across Independently Deployed Services
+## Part 4 — Scenario B: Shared Policy Across Independently Deployed Services
 
 You maintain a platform with these independently deployed components:
 
@@ -538,7 +538,7 @@ Then resolve this deliberate collision explicitly:
 
 There is no hidden universal answer. The point is to make revocation knowledge, artifact freshness, and partition behavior one coherent contract rather than three independent settings.
 
-## Your Task
+### Your Task
 
 Choose one primary architecture and one deployment shape.
 
@@ -585,7 +585,7 @@ If you use remote evaluation, define:
 - Which operations must deny, defer, or otherwise stop.
 - How the sixty-second withdrawal/replacement target changes the argument for a central evaluator or a cached/degraded path.
 
-### Required Comparison
+#### Required Comparison
 
 Your strongest rejected alternative must be genuinely credible.
 
@@ -608,7 +608,7 @@ For example, compare:
 - Operational support cost.
 - Failure blast radius.
 
-### Failure Prompt
+#### Failure Prompt
 
 Choose one:
 
@@ -630,7 +630,7 @@ Explain:
 
 ---
 
-# Part 5 — Scenario C: Consequential Operation with a Rich Decision Lifecycle
+## Part 5 — Scenario C: Consequential Operation with a Rich Decision Lifecycle
 
 You maintain **Atlas Export**, a service that can export sensitive customer records to an external archive provider.
 
@@ -657,7 +657,7 @@ Escalate
 4. Exports containing a protected classification must be escalated to a designated reviewer rather than treated as a permanent denial.
 5. A temporary legal hold should produce `Defer`.
 
-### Execution Lifecycle Facts
+#### Execution Lifecycle Facts
 
 6. Approved work is placed on a queue for later execution.
 7. The worker is independently deployed and must not receive the caller's standing credentials.
@@ -668,7 +668,7 @@ Escalate
 12. If required policy, acknowledgment state, authority verification, or durable evidence cannot be established, the system must not manufacture execution authority.
 13. The team accepts additional state and operational complexity only where a stated lifecycle or trust boundary requires it; no component is justified merely for architectural symmetry.
 
-## Your Task
+### Your Task
 
 Choose the architecture that best represents the full lifecycle.
 
@@ -700,7 +700,7 @@ The question is:
 
 > **Where does each lifecycle responsibility live, and which boundary prevents a blocked or incomplete decision from reaching execution?**
 
-### Required Authority Explanation
+#### Required Authority Explanation
 
 Explain why this artifact:
 
@@ -760,7 +760,7 @@ Then explain:
 
 The two branches may converge more than their labels suggest. A short-lived capability that still requires current-policy freshness and a reevaluation path that binds prior acknowledgment/reviewer state can preserve nearly the same invariants; they place the trust anchor and continuation proof in different places. Explain that placement rather than treating `capability` and `reevaluate` as opposites.
 
-### Required Revocation and Drift Explanation
+#### Required Revocation and Drift Explanation
 
 Analyze this sequence even if it is not your primary failure mode:
 
@@ -787,7 +787,7 @@ Preserve this symmetry:
 
 > **A prior `Allow` is not automatically a capability, and a cryptographically valid capability is not automatically proof that current policy still permits execution.**
 
-### Failure Prompt
+#### Failure Prompt
 
 Choose the failure that most influenced your design:
 
@@ -808,7 +808,7 @@ Do not rewrite an executor outage as a policy denial.
 
 ---
 
-# Part 6 — Scenario D: Regional Facility with Intermittent Connectivity
+## Part 6 — Scenario D: Regional Facility with Intermittent Connectivity
 
 A remote industrial facility must continue selected safety operations even when its connection to the central control plane is unavailable.
 
@@ -842,7 +842,7 @@ new-device.enroll
 12. The facility must not interpret `central unavailable` as `policy disabled`.
 13. The team prefers the smallest architecture that preserves central policy ownership and bounded local autonomy.
 
-## Your Task
+### Your Task
 
 Choose the primary policy architecture and enforcement location.
 
@@ -888,7 +888,7 @@ Tref = freshness reference event chosen by you
 
 The `13h` case is intentionally outside the normal disconnection envelope. Treat it as a failure-model stress test, not as a contradiction in the scenario. Depending on the reference clock you chose, the `11h` point may also fall outside the stated eight-hour disconnection envelope—for example, if freshness starts at the last successful verified synchronization. State whether it does in your design and why; artifact age and time-since-disconnection are intentionally not assumed to be the same clock.
 
-### Failure Prompt
+#### Failure Prompt
 
 Analyze:
 
@@ -916,11 +916,11 @@ Name the operation class, trust property, freshness rule, and explicit behavior.
 
 ---
 
-# Part 7 — Produce the Required Learner Outputs
+## Part 7 — Produce the Required Learner Outputs
 
 For **each** scenario in your chosen path, produce these seven outputs. Short-path learners produce them for Scenarios A and C; full-submission learners produce them for all four scenarios.
 
-## 1. Selected Architecture
+### 1. Selected Architecture
 
 Name the primary architecture and any essential composition.
 
@@ -938,7 +938,7 @@ Governed decision pipeline + external PDP + scoped worker capability
 
 Do not answer with a vendor name alone.
 
-## 2. Rationale Tied to Explicit Requirements
+### 2. Rationale Tied to Explicit Requirements
 
 Cite at least **four** scenario facts that drove the selection.
 
@@ -952,7 +952,7 @@ Architectural consequence
 Selected responsibility or boundary
 ```
 
-## 3. Strongest Rejected Alternative
+### 3. Strongest Rejected Alternative
 
 Choose the alternative you would be most comfortable shipping if the selected design were unavailable.
 
@@ -960,7 +960,7 @@ Then explain why it lost **under the current facts**.
 
 A weak rejected alternative is not useful.
 
-## 4. Operational Failure Mode That Most Influenced the Decision
+### 4. Operational Failure Mode That Most Influenced the Decision
 
 Name one failure and explain:
 
@@ -969,7 +969,7 @@ Name one failure and explain:
 - What the host or PEP should do.
 - Whether the result is denial, deferral, escalation, bounded degraded behavior, or operational failure after an earlier decision.
 
-## 5. Trust Boundary and Enforcement Location
+### 5. Trust Boundary and Enforcement Location
 
 Draw a small responsibility map.
 
@@ -1002,7 +1002,7 @@ If several responsibilities live in one process, say so.
 
 Logical separation still matters.
 
-## 6. Minimum Evidence Required to Reconstruct an Important Decision
+### 6. Minimum Evidence Required to Reconstruct an Important Decision
 
 Choose the minimum set needed for that scenario.
 
@@ -1026,7 +1026,7 @@ PolicyId + PolicyVersion
 Which policy release evaluated this request?
 ```
 
-## 7. What Must Change Before More Complexity Is Justified
+### 7. What Must Change Before More Complexity Is Justified
 
 State at least **two** requirement changes that would cause you to reconsider the architecture.
 
@@ -1050,7 +1050,7 @@ Name the architectural pressure.
 
 ---
 
-# Part 8 — Create a One-Page Decision Record for Each Scenario
+## Part 8 — Create a One-Page Decision Record for Each Scenario
 
 Use this compact structure for each scenario in your chosen path: A and C for the short path, or A–D for the full submission.
 
@@ -1148,11 +1148,11 @@ The objective is decision clarity, not document length.
 
 ---
 
-# Part 9 — Challenge Your Own Answer
+## Part 9 — Challenge Your Own Answer
 
 For each scenario in your chosen path, perform these adversarial checks. The aggregate-consistency challenge is optional on the short path unless your A/C design itself introduces multiple evaluators or PEPs; it is required for the full submission where B/D make fleet or regional consistency first-class concerns.
 
-## Simplicity Challenge
+### Simplicity Challenge
 
 Ask:
 
@@ -1160,7 +1160,7 @@ Ask:
 
 If removing a component does not break a requirement, explain why the component remains justified.
 
-## Richness Challenge
+### Richness Challenge
 
 Ask:
 
@@ -1168,7 +1168,7 @@ Ask:
 
 If you cannot name one, you may be overengineering.
 
-## Alternative-Validity Challenge
+### Alternative-Validity Challenge
 
 Ask:
 
@@ -1176,7 +1176,7 @@ Ask:
 
 If the answer is `never`, re-check whether you selected a genuinely credible alternative.
 
-## Trust Challenge
+### Trust Challenge
 
 Ask:
 
@@ -1184,7 +1184,7 @@ Ask:
 
 A perfect evaluator does not repair untrusted context.
 
-## Failure Challenge
+### Failure Challenge
 
 Ask:
 
@@ -1192,7 +1192,7 @@ Ask:
 
 Do not let exception handling define governance accidentally.
 
-## Aggregate Consistency Challenge
+### Aggregate Consistency Challenge
 
 Ask:
 
@@ -1200,7 +1200,7 @@ Ask:
 
 A version-skew or partial-rollout failure may produce **no degraded state at any single evaluator**. Name the evidence or aggregate telemetry that would surface that condition, and distinguish node-local health from fleet-level policy consistency.
 
-## Enforcement Challenge
+### Enforcement Challenge
 
 Ask:
 
@@ -1208,7 +1208,7 @@ Ask:
 
 A decision service that cannot prevent execution is not the PEP.
 
-## Evidence Challenge
+### Evidence Challenge
 
 Ask:
 
@@ -1218,7 +1218,7 @@ Ask:
 
 ---
 
-# Part 10 — Architecture Review Rubric
+## Part 10 — Architecture Review Rubric
 
 Use this self-check after completing the scenarios in your chosen path. A `Yes` without an evidence pointer is incomplete.
 
@@ -1257,7 +1257,7 @@ Architecture is often a decision under constraints rather than a theorem with on
 
 ---
 
-# Post-Submission Discussion Guidance
+## Post-Submission Discussion Guidance
 
 Read this section **after** completing the decision records and adversarial checks. It is a set of review lenses, not a mapping from scenarios to answers.
 
@@ -1278,7 +1278,7 @@ The labels themselves are not graded. A different architecture can be correct wh
 
 ---
 
-# Optional Extension — Change One Requirement and Re-Decide
+## Optional Extension — Change One Requirement and Re-Decide
 
 Choose one scenario and change exactly one requirement.
 
@@ -1318,7 +1318,7 @@ therefore I kept / removed / moved this responsibility
 
 ---
 
-# Related Learning Material
+## Related Learning Material
 
 Use these references to challenge or deepen your reasoning:
 
@@ -1336,7 +1336,7 @@ Use these references to challenge or deepen your reasoning:
 
 ---
 
-## Final Self-Check
+### Final Self-Check
 
 Before calling the lab complete, ask:
 

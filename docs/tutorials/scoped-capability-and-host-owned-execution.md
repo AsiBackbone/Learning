@@ -1573,6 +1573,7 @@ It is the first full composition of the primitives established so far.
 ## Related Content
 
 - [Foundational Tutorial Index](index.md) — view the complete five-tutorial governed-execution learning path.
+- [Do You Need a Capability Token, or Are Roles and Claims Enough?](../articles/2026/roles-claims-or-capability-token-dotnet.md) — use a scenario-driven selection guide before introducing capability infrastructure where roles, claims, or immediate host authorization may already be enough.
 - [Decision Before Execution](decision-before-execution.md) — revisit the foundational boundary between a proposed operation, a governance decision, and the host-owned side effect.
 - [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — review the responsibility and evidence boundaries that may precede issuance of execution authority.
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — revisit the policy facts, outcome semantics, and policy identity that justify a scoped capability.

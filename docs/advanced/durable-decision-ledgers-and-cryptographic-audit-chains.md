@@ -1,5 +1,5 @@
 ---
-description: Learn how durable governance receipts become verifiable append-oriented evidence chains through canonicalization, ordered linkage, optional signatures, checkpoints, key lifecycle, retention, and failure handling.
+description: Learn how governance receipts form verifiable, append-oriented evidence chains through canonicalization, links, signatures, checkpoints, and key lifecycle.
 ---
 
 # Durable Decision Ledgers and Cryptographic Audit Chains

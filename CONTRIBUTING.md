@@ -14,7 +14,7 @@ For a typo, broken link, or narrow wording fix, the contribution path is intenti
 2. Open a focused pull request describing the correction.
 3. Let the automated checks run:
    - **Documentation Validation (`docs-validation`)** builds the DocFX site with warnings treated as errors.
-   - **Link Validation (`link-validation`)** checks Markdown links for broken or invalid targets.
+   - **Link Validation (`link-validation`)** checks Markdown links for broken or invalid targets, including the `#anchor` part, so renaming a heading also means updating the links that point at it.
    - **Sample Validation (`samples-validation`)** restores, builds, and tests the executable samples; it runs on every pull request.
 4. Address review comments if needed. Once the checks and review are satisfied, the change can be merged.
 
@@ -215,6 +215,17 @@ Do not combine statuses into ad hoc labels such as `General learning material â€
 
 These labels are descriptive, not quality rankings. Canonical does not mean universally correct, Alternative does not mean inferior, Experimental does not mean low quality, and General learning material does not mean unimportant. An alternative does not need to be treated as incorrect merely because it differs from the canonical implementation.
 
+### Page Orientation Metadata
+
+Substantive learning pages should place orientation metadata immediately after the page title in this canonical order:
+
+1. **Learning objective**
+2. **Pattern classification**
+3. **Difficulty**
+4. **Prerequisites**
+
+Write each field as its own bold-labeled paragraph, with a blank line between fields. Use `None` when a page is a suitable starting point, and link directly to prerequisite material when prior reading is expected. Navigation pages, indexes, labs, exercises, or other documents may omit fields that would add no useful guidance.
+
 ### 6. Preserve Project Boundaries
 
 Do not present the Learning repository as:
@@ -350,7 +361,7 @@ A good lab should clearly state:
 
 Labs should also define **architectural acceptance criteria** so learners can distinguish a program that merely runs from one that preserves the boundary the exercise is intended to teach.
 
-Use [docs/templates/lab-acceptance-criteria-template.md](docs/templates/lab-acceptance-criteria-template.md) as the reusable authoring starting point. Specialize the criteria to the lab rather than copying them mechanically.
+Use [community/lab-acceptance-criteria-template.md](community/lab-acceptance-criteria-template.md) as the reusable authoring starting point. Specialize the criteria to the lab rather than copying them mechanically.
 
 Useful criteria commonly verify that:
 
@@ -379,7 +390,7 @@ For code examples:
 - Add tests when the lesson depends on behavioral correctness.
 - Avoid embedding real credentials, secrets, tokens, connection strings, or personally identifiable information.
 - Use obviously fictional or placeholder values where examples require identifiers or sensitive-looking data.
-- When adding, renaming, or removing an executable sample, update `docs/samples/index.md` with its learning objective, difficulty, key invariant, run command, and canonical README link so the published sample guide remains current.
+- When adding, renaming, or removing an executable sample, update both sample catalogs. Add or revise its repository-facing entry in `samples/README.md`, and update `docs/samples/index.md` with its learning objective, difficulty, key invariant, run command, and canonical README link so the published sample guide remains current.
 
 Code should optimize for understanding first, while still modeling responsible engineering practice.
 
@@ -468,8 +479,8 @@ The supported contract is:
 ---
 title: When ASP.NET Core Authorization Is Enough
 author: Christopher D. Cavell
-published: 2026-08-14
-updated: 2026-08-20
+published: "2026-08-14"
+updated: "2026-08-20"
 summary: Built-in policies and handlers cover more than teams sometimes assume.
 feed: true
 ---
@@ -479,8 +490,8 @@ The fields mean:
 
 - `title` is the canonical article title.
 - `author` is the displayed author and RSS creator attribution.
-- `published` is the original publication date in `YYYY-MM-DD` format.
-- `updated` is optional, must not be earlier than `published`, and should be changed only for a substantive revision, not routine formatting or link maintenance. When present, the feed emits the date as an Atom `atom:updated` timestamp at `00:00:00Z`; RSS `pubDate` continues to represent the original `published` date.
+- `published` is the original publication date in double-quoted `"YYYY-MM-DD"` format so YAML processors preserve it as a string.
+- `updated` is optional, uses the same double-quoted date format, must not be earlier than `published`, and should be changed only for a substantive revision, not routine formatting or link maintenance. When present, the feed emits the date as an Atom `atom:updated` timestamp at `00:00:00Z`; RSS `pubDate` continues to represent the original `published` date.
 - `summary` is the concise article description used by the feed.
 - `feed` controls RSS participation explicitly. Only `feed: true` publishes an item.
 

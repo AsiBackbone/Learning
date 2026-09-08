@@ -8,7 +8,7 @@ description: Diagnose a deliberately misordered ASP.NET Core pipeline, predict b
 
 **Difficulty:** Beginner  
 
-**Pattern classification:** Canonical pattern  
+**Pattern classification:** Canonical Pattern
 
 **Prerequisites:** Complete [Middleware Ordering Changes Behavior](../aspnetcore/middleware-ordering-changes-behavior.md). Run the [Middleware Ordering Changes Behavior sample](https://github.com/AsiBackbone/Learning/blob/main/samples/middleware-ordering-changes-behavior/README.md) before starting the repair exercise.
 
@@ -42,7 +42,7 @@ The goal is to learn how to prove what a particular position means.
 
 ---
 
-# Part 1 — Establish the Baseline
+## Part 1 — Establish the Baseline
 
 From the repository root, run the focused sample tests:
 
@@ -79,7 +79,7 @@ Do not repair it yet.
 
 ---
 
-# Part 2 — Predict Before You Run
+## Part 2 — Predict Before You Run
 
 For the incorrect pipeline, predict what will happen for each request before executing it.
 
@@ -115,7 +115,7 @@ Before running anything, answer:
 
 ---
 
-# Part 3 — Observe the Incorrect Behavior
+## Part 3 — Observe the Incorrect Behavior
 
 Run the deliberately incorrect pipeline:
 
@@ -169,7 +169,7 @@ The defect is:
 
 ---
 
-# Part 4 — Make a Disposable Repair Copy
+## Part 4 — Make a Disposable Repair Copy
 
 Do not change the canonical teaching sample in your working tree for the exercise.
 
@@ -183,7 +183,7 @@ Copy-Item -Recurse `
   ../MiddlewareOrderingLab
 ```
 
-### Bash
+#### Bash
 
 ```bash
 cp -R samples/middleware-ordering-changes-behavior ../MiddlewareOrderingLab
@@ -201,7 +201,7 @@ They should pass in the copied baseline.
 
 ---
 
-# Part 5 — Encode the Target Behavior Before Repairing the Order
+## Part 5 — Encode the Target Behavior Before Repairing the Order
 
 In the copied `MiddlewareOrderTests.cs`, replace the test named:
 
@@ -263,7 +263,7 @@ Now the code must earn the new expectation.
 
 ---
 
-# Part 6 — Repair the Middleware Boundary
+## Part 6 — Repair the Middleware Boundary
 
 Open the copied `MiddlewareOrderDemo.cs`.
 
@@ -318,7 +318,7 @@ The difference is that the failure now occurs **inside** the boundary that owns 
 
 ---
 
-# Part 7 — Explain Why the Behavior Changed
+## Part 7 — Explain Why the Behavior Changed
 
 Write a short explanation using these terms:
 
@@ -356,13 +356,13 @@ Boundary can normalize the failure
 
 ---
 
-# Part 8 — Diagnose Other Ordering Boundaries
+## Part 8 — Diagnose Other Ordering Boundaries
 
 Exception handling is only one form of order-dependent behavior.
 
 For each scenario below, identify the broken dependency or coverage requirement before proposing a reorder.
 
-## Scenario A — Authentication and Authorization
+### Scenario A — Authentication and Authorization
 
 ```csharp
 app.UseAuthorization();
@@ -384,7 +384,7 @@ Authorization
 
 If authorization is endpoint-specific, routing metadata is another dependency that must already be available.
 
-## Scenario B — Request Logging and a Short-Circuiting Limiter
+### Scenario B — Request Logging and a Short-Circuiting Limiter
 
 ```text
 Rate limiter
@@ -414,7 +414,7 @@ That does not make earlier logging universally correct.
 
 If the requirement intentionally excludes noisy rejected traffic from that log, later placement may be reasonable.
 
-## Scenario C — Security Headers and an Earlier Response Producer
+### Scenario C — Security Headers and an Earlier Response Producer
 
 ```text
 Static files
@@ -442,7 +442,7 @@ Application endpoints
 
 Again, define the response-coverage requirement first rather than memorizing the position.
 
-## Scenario D — Endpoint-Specific Rate Limiting
+### Scenario D — Endpoint-Specific Rate Limiting
 
 An endpoint-specific limiter needs routing metadata.
 
@@ -462,7 +462,7 @@ This is why "Where does rate limiting go?" does not have one universal answer.
 
 ---
 
-# Part 9 — Build a Dependency Table
+## Part 9 — Build a Dependency Table
 
 Choose a real or sample ASP.NET Core pipeline and classify at least five middleware concerns using this shape:
 
@@ -495,7 +495,7 @@ That question is more durable than memorizing a framework-specific list.
 
 ---
 
-# Part 10 — Compare with the Working Reference
+## Part 10 — Compare with the Working Reference
 
 After completing the repair, inspect the fuller `NetCoreApplicationTemplate` pipeline:
 
@@ -511,7 +511,7 @@ If you cannot explain why two components have to be ordered relative to each oth
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can demonstrate all of the following:
 
@@ -542,7 +542,7 @@ Observable application behavior
 
 ---
 
-## Optional Extension — Add a Short-Circuit Probe
+### Optional Extension — Add a Short-Circuit Probe
 
 In the disposable copy, add middleware that returns `418 I'm a teapot` without calling `next` for `/short-circuit`.
 
@@ -562,7 +562,7 @@ This makes pipeline reachability observable without introducing authentication, 
 
 ---
 
-## Related Content
+### Related Content
 
 - [Middleware Ordering Changes Behavior](../aspnetcore/middleware-ordering-changes-behavior.md) — architecture explanation and ordering dependency model.
 - [Middleware Ordering Changes Behavior sample](https://github.com/AsiBackbone/Learning/blob/main/samples/middleware-ordering-changes-behavior/README.md) — runnable corrected and deliberately incorrect pipelines.

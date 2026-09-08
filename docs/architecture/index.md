@@ -33,6 +33,17 @@ Substantive pages use a visible `Pattern classification` line when architectural
 
 Not every page needs a classification. The labels are descriptive rather than rankings: canonical does not mean universally correct, and experimental does not mean low quality.
 
+## Foundational Organization Concepts
+
+For the broad organization-level concepts that previously appeared inside product documentation, start with:
+
+* [Accountable Systems Infrastructure and Governed Execution](accountable-systems-infrastructure-and-governed-execution.md) — the stack-neutral meaning of the ASI Backbone governance-spine idea.
+* [Intent to Execution: An Accountability Pattern](intent-to-execution-accountability-pattern.md) — the accountability gap between proposal and side effect.
+* [Constraint-Conditioned Decision Model](constraint-conditioned-decision-model.md) — the conceptual structure behind narrowing intent through active constraints.
+* [Governance Tool Selection and Composition](governance-tool-selection-and-composition.md) — how adjacent governance mechanisms protect different boundaries and compose without becoming substitutes.
+
+These pages are educational. Concrete package, API, configuration, compatibility, security, and release behavior remains authoritative in the implementation repositories.
+
 ## Current Focus
 
 The current foundational material emphasizes separation among:
@@ -100,6 +111,10 @@ Future material in this section may examine questions such as:
 * Which architectural concerns belong in the host rather than a framework?
 * When is a governance pipeline unnecessary complexity?
 
+## Application Structure Growth
+
+For general application-layering guidance, see [Growing Beyond a Simple Application Structure](growing-beyond-a-simple-application-structure.md). It explains when a compact application is enough, what signals justify Application or Domain boundaries, how dependency direction should be reasoned about, and the tradeoffs around CQRS, MediatR, DDD, and premature layering. NetCoreApplicationTemplate is used as one working reference rather than a universal pattern.
+
 ## Alternative Patterns
 
 Architecture should be compared against viable alternatives rather than presented as a single prescribed design.
@@ -136,7 +151,7 @@ An ASP.NET Core reference architecture demonstrating middleware organization, se
 
 ## Current Status
 
-The Architecture section is established as a learning area and now includes a governed-execution visual reference alongside nine concrete alternative-pattern comparisons. It will continue to grow through additional comparisons, diagrams, and cross-repository studies.
+The Architecture section is established as a learning area and now includes general application-structure growth guidance, a governed-execution visual reference, and concrete alternative-pattern comparisons. It will continue to grow through additional comparisons, diagrams, and cross-repository studies.
 
 For the current learning path, continue with the [Foundational Tutorials](../tutorials/index.md).
 

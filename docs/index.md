@@ -22,6 +22,8 @@ Begin with [Getting Started](getting-started/index.md) for an introduction to th
 
 Already have a concrete problem in mind? Use [Find Your Path](getting-started/find-your-path.md) to choose a short, goal-specific route through the existing material without reading the repository in sequence.
 
+Evaluating the material from a developer, system engineering, enterprise architecture, platform, AI integration, or security/compliance role? Use [Adoption Personas and Entry Points](getting-started/adoption-personas-and-entry-points.md) to start from the responsibility you own.
+
 If the repository's vocabulary is new to you, use [Terminology and Established Architecture Concepts](architecture/terminology-and-established-concepts.md) to map Learning terms to established authorization, policy, capability, provenance, workflow, and mediation concepts.
 
 Already using ASP.NET Core authorization and unsure whether you need a broader governed-execution model? Read [When ASP.NET Core Authorization Is Enough](architecture/when-aspnet-core-authorization-is-enough.md). It presents the simpler framework-native approach first and explains where the architectural problem becomes larger than authorization.

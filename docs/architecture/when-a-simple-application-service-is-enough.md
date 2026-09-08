@@ -2,7 +2,7 @@
 description: Compare ordinary application-service orchestration with governed execution and learn when additional governance boundaries are justified.
 title: When a Simple Application Service Is Enough
 author: Christopher D. Cavell
-published: 2026-08-19
+published: "2026-08-19"
 summary: Use a broader governed-execution lifecycle only when the problem needs boundaries beyond ordinary application orchestration.
 feed: true
 ---
@@ -47,7 +47,7 @@ This comparison asks:
 
 > **When is an ordinary application-service workflow enough, and when do requirements justify a broader governed-execution lifecycle?**
 
-The answer is not based on whether an operation is called `CRUD`, whether the application uses ASP.NET Core, or whether the ASI Backbone package is available.
+The answer is not based on whether an operation is called `CRUD`, whether the application uses ASP.NET Core, or whether the AsiBackbone package is available.
 
 The useful threshold is whether the operation needs **independent decision, continuation-authority, acknowledgment, mediation, or provenance boundaries** that survive beyond an ordinary application-service call.
 

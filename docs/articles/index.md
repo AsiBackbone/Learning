@@ -20,6 +20,22 @@ The Learning site is the canonical publication host. Cross-posted copies should 
 
 ## 2026
 
+### [Your Audit Log Records the Story, Not the Decision](2026/your-audit-log-is-not-evidence.md)
+
+**Christopher D. Cavell** · **September 7, 2026**
+
+An audit line written after execution describes an outcome; evidence requires a recorded decision, a binding to the operation it authorized, and integrity that outlives the process that wrote it.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/your-audit-log-is-not-evidence.html`
+
+### [Do You Need a Capability Token, or Are Roles and Claims Enough?](2026/roles-claims-or-capability-token-dotnet.md)
+
+**Christopher D. Cavell** · **September 2, 2026**
+
+Use roles or claims when current host authorization is enough; introduce a capability only when narrow authority must survive a later, delegated, or cross-boundary execution step.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/roles-claims-or-capability-token-dotnet.html`
+
 ### [Why an AI Tool Call Is a Proposal, Not Authority](2026/why-ai-tool-call-is-only-a-proposal.md)
 
 **Christopher D. Cavell** · **August 28, 2026**

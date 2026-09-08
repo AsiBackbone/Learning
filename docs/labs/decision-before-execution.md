@@ -86,7 +86,7 @@ You should be able to point to the exact line where the workflow decides whether
 
 ---
 
-# Part 1 — Break the Boundary Deliberately
+## Part 1 — Break the Boundary Deliberately
 
 The current workflow contains an execution guard similar to:
 
@@ -117,7 +117,7 @@ return decision;
 
 Run the sample again.
 
-## Observe
+### Observe
 
 Do not focus only on whether the decision values are still correct.
 
@@ -139,7 +139,7 @@ It demonstrates that:
 
 ---
 
-# Part 2 — Repair the Boundary
+## Part 2 — Repair the Boundary
 
 Restore the explicit guard:
 
@@ -167,7 +167,7 @@ Invariant preserved: blocked decisions never reached the executor.
 Total simulated executions: 1
 ```
 
-## Explain the Repair
+### Explain the Repair
 
 Before moving on, write a one- or two-sentence explanation in your own words answering:
 
@@ -177,7 +177,7 @@ A useful answer should address **when the side effect becomes reachable**, not m
 
 ---
 
-# Part 3 — Add a New Constraint Without Changing the Executor
+## Part 3 — Add a New Constraint Without Changing the Executor
 
 Now extend the governance context with one additional fact:
 
@@ -200,7 +200,7 @@ ReasonCode: account.disable.already-disabled
 
 But you should decide whether `Denied` is the best semantic outcome for this sample and be able to explain your choice.
 
-## Constraint
+### Constraint
 
 **Do not modify `RecordingDisableAccountExecutor` to implement the rule.**
 
@@ -222,7 +222,7 @@ The new scenario must not invoke the executor.
 
 ---
 
-# Part 4 — Validate the Architecture
+## Part 4 — Validate the Architecture
 
 Run the sample again.
 
@@ -244,7 +244,7 @@ If your final invariant check assumes exactly one execution, adjust scenarios ca
 
 ---
 
-# Part 5 — Reason About an Alternative
+## Part 5 — Reason About an Alternative
 
 Consider this alternative design:
 
@@ -292,7 +292,7 @@ The lesson is that **the primary governance decision should remain explicit and 
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can demonstrate all of the following:
 
@@ -312,7 +312,7 @@ Executor remains host-owned
 
 You should also be able to explain why a system can return the correct decision values and still have a broken architecture if the host does not enforce those decisions before execution.
 
-## Optional Extension
+### Optional Extension
 
 Add a second new constraint of your choice, such as:
 
@@ -326,7 +326,7 @@ Preserve this rule:
 
 If the executor must change merely because a new decision rule was introduced, examine whether policy and execution have become too tightly coupled.
 
-## Resetting the Sample
+### Resetting the Sample
 
 If you created a temporary branch only for the exercise, you can compare your work with the original sample and then discard or keep the branch as desired.
 
@@ -340,7 +340,7 @@ Use `git status` before restoring anything so that you understand which local ch
 
 ---
 
-## Related Content
+### Related Content
 
 - [Decision Before Execution tutorial](../tutorials/decision-before-execution.md) — review the architectural reasoning behind the lab.
 - [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md) — return to the known executable baseline.

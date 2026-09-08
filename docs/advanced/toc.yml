@@ -4,6 +4,12 @@
 - name: Regional and Tenant Policy Overlays
   href: regional-and-tenant-policy-overlays.md
 
+- name: Regional Policy and Operational Gateways
+  href: regional-policy-and-operational-gateways.md
+
+- name: Governed Execution in Regulated Systems
+  href: governed-execution-in-regulated-systems.md
+
 - name: Federated Governance and Independent Authority Coordination
   href: federated-governance-and-independent-authority-coordination.md
 

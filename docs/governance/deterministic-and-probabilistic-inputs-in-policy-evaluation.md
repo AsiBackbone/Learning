@@ -1,5 +1,5 @@
 ---
-description: Learn to distinguish authoritative deterministic policy facts from probabilistic or model-derived signals while preserving uncertainty, provenance, freshness, and host-owned execution.
+description: Distinguish authoritative policy facts from probabilistic signals while preserving uncertainty, provenance, freshness, and host-owned execution.
 ---
 
 # Deterministic and Probabilistic Inputs in Policy Evaluation

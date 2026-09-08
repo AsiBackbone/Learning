@@ -97,7 +97,7 @@ You should be able to explain which types contain **facts**, which type contains
 
 ---
 
-# Part 1 — Collapse the Decision Back to a Boolean
+## Part 1 — Collapse the Decision Back to a Boolean
 
 The sample currently preserves several distinct outcomes:
 
@@ -119,7 +119,7 @@ bool allowed = decision.CanProceed;
 
 Print only the scenario name and the boolean for one run.
 
-## Observe the Information Loss
+### Observe the Information Loss
 
 Answer these questions before restoring the original output:
 
@@ -135,7 +135,7 @@ A derived property such as `CanProceed` can be useful at a specific boundary. Th
 
 ---
 
-# Part 2 — Add an Explicit Context Fact
+## Part 2 — Add an Explicit Context Fact
 
 Extend the account context with a simple data-classification fact:
 
@@ -191,7 +191,7 @@ A context should describe the evaluated situation. It should not silently decide
 
 ---
 
-# Part 3 — Interpret the New Fact with a Structured Outcome
+## Part 3 — Interpret the New Fact with a Structured Outcome
 
 Now introduce a policy rule for `Restricted` accounts.
 
@@ -222,7 +222,7 @@ account.disable.restricted-classification
 
 Run the sample again and confirm that the scenario is verified.
 
-## Explain the Outcome
+### Explain the Outcome
 
 Write a short explanation answering:
 
@@ -236,7 +236,7 @@ Those states may both have `CanProceed == false`, but they are not operationally
 
 ---
 
-# Part 4 — Make Rule Precedence Observable
+## Part 4 — Make Rule Precedence Observable
 
 Create an overlapping scenario where more than one rule could apply:
 
@@ -280,7 +280,7 @@ The expected scenario becomes a small contract documenting intended precedence.
 
 ---
 
-# Part 5 — Preserve Stable Reason Codes
+## Part 5 — Preserve Stable Reason Codes
 
 Change the human-readable message for one rule without changing its reason code.
 
@@ -328,7 +328,7 @@ The reason code is the stable machine-readable contract.
 
 ---
 
-# Part 6 — Validate the Final Architecture
+## Part 6 — Validate the Final Architecture
 
 Run the modified sample again.
 
@@ -353,7 +353,7 @@ The useful invariant is that every declared scenario produces the expected struc
 
 ---
 
-# Part 7 — Reason About a Scattered Alternative
+## Part 7 — Reason About a Scattered Alternative
 
 Consider this alternative implementation:
 
@@ -384,7 +384,7 @@ The lesson is to avoid compressing a richer governance lifecycle into a boolean 
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can demonstrate this progression:
 
@@ -421,7 +421,7 @@ acknowledged, denied, or escalated.
 
 The second preserves information that the host can use.
 
-## Optional Extension — Add Policy Identity to Verification
+### Optional Extension — Add Policy Identity to Verification
 
 The sample already carries:
 
@@ -442,7 +442,7 @@ Discuss:
 
 This prepares for the next tutorial, where acknowledgment and audit residue become first-class concerns.
 
-## Resetting the Sample
+### Resetting the Sample
 
 If you created a temporary branch only for the exercise, you can compare your work with the original sample and then discard or keep the branch as desired.
 
@@ -456,7 +456,7 @@ Use `git status` before restoring anything so that you understand which local ch
 
 ---
 
-## Related Content
+### Related Content
 
 - [Policy Context and Explicit Decision Outcomes tutorial](../tutorials/policy-context-and-explicit-decision-outcomes.md) — review the architectural reasoning behind the lab.
 - [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md) — return to the executable baseline used by this exercise.

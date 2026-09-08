@@ -1,5 +1,5 @@
 ---
-description: Diagnose governance checks scattered around account mutation and external calls, then refactor the workflow into an explicit decision pipeline whose blocked outcomes cannot reach protected execution.
+description: Refactor scattered governance checks into an explicit decision pipeline whose blocked outcomes cannot reach account changes or external calls.
 ---
 
 # Lab — Refactor Scattered Governance Checks into an Explicit Decision Pipeline
@@ -71,7 +71,7 @@ The operation is intentionally local and deterministic. No real account system, 
 
 ---
 
-# Part 1 — Run the Deliberately Flawed Starter
+## Part 1 — Run the Deliberately Flawed Starter
 
 The runnable companion lives at:
 
@@ -129,7 +129,7 @@ A caller cannot undo the fact that the account mutation and notification were al
 
 ---
 
-# Part 2 — Diagnose Before Refactoring
+## Part 2 — Diagnose Before Refactoring
 
 Do not begin by moving lines.
 
@@ -169,7 +169,7 @@ A useful diagnosis should identify at least these problems:
 
 ---
 
-# Part 3 — Write the Target Invariant Before the Target Classes
+## Part 3 — Write the Target Invariant Before the Target Classes
 
 Before choosing types, write the behavior you need to preserve.
 
@@ -198,7 +198,7 @@ Your refactor may use one application-service class or several collaborating cla
 
 ---
 
-# Part 4 — Refactor Toward Explicit Phases
+## Part 4 — Refactor Toward Explicit Phases
 
 Use this responsibility sequence as the target:
 
@@ -265,7 +265,7 @@ That keeps the lesson focused on the decision/execution boundary.
 
 ---
 
-# Part 5 — Make Authoritative Context Visible
+## Part 5 — Make Authoritative Context Visible
 
 The starter checks administrator status before loading account state, then evaluates resource rules later.
 
@@ -299,7 +299,7 @@ Do not treat an explicit context object as automatically trustworthy merely beca
 
 ---
 
-# Part 6 — Replace Exception-Driven Governance with an Explicit Outcome
+## Part 6 — Replace Exception-Driven Governance with an Explicit Outcome
 
 The starter uses an exception to manufacture this result:
 
@@ -339,7 +339,7 @@ Do not convert every exception into a governance outcome merely to keep the meth
 
 ---
 
-# Part 7 — Define the Protected Executor Boundary
+## Part 7 — Define the Protected Executor Boundary
 
 For the reference sample, the protected executor represents one semantic operation:
 
@@ -374,7 +374,7 @@ If you split the side effects into multiple executors, strengthen the tests so e
 
 ---
 
-# Part 8 — Add the Invariant Tests
+## Part 8 — Add the Invariant Tests
 
 Run the companion tests:
 
@@ -384,7 +384,7 @@ dotnet test samples/decision-pipeline-refactoring/DecisionPipelineRefactoring.Te
 
 The test project contains one diagnostic starter test plus the required refactored invariants.
 
-## Diagnostic starter test
+### Diagnostic starter test
 
 The starter test intentionally proves the defect:
 
@@ -398,7 +398,7 @@ The test passes because it records known broken behavior.
 
 It prevents the exercise from relying on prose alone to claim that the starter is unsafe.
 
-## Required refactored tests
+### Required refactored tests
 
 Your refactor should preserve these cases:
 
@@ -444,7 +444,7 @@ The other counters make hidden bypasses easier to detect.
 
 ---
 
-# Part 9 — Preserve Evidence Without Confusing It with Authority
+## Part 9 — Preserve Evidence Without Confusing It with Authority
 
 The reference pipeline records a decision before it tests `CanExecute`.
 
@@ -478,11 +478,11 @@ Those claims require stronger infrastructure than this lab provides.
 
 ---
 
-# Part 10 — Compare Multiple Legitimate Refactoring Shapes
+## Part 10 — Compare Multiple Legitimate Refactoring Shapes
 
 Do not treat the companion sample's class layout as the only correct answer.
 
-## Option A — One Explicit Application Service
+### Option A — One Explicit Application Service
 
 A small application may keep the flow in one service:
 
@@ -497,7 +497,7 @@ load authoritative state
 
 This can be excellent architecture when the method remains short and the decision/execution boundary is obvious.
 
-## Option B — Separate Context, Policy, Pipeline, and Executor
+### Option B — Separate Context, Policy, Pipeline, and Executor
 
 This is the companion sample's reference shape.
 
@@ -509,7 +509,7 @@ It is useful when:
 - execution dependencies should be structurally unavailable to policy code;
 - the team benefits from a named decision boundary.
 
-## Option C — External or Shared Policy Evaluation
+### Option C — External or Shared Policy Evaluation
 
 A larger system may move policy evaluation behind a shared policy engine or Policy Decision Point while keeping enforcement local.
 
@@ -528,7 +528,7 @@ The lab succeeds when you can explain **why your chosen boundary earns its compl
 
 ---
 
-# Part 11 — When the Simple Service Should Win
+## Part 11 — When the Simple Service Should Win
 
 After completing the refactor, challenge it.
 
@@ -553,17 +553,17 @@ Read [When a Simple Application Service Is Enough](../architecture/when-a-simple
 
 ---
 
-# Reference Discussion
+## Reference Discussion
 
 The companion sample's reference solution uses five distinct responsibilities.
 
-## 1. Context construction
+### 1. Context construction
 
 `AccountDisableContextBuilder` loads current account state before resource-dependent policy evaluation.
 
 It does not mutate the account.
 
-## 2. Policy evaluation
+### 2. Policy evaluation
 
 `AccountDisablePolicy` returns explicit outcomes and has no dependency capable of disabling an account, sending a notification, or publishing an event.
 
@@ -575,7 +575,7 @@ Policy evaluator
 Cannot directly perform account.disable
 ```
 
-## 3. Continuation interpretation
+### 3. Continuation interpretation
 
 `CanExecute` is true only for `Allowed`.
 
@@ -583,13 +583,13 @@ Cannot directly perform account.disable
 
 The sample does not pretend that merely returning one of those outcomes completes a workflow.
 
-## 4. Protected execution
+### 4. Protected execution
 
 `RecordingAccountDisableExecutor` owns the simulated side-effect bundle.
 
 The pipeline invokes it only after the decision guard.
 
-## 5. Evidence
+### 5. Evidence
 
 `RecordingDecisionEvidenceSink` records the decision path without granting execution authority.
 
@@ -601,7 +601,7 @@ A smaller service can preserve the same invariant with fewer types, and a distri
 
 ---
 
-# Architectural Acceptance Criteria
+## Architectural Acceptance Criteria
 
 You have completed the lab when you can demonstrate all of the following:
 
@@ -633,9 +633,9 @@ One explicit protected execution attempt
 
 ---
 
-## Optional Extensions
+### Optional Extensions
 
-### Extension 1 — Resource Drift
+#### Extension 1 — Resource Drift
 
 After policy evaluation but before execution, change the account version.
 
@@ -648,7 +648,7 @@ Decide whether the pipeline should:
 
 Explain the consistency contract you choose.
 
-### Extension 2 — Durable Escalation
+#### Extension 2 — Durable Escalation
 
 Persist `EscalationRecommended` as workflow state and resume later.
 
@@ -658,13 +658,13 @@ Then answer:
 
 If not, what must be revalidated?
 
-### Extension 3 — Outbox Boundary
+#### Extension 3 — Outbox Boundary
 
 Replace direct event publication with a simulated outbox entry written with the account mutation.
 
 Explain which action now counts as the protected execution attempt and which later deliveries are consequences of that committed operation.
 
-### Extension 4 — Remove the Extra Abstractions
+#### Extension 4 — Remove the Extra Abstractions
 
 Refactor the reference implementation back into one application service while keeping all invariant tests green.
 
@@ -672,7 +672,7 @@ If the result is easier to understand, explain why the simpler shape is better f
 
 ---
 
-## Related Content
+### Related Content
 
 - [Decision Before Execution tutorial](../tutorials/decision-before-execution.md) — foundational separation between deciding and acting.
 - [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md) — smaller runnable demonstration of the core invariant.

@@ -74,7 +74,7 @@ Whenever practical, maintainers should explain moderation decisions and provide 
 
 ## Reporting a Problem
 
-If you experience or observe behavior that may violate this Code of Conduct, contact the repository maintainers through an appropriate private GitHub or organization contact channel when possible.
+If you experience or observe behavior that may violate this Code of Conduct, use [GitHub private vulnerability reporting](https://github.com/AsiBackbone/Learning/security/advisories/new) for a confidential report. If that form is unavailable, open a minimal public Issue asking for a private contact route without including sensitive details.
 
 Do not publicly disclose sensitive personal information, security information, or details that could place another person at risk.
 

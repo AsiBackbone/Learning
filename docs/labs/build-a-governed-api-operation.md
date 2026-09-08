@@ -8,7 +8,7 @@ description: Extend an ASP.NET Core API into governed execution with explicit in
 
 **Difficulty:** Intermediate
 
-**Pattern classification:** Canonical pattern
+**Pattern classification:** Canonical Pattern
 
 **Prerequisites:** Complete [Decision Before Execution](../tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md), and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md). Read [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md) before starting so that the authorization/governance boundary is explicit.
 
@@ -155,7 +155,7 @@ This is the boundary you will make explicit.
 
 ---
 
-# Part 1 — Identify the Real Execution Boundary
+## Part 1 — Identify the Real Execution Boundary
 
 Locate the line that performs the side effect:
 
@@ -225,7 +225,7 @@ That difference is the central learning objective.
 
 ---
 
-# Part 2 — Make the Exercise Disposable
+## Part 2 — Make the Exercise Disposable
 
 Do not experiment directly in a production application.
 
@@ -266,7 +266,7 @@ Do not make the governance lesson depend on a particular authentication test pac
 
 ---
 
-# Part 3 — Keep Authorization as Authorization
+## Part 3 — Keep Authorization as Authorization
 
 Before adding governance, decide what `CanDisableAccount` should answer.
 
@@ -318,7 +318,7 @@ Then continue only with requests that have already passed authorization.
 
 ---
 
-# Part 4 — Represent Proposed Intent
+## Part 4 — Represent Proposed Intent
 
 Create an explicit intent model.
 
@@ -378,7 +378,7 @@ It still performs no side effect.
 
 ---
 
-# Part 5 — Build Authoritative Policy Context
+## Part 5 — Build Authoritative Policy Context
 
 Create an explicit policy-context snapshot.
 
@@ -443,7 +443,7 @@ At this stage, add a focused unit test or inspection test confirming that the ca
 
 ---
 
-# Part 6 — Evaluate an Explicit Governance Decision
+## Part 6 — Evaluate an Explicit Governance Decision
 
 Introduce the decision vocabulary used throughout Learning:
 
@@ -535,7 +535,7 @@ That second question belongs to the host integration tests later in the lab.
 
 ---
 
-# Part 7 — Map Governance Outcomes at the HTTP Host Boundary
+## Part 7 — Map Governance Outcomes at the HTTP Host Boundary
 
 Return to the endpoint.
 
@@ -644,7 +644,7 @@ Account service calls = 0
 
 ---
 
-# Part 8 — Add an Acknowledgment Boundary
+## Part 8 — Add an Acknowledgment Boundary
 
 For a sensitive account, the first decision should be:
 
@@ -752,7 +752,7 @@ This proves that acknowledgment satisfies a specific boundary rather than becomi
 
 ---
 
-# Part 9 — Issue Narrow Execution Authority
+## Part 9 — Issue Narrow Execution Authority
 
 After the current decision is `Allowed`, create a deliberately small execution capability.
 
@@ -825,7 +825,7 @@ Capability validation failure
 Account service calls = 0
 ```
 
-## Question the Capability Honestly
+### Question the Capability Honestly
 
 In a single request, single process, immediately executed endpoint, a separate capability object may be more machinery than the production problem needs.
 
@@ -843,7 +843,7 @@ Capability artifacts become more compelling when approval and execution are sepa
 
 ---
 
-# Part 10 — Preserve Host-Owned Execution
+## Part 10 — Preserve Host-Owned Execution
 
 The governance evaluator still should not perform the side effect.
 
@@ -941,7 +941,7 @@ The acknowledgment is not the account service.
 
 ---
 
-# Part 11 — Record Decision and Execution as Different Evidence
+## Part 11 — Record Decision and Execution as Different Evidence
 
 Create a small residue model or recording sink for the exercise.
 
@@ -1021,7 +1021,7 @@ The required invariant is the decision/execution distinction.
 
 ---
 
-# Part 12 — Add Integration Tests for the Architectural Invariants
+## Part 12 — Add Integration Tests for the Architectural Invariants
 
 Your final integration-test matrix should include at least these scenarios.
 
@@ -1048,7 +1048,7 @@ The most important tests are not assertions about returned enum values.
 
 They cross the host boundary and prove whether the side-effect service was invoked.
 
-## Suggested Test Names
+### Suggested Test Names
 
 Use names that state the invariant directly.
 
@@ -1076,7 +1076,7 @@ It does not prove that the host respected the decision.
 
 ---
 
-# Part 13 — Deliberately Break the Boundary
+## Part 13 — Deliberately Break the Boundary
 
 Choose one failure mode and introduce it temporarily.
 
@@ -1086,7 +1086,7 @@ Change the host so it always calls the account service after evaluation.
 
 Your denied/deferred/acknowledgment tests should fail because the service call count becomes nonzero.
 
-### Option B — Treat Acknowledgment as Permission
+#### Option B — Treat Acknowledgment as Permission
 
 Skip re-evaluation after a valid acknowledgment.
 
@@ -1094,13 +1094,13 @@ Then activate a legal hold between challenge issuance and continuation.
 
 A good test should expose the stale decision.
 
-### Option C — Skip Capability Validation
+#### Option C — Skip Capability Validation
 
 Issue a capability for account A and execute account B.
 
 The invalid-capability test should fail if resource binding is ignored.
 
-### Option D — Move the Side Effect into Policy
+#### Option D — Move the Side Effect into Policy
 
 Call `IAccountService` from the evaluator when it reaches `Allowed`.
 
@@ -1118,7 +1118,7 @@ The point of deliberately breaking the design is to make the boundary causal rat
 
 ---
 
-# Part 14 — Compare the Final Design with Plain Authorization
+## Part 14 — Compare the Final Design with Plain Authorization
 
 Now compare your completed endpoint with the starting endpoint.
 
@@ -1184,7 +1184,7 @@ The architectural standard is:
 
 ---
 
-# Final Validation
+## Final Validation
 
 Before completing the lab, verify all of the following.
 
@@ -1228,7 +1228,7 @@ Account service calls = 1
 
 ---
 
-# Completion Criteria
+## Completion Criteria
 
 You have completed the lab when you can explain why each statement answers a different question:
 
@@ -1252,7 +1252,7 @@ A useful architecture makes the intermediate boundaries observable and testable 
 
 ---
 
-## Related Content
+### Related Content
 
 - [Decision Before Execution](../tutorials/decision-before-execution.md) — revisit the boundary between proposed intent, governance decision, and side effect.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — review authoritative decision-time facts, explicit outcomes, and reason codes.

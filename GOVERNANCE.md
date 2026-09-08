@@ -426,7 +426,9 @@ Public documentation may be added later when disclosure is safe and useful.
 
 ## Licensing and Intellectual Property
 
-The repository is distributed under the MIT License unless explicitly stated otherwise for a particular artifact.
+Documentation, educational material, and community content are licensed under CC BY 4.0.
+Executable sample code under `samples/` is licensed under the MIT License. See
+[LICENSING.md](LICENSING.md) for the complete component-specific licensing policy.
 
 Contributors must have the right to submit their contributions.
 
