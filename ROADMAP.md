@@ -16,13 +16,13 @@ The project should continue to grow deliberately:
 
 ## Current Project Status
 
-**Active development — foundational tutorial/sample/test/lab path established**
+**Maintenance and evidence-driven refinement — foundational curriculum established**
 
-The repository has moved beyond its initial scaffolding phase.
-
-The initial five-tutorial learning path is now established, and the foundational
-sequence is supported by runnable companion samples, focused invariant tests,
-and tutorial-aligned learner exercises or labs.
+The repository has moved beyond its initial scaffolding and milestone-building phases.
+The five-tutorial foundation is established, all thirteen originally defined roadmap
+milestones have substantial coverage at the current Learning scope, and the repository
+now has runnable samples, invariant tests, labs, implementation references, publication
+automation, and community intake surfaces.
 
 1. [Decision Before Execution](docs/tutorials/decision-before-execution.md)
 2. [Policy Context and Explicit Decision Outcomes](docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
@@ -50,28 +50,59 @@ Host-owned execution
 Audit residue
 ```
 
-The current development emphasis is now:
+The repository therefore enters a **post-foundation maintenance mode** rather than
+opening another volume-driven milestone. The operating loop is:
 
 ```text
-Established Foundation
+Established curriculum
    ↓
-Working Implementation References
+Learner feedback / implementation change / quality signal
    ↓
-Deeper Diagnostic / Tradeoff Labs
+Bounded issue with a measurable outcome
    ↓
-ASP.NET Core Architecture
+Targeted correction or extension
    ↓
-Security and Trust Architecture
+Build, link, sample, and rendered-content validation
    ↓
-Governance and Advanced Material
+Return to maintenance monitoring
 ```
 
-The next major objective is therefore not to rebuild the foundation or simply add
-more written material.
+New material should be added when evidence shows a distinct learner need, an
+implementation change creates drift, or an architecture/security gap is not already
+served by the existing curriculum. Page count alone is not a roadmap signal.
 
-It is to deepen the established path, strengthen its connection to real
-implementations, and begin the next architecture subjects without sacrificing
-cohesion.
+### Maintenance Ownership and Review Cadence
+
+Continuous obligations are intentionally not represented as permanently unchecked
+milestone boxes. Each obligation has a mechanism that turns a recurring concern into
+bounded work when a trigger or review finds something actionable.
+
+| Obligation | Owner mechanism | Trigger or cadence | Evidence / completion signal |
+| --- | --- | --- | --- |
+| Repository metadata | Scheduled repository review | Quarterly and before a meaningful archival release | Description, topics, community links, security/repository settings, and release-facing metadata reflect the current project |
+| Estimated-scope guidance | Documented deferral with issue-on-evidence | Revisit when learner feedback shows that effort or prerequisite ambiguity is blocking completion | Add scope guidance only where it improves planning; do not invent artificial completion times |
+| Implementation links | Scheduled reference-currentness review; findings become bounded issues | After material `AsiBackbone` or `NetCoreApplicationTemplate` changes and at least quarterly | Automated links pass and the reviewed direct file/API references have no known stale targets |
+| Accessibility | Pull-request review plus representative spot-check | Every substantial visual, media, interactive, or theme change; representative review at least twice yearly | Changed/reviewed material has text equivalents, usable structure, and no known critical accessibility regression |
+| Technical currency | Scheduled technical-currentness review; findings become bounded issues | Quarterly and after relevant .NET/runtime/security or implementation-repository changes | Guidance is current, version-qualified, or explicitly marked illustrative where it intentionally differs from an implementation API |
+| License boundary | Release review; automation remains explicitly deferred until a low-noise check is practical | Each meaningful archival release and whenever documentation/sample placement changes materially | The CC BY 4.0 documentation / MIT sample-code split remains accurate; automation is added only when it can enforce the boundary without noisy failures |
+| Citation and archival integrity | Release-triggered checklist plus periodic link review | Every archival release; related-identifier and citation-link spot-check at least yearly | `CITATION.cff`, `.zenodo.json`, version/concept DOI guidance, licensing identity, and related identifiers remain synchronized |
+
+### Next Bounded Outcomes
+
+The next maintenance cycle should prioritize three outcomes before adding a new subject
+area solely for breadth:
+
+1. **Reference-currentness baseline:** review the five foundational tutorial/sample/lab
+   paths plus a representative advanced path against the current implementation
+   repositories; convert any stale links, renamed APIs, or misleading implementation
+   claims into bounded correction issues.
+2. **Learner usability and accessibility spot-check:** walk one beginner, one
+   intermediate, and one advanced learning path in rendered form, recording hidden
+   assumptions, navigation friction, inaccessible visual information, or unclear
+   validation steps as bounded issues.
+3. **Release-integrity checkpoint:** at the next meaningful educational archive,
+   synchronize citation metadata and verify the documentation/sample license boundary;
+   only propose new automation if that review exposes a repeatable failure mode.
 
 ---
 
@@ -293,7 +324,10 @@ See [LICENSING.md](LICENSING.md) for the complete licensing policy.
 
 ### Ongoing Maintenance
 
-* [ ] Review repository metadata periodically as the project matures.
+* **Repository metadata review — scheduled maintenance.** Follow the quarterly and
+  pre-archive cadence in [Maintenance Ownership and Review Cadence](#maintenance-ownership-and-review-cadence);
+  convert discovered drift into a bounded issue rather than leaving a permanent
+  milestone checkbox open.
 
 ### Contributor Label Taxonomy
 
@@ -360,7 +394,10 @@ The intent is to make Issues discoverable by **content area, architectural class
 
 ### Ongoing Maintenance
 
-* [ ] Re-review accessibility when substantial new diagrams, media, interactive content, or theme customizations are introduced.
+* **Accessibility review — change-triggered maintenance.** Re-review substantial new
+  diagrams, media, interactive content, or theme customizations as part of the change,
+  with the representative twice-yearly spot-check defined in
+  [Maintenance Ownership and Review Cadence](#maintenance-ownership-and-review-cadence).
 
 ### Documentation Goal
 
@@ -1092,22 +1129,26 @@ As the repository grows, learning material should increasingly provide:
 * [x] Consistent tutorial metadata.
 * [x] Difficulty indicators.
 * [x] Prerequisites.
-* [ ] Estimated scope rather than artificial completion times.
+* **Estimated scope — deferred until learner evidence warrants it.** Prefer explicit
+  prerequisites, difficulty, validation criteria, and bounded tasks over artificial
+  completion times. Open a focused issue when learner feedback shows that missing effort
+  guidance is itself a usability problem.
 * [x] Runnable companion samples.
 * [x] Executable tests. ([#2](https://github.com/AsiBackbone/Learning/issues/2))
 * [x] Consistent "When not to use this" guidance where it materially improves the lesson. ([#140](https://github.com/AsiBackbone/Learning/issues/140))
-* [ ] **Ongoing maintenance — implementation links:** Continue strengthening links to
-  working implementation repositories where they materially deepen the lesson.
+* **Implementation links — scheduled maintenance.** Strengthen and correct links to
+  working implementation repositories when they materially deepen the lesson; use the
+  reference-currentness cadence and signals defined above.
 * [x] Links to relevant ADRs when they directly explain a working implementation decision. ([#140](https://github.com/AsiBackbone/Learning/issues/140))
 * [x] Related-tutorial links.
 * [x] Suggested labs.
 * [x] Clear canonical, alternative, or experimental status where relevant. ([#139](https://github.com/AsiBackbone/Learning/issues/139))
-* [ ] **Ongoing maintenance — accessibility:** Re-review diagrams and visual material
-  when substantial new visuals, media, interactive content, or theme changes are
-  introduced.
-* [ ] **Ongoing maintenance — technical currency:** Periodically review technical
-  guidance and implementation-repository cross-links as .NET and the implementation
-  repositories evolve.
+* **Accessibility — change-triggered and scheduled maintenance.** Review changed visual
+  material as part of the pull request and perform the representative spot-check defined
+  above.
+* **Technical currency — scheduled maintenance.** Review guidance and implementation
+  cross-links after relevant platform/repository changes and on the quarterly cadence;
+  convert discovered drift into bounded issues.
 
 Issue #140 completed a representative cross-cutting pass rather than adding formulaic sections to every page. Usage boundaries remain explicit where over-application is a meaningful risk, and ADR links are added only when a working repository contains a directly relevant decision record.
 
@@ -1145,9 +1186,10 @@ Automation should support quality without making contribution unnecessarily diff
   covers the DocFX/template baseline, generated sitemap, RSS feed, IndexNow
   publication contract, and generated metadata; the publish workflow produces and
   uploads the GitHub Pages artifact.
-* **Still needed where practical — license-boundary validation.** Add automation only
-  when it can verify the documentation/sample licensing split without creating
-  noisy or burdensome checks.
+* **Deferred automation — license-boundary validation.** Verify the documentation/sample
+  licensing split during meaningful archival-release review. Add automated enforcement
+  only after a repeatable failure mode or a low-noise validation strategy demonstrates
+  that the check will reduce risk without creating burdensome false positives.
 
 Source-controlled automation and repository-host controls should be reviewed separately. A committed workflow does not prove that branch rules, secret scanning, push protection, Dependabot alerts, or Dependabot security updates are enabled in GitHub settings.
 
@@ -1172,10 +1214,21 @@ The Learning repository uses a versioned educational-release model so that meani
 
 ### Ongoing Maintenance
 
-* [ ] Update the `CITATION.cff` release version/date, the `CITATION.cff` version DOI identifier, and the `.zenodo.json` version together for each future archived release. The version DOI is minted by the deposit, so it is recorded after the release rather than in the tagged snapshot; the concept DOI in the top-level `doi` key does not change.
-* [ ] Keep Zenodo project identity, licensing, and related identifiers current.
-* [ ] Preserve new versioned snapshots when a meaningful educational milestone warrants an archival release.
-* [ ] Re-check citation guidance, archival links, and the related-identifier graph when the publication workflow or related works change.
+These are release- or change-triggered responsibilities rather than unfinished roadmap
+milestones:
+
+* **Release metadata synchronization:** Update the `CITATION.cff` release version/date,
+  the `CITATION.cff` version DOI identifier, and the `.zenodo.json` version together for
+  each future archived release. The version DOI is minted by the deposit, so it is
+  recorded after the release rather than in the tagged snapshot; the concept DOI in the
+  top-level `doi` key does not change.
+* **Zenodo identity review:** Keep project identity, licensing, and related identifiers
+  current as part of each archival release.
+* **Versioned snapshot decision:** Preserve a new snapshot only when a meaningful
+  educational milestone warrants an archival release.
+* **Citation/link review:** Re-check citation guidance, archival links, and the
+  related-identifier graph whenever the publication workflow or related works change,
+  plus the periodic spot-check defined in the maintenance cadence above.
 
 Archival infrastructure should support the learning resource.
 
@@ -1187,26 +1240,37 @@ Versioned Learning releases are citable educational snapshots. They do not estab
 
 ## Near-Term Priorities
 
-The highest-priority work now is:
+The repository is in maintenance mode. The highest-priority work is the next bounded
+outcome supported by a maintenance signal, not the next unchecked content category.
 
-1. Treat the currently listed Milestone 5 lab path as complete and add new labs only
-   when learner work exposes a distinct architecture, security, ASP.NET Core, governance,
-   or AI-integration gap that is not already served by existing tutorials, samples, or labs.
-2. Keep concrete good-first contribution opportunities visible when genuine starter
-   work exists, and grow lab/topic reviewer participation as community activity
-   justifies it.
-3. Revisit completed Milestone 13 subjects when implementation experience, reader
-   feedback, or a concrete failure mode reveals a deeper learning gap.
+In order:
 
-These are strategic curriculum and community priorities. Editorial publication
-planning remains in `community/article-backlog.md`; article candidates and their
-dedicated implementation issues should not be duplicated here as roadmap work.
+1. Establish and repeat the **reference-currentness baseline** across the foundational
+   learner path and representative advanced material; open correction issues for stale
+   implementation links, renamed APIs, or direct implementation claims that no longer
+   match the owning repositories.
+2. Perform the **learner usability and accessibility spot-check** across representative
+   beginner, intermediate, and advanced paths; turn concrete navigation, hidden-assumption,
+   validation, or accessibility findings into bounded issues.
+3. Execute the **release-integrity checkpoint** at the next meaningful educational
+   archive, synchronizing citation metadata and verifying the component-specific license
+   boundary before deciding whether additional automation is justified.
 
-The short-term emphasis should remain:
+New labs, tutorials, samples, or advanced subjects should follow only when reader
+feedback, implementation experience, a security/architecture failure mode, or another
+observable gap demonstrates that the current material does not adequately serve the
+learner outcome.
 
-> **Depth before breadth.**
+Editorial publication planning remains in `community/article-backlog.md`; article
+candidates and their dedicated implementation issues should not be duplicated here as
+roadmap work.
 
-A strong tutorial with a runnable sample, meaningful tests, a useful lab, and clear implementation references is more valuable than several disconnected pages of new material.
+The short-term emphasis remains:
+
+> **Depth before breadth. Evidence before volume.**
+
+A correction that removes implementation drift or learner friction is more valuable
+than disconnected material added only to make the repository larger.
 
 ---
 
@@ -1221,10 +1285,19 @@ Useful signals include:
 * Tests that preserve architectural invariants.
 * Labs that can be completed without hidden assumptions.
 * Documentation build health.
-* Working links between Learning and implementation repositories.
+* Automated link validation plus no known stale direct implementation links in the
+  representative set reviewed during the current maintenance cycle.
+* Direct API-shaped examples that either match the owning implementation documentation
+  at review time or are clearly labeled as illustrative/framework-neutral.
+* Accessibility review of changed visual content plus the representative twice-yearly
+  rendered-content spot-check.
+* Learner-usability findings such as repeated questions, hidden prerequisites, unclear
+  validation steps, or navigation dead ends being converted into bounded corrections.
+* Citation, archival, and license-boundary metadata remaining synchronized at each
+  meaningful educational release.
 * Corrections prompted by readers.
 * Questions converted into improved explanations.
-* Architectural discussions converted into tutorials or labs.
+* Architectural discussions converted into tutorials or labs when they expose a real gap.
 * Alternative patterns contributed and reviewed.
 * Patterns reused outside ASI Backbone repositories.
 * Community Issues and Discussions.
