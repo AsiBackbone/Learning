@@ -71,9 +71,9 @@ jobs:
             --volume "$GITHUB_WORKSPACE:/src" \
             owasp/dependency-check-action@sha256:5dba1047835a50d51e5819fb912d3ed4037076f665cbff284ccdcd5953fa3d0c \
             --project AsiBackbone \
-            --scan /samples \
+            --scan /src/samples \
             --format ALL \
-            --out /samples/reports \
+            --out /src/reports \
             --noupdate \
             --failOnCVSS 7 \
             --suppression /src/dependency-check-suppressions.xml
