@@ -103,9 +103,9 @@ git switch -c lab/governed-ai-tool-gateway
 Run the sample and focused tests before making changes:
 
 ```bash
-dotnet run --project samples/governed-ai-tool-gateway/GovernedAiToolGateway/GovernedAiToolGateway.csproj
+dotnet run --project samples/governed-ai-tool-gateway/Sample/GovernedAiToolGateway.csproj
 
-dotnet test samples/governed-ai-tool-gateway/GovernedAiToolGateway.Tests/GovernedAiToolGateway.Tests.csproj
+dotnet test samples/governed-ai-tool-gateway/Tests/GovernedAiToolGateway.Tests.csproj
 ```
 
 Locate these types in the sample:

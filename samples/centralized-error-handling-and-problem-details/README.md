@@ -45,13 +45,13 @@ HTTP result / Problem Details
 
 ```text
 centralized-error-handling-and-problem-details/
-├── CentralizedErrorHandlingAndProblemDetails/
+├── Sample/
 │   ├── ApplicationExceptionHandler.cs
 │   ├── CentralizedErrorHandlingAndProblemDetails.csproj
 │   ├── GovernanceDecision.cs
 │   ├── Program.cs
 │   └── SampleApplication.cs
-├── CentralizedErrorHandlingAndProblemDetails.Tests/
+├── Tests/
 │   ├── CentralizedErrorHandlingAndProblemDetails.Tests.csproj
 │   └── ErrorHandlingIntegrationTests.cs
 └── README.md
@@ -62,7 +62,7 @@ centralized-error-handling-and-problem-details/
 From the repository root:
 
 ```bash
-dotnet run --project samples/centralized-error-handling-and-problem-details/CentralizedErrorHandlingAndProblemDetails/CentralizedErrorHandlingAndProblemDetails.csproj --urls http://127.0.0.1:5082
+dotnet run --project samples/centralized-error-handling-and-problem-details/Sample/CentralizedErrorHandlingAndProblemDetails.csproj --urls http://127.0.0.1:5082
 ```
 
 Then try the paths below.
@@ -178,7 +178,7 @@ This shows that exception normalization and ordinary HTTP status handling are di
 From the repository root:
 
 ```bash
-dotnet test samples/centralized-error-handling-and-problem-details/CentralizedErrorHandlingAndProblemDetails.Tests/CentralizedErrorHandlingAndProblemDetails.Tests.csproj
+dotnet test samples/centralized-error-handling-and-problem-details/Tests/CentralizedErrorHandlingAndProblemDetails.Tests.csproj
 ```
 
 The focused tests prove these invariants:

@@ -43,13 +43,13 @@ The projection also retains `SourceReasonCodes` and `SourcePolicies` as trusted 
 From the repository root:
 
 ```bash
-dotnet run --project samples/decision-explainability/DecisionExplainability/DecisionExplainability.csproj
+dotnet run --project samples/decision-explainability/Sample/DecisionExplainability.csproj
 ```
 
 Run the focused tests with:
 
 ```bash
-dotnet test samples/decision-explainability/DecisionExplainability.Tests/DecisionExplainability.Tests.csproj
+dotnet test samples/decision-explainability/Tests/DecisionExplainability.Tests.csproj
 ```
 
 Or validate the complete sample solution:

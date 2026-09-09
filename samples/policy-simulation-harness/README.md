@@ -63,7 +63,7 @@ No model provider, database, network service, external policy engine, or protect
 From the repository root:
 
 ```bash
-dotnet run --project samples/policy-simulation-harness/PolicySimulationHarness/PolicySimulationHarness.csproj
+dotnet run --project samples/policy-simulation-harness/Sample/PolicySimulationHarness.csproj
 ```
 
 The console report includes comparisons for:
@@ -82,7 +82,7 @@ It also includes a degraded-environment scenario that produces `Deferred`.
 Run the focused test project:
 
 ```bash
-dotnet test samples/policy-simulation-harness/PolicySimulationHarness.Tests/PolicySimulationHarness.Tests.csproj
+dotnet test samples/policy-simulation-harness/Tests/PolicySimulationHarness.Tests.csproj
 ```
 
 Or run the complete Learning sample suite:

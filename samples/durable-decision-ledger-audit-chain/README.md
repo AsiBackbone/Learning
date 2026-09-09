@@ -15,13 +15,13 @@ The sample targets **.NET 10**, matching `samples/Directory.Build.props`.
 From the repository root:
 
 ```bash
-dotnet run --project samples/durable-decision-ledger-audit-chain/DurableDecisionLedgerAuditChain/DurableDecisionLedgerAuditChain.csproj
+dotnet run --project samples/durable-decision-ledger-audit-chain/Sample/DurableDecisionLedgerAuditChain.csproj
 ```
 
 Run the focused tests:
 
 ```bash
-dotnet test samples/durable-decision-ledger-audit-chain/DurableDecisionLedgerAuditChain.Tests/DurableDecisionLedgerAuditChain.Tests.csproj
+dotnet test samples/durable-decision-ledger-audit-chain/Tests/DurableDecisionLedgerAuditChain.Tests.csproj
 ```
 
 Or validate the complete sample suite:

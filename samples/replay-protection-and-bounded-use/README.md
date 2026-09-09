@@ -63,11 +63,11 @@ The [Data Access Boundaries and Transaction Reasoning](../../docs/aspnetcore/dat
 
 ```text
 samples/replay-protection-and-bounded-use/
-├── ReplayProtectionAndBoundedUse/
+├── Sample/
 │   ├── Program.cs
 │   ├── ReplayProtection.cs
 │   └── ReplayProtectionAndBoundedUse.csproj
-├── ReplayProtectionAndBoundedUse.Tests/
+├── Tests/
 │   ├── ReplayProtectionBoundaryTests.cs
 │   └── ReplayProtectionAndBoundedUse.Tests.csproj
 └── README.md
@@ -80,7 +80,7 @@ samples/replay-protection-and-bounded-use/
 From the repository root:
 
 ```bash
-dotnet run --project samples/replay-protection-and-bounded-use/ReplayProtectionAndBoundedUse/ReplayProtectionAndBoundedUse.csproj
+dotnet run --project samples/replay-protection-and-bounded-use/Sample/ReplayProtectionAndBoundedUse.csproj
 ```
 
 The program runs four observable comparisons.
@@ -161,7 +161,7 @@ This demonstrates why artifact validity and use-state consumption are distinct o
 From the repository root:
 
 ```bash
-dotnet test samples/replay-protection-and-bounded-use/ReplayProtectionAndBoundedUse.Tests/ReplayProtectionAndBoundedUse.Tests.csproj
+dotnet test samples/replay-protection-and-bounded-use/Tests/ReplayProtectionAndBoundedUse.Tests.csproj
 ```
 
 Or run the complete sample suite:

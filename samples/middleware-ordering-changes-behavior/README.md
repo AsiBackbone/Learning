@@ -59,11 +59,11 @@ No `AsiBackbone` package is required.
 
 ```text
 middleware-ordering-changes-behavior/
-├── MiddlewareOrderingChangesBehavior/
+├── Sample/
 │   ├── MiddlewareOrderingChangesBehavior.csproj
 │   ├── MiddlewareOrderDemo.cs
 │   └── Program.cs
-├── MiddlewareOrderingChangesBehavior.Tests/
+├── Tests/
 │   ├── MiddlewareOrderingChangesBehavior.Tests.csproj
 │   └── MiddlewareOrderTests.cs
 └── README.md
@@ -76,7 +76,7 @@ middleware-ordering-changes-behavior/
 From the repository root:
 
 ```bash
-dotnet run --project samples/middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior/MiddlewareOrderingChangesBehavior.csproj -- --PipelineMode=correct --urls http://127.0.0.1:5080
+dotnet run --project samples/middleware-ordering-changes-behavior/Sample/MiddlewareOrderingChangesBehavior.csproj -- --PipelineMode=correct --urls http://127.0.0.1:5080
 ```
 
 In another terminal:
@@ -126,7 +126,7 @@ The custom boundary has already entered the request before the fault occurs, so 
 Stop the application and restart it:
 
 ```bash
-dotnet run --project samples/middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior/MiddlewareOrderingChangesBehavior.csproj -- --PipelineMode=incorrect --urls http://127.0.0.1:5080
+dotnet run --project samples/middleware-ordering-changes-behavior/Sample/MiddlewareOrderingChangesBehavior.csproj -- --PipelineMode=incorrect --urls http://127.0.0.1:5080
 ```
 
 The incorrect sequence is:
@@ -158,7 +158,7 @@ The focused test makes that distinction deterministic.
 From the repository root:
 
 ```bash
-dotnet test samples/middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior.Tests/MiddlewareOrderingChangesBehavior.Tests.csproj
+dotnet test samples/middleware-ordering-changes-behavior/Tests/MiddlewareOrderingChangesBehavior.Tests.csproj
 ```
 
 Or run the complete sample suite:

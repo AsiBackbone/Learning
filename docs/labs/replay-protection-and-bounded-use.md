@@ -66,9 +66,9 @@ git switch -c lab/replay-protection-concurrency
 Run the sample and focused tests before making changes:
 
 ```bash
-dotnet run --project samples/replay-protection-and-bounded-use/ReplayProtectionAndBoundedUse/ReplayProtectionAndBoundedUse.csproj
+dotnet run --project samples/replay-protection-and-bounded-use/Sample/ReplayProtectionAndBoundedUse.csproj
 
-dotnet test samples/replay-protection-and-bounded-use/ReplayProtectionAndBoundedUse.Tests/ReplayProtectionAndBoundedUse.Tests.csproj
+dotnet test samples/replay-protection-and-bounded-use/Tests/ReplayProtectionAndBoundedUse.Tests.csproj
 ```
 
 Locate these types in `ReplayProtection.cs`:

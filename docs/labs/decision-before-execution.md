@@ -63,7 +63,7 @@ git switch -c lab/decision-before-execution
 From the repository root, run the companion sample before making changes:
 
 ```bash
-dotnet run --project samples/decision-before-execution/DecisionBeforeExecution/DecisionBeforeExecution.csproj
+dotnet run --project samples/decision-before-execution/Sample/DecisionBeforeExecution.csproj
 ```
 
 The baseline should finish with:
@@ -157,7 +157,7 @@ await executor.ExecuteAsync(
 Run the sample again:
 
 ```bash
-dotnet run --project samples/decision-before-execution/DecisionBeforeExecution/DecisionBeforeExecution.csproj
+dotnet run --project samples/decision-before-execution/Sample/DecisionBeforeExecution.csproj
 ```
 
 The invariant should be restored:

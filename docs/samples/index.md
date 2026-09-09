@@ -61,7 +61,7 @@ The five foundational tutorials each have an executable companion sample.
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/decision-before-execution/DecisionBeforeExecution/DecisionBeforeExecution.csproj
+dotnet run --project samples/decision-before-execution/Sample/DecisionBeforeExecution.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md)
@@ -81,7 +81,7 @@ dotnet run --project samples/decision-before-execution/DecisionBeforeExecution/D
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/policy-context-and-explicit-decision-outcomes/PolicyContextAndExplicitDecisionOutcomes/PolicyContextAndExplicitDecisionOutcomes.csproj
+dotnet run --project samples/policy-context-and-explicit-decision-outcomes/Sample/PolicyContextAndExplicitDecisionOutcomes.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md)
@@ -103,7 +103,7 @@ Decision, acknowledgment, re-evaluation, and execution remain distinguishable ev
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/acknowledgment-and-audit-residue/AcknowledgmentAndAuditResidue/AcknowledgmentAndAuditResidue.csproj
+dotnet run --project samples/acknowledgment-and-audit-residue/Sample/AcknowledgmentAndAuditResidue.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/acknowledgment-and-audit-residue/README.md)
@@ -125,7 +125,7 @@ dotnet run --project samples/acknowledgment-and-audit-residue/AcknowledgmentAndA
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/scoped-capability-and-host-owned-execution/ScopedCapabilityAndHostOwnedExecution/ScopedCapabilityAndHostOwnedExecution.csproj
+dotnet run --project samples/scoped-capability-and-host-owned-execution/Sample/ScopedCapabilityAndHostOwnedExecution.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/scoped-capability-and-host-owned-execution/README.md)
@@ -145,7 +145,7 @@ dotnet run --project samples/scoped-capability-and-host-owned-execution/ScopedCa
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/governed-ai-tool-gateway/GovernedAiToolGateway/GovernedAiToolGateway.csproj
+dotnet run --project samples/governed-ai-tool-gateway/Sample/GovernedAiToolGateway.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md)
@@ -170,7 +170,7 @@ The same executable includes a deterministic local observability demonstration u
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/decision-pipeline-refactoring/DecisionPipelineRefactoring/DecisionPipelineRefactoring.csproj
+dotnet run --project samples/decision-pipeline-refactoring/Sample/DecisionPipelineRefactoring.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-pipeline-refactoring/README.md)
@@ -193,7 +193,7 @@ The sample emits structured scenario results with decision outcome, reason code,
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/policy-simulation-harness/PolicySimulationHarness/PolicySimulationHarness.csproj
+dotnet run --project samples/policy-simulation-harness/Sample/PolicySimulationHarness.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-simulation-harness/README.md)
@@ -212,13 +212,13 @@ dotnet run --project samples/policy-simulation-harness/PolicySimulationHarness/P
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/federated-governance-coordination/FederatedGovernanceCoordination/FederatedGovernanceCoordination.csproj
+dotnet run --project samples/federated-governance-coordination/Sample/FederatedGovernanceCoordination.csproj
 ```
 
 Run the focused tests:
 
 ```bash
-dotnet test samples/federated-governance-coordination/FederatedGovernanceCoordination.Tests/FederatedGovernanceCoordination.Tests.csproj
+dotnet test samples/federated-governance-coordination/Tests/FederatedGovernanceCoordination.Tests.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/federated-governance-coordination/README.md)
@@ -235,13 +235,13 @@ dotnet test samples/federated-governance-coordination/FederatedGovernanceCoordin
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/distributed-acknowledgment-continuation/DistributedAcknowledgmentContinuation/DistributedAcknowledgmentContinuation.csproj
+dotnet run --project samples/distributed-acknowledgment-continuation/Sample/DistributedAcknowledgmentContinuation.csproj
 ```
 
 Run the focused tests:
 
 ```bash
-dotnet test samples/distributed-acknowledgment-continuation/DistributedAcknowledgmentContinuation.Tests/DistributedAcknowledgmentContinuation.Tests.csproj
+dotnet test samples/distributed-acknowledgment-continuation/Tests/DistributedAcknowledgmentContinuation.Tests.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/distributed-acknowledgment-continuation/README.md)
@@ -258,13 +258,13 @@ dotnet test samples/distributed-acknowledgment-continuation/DistributedAcknowled
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/decision-explainability/DecisionExplainability/DecisionExplainability.csproj
+dotnet run --project samples/decision-explainability/Sample/DecisionExplainability.csproj
 ```
 
 Run the focused tests:
 
 ```bash
-dotnet test samples/decision-explainability/DecisionExplainability.Tests/DecisionExplainability.Tests.csproj
+dotnet test samples/decision-explainability/Tests/DecisionExplainability.Tests.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-explainability/README.md)
@@ -281,13 +281,13 @@ dotnet test samples/decision-explainability/DecisionExplainability.Tests/Decisio
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/adaptive-risk-context/AdaptiveRiskContext/AdaptiveRiskContext.csproj
+dotnet run --project samples/adaptive-risk-context/Sample/AdaptiveRiskContext.csproj
 ```
 
 Run the focused tests:
 
 ```bash
-dotnet test samples/adaptive-risk-context/AdaptiveRiskContext.Tests/AdaptiveRiskContext.Tests.csproj
+dotnet test samples/adaptive-risk-context/Tests/AdaptiveRiskContext.Tests.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/adaptive-risk-context/README.md)
@@ -310,7 +310,7 @@ The sample also demonstrates that successful capability consumption does not est
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/replay-protection-and-bounded-use/ReplayProtectionAndBoundedUse/ReplayProtectionAndBoundedUse.csproj
+dotnet run --project samples/replay-protection-and-bounded-use/Sample/ReplayProtectionAndBoundedUse.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/replay-protection-and-bounded-use/README.md)
@@ -328,13 +328,13 @@ dotnet run --project samples/replay-protection-and-bounded-use/ReplayProtectionA
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/cross-system-capability-exchange/CrossSystemCapabilityExchange/CrossSystemCapabilityExchange.csproj
+dotnet run --project samples/cross-system-capability-exchange/Sample/CrossSystemCapabilityExchange.csproj
 ```
 
 Run the focused tests:
 
 ```bash
-dotnet test samples/cross-system-capability-exchange/CrossSystemCapabilityExchange.Tests/CrossSystemCapabilityExchange.Tests.csproj
+dotnet test samples/cross-system-capability-exchange/Tests/CrossSystemCapabilityExchange.Tests.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/cross-system-capability-exchange/README.md)
@@ -355,13 +355,13 @@ dotnet test samples/cross-system-capability-exchange/CrossSystemCapabilityExchan
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/durable-decision-ledger-audit-chain/DurableDecisionLedgerAuditChain/DurableDecisionLedgerAuditChain.csproj
+dotnet run --project samples/durable-decision-ledger-audit-chain/Sample/DurableDecisionLedgerAuditChain.csproj
 ```
 
 Run the focused tests:
 
 ```bash
-dotnet test samples/durable-decision-ledger-audit-chain/DurableDecisionLedgerAuditChain.Tests/DurableDecisionLedgerAuditChain.Tests.csproj
+dotnet test samples/durable-decision-ledger-audit-chain/Tests/DurableDecisionLedgerAuditChain.Tests.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/durable-decision-ledger-audit-chain/README.md)
@@ -385,7 +385,7 @@ dotnet test samples/durable-decision-ledger-audit-chain/DurableDecisionLedgerAud
 Run the corrected pipeline from the repository root:
 
 ```bash
-dotnet run --project samples/middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior/MiddlewareOrderingChangesBehavior.csproj -- --PipelineMode=correct --urls http://127.0.0.1:5080
+dotnet run --project samples/middleware-ordering-changes-behavior/Sample/MiddlewareOrderingChangesBehavior.csproj -- --PipelineMode=correct --urls http://127.0.0.1:5080
 ```
 
 Restart with `--PipelineMode=incorrect` to move the fault-producing middleware outside the sample exception boundary and compare the observable behavior.
@@ -405,13 +405,13 @@ Restart with `--PipelineMode=incorrect` to move the fault-producing middleware o
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/centralized-error-handling-and-problem-details/CentralizedErrorHandlingAndProblemDetails/CentralizedErrorHandlingAndProblemDetails.csproj --urls http://127.0.0.1:5082
+dotnet run --project samples/centralized-error-handling-and-problem-details/Sample/CentralizedErrorHandlingAndProblemDetails.csproj --urls http://127.0.0.1:5082
 ```
 
 Run the focused integration tests:
 
 ```bash
-dotnet test samples/centralized-error-handling-and-problem-details/CentralizedErrorHandlingAndProblemDetails.Tests/CentralizedErrorHandlingAndProblemDetails.Tests.csproj
+dotnet test samples/centralized-error-handling-and-problem-details/Tests/CentralizedErrorHandlingAndProblemDetails.Tests.csproj
 ```
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/centralized-error-handling-and-problem-details/README.md)

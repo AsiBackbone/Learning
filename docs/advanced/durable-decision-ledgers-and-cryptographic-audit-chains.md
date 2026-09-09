@@ -1230,13 +1230,13 @@ A useful test plan exercises the evidence lifecycle rather than only the happy-p
 The repository includes a deterministic, provider-neutral sample that makes the main invariants observable without a database, KMS, blockchain, or external timestamp service:
 
 ```bash
-dotnet run --project samples/durable-decision-ledger-audit-chain/DurableDecisionLedgerAuditChain/DurableDecisionLedgerAuditChain.csproj
+dotnet run --project samples/durable-decision-ledger-audit-chain/Sample/DurableDecisionLedgerAuditChain.csproj
 ```
 
 Run its focused tests with:
 
 ```bash
-dotnet test samples/durable-decision-ledger-audit-chain/DurableDecisionLedgerAuditChain.Tests/DurableDecisionLedgerAuditChain.Tests.csproj
+dotnet test samples/durable-decision-ledger-audit-chain/Tests/DurableDecisionLedgerAuditChain.Tests.csproj
 ```
 
 The sample deliberately models a small subset: deterministic canonical bytes, stable ASCII and non-ASCII digest test vectors, idempotent append-before-rebuild behavior, serialized head transitions, resumable verification from an accepted checkpoint boundary, explicit unsupported-format categories, streaming verification, mutation/reordering detection, and the difference between an internally valid truncated prefix and one that contradicts a protected checkpoint. It intentionally omits production key custody, signatures, RFC 3161 timestamping, distributed witnesses/gossip, and a real durable store.

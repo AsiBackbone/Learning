@@ -55,11 +55,11 @@ The stateful/external seams are represented by interfaces (`IExecutionAuthorityC
 ## Run It
 
 ```bash
-dotnet run --project samples/adaptive-risk-context/AdaptiveRiskContext/AdaptiveRiskContext.csproj
+dotnet run --project samples/adaptive-risk-context/Sample/AdaptiveRiskContext.csproj
 ```
 
 ```bash
-dotnet test samples/adaptive-risk-context/AdaptiveRiskContext.Tests/AdaptiveRiskContext.Tests.csproj
+dotnet test samples/adaptive-risk-context/Tests/AdaptiveRiskContext.Tests.csproj
 ```
 
 Or validate all samples:

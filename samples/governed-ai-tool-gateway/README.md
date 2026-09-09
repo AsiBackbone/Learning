@@ -54,11 +54,11 @@ The sample deliberately keeps the proposer and executor separate.
 ```text
 governed-ai-tool-gateway/
 │
-├── GovernedAiToolGateway/
+├── Sample/
 │   ├── GovernedAiToolGateway.csproj
 │   └── Program.cs
 │
-├── GovernedAiToolGateway.Tests/
+├── Tests/
 │   ├── GovernedAiToolGateway.Tests.csproj
 │   └── GovernedGatewayTests.cs
 │
@@ -72,7 +72,7 @@ The executable project contains the teaching implementation. The sibling xUnit p
 From the repository root:
 
 ```bash
-dotnet run --project samples/governed-ai-tool-gateway/GovernedAiToolGateway/GovernedAiToolGateway.csproj
+dotnet run --project samples/governed-ai-tool-gateway/Sample/GovernedAiToolGateway.csproj
 ```
 
 The console application runs representative scenarios including:
@@ -97,7 +97,7 @@ instead of performing an external side effect.
 Run the focused tests:
 
 ```bash
-dotnet test samples/governed-ai-tool-gateway/GovernedAiToolGateway.Tests/GovernedAiToolGateway.Tests.csproj
+dotnet test samples/governed-ai-tool-gateway/Tests/GovernedAiToolGateway.Tests.csproj
 ```
 
 Or run the complete Learning sample suite:

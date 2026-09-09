@@ -176,13 +176,13 @@ After the challenge record becomes available, the same evidence can be retried. 
 From the repository root:
 
 ```bash
-dotnet run --project samples/distributed-acknowledgment-continuation/DistributedAcknowledgmentContinuation/DistributedAcknowledgmentContinuation.csproj
+dotnet run --project samples/distributed-acknowledgment-continuation/Sample/DistributedAcknowledgmentContinuation.csproj
 ```
 
 ## Run the Tests
 
 ```bash
-dotnet test samples/distributed-acknowledgment-continuation/DistributedAcknowledgmentContinuation.Tests/DistributedAcknowledgmentContinuation.Tests.csproj
+dotnet test samples/distributed-acknowledgment-continuation/Tests/DistributedAcknowledgmentContinuation.Tests.csproj
 ```
 
 The focused tests prove:
