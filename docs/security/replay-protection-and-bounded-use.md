@@ -1210,6 +1210,13 @@ Do not claim global replay resistance without stating how competing regions coor
 
 A host-owned gateway can make the state transition explicit:
 
+> **Illustrative API:** The exact APIs are illustrative. `IllustrativeCapabilityCheck`,
+> `IllustrativeCapabilityCheckResult`, and `CheckAsync` are teaching-only names used
+> here to keep the replay-protection discussion independent of the released package API.
+> For the current `AsiBackbone` capability-grant validation surface, see
+> [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md)
+> and the [4.0 to 5.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-400-to-500.md).
+
 ```csharp
 public sealed class ProtectedOperationGateway(
     ICapabilityValidator validator,
@@ -1221,13 +1228,14 @@ public sealed class ProtectedOperationGateway(
         ExecutionRequest request,
         CancellationToken cancellationToken)
     {
-        CapabilityValidationResult validation =
-            await validator.ValidateAsync(
-                capability,
-                request,
+        IllustrativeCapabilityCheckResult validation =
+            await validator.CheckAsync(
+                new IllustrativeCapabilityCheck(
+                    CapabilityReference: capability,
+                    ExpectedContext: request),
                 cancellationToken);
 
-        if (!validation.IsValid)
+        if (!validation.ShouldProceed)
         {
             return ExecutionResult.Blocked(
                 validation.ReasonCode);

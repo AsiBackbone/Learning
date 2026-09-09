@@ -318,6 +318,13 @@ flowchart TD
 
 A compact teaching shape might separate the original command from the later execution message:
 
+> **Illustrative API:** The exact APIs are illustrative. `IllustrativeCapabilityCheck`,
+> `IllustrativeCapabilityCheckResult`, and `CheckAsync` are teaching-only names used
+> here to show the architectural boundary without reproducing the released package API.
+> For the current `AsiBackbone` capability-grant validation surface, see
+> [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md)
+> and the [4.0 to 5.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-400-to-500.md).
+
 ```csharp
 public sealed record ExecuteDeployment(
     string DeploymentId,
@@ -333,14 +340,19 @@ public sealed class ExecuteDeploymentHandler(
         ExecuteDeployment command,
         CancellationToken cancellationToken)
     {
-        CapabilityValidationResult authority = await capabilities.ValidateAsync(
-            command.CapabilityId,
-            expectedOperation: "deployment.execute",
-            expectedResource: command.DeploymentId,
-            expectedIntentFingerprint: command.IntentFingerprint,
-            cancellationToken);
+        IllustrativeCapabilityCheckResult authority =
+            await capabilities.CheckAsync(
+                new IllustrativeCapabilityCheck(
+                    CapabilityReference: command.CapabilityId,
+                    ExpectedContext: new
+                    {
+                        Operation = "deployment.execute",
+                        Resource = command.DeploymentId,
+                        command.IntentFingerprint
+                    }),
+                cancellationToken);
 
-        if (!authority.IsValid)
+        if (!authority.ShouldProceed)
         {
             return;
         }
