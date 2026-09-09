@@ -62,7 +62,7 @@ jobs:
       # Restore so the full transitive dependency graph (obj/project.assets.json)
       # is available for Dependency-Check's NuGet analyzers to read.
       - name: Restore dependencies
-        run: dotnet restore ./samples/Sample.slnx
+        run: dotnet restore ./samples/Samples.slnx
 
       - name: Run OWASP Dependency-Check (fail on CVSS 7 or higher)
         shell: bash
