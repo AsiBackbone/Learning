@@ -1561,8 +1561,8 @@ The Learning repository and the `AsiBackbone` implementation repository contain 
 
 | Testing concern | Reference | What to inspect |
 | --- | --- | --- |
-| Explicit outcome assertions | [`DecisionOutcomeTests`](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/PolicyContextAndExplicitDecisionOutcomes.Tests/DecisionOutcomeTests.cs) | Direct assertions for `Denied`, `Deferred`, `AcknowledgmentRequired`, and `Allowed` |
-| Table-like scenario coverage | [Policy Context sample program](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/PolicyContextAndExplicitDecisionOutcomes/Program.cs) | Named policy scenarios covering all major disable-account outcomes |
+| Explicit outcome assertions | [`DecisionOutcomeTests`](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/Tests/DecisionOutcomeTests.cs) | Direct assertions for `Denied`, `Deferred`, `AcknowledgmentRequired`, and `Allowed` |
+| Table-like scenario coverage | [Policy Context sample program](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/Sample/Program.cs) | Named policy scenarios covering all major disable-account outcomes |
 | Composition invariants | [`DefaultAsiBackbonePolicyEvaluatorTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Evaluation/DefaultAsiBackbonePolicyEvaluatorTests.cs) | Empty-policy behavior, warning/denial composition, exception posture, short-circuiting, and decision-policy interaction |
 | End-to-end evaluator behavior | [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) | Policy-evaluator invariants across the real implementation pipeline |
 | Policy provenance | [Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md) | Historical identity, drift, freshness, and version/hash boundaries |

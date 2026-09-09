@@ -588,7 +588,7 @@ The Learning sample is intentionally smaller. It uses `ActivitySource` and an in
 From the repository root:
 
 ```bash
-dotnet run --project samples/governed-ai-tool-gateway/GovernedAiToolGateway/GovernedAiToolGateway.csproj
+dotnet run --project samples/governed-ai-tool-gateway/Sample/GovernedAiToolGateway.csproj
 ```
 
 The existing gateway scenarios run first.
@@ -605,7 +605,7 @@ The observability demonstration then prints the allowed, denied, and acknowledgm
 Run the focused tests with:
 
 ```bash
-dotnet test samples/governed-ai-tool-gateway/GovernedAiToolGateway.Tests/GovernedAiToolGateway.Tests.csproj
+dotnet test samples/governed-ai-tool-gateway/Tests/GovernedAiToolGateway.Tests.csproj
 ```
 
 The observability tests verify the architectural outcomes rather than a particular exporter.

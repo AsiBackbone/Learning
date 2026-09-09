@@ -75,9 +75,9 @@ git switch -c lab/scoped-capability-execution
 Run the sample and its focused tests before making changes:
 
 ```bash
-dotnet run --project samples/scoped-capability-and-host-owned-execution/ScopedCapabilityAndHostOwnedExecution/ScopedCapabilityAndHostOwnedExecution.csproj
+dotnet run --project samples/scoped-capability-and-host-owned-execution/Sample/ScopedCapabilityAndHostOwnedExecution.csproj
 
-dotnet test samples/scoped-capability-and-host-owned-execution/ScopedCapabilityAndHostOwnedExecution.Tests/ScopedCapabilityAndHostOwnedExecution.Tests.csproj
+dotnet test samples/scoped-capability-and-host-owned-execution/Tests/ScopedCapabilityAndHostOwnedExecution.Tests.csproj
 ```
 
 Locate these types in `Program.cs`:

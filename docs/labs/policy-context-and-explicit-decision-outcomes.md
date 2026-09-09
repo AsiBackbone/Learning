@@ -70,7 +70,7 @@ git switch -c lab/policy-context-and-outcomes
 From the repository root, run the companion sample before making changes:
 
 ```bash
-dotnet run --project samples/policy-context-and-explicit-decision-outcomes/PolicyContextAndExplicitDecisionOutcomes/PolicyContextAndExplicitDecisionOutcomes.csproj
+dotnet run --project samples/policy-context-and-explicit-decision-outcomes/Sample/PolicyContextAndExplicitDecisionOutcomes.csproj
 ```
 
 The baseline should finish with:
@@ -449,7 +449,7 @@ If you created a temporary branch only for the exercise, you can compare your wo
 To discard uncommitted changes to the sample:
 
 ```bash
-git restore samples/policy-context-and-explicit-decision-outcomes/PolicyContextAndExplicitDecisionOutcomes/Program.cs
+git restore samples/policy-context-and-explicit-decision-outcomes/Sample/Program.cs
 ```
 
 Use `git status` before restoring anything so that you understand which local changes will be affected.

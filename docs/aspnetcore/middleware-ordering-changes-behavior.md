@@ -464,7 +464,7 @@ The companion sample intentionally isolates two ideas:
 From the repository root:
 
 ```bash
-dotnet run --project samples/middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior/MiddlewareOrderingChangesBehavior.csproj -- --PipelineMode=correct --urls http://127.0.0.1:5080
+dotnet run --project samples/middleware-ordering-changes-behavior/Sample/MiddlewareOrderingChangesBehavior.csproj -- --PipelineMode=correct --urls http://127.0.0.1:5080
 ```
 
 Request the normal path and watch the console:
@@ -484,7 +484,7 @@ In `correct` mode, the demo exception boundary is placed before the fault-produc
 Restart in deliberately incorrect mode:
 
 ```bash
-dotnet run --project samples/middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior/MiddlewareOrderingChangesBehavior.csproj -- --PipelineMode=incorrect --urls http://127.0.0.1:5080
+dotnet run --project samples/middleware-ordering-changes-behavior/Sample/MiddlewareOrderingChangesBehavior.csproj -- --PipelineMode=incorrect --urls http://127.0.0.1:5080
 ```
 
 The `/fault` request now throws before the custom exception boundary is entered.

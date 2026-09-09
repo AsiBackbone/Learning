@@ -89,7 +89,7 @@ git switch -c lab/safe-degraded-mode
 Run the current sample tests first:
 
 ```bash
-dotnet test samples/governed-ai-tool-gateway/GovernedAiToolGateway.Tests/GovernedAiToolGateway.Tests.csproj
+dotnet test samples/governed-ai-tool-gateway/Tests/GovernedAiToolGateway.Tests.csproj
 ```
 
 Then run the full sample suite:
@@ -1082,7 +1082,7 @@ Those questions are not interchangeable.
 Run the focused gateway tests again:
 
 ```bash
-dotnet test samples/governed-ai-tool-gateway/GovernedAiToolGateway.Tests/GovernedAiToolGateway.Tests.csproj
+dotnet test samples/governed-ai-tool-gateway/Tests/GovernedAiToolGateway.Tests.csproj
 ```
 
 Then run the full sample suite:

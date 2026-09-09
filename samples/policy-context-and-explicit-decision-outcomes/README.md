@@ -45,7 +45,7 @@ Beginner
 From the repository root:
 
 ```bash
-dotnet run --project samples/policy-context-and-explicit-decision-outcomes/PolicyContextAndExplicitDecisionOutcomes/PolicyContextAndExplicitDecisionOutcomes.csproj
+dotnet run --project samples/policy-context-and-explicit-decision-outcomes/Sample/PolicyContextAndExplicitDecisionOutcomes.csproj
 ```
 
 ## Run the Tests
@@ -53,7 +53,7 @@ dotnet run --project samples/policy-context-and-explicit-decision-outcomes/Polic
 From the repository root:
 
 ```bash
-dotnet test samples/policy-context-and-explicit-decision-outcomes/PolicyContextAndExplicitDecisionOutcomes.Tests/PolicyContextAndExplicitDecisionOutcomes.Tests.csproj
+dotnet test samples/policy-context-and-explicit-decision-outcomes/Tests/PolicyContextAndExplicitDecisionOutcomes.Tests.csproj
 ```
 
 The focused xUnit tests verify representative structured outcomes and confirm that denied, deferred, and acknowledgment-required decisions remain non-proceeding host instructions.

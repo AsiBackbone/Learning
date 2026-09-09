@@ -27,10 +27,27 @@ From a terminal:
 git clone https://github.com/AsiBackbone/Learning.git
 cd Learning
 
-dotnet run --project samples/decision-before-execution/DecisionBeforeExecution/DecisionBeforeExecution.csproj
+dotnet run --project samples/decision-before-execution/Sample/DecisionBeforeExecution.csproj
 
-dotnet test samples/decision-before-execution/DecisionBeforeExecution.Tests/DecisionBeforeExecution.Tests.csproj
+dotnet test samples/decision-before-execution/Tests/DecisionBeforeExecution.Tests.csproj
 ```
+
+#### Windows path-length troubleshooting
+
+The repository is intended to clone and build normally on supported Windows environments.
+
+If Git reports `Filename too long` during clone or checkout, you can enable Git for Windows long-path support:
+
+```powershell
+git config --global core.longpaths true
+```
+
+You can also reduce total path length by cloning the repository into a short location such as:
+
+```text
+C:\src\Learning
+```
+
 
 ### What to Observe
 

@@ -1820,7 +1820,7 @@ It does not remove the need to resolve security-sensitive facts from trusted app
 The Learning repository already contains an executable capstone that demonstrates the broader boundary:
 
 - [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) — simulated model proposals, host-owned context, decision handling, acknowledgment, capability validation, dry-run execution, and invariant tests.
-- [Governed AI Tool Gateway tests](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/GovernedAiToolGateway.Tests/GovernedGatewayTests.cs) — executable negative and positive gateway scenarios.
+- [Governed AI Tool Gateway tests](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/Tests/GovernedGatewayTests.cs) — executable negative and positive gateway scenarios.
 
 The `AsiBackbone/AsiBackbone` repository provides fuller governance references:
 

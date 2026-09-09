@@ -53,7 +53,7 @@ Intermediate
 From the repository root:
 
 ```bash
-dotnet run --project samples/acknowledgment-and-audit-residue/AcknowledgmentAndAuditResidue/AcknowledgmentAndAuditResidue.csproj
+dotnet run --project samples/acknowledgment-and-audit-residue/Sample/AcknowledgmentAndAuditResidue.csproj
 ```
 
 ## Run the Tests
@@ -61,7 +61,7 @@ dotnet run --project samples/acknowledgment-and-audit-residue/AcknowledgmentAndA
 From the repository root:
 
 ```bash
-dotnet test samples/acknowledgment-and-audit-residue/AcknowledgmentAndAuditResidue.Tests/AcknowledgmentAndAuditResidue.Tests.csproj
+dotnet test samples/acknowledgment-and-audit-residue/Tests/AcknowledgmentAndAuditResidue.Tests.csproj
 ```
 
 The focused xUnit tests make the boundary explicit: acknowledgment can satisfy one governance requirement, but it does not itself grant authorization or execution authority. Re-evaluation still controls the next step, and changed resource state can still block execution.
