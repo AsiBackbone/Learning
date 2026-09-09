@@ -244,6 +244,15 @@ if ($Apply) {
         Write-Host 'Enabled mandatory secret scanning and push protection settings.'
     }
 
+    $repositorySettings = @{
+        delete_branch_on_merge = $true
+    }
+
+    if ($PSCmdlet.ShouldProcess($Repository, 'Enable automatic deletion of merged pull-request branches')) {
+        Invoke-GitHubApiWithBody -Method PATCH -Endpoint "repos/$Repository" -Body $repositorySettings | Out-Null
+        Write-Host 'Enabled automatic deletion of merged pull-request branches.'
+    }
+
     foreach ($optionalFeature in @(
         'secret_scanning_non_provider_patterns',
         'secret_scanning_validity_checks'
@@ -328,6 +337,14 @@ else {
 
 $repositoryState = Invoke-GitHubApi -Arguments @("repos/$Repository")
 $securityAndAnalysis = Get-OptionalPropertyValue -InputObject $repositoryState -Name 'security_and_analysis'
+$deleteBranchOnMerge = [bool](Get-OptionalPropertyValue -InputObject $repositoryState -Name 'delete_branch_on_merge')
+
+if (-not $deleteBranchOnMerge) {
+    Add-Failure -Failures $failures -Message 'Automatic deletion of merged pull-request branches is not enabled.'
+}
+else {
+    Write-Host 'Automatic deletion of merged pull-request branches is enabled.'
+}
 
 if ($null -eq $securityAndAnalysis) {
     Add-Failure -Failures $failures -Message (
@@ -506,4 +523,4 @@ if ($failures.Count -gt 0) {
     throw "$($failures.Count) repository security control checks failed. Use -Apply -WhatIf to preview remediation."
 }
 
-Write-Host 'Repository security control audit passed. Dependabot security updates, mandatory push protection, and the canonical main-branch ruleset are in the expected state.'
+Write-Host 'Repository security control audit passed. Dependabot security updates, mandatory push protection, merged-branch cleanup, and the canonical main-branch ruleset are in the expected state.'
