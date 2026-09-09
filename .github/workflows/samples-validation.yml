@@ -47,6 +47,15 @@ jobs:
       - name: Display .NET information
         run: dotnet --info
 
+      - name: Verify centralized sample package versions
+        working-directory: samples
+        shell: bash
+        run: |
+          if grep -R --include='*.csproj' -nE '<PackageReference[^>]*[[:space:]]Version=' .; then
+            echo "Sample PackageReference versions must be managed in samples/Directory.Packages.props."
+            exit 1
+          fi
+
       - name: Restore samples
         working-directory: samples
         run: dotnet restore Samples.slnx

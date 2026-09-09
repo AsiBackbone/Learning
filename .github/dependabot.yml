@@ -1,12 +1,12 @@
 version: 2
 
 updates:
-  # Monitor the repository-local DocFX tool manifest and all NuGet manifests
-  # used by executable teaching samples.
+  # Monitor the repository-local DocFX tool manifest and the centralized
+  # NuGet package-version manifest used by executable teaching samples.
   - package-ecosystem: "nuget"
     directories:
       - "/.config"
-      - "/samples/**"
+      - "/samples"
     schedule:
       interval: "weekly"
       day: "friday"

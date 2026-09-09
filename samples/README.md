@@ -895,6 +895,23 @@ dotnet test Samples.slnx --no-build
 
 Common compiler settings are centralized in [`Directory.Build.props`](Directory.Build.props), so sample projects share the same target framework, nullable configuration, implicit-usings setting, and warnings-as-errors behavior.
 
+Shared NuGet versions are centralized in [`Directory.Packages.props`](Directory.Packages.props). Individual sample projects still declare which packages they use, but shared version numbers have one authoritative location.
+
+### Sample Dependency Updates and Reproducibility
+
+When a shared sample dependency changes:
+
+1. Update the version once in `samples/Directory.Packages.props`.
+2. Restore, build, and test `samples/Samples.slnx`.
+3. Review the resolved dependency change and any affected teaching behavior.
+4. Commit the central version update together with any sample changes it requires.
+
+The sample suite intentionally does **not** commit per-project `packages.lock.json` files or use `dotnet restore --locked-mode` at this time. NuGet lock files are project-scoped, so adopting them for the current 32-project teaching suite would add a large set of generated maintenance artifacts and make small sample copies noisier.
+
+This is a deliberate reproducibility tradeoff. Direct shared versions are pinned centrally, while transitive dependency resolution is refreshed during ordinary restore. Reconsider committed lock files if dependency-graph drift becomes an observed problem, if an archived sample needs exact dependency-graph reconstruction, or if the suite develops a smaller lock-file boundary that preserves teaching clarity.
+
+A sample copied outside this repository also needs the shared `Directory.Build.props` and `Directory.Packages.props` files (or equivalent local settings), because target-framework defaults and package versions are intentionally owned at the `samples/` root.
+
 Focused xUnit test projects live beside their corresponding executable sample projects and reference those executable projects directly. This keeps the samples small while making their architectural contracts testable without introducing separate class-library layers solely for testing.
 
 ## Per-Sample Documentation
