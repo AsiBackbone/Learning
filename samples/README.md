@@ -880,7 +880,7 @@ The shared sample solution is [`Samples.slnx`](Samples.slnx).
 From the repository root, restore, build, and test all executable samples with:
 
 ```bash
-dotnet restore samples/Samples.slnx
+dotnet restore samples/Samples.slnx --locked-mode
 dotnet build samples/Samples.slnx --no-restore
 dotnet test samples/Samples.slnx --no-build
 ```
@@ -888,7 +888,7 @@ dotnet test samples/Samples.slnx --no-build
 From the `samples/` directory, the equivalent commands are:
 
 ```bash
-dotnet restore Samples.slnx
+dotnet restore Samples.slnx --locked-mode
 dotnet build Samples.slnx --no-restore
 dotnet test Samples.slnx --no-build
 ```
@@ -902,15 +902,14 @@ Shared NuGet versions are centralized in [`Directory.Packages.props`](Directory.
 When a shared sample dependency changes:
 
 1. Update the version once in `samples/Directory.Packages.props`.
-2. Restore, build, and test `samples/Samples.slnx`.
-3. Review the resolved dependency change and any affected teaching behavior.
-4. Commit the central version update together with any sample changes it requires.
+2. Regenerate the lock files with `dotnet restore samples/Samples.slnx --force-evaluate`.
+3. Restore with `--locked-mode`, then build and test `samples/Samples.slnx`.
+4. Review the resolved dependency changes and any affected teaching behavior.
+5. Commit the central version update and updated lock files together with any sample changes it requires.
 
-The sample suite intentionally does **not** commit per-project `packages.lock.json` files or use `dotnet restore --locked-mode` at this time. NuGet lock files are project-scoped, so adopting them for the current 32-project teaching suite would add a large set of generated maintenance artifacts and make small sample copies noisier.
+The sample suite commits each project's `packages.lock.json` and enables lock-file generation through `Directory.Build.props`. CI and security workflows restore with `--locked-mode`, so an unreviewed direct or transitive dependency change fails validation instead of silently changing the resolved graph. The lock files are part of the suite's reproducibility contract and must be updated intentionally alongside central package-version changes.
 
-This is a deliberate reproducibility tradeoff. Direct shared versions are pinned centrally, while transitive dependency resolution is refreshed during ordinary restore. Reconsider committed lock files if dependency-graph drift becomes an observed problem, if an archived sample needs exact dependency-graph reconstruction, or if the suite develops a smaller lock-file boundary that preserves teaching clarity.
-
-A sample copied outside this repository also needs the shared `Directory.Build.props` and `Directory.Packages.props` files (or equivalent local settings), because target-framework defaults and package versions are intentionally owned at the `samples/` root.
+A sample copied outside this repository also needs its `packages.lock.json` plus the shared `Directory.Build.props` and `Directory.Packages.props` files (or equivalent local settings), because target-framework defaults, lock-file behavior, and package versions are intentionally owned at the `samples/` root.
 
 Focused xUnit test projects live beside their corresponding executable sample projects and reference those executable projects directly. This keeps the samples small while making their architectural contracts testable without introducing separate class-library layers solely for testing.
 
