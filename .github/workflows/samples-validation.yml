@@ -58,7 +58,7 @@ jobs:
 
       - name: Restore samples
         working-directory: samples
-        run: dotnet restore Samples.slnx
+        run: dotnet restore Samples.slnx --locked-mode
 
       - name: Build samples
         working-directory: samples
