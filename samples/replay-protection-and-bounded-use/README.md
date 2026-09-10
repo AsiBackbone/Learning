@@ -69,6 +69,7 @@ samples/replay-protection-and-bounded-use/
 │   └── ReplayProtectionAndBoundedUse.csproj
 ├── Tests/
 │   ├── ReplayProtectionBoundaryTests.cs
+│   ├── ReplayProtectionPropertyTests.cs
 │   └── ReplayProtectionAndBoundedUse.Tests.csproj
 └── README.md
 ```
@@ -204,7 +205,7 @@ No consumption
 Execution count = 0
 ```
 
-They also cover bounded-use authority, rejected-replay evidence, cancellation before consumption, explicit replay-store unavailability, and executor failure after a use has already been consumed.
+They also cover bounded-use authority, rejected-replay evidence, cancellation before consumption, explicit replay-store unavailability, and executor failure after a use has already been consumed. FsCheck property tests fuzz arbitrary subject inputs and bounded-use limits to verify that mismatched identities always fail closed and accepted consumption never exceeds the configured limit.
 
 ## What to Observe
 
