@@ -31,5 +31,9 @@ include_fragments = "anchor-only"
 exclude = [
   # Private vulnerability reporting is intentionally conditional and may
   # return 404 to automated or unauthenticated link checkers.
-  '^https://github\.com/AsiBackbone/Learning/security/advisories/new$'
+  '^https://github\.com/AsiBackbone/Learning/security/advisories/new$',
+
+
+  # Zenodo DOI occasionally times out for automated link validation.
+  '^https://doi\.org/10\.5281/zenodo\.21938556$'
 ]

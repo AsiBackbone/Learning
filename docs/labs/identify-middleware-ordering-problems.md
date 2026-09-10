@@ -47,7 +47,7 @@ The goal is to learn how to prove what a particular position means.
 From the repository root, run the focused sample tests:
 
 ```bash
-dotnet test samples/middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior.Tests/MiddlewareOrderingChangesBehavior.Tests.csproj
+dotnet test samples/middleware-ordering-changes-behavior/Tests/MiddlewareOrderingChangesBehavior.Tests.csproj
 ```
 
 The existing tests establish three observable facts:
@@ -60,10 +60,10 @@ Now inspect these files:
 
 ```text
 samples/middleware-ordering-changes-behavior/
-├── MiddlewareOrderingChangesBehavior/
+├── Sample/
 │   ├── MiddlewareOrderDemo.cs
 │   └── Program.cs
-└── MiddlewareOrderingChangesBehavior.Tests/
+└── Tests/
     └── MiddlewareOrderTests.cs
 ```
 
@@ -120,7 +120,7 @@ Before running anything, answer:
 Run the deliberately incorrect pipeline:
 
 ```bash
-dotnet run --project samples/middleware-ordering-changes-behavior/MiddlewareOrderingChangesBehavior/MiddlewareOrderingChangesBehavior.csproj -- --PipelineMode=incorrect --urls http://127.0.0.1:5080
+dotnet run --project samples/middleware-ordering-changes-behavior/Sample/MiddlewareOrderingChangesBehavior.csproj -- --PipelineMode=incorrect --urls http://127.0.0.1:5080
 ```
 
 In another terminal, make a normal request:
@@ -194,7 +194,7 @@ The copied test project keeps its relative project reference, so the pair remain
 Run the copied tests before changing anything:
 
 ```bash
-dotnet test ../MiddlewareOrderingLab/MiddlewareOrderingChangesBehavior.Tests/MiddlewareOrderingChangesBehavior.Tests.csproj
+dotnet test ../MiddlewareOrderingLab/Tests/MiddlewareOrderingChangesBehavior.Tests.csproj
 ```
 
 They should pass in the copied baseline.
@@ -240,7 +240,7 @@ public async Task RepairedOrder_CatchesFaultInsideExceptionBoundary()
 Run the copied tests again:
 
 ```bash
-dotnet test ../MiddlewareOrderingLab/MiddlewareOrderingChangesBehavior.Tests/MiddlewareOrderingChangesBehavior.Tests.csproj
+dotnet test ../MiddlewareOrderingLab/Tests/MiddlewareOrderingChangesBehavior.Tests.csproj
 ```
 
 The new repair-target test should fail because `correctOrder: false` still builds the defective sequence.
@@ -293,7 +293,7 @@ Leave the trace middleware in a position you can explain.
 Run the copied tests:
 
 ```bash
-dotnet test ../MiddlewareOrderingLab/MiddlewareOrderingChangesBehavior.Tests/MiddlewareOrderingChangesBehavior.Tests.csproj
+dotnet test ../MiddlewareOrderingLab/Tests/MiddlewareOrderingChangesBehavior.Tests.csproj
 ```
 
 The repair-target test should now pass.

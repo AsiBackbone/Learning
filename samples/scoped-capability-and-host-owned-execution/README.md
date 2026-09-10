@@ -48,7 +48,7 @@ Intermediate
 From the repository root:
 
 ```bash
-dotnet run --project samples/scoped-capability-and-host-owned-execution/ScopedCapabilityAndHostOwnedExecution/ScopedCapabilityAndHostOwnedExecution.csproj
+dotnet run --project samples/scoped-capability-and-host-owned-execution/Sample/ScopedCapabilityAndHostOwnedExecution.csproj
 ```
 
 The sample evaluates deterministic execution-boundary scenarios:
@@ -72,7 +72,7 @@ No real account operation occurs. The executor records and prints a simulated ho
 From the repository root:
 
 ```bash
-dotnet test samples/scoped-capability-and-host-owned-execution/ScopedCapabilityAndHostOwnedExecution.Tests/ScopedCapabilityAndHostOwnedExecution.Tests.csproj
+dotnet test samples/scoped-capability-and-host-owned-execution/Tests/ScopedCapabilityAndHostOwnedExecution.Tests.csproj
 ```
 
 Or run the complete sample suite:

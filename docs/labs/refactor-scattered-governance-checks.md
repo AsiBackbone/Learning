@@ -82,7 +82,7 @@ samples/decision-pipeline-refactoring/
 Run it from the repository root:
 
 ```bash
-dotnet run --project samples/decision-pipeline-refactoring/DecisionPipelineRefactoring/DecisionPipelineRefactoring.csproj
+dotnet run --project samples/decision-pipeline-refactoring/Sample/DecisionPipelineRefactoring.csproj
 ```
 
 The first output section is the intentionally flawed `ScatteredAccountDisableService`.
@@ -379,7 +379,7 @@ If you split the side effects into multiple executors, strengthen the tests so e
 Run the companion tests:
 
 ```bash
-dotnet test samples/decision-pipeline-refactoring/DecisionPipelineRefactoring.Tests/DecisionPipelineRefactoring.Tests.csproj
+dotnet test samples/decision-pipeline-refactoring/Tests/DecisionPipelineRefactoring.Tests.csproj
 ```
 
 The test project contains one diagnostic starter test plus the required refactored invariants.

@@ -88,7 +88,7 @@ git switch -c lab/policy-version-evidence
 From the repository root, run the baseline sample:
 
 ```bash
-dotnet run --project samples/policy-context-and-explicit-decision-outcomes/PolicyContextAndExplicitDecisionOutcomes/PolicyContextAndExplicitDecisionOutcomes.csproj
+dotnet run --project samples/policy-context-and-explicit-decision-outcomes/Sample/PolicyContextAndExplicitDecisionOutcomes.csproj
 ```
 
 The baseline should finish with:
@@ -769,7 +769,7 @@ git diff
 To restore the companion sample:
 
 ```bash
-git restore samples/policy-context-and-explicit-decision-outcomes/PolicyContextAndExplicitDecisionOutcomes/Program.cs
+git restore samples/policy-context-and-explicit-decision-outcomes/Sample/Program.cs
 ```
 
 Use `git status` first so you understand which local work will be affected.

@@ -66,7 +66,7 @@ Those concerns remain article-level architecture responsibilities.
 From the repository root:
 
 ```bash
-dotnet run --project samples/federated-governance-coordination/FederatedGovernanceCoordination/FederatedGovernanceCoordination.csproj
+dotnet run --project samples/federated-governance-coordination/Sample/FederatedGovernanceCoordination.csproj
 ```
 
 The console demonstrates:
@@ -80,7 +80,7 @@ The console demonstrates:
 ## Run the Tests
 
 ```bash
-dotnet test samples/federated-governance-coordination/FederatedGovernanceCoordination.Tests/FederatedGovernanceCoordination.Tests.csproj
+dotnet test samples/federated-governance-coordination/Tests/FederatedGovernanceCoordination.Tests.csproj
 ```
 
 The focused suite proves these invariants:

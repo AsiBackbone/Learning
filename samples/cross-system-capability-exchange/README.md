@@ -144,7 +144,7 @@ The sample is split by responsibility so the trust boundary is easy to browse:
 From the repository root:
 
 ```bash
-dotnet run --project samples/cross-system-capability-exchange/CrossSystemCapabilityExchange/CrossSystemCapabilityExchange.csproj
+dotnet run --project samples/cross-system-capability-exchange/Sample/CrossSystemCapabilityExchange.csproj
 ```
 
 The console runs a valid exchange, wrong-audience rejection, resource-drift rejection, and a sequential replay attempt.
@@ -152,7 +152,7 @@ The console runs a valid exchange, wrong-audience rejection, resource-drift reje
 ## Run the Tests
 
 ```bash
-dotnet test samples/cross-system-capability-exchange/CrossSystemCapabilityExchange.Tests/CrossSystemCapabilityExchange.Tests.csproj
+dotnet test samples/cross-system-capability-exchange/Tests/CrossSystemCapabilityExchange.Tests.csproj
 ```
 
 The focused xUnit suite protects these boundaries:

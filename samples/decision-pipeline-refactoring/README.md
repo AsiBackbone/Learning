@@ -92,10 +92,10 @@ CanExecute?
 
 ```text
 samples/decision-pipeline-refactoring/
-├── DecisionPipelineRefactoring/
+├── Sample/
 │   ├── DecisionPipelineRefactoring.csproj
 │   └── Program.cs
-├── DecisionPipelineRefactoring.Tests/
+├── Tests/
 │   ├── DecisionPipelineRefactoring.Tests.csproj
 │   └── DecisionPipelineInvariantTests.cs
 └── README.md
@@ -186,7 +186,7 @@ An allowed operation produces a decision record followed by an execution record.
 From the repository root:
 
 ```bash
-dotnet run --project samples/decision-pipeline-refactoring/DecisionPipelineRefactoring/DecisionPipelineRefactoring.csproj
+dotnet run --project samples/decision-pipeline-refactoring/Sample/DecisionPipelineRefactoring.csproj
 ```
 
 The first section intentionally demonstrates the broken architecture. A protected account is denied **after** the account mutation and notification have already occurred.
@@ -216,7 +216,7 @@ Exact spacing is not part of the contract.
 From the repository root:
 
 ```bash
-dotnet test samples/decision-pipeline-refactoring/DecisionPipelineRefactoring.Tests/DecisionPipelineRefactoring.Tests.csproj
+dotnet test samples/decision-pipeline-refactoring/Tests/DecisionPipelineRefactoring.Tests.csproj
 ```
 
 Or run the complete sample suite:

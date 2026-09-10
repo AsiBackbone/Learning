@@ -39,7 +39,7 @@ Beginner
 From the repository root:
 
 ```bash
-dotnet run --project samples/decision-before-execution/DecisionBeforeExecution/DecisionBeforeExecution.csproj
+dotnet run --project samples/decision-before-execution/Sample/DecisionBeforeExecution.csproj
 ```
 
 ## Run the Tests
@@ -47,7 +47,7 @@ dotnet run --project samples/decision-before-execution/DecisionBeforeExecution/D
 From the repository root:
 
 ```bash
-dotnet test samples/decision-before-execution/DecisionBeforeExecution.Tests/DecisionBeforeExecution.Tests.csproj
+dotnet test samples/decision-before-execution/Tests/DecisionBeforeExecution.Tests.csproj
 ```
 
 The focused xUnit tests assert that denied, deferred, and acknowledgment-required decisions never invoke the executor. A positive-control test confirms that an allowed decision crosses the execution boundary exactly once.

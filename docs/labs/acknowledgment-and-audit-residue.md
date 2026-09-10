@@ -91,7 +91,7 @@ git switch -c lab/acknowledgment-audit-residue
 From the repository root, run the companion sample before making changes:
 
 ```bash
-dotnet run --project samples/acknowledgment-and-audit-residue/AcknowledgmentAndAuditResidue/AcknowledgmentAndAuditResidue.csproj
+dotnet run --project samples/acknowledgment-and-audit-residue/Sample/AcknowledgmentAndAuditResidue.csproj
 ```
 
 Before continuing, locate these elements in `Program.cs`:
@@ -633,7 +633,7 @@ git diff
 To restore the companion sample:
 
 ```bash
-git restore samples/acknowledgment-and-audit-residue/AcknowledgmentAndAuditResidue/Program.cs
+git restore samples/acknowledgment-and-audit-residue/Sample/Program.cs
 ```
 
 Use `git status` first so you understand which local work will be affected.
