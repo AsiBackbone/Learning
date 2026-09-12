@@ -1,25 +1,17 @@
 namespace DistributedAcknowledgmentContinuation;
 
-public sealed class RecordingContinuationExecutor
-    : IContinuationExecutor
+public sealed class RecordingContinuationExecutor(
+    string acceptedAudience = RecordingContinuationExecutor.DefaultAcceptedAudience,
+    DateTimeOffset? executionNowUtc = null)
+        : IContinuationExecutor
 {
     public const string DefaultAcceptedAudience =
         "system-c:accounts-bulk-suspend";
 
-    private readonly string _acceptedAudience;
-    private readonly DateTimeOffset? _executionNowUtc;
-    private readonly object _lastExecutionSync = new();
+    private readonly string _acceptedAudience = acceptedAudience;
+    private readonly DateTimeOffset? _executionNowUtc = executionNowUtc;
+    private readonly Lock _lastExecutionSync = new();
     private int _invocationCount;
-    private ScopedContinuationAuthority? _lastAuthority;
-    private ValidatedContinuationCommand? _lastCommand;
-
-    public RecordingContinuationExecutor(
-        string acceptedAudience = DefaultAcceptedAudience,
-        DateTimeOffset? executionNowUtc = null)
-    {
-        _acceptedAudience = acceptedAudience;
-        _executionNowUtc = executionNowUtc;
-    }
 
     public int InvocationCount =>
         Volatile.Read(ref _invocationCount);
@@ -30,9 +22,11 @@ public sealed class RecordingContinuationExecutor
         {
             lock (_lastExecutionSync)
             {
-                return _lastAuthority;
+                return field;
             }
         }
+
+        private set;
     }
 
     public ValidatedContinuationCommand? LastCommand
@@ -41,9 +35,11 @@ public sealed class RecordingContinuationExecutor
         {
             lock (_lastExecutionSync)
             {
-                return _lastCommand;
+                return field;
             }
         }
+
+        private set;
     }
 
     public Task<ContinuationExecutionResult> ExecuteAsync(
@@ -119,8 +115,8 @@ public sealed class RecordingContinuationExecutor
 
         lock (_lastExecutionSync)
         {
-            _lastAuthority = authority;
-            _lastCommand = command;
+            LastAuthority = authority;
+            LastCommand = command;
         }
 
         Console.WriteLine(

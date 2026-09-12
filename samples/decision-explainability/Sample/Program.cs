@@ -4,32 +4,32 @@ public static class Program
 {
     public static void Main()
     {
-        ExplanationProjector projector = new();
+        _ = new ExplanationProjector();
 
         Console.WriteLine("Decision Explainability for Human Operators");
         Console.WriteLine();
 
         Show(
             "End-user regional denial",
-            projector.Project(
+            ExplanationProjector.Project(
                 SampleScenarios.RegionalResidencyDenial(),
                 ExplanationAudience.EndUser));
 
         Show(
             "Operator regional denial",
-            projector.Project(
+            ExplanationProjector.Project(
                 SampleScenarios.RegionalResidencyDenial(),
                 ExplanationAudience.Operator));
 
         Show(
             "Deferred current-context outcome",
-            projector.Project(
+            ExplanationProjector.Project(
                 SampleScenarios.DeferredContextUnavailable(),
                 ExplanationAudience.EndUser));
 
         Show(
             "Multiple contributing reasons",
-            projector.Project(
+            ExplanationProjector.Project(
                 SampleScenarios.MultiReasonDenial(),
                 ExplanationAudience.Operator));
 

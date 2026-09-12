@@ -9,7 +9,7 @@ public sealed class DurableDecisionLedgerAuditChainTests
     {
         LedgerRecordCore core = FirstCore();
 
-        const string expected = "{\"artifactType\":\"accountable-systems-governance-ledger-record/v1\",\"canonicalizationVersion\":\"canonical-json/v1\",\"hashAlgorithm\":\"SHA-256\",\"ledgerId\":\"governance-east\",\"previousFingerprint\":\"GENESIS/v1\",\"receipt\":{\"decisionId\":\"dec-001\",\"occurredUtc\":\"2026-08-28T12:00:00.0000000Z\",\"operation\":\"account.disable\",\"outcome\":\"Allowed\",\"policyId\":\"account-admin\",\"policyVersion\":\"7.4\",\"resourceId\":\"account-123\"},\"recordId\":\"record-001\",\"recordSchemaVersion\":\"ledger-record/v1\",\"sequenceNumber\":\"1\"}";
+        const string expected = /*lang=json,strict*/ "{\"artifactType\":\"accountable-systems-governance-ledger-record/v1\",\"canonicalizationVersion\":\"canonical-json/v1\",\"hashAlgorithm\":\"SHA-256\",\"ledgerId\":\"governance-east\",\"previousFingerprint\":\"GENESIS/v1\",\"receipt\":{\"decisionId\":\"dec-001\",\"occurredUtc\":\"2026-08-28T12:00:00.0000000Z\",\"operation\":\"account.disable\",\"outcome\":\"Allowed\",\"policyId\":\"account-admin\",\"policyVersion\":\"7.4\",\"resourceId\":\"account-123\"},\"recordId\":\"record-001\",\"recordSchemaVersion\":\"ledger-record/v1\",\"sequenceNumber\":\"1\"}";
         const string expectedFingerprint = "f4ac42655d93a38dae11a0eefd8627e02cd53a15944e376041a88d30eeef4984";
 
         Assert.Equal(expected, CanonicalLedgerEncoding.EncodeAsUtf8Text(core));
@@ -24,7 +24,7 @@ public sealed class DurableDecisionLedgerAuditChainTests
             Receipt = FirstReceipt() with { ResourceId = "café-☕" }
         };
 
-        const string expected = "{\"artifactType\":\"accountable-systems-governance-ledger-record/v1\",\"canonicalizationVersion\":\"canonical-json/v1\",\"hashAlgorithm\":\"SHA-256\",\"ledgerId\":\"governance-east\",\"previousFingerprint\":\"GENESIS/v1\",\"receipt\":{\"decisionId\":\"dec-001\",\"occurredUtc\":\"2026-08-28T12:00:00.0000000Z\",\"operation\":\"account.disable\",\"outcome\":\"Allowed\",\"policyId\":\"account-admin\",\"policyVersion\":\"7.4\",\"resourceId\":\"café-☕\"},\"recordId\":\"record-001\",\"recordSchemaVersion\":\"ledger-record/v1\",\"sequenceNumber\":\"1\"}";
+        const string expected = /*lang=json,strict*/ "{\"artifactType\":\"accountable-systems-governance-ledger-record/v1\",\"canonicalizationVersion\":\"canonical-json/v1\",\"hashAlgorithm\":\"SHA-256\",\"ledgerId\":\"governance-east\",\"previousFingerprint\":\"GENESIS/v1\",\"receipt\":{\"decisionId\":\"dec-001\",\"occurredUtc\":\"2026-08-28T12:00:00.0000000Z\",\"operation\":\"account.disable\",\"outcome\":\"Allowed\",\"policyId\":\"account-admin\",\"policyVersion\":\"7.4\",\"resourceId\":\"café-☕\"},\"recordId\":\"record-001\",\"recordSchemaVersion\":\"ledger-record/v1\",\"sequenceNumber\":\"1\"}";
         // This value deliberately pins the NFC form of "café" as well as UTF-8 escaping.
         // Do not regenerate it merely because an NFD-equivalent string looks identical.
         const string expectedFingerprint = "79ef458652074c2e596c40c401cdcb68519635021e43341ac929283ba32d5335";
@@ -115,7 +115,7 @@ public sealed class DurableDecisionLedgerAuditChainTests
         InMemoryDecisionLedger ledger = new("governance-east");
         TaskCompletionSource<bool> release = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        Task<LedgerRecord>[] writers = Enumerable.Range(0, writerCount)
+        Task<LedgerRecord>[] writers = [.. Enumerable.Range(0, writerCount)
             .Select(index => Task.Run(async () =>
             {
                 await release.Task;
@@ -127,8 +127,7 @@ public sealed class DurableDecisionLedgerAuditChainTests
                         ResourceId = $"account-{index:D2}",
                         OccurredUtc = DateTimeOffset.UnixEpoch.AddSeconds(index)
                     });
-            }))
-            .ToArray();
+            }))];
 
         release.SetResult(true);
         await Task.WhenAll(writers);
@@ -172,7 +171,7 @@ public sealed class DurableDecisionLedgerAuditChainTests
     [Fact]
     public void EmptyInputWithLaterCheckpointStillReportsMissingTail()
     {
-        var (ledger, _, checkpoint) = TwoRecordLedger();
+        (InMemoryDecisionLedger? ledger, IReadOnlyList<LedgerRecord> _, LedgerCheckpoint? checkpoint) = TwoRecordLedger();
 
         LedgerVerificationResult result = LedgerVerifier.Verify([], ledger.LedgerId, checkpoint);
 
@@ -387,7 +386,7 @@ public sealed class DurableDecisionLedgerAuditChainTests
     [Fact]
     public void ModifiedMiddleRecordIsDetected()
     {
-        var (ledger, records, checkpoint) = TwoRecordLedger();
+        (InMemoryDecisionLedger? ledger, IReadOnlyList<LedgerRecord>? records, LedgerCheckpoint? checkpoint) = TwoRecordLedger();
         LedgerRecord modified = records[0] with
         {
             Receipt = records[0].Receipt with { Outcome = "Denied" }
@@ -406,7 +405,7 @@ public sealed class DurableDecisionLedgerAuditChainTests
     [Fact]
     public void ReorderedRecordsFailSequenceVerification()
     {
-        var (ledger, records, checkpoint) = TwoRecordLedger();
+        (InMemoryDecisionLedger? ledger, IReadOnlyList<LedgerRecord>? records, LedgerCheckpoint? checkpoint) = TwoRecordLedger();
 
         LedgerVerificationResult result = LedgerVerifier.Verify(
             [records[1], records[0]],
@@ -420,7 +419,7 @@ public sealed class DurableDecisionLedgerAuditChainTests
     [Fact]
     public void TruncatedPrefixCanVerifyWhileTailCompletenessRemainsUnknownWithoutCheckpoint()
     {
-        var (ledger, records, _) = TwoRecordLedger();
+        (InMemoryDecisionLedger? ledger, IReadOnlyList<LedgerRecord>? records, LedgerCheckpoint _) = TwoRecordLedger();
 
         LedgerVerificationResult result = LedgerVerifier.Verify([records[0]], ledger.LedgerId);
 
@@ -432,7 +431,7 @@ public sealed class DurableDecisionLedgerAuditChainTests
     [Fact]
     public void CheckpointCapturedFromLaterHeadDetectsMissingNewestRecord()
     {
-        var (ledger, records, checkpoint) = TwoRecordLedger();
+        (InMemoryDecisionLedger? ledger, IReadOnlyList<LedgerRecord>? records, LedgerCheckpoint? checkpoint) = TwoRecordLedger();
 
         LedgerVerificationResult result = LedgerVerifier.Verify(
             [records[0]],
@@ -446,7 +445,7 @@ public sealed class DurableDecisionLedgerAuditChainTests
     [Fact]
     public void KnownCheckpointDetectsWholeChainReplacementFromAlternateValidView()
     {
-        var (original, _, checkpoint) = TwoRecordLedger();
+        (InMemoryDecisionLedger? original, IReadOnlyList<LedgerRecord> _, LedgerCheckpoint? checkpoint) = TwoRecordLedger();
 
         InMemoryDecisionLedger alternate = new(original.LedgerId);
         alternate.Append("record-001-alt", FirstReceipt() with { DecisionId = "dec-alt", Outcome = "Denied" });
@@ -545,7 +544,9 @@ public sealed class DurableDecisionLedgerAuditChainTests
         return (ledger, ledger.Snapshot(), checkpoint);
     }
 
-    private static LedgerRecord CreateRecord(LedgerRecordCore core) => new(
+    private static LedgerRecord CreateRecord(LedgerRecordCore core)
+    {
+        return new(
         core.ArtifactType,
         core.LedgerId,
         core.SequenceNumber,
@@ -556,8 +557,11 @@ public sealed class DurableDecisionLedgerAuditChainTests
         core.HashAlgorithm,
         core.Receipt,
         CanonicalLedgerEncoding.ComputeFingerprint(core));
+    }
 
-    private static LedgerRecordCore FirstCore() => new(
+    private static LedgerRecordCore FirstCore()
+    {
+        return new(
         LedgerFormat.ArtifactType,
         "governance-east",
         1,
@@ -567,8 +571,11 @@ public sealed class DurableDecisionLedgerAuditChainTests
         LedgerFormat.CanonicalizationVersion,
         LedgerFormat.HashAlgorithm,
         FirstReceipt());
+    }
 
-    private static GovernanceDecisionReceipt FirstReceipt() => new(
+    private static GovernanceDecisionReceipt FirstReceipt()
+    {
+        return new(
         "dec-001",
         "account.disable",
         "account-123",
@@ -576,4 +583,5 @@ public sealed class DurableDecisionLedgerAuditChainTests
         "account-admin",
         "7.4",
         new DateTimeOffset(2026, 8, 28, 12, 0, 0, TimeSpan.Zero));
+    }
 }

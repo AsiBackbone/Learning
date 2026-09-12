@@ -4,18 +4,19 @@ namespace AcknowledgmentAndAuditResidue.Tests;
 
 public sealed class AcknowledgmentBoundaryTests
 {
-    private static readonly DateTimeOffset NowUtc =
+    private static readonly DateTimeOffset _nowUtc =
         new(2026, 8, 14, 12, 0, 0, TimeSpan.Zero);
 
     [Fact]
     public void AcknowledgmentDoesNotGrantExecutionAuthority()
     {
-        var policy = new DisableAccountPolicy();
-        var validator = new AcknowledgmentValidator();
+        _ = new DisableAccountPolicy();
+
+        _ = new AcknowledgmentValidator();
         var executor = new RecordingExecutor();
         DisableAccountPolicyContext context = CreateContext();
 
-        GovernanceDecision initialDecision = policy.Evaluate(context);
+        GovernanceDecision initialDecision = DisableAccountPolicy.Evaluate(context);
 
         Assert.Equal(
             GovernanceDecisionOutcome.AcknowledgmentRequired,
@@ -26,11 +27,11 @@ public sealed class AcknowledgmentBoundaryTests
         AcknowledgmentChallenge challenge = CreateChallenge(
             context,
             initialDecision,
-            NowUtc);
+            _nowUtc);
         AcknowledgmentResponse response = CreateAcceptedResponse(
             challenge,
-            NowUtc.AddSeconds(1));
-        AcknowledgmentValidation validation = validator.Validate(
+            _nowUtc.AddSeconds(1));
+        AcknowledgmentValidation validation = AcknowledgmentValidator.Validate(
             challenge,
             response,
             response.OccurredUtc);
@@ -43,7 +44,7 @@ public sealed class AcknowledgmentBoundaryTests
             RequiredAcknowledgmentSatisfied = true
         };
         GovernanceDecision reevaluatedDecision =
-            policy.Evaluate(acknowledgedContext);
+            DisableAccountPolicy.Evaluate(acknowledgedContext);
 
         Assert.Equal(
             GovernanceDecisionOutcome.Allowed,
@@ -58,20 +59,21 @@ public sealed class AcknowledgmentBoundaryTests
     [Fact]
     public void ResourceChangedAfterAcknowledgmentBlocksExecution()
     {
-        var policy = new DisableAccountPolicy();
-        var validator = new AcknowledgmentValidator();
+        _ = new DisableAccountPolicy();
+
+        _ = new AcknowledgmentValidator();
         var executor = new RecordingExecutor();
         DisableAccountPolicyContext context = CreateContext();
-        GovernanceDecision initialDecision = policy.Evaluate(context);
+        GovernanceDecision initialDecision = DisableAccountPolicy.Evaluate(context);
         AcknowledgmentChallenge challenge = CreateChallenge(
             context,
             initialDecision,
-            NowUtc);
+            _nowUtc);
         AcknowledgmentResponse response = CreateAcceptedResponse(
             challenge,
-            NowUtc.AddSeconds(1));
+            _nowUtc.AddSeconds(1));
 
-        AcknowledgmentValidation validation = validator.Validate(
+        AcknowledgmentValidation validation = AcknowledgmentValidator.Validate(
             challenge,
             response,
             response.OccurredUtc);
@@ -84,7 +86,7 @@ public sealed class AcknowledgmentBoundaryTests
             Account = context.Account with { IsProtected = true }
         };
         GovernanceDecision reevaluatedDecision =
-            policy.Evaluate(changedContext);
+            DisableAccountPolicy.Evaluate(changedContext);
 
         Assert.Equal(
             GovernanceDecisionOutcome.EscalationRecommended,
@@ -96,21 +98,22 @@ public sealed class AcknowledgmentBoundaryTests
     [Fact]
     public void ExpiredAcknowledgmentDoesNotReachExecution()
     {
-        var policy = new DisableAccountPolicy();
-        var validator = new AcknowledgmentValidator();
+        _ = new DisableAccountPolicy();
+
+        _ = new AcknowledgmentValidator();
         var executor = new RecordingExecutor();
         DisableAccountPolicyContext context = CreateContext();
-        GovernanceDecision initialDecision = policy.Evaluate(context);
+        GovernanceDecision initialDecision = DisableAccountPolicy.Evaluate(context);
         AcknowledgmentChallenge challenge = CreateChallenge(
             context,
             initialDecision,
-            NowUtc);
+            _nowUtc);
         DateTimeOffset expiredAt = challenge.ExpiresUtc.AddSeconds(1);
         AcknowledgmentResponse response = CreateAcceptedResponse(
             challenge,
             expiredAt);
 
-        AcknowledgmentValidation validation = validator.Validate(
+        AcknowledgmentValidation validation = AcknowledgmentValidator.Validate(
             challenge,
             response,
             expiredAt);

@@ -7,22 +7,16 @@ public interface IExportExecutor
         CancellationToken cancellationToken);
 }
 
-public sealed class RecordingExportExecutor : IExportExecutor
+public sealed class RecordingExportExecutor(
+    string currentResourceVersion = "snapshot-8",
+    IReadOnlySet<string>? allowedDestinations = null) : IExportExecutor
 {
-    private readonly string _currentResourceVersion;
-    private readonly IReadOnlySet<string> _allowedDestinations;
-    private int _invocationCount;
-
-    public RecordingExportExecutor(
-        string currentResourceVersion = "snapshot-8",
-        IReadOnlySet<string>? allowedDestinations = null)
-    {
-        _currentResourceVersion = currentResourceVersion;
-        _allowedDestinations = allowedDestinations ??
+    private readonly string _currentResourceVersion = currentResourceVersion;
+    private readonly IReadOnlySet<string> _allowedDestinations = allowedDestinations ??
             new HashSet<string>(
                 new[] { SampleScenarios.DefaultDestination },
                 StringComparer.Ordinal);
-    }
+    private int _invocationCount;
 
     public int InvocationCount =>
         Volatile.Read(ref _invocationCount);

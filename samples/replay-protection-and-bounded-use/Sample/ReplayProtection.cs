@@ -21,16 +21,20 @@ public sealed record CapabilityValidationResult(
     bool IsValid,
     string ReasonCode)
 {
-    public static CapabilityValidationResult Valid() =>
-        new(true, "capability.valid");
+    public static CapabilityValidationResult Valid()
+    {
+        return new(true, "capability.valid");
+    }
 
-    public static CapabilityValidationResult Invalid(string reasonCode) =>
-        new(false, reasonCode);
+    public static CapabilityValidationResult Invalid(string reasonCode)
+    {
+        return new(false, reasonCode);
+    }
 }
 
 public sealed class ExecutionCapabilityValidator
 {
-    public CapabilityValidationResult Validate(
+    public static CapabilityValidationResult Validate(
         ExecutionCapability capability,
         CapabilityValidationRequest request)
     {
@@ -76,19 +80,13 @@ public sealed class ExecutionCapabilityValidator
                 "capability.audience-mismatch");
         }
 
-        if (request.NowUtc < capability.IssuedUtc)
-        {
-            return CapabilityValidationResult.Invalid(
-                "capability.not-yet-valid");
-        }
-
-        if (request.NowUtc >= capability.ExpiresUtc)
-        {
-            return CapabilityValidationResult.Invalid(
-                "capability.expired");
-        }
-
-        return CapabilityValidationResult.Valid();
+        return request.NowUtc < capability.IssuedUtc
+            ? CapabilityValidationResult.Invalid(
+                "capability.not-yet-valid")
+            : request.NowUtc >= capability.ExpiresUtc
+            ? CapabilityValidationResult.Invalid(
+                "capability.expired")
+            : CapabilityValidationResult.Valid();
     }
 }
 
@@ -100,30 +98,36 @@ public sealed record CapabilityUseResult(
 {
     public static CapabilityUseResult Consumed(
         int observedUseCount,
-        int maximumUses) =>
-        new(
+        int maximumUses)
+    {
+        return new(
             true,
             observedUseCount,
             maximumUses,
             "capability.use-consumed");
+    }
 
     public static CapabilityUseResult UseLimitExceeded(
         int observedUseCount,
-        int maximumUses) =>
-        new(
+        int maximumUses)
+    {
+        return new(
             false,
             observedUseCount,
             maximumUses,
             "capability.use-limit-exceeded");
+    }
 
     public static CapabilityUseResult MaximumUsesMismatch(
         int observedUseCount,
-        int maximumUses) =>
-        new(
+        int maximumUses)
+    {
+        return new(
             false,
             observedUseCount,
             maximumUses,
             "capability.maximum-uses-mismatch");
+    }
 }
 
 public interface ICapabilityUseStore
@@ -299,12 +303,8 @@ public sealed class DeliberatelyUnsafeCheckThenActCapabilityUseStore(
     }
 }
 
-public sealed class CapabilityUseStoreUnavailableException : Exception
+public sealed class CapabilityUseStoreUnavailableException(string message) : Exception(message)
 {
-    public CapabilityUseStoreUnavailableException(string message)
-        : base(message)
-    {
-    }
 }
 
 public sealed record ReplayEvidence(
@@ -332,8 +332,10 @@ public sealed class InMemoryReplayEvidenceSink : IReplayEvidenceSink
         _events.Enqueue(evidence);
     }
 
-    public IReadOnlyList<ReplayEvidence> Snapshot() =>
-        _events.ToArray();
+    public IReadOnlyList<ReplayEvidence> Snapshot()
+    {
+        return _events.ToArray();
+    }
 }
 
 public interface IProtectedOperationExecutor
@@ -377,7 +379,6 @@ public sealed record CapabilityExecutionResult(
     CapabilityUseResult? Consumption);
 
 public sealed class ProtectedOperationGateway(
-    ExecutionCapabilityValidator validator,
     ICapabilityUseStore useStore,
     IProtectedOperationExecutor executor,
     IReplayEvidenceSink evidenceSink)
@@ -388,7 +389,7 @@ public sealed class ProtectedOperationGateway(
         CancellationToken cancellationToken)
     {
         CapabilityValidationResult validation =
-            validator.Validate(capability, request);
+            ExecutionCapabilityValidator.Validate(capability, request);
 
         if (!validation.IsValid)
         {

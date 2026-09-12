@@ -1,19 +1,17 @@
 DateTimeOffset issuedUtc =
     new(2026, 8, 14, 14, 0, 0, TimeSpan.Zero);
 
-var context = CreateContext(resourceVersion: 7);
+DisableAccountPolicyContext context = CreateContext(resourceVersion: 7);
 var decision = GovernanceDecision.Allow();
-var factory = new ExecutionCapabilityFactory();
 
-ExecutionCapability capability = factory.Create(
+ExecutionCapability capability = ExecutionCapabilityFactory.Create(
     context,
     decision,
     issuedUtc,
     acknowledgmentId: "ack-77");
 
-var validator = new ExecutionCapabilityValidator();
 var executor = new RecordingDisableAccountExecutor();
-var gateway = new DisableAccountGateway(validator, executor);
+var gateway = new DisableAccountGateway(executor);
 
 CapabilityScenario[] scenarios =
 [
@@ -98,7 +96,7 @@ bool blockedDecisionCouldMintCapability = true;
 
 try
 {
-    _ = factory.Create(
+    _ = ExecutionCapabilityFactory.Create(
         context,
         GovernanceDecision.Deny(
             "account.disable.denied",
@@ -214,13 +212,17 @@ public sealed record GovernanceDecision(
     public bool CanProceed =>
         Outcome == GovernanceDecisionOutcome.Allowed;
 
-    public static GovernanceDecision Allow() =>
-        new(GovernanceDecisionOutcome.Allowed, null, null);
+    public static GovernanceDecision Allow()
+    {
+        return new(GovernanceDecisionOutcome.Allowed, null, null);
+    }
 
     public static GovernanceDecision Deny(
         string reasonCode,
-        string reason) =>
-        new(GovernanceDecisionOutcome.Denied, reasonCode, reason);
+        string reason)
+    {
+        return new(GovernanceDecisionOutcome.Denied, reasonCode, reason);
+    }
 }
 
 public sealed record DisableAccountPolicyContext(
@@ -250,19 +252,16 @@ public sealed record ExecutionCapability(
 
 public sealed class ExecutionCapabilityFactory
 {
-    public ExecutionCapability Create(
+    public static ExecutionCapability Create(
         DisableAccountPolicyContext context,
         GovernanceDecision decision,
         DateTimeOffset nowUtc,
         string? acknowledgmentId)
     {
-        if (!decision.CanProceed)
-        {
-            throw new InvalidOperationException(
-                "A blocked decision cannot produce an execution capability.");
-        }
-
-        return new ExecutionCapability(
+        return !decision.CanProceed
+            ? throw new InvalidOperationException(
+                "A blocked decision cannot produce an execution capability.")
+            : new ExecutionCapability(
             CapabilityId: $"{context.CorrelationId}-capability",
             Issuer: "policy-engine",
             Audience: context.Audience,
@@ -297,16 +296,20 @@ public sealed record CapabilityValidationResult(
     bool IsValid,
     string ReasonCode)
 {
-    public static CapabilityValidationResult Valid() =>
-        new(true, "capability.valid");
+    public static CapabilityValidationResult Valid()
+    {
+        return new(true, "capability.valid");
+    }
 
-    public static CapabilityValidationResult Invalid(string reasonCode) =>
-        new(false, reasonCode);
+    public static CapabilityValidationResult Invalid(string reasonCode)
+    {
+        return new(false, reasonCode);
+    }
 }
 
 public sealed class ExecutionCapabilityValidator
 {
-    public CapabilityValidationResult Validate(
+    public static CapabilityValidationResult Validate(
         ExecutionCapability capability,
         CapabilityValidationRequest request)
     {
@@ -379,25 +382,19 @@ public sealed class ExecutionCapabilityValidator
                 "capability.expired");
         }
 
-        if (!string.Equals(
+        return !string.Equals(
                 capability.AcknowledgmentId,
                 request.AcknowledgmentId,
-                StringComparison.Ordinal))
-        {
-            return CapabilityValidationResult.Invalid(
-                "capability.acknowledgment-mismatch");
-        }
-
-        if (!string.Equals(
+                StringComparison.Ordinal)
+            ? CapabilityValidationResult.Invalid(
+                "capability.acknowledgment-mismatch")
+            : !string.Equals(
                 capability.IntendedUse,
                 request.IntendedUse,
-                StringComparison.Ordinal))
-        {
-            return CapabilityValidationResult.Invalid(
-                "capability.intended-use-mismatch");
-        }
-
-        return CapabilityValidationResult.Valid();
+                StringComparison.Ordinal)
+            ? CapabilityValidationResult.Invalid(
+                "capability.intended-use-mismatch")
+            : CapabilityValidationResult.Valid();
     }
 }
 
@@ -437,7 +434,6 @@ public sealed class RecordingDisableAccountExecutor
 }
 
 public sealed class DisableAccountGateway(
-    ExecutionCapabilityValidator validator,
     IDisableAccountExecutor executor)
 {
     public async Task<CapabilityExecutionResult> ExecuteAsync(
@@ -446,7 +442,7 @@ public sealed class DisableAccountGateway(
         CancellationToken cancellationToken)
     {
         CapabilityValidationResult validation =
-            validator.Validate(capability, request);
+            ExecutionCapabilityValidator.Validate(capability, request);
 
         if (!validation.IsValid)
         {

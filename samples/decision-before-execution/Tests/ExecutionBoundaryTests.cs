@@ -9,7 +9,6 @@ public sealed class ExecutionBoundaryTests
     {
         var executor = new RecordingDisableAccountExecutor();
         var workflow = new DisableAccountWorkflow(
-            new DisableAccountPolicy(),
             executor);
 
         GovernanceDecision decision = await workflow.ExecuteAsync(
@@ -25,7 +24,6 @@ public sealed class ExecutionBoundaryTests
     {
         var executor = new RecordingDisableAccountExecutor();
         var workflow = new DisableAccountWorkflow(
-            new DisableAccountPolicy(),
             executor);
 
         GovernanceDecision decision = await workflow.ExecuteAsync(
@@ -41,7 +39,6 @@ public sealed class ExecutionBoundaryTests
     {
         var executor = new RecordingDisableAccountExecutor();
         var workflow = new DisableAccountWorkflow(
-            new DisableAccountPolicy(),
             executor);
 
         GovernanceDecision decision = await workflow.ExecuteAsync(
@@ -59,7 +56,6 @@ public sealed class ExecutionBoundaryTests
     {
         var executor = new RecordingDisableAccountExecutor();
         var workflow = new DisableAccountWorkflow(
-            new DisableAccountPolicy(),
             executor);
 
         GovernanceDecision decision = await workflow.ExecuteAsync(

@@ -479,7 +479,7 @@ public sealed class DistributedAcknowledgmentContinuationTests
         using var start = new ManualResetEventSlim(false);
 
         Task<GatewayResult>[] tasks =
-            Enumerable.Range(0, 2)
+            [.. Enumerable.Range(0, 2)
                 .Select(_ => Task.Run(async () =>
                 {
                     ready.Signal();
@@ -489,8 +489,7 @@ public sealed class DistributedAcknowledgmentContinuationTests
                         request,
                         evidence,
                         cancellationToken);
-                }, cancellationToken))
-                .ToArray();
+                }, cancellationToken))];
 
         Assert.True(
             ready.Wait(
