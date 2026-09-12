@@ -22,6 +22,8 @@ Prefer to see the architecture run before reading the deeper explanation? The fo
 
 **Prerequisite:** .NET 10 SDK
 
+Learning selects `Microsoft.Testing.Platform` in `global.json`, and every sample test project uses the aligned `xunit.v3` runner integration. The same `dotnet test` commands are used locally and in CI.
+
 From a terminal:
 
 ```bash
