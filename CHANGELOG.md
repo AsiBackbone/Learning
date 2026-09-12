@@ -11,6 +11,10 @@ Learning releases are archival and citation snapshots of educational material. T
 - Durable stable-release evidence publishing release notes, a samples SPDX SBOM, a release-evidence manifest, hashes, and provenance attestations.
 - Shared repository formatting, security-policy, workflow-validation, support, and maintainer baselines.
 
+### Changed
+
+- Aligned all sample tests on `Microsoft.Testing.Platform` and `xunit.v3`, matching the shared ASI Backbone repository posture.
+
 ## [0.15.0] - 2026-09-11
 
 ### Added

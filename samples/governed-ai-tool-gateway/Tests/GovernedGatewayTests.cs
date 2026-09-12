@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace GovernedAiToolGateway.Tests;
+namespace AsiBackbone.Learning.GovernedAiToolGateway.Tests;
 
 public sealed class GovernedGatewayTests
 {
