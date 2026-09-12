@@ -11,6 +11,8 @@ on:
     branches:
       - main
     paths:
+      - '.editorconfig'
+      - 'global.json'
       - 'samples/**'
       - '.github/workflows/samples-validation.yml'
 
@@ -63,6 +65,10 @@ jobs:
       - name: Build samples
         working-directory: samples
         run: dotnet build Samples.slnx --no-restore
+
+      - name: Verify sample formatting
+        working-directory: samples
+        run: dotnet format Samples.slnx --verify-no-changes --no-restore --verbosity minimal
 
       - name: Test samples
         working-directory: samples

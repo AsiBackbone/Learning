@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Http;
-using MiddlewareOrderingChangesBehavior;
 using Xunit;
 
 namespace MiddlewareOrderingChangesBehavior.Tests;
