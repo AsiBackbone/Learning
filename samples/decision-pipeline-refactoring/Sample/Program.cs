@@ -15,20 +15,30 @@ public sealed record GovernanceDecision(
 {
     public bool CanExecute => Outcome == DecisionOutcome.Allowed;
 
-    public static GovernanceDecision Allow() =>
-        new(DecisionOutcome.Allowed, "account.disable.allowed");
+    public static GovernanceDecision Allow()
+    {
+        return new(DecisionOutcome.Allowed, "account.disable.allowed");
+    }
 
-    public static GovernanceDecision Deny(string reasonCode) =>
-        new(DecisionOutcome.Denied, reasonCode);
+    public static GovernanceDecision Deny(string reasonCode)
+    {
+        return new(DecisionOutcome.Denied, reasonCode);
+    }
 
-    public static GovernanceDecision Defer(string reasonCode) =>
-        new(DecisionOutcome.Deferred, reasonCode);
+    public static GovernanceDecision Defer(string reasonCode)
+    {
+        return new(DecisionOutcome.Deferred, reasonCode);
+    }
 
-    public static GovernanceDecision RequireAcknowledgment(string reasonCode) =>
-        new(DecisionOutcome.AcknowledgmentRequired, reasonCode);
+    public static GovernanceDecision RequireAcknowledgment(string reasonCode)
+    {
+        return new(DecisionOutcome.AcknowledgmentRequired, reasonCode);
+    }
 
-    public static GovernanceDecision Escalate(string reasonCode) =>
-        new(DecisionOutcome.EscalationRecommended, reasonCode);
+    public static GovernanceDecision Escalate(string reasonCode)
+    {
+        return new(DecisionOutcome.EscalationRecommended, reasonCode);
+    }
 }
 
 public sealed record AccountDisableRequest(
@@ -72,12 +82,9 @@ public sealed class InMemoryAccountRepository(params AccountSnapshot[] accounts)
 
     public AccountSnapshot GetRequired(string accountId)
     {
-        if (!_accounts.TryGetValue(accountId, out AccountSnapshot? account))
-        {
-            throw new KeyNotFoundException($"Unknown account '{accountId}'.");
-        }
-
-        return account;
+        return !_accounts.TryGetValue(accountId, out AccountSnapshot? account)
+            ? throw new KeyNotFoundException($"Unknown account '{accountId}'.")
+            : account;
     }
 
     public void Disable(string accountId)
@@ -210,7 +217,7 @@ public sealed class AccountDisableContextBuilder(IAccountRepository repository)
 
 public sealed class AccountDisablePolicy
 {
-    public GovernanceDecision Evaluate(AccountDisableContext context)
+    public static GovernanceDecision Evaluate(AccountDisableContext context)
     {
         if (!context.RequesterIsAdministrator)
         {
@@ -227,18 +234,12 @@ public sealed class AccountDisablePolicy
             return GovernanceDecision.Defer("account.disable.investigation-pending");
         }
 
-        if (context.Account.RequiresManualReview)
-        {
-            return GovernanceDecision.Escalate("account.disable.manual-review-required");
-        }
-
-        if (!context.AcknowledgmentSatisfied)
-        {
-            return GovernanceDecision.RequireAcknowledgment(
-                "account.disable.acknowledgment-required");
-        }
-
-        return GovernanceDecision.Allow();
+        return context.Account.RequiresManualReview
+            ? GovernanceDecision.Escalate("account.disable.manual-review-required")
+            : !context.AcknowledgmentSatisfied
+            ? GovernanceDecision.RequireAcknowledgment(
+                "account.disable.acknowledgment-required")
+            : GovernanceDecision.Allow();
     }
 }
 
@@ -286,19 +287,21 @@ public sealed class RecordingDecisionEvidenceSink : IDecisionEvidenceSink
 
     public IReadOnlyList<DecisionEvidenceRecord> Records => _records;
 
-    public void Append(DecisionEvidenceRecord record) => _records.Add(record);
+    public void Append(DecisionEvidenceRecord record)
+    {
+        _records.Add(record);
+    }
 }
 
 public sealed class AccountDisableDecisionPipeline(
     AccountDisableContextBuilder contextBuilder,
-    AccountDisablePolicy policy,
     IAccountDisableExecutor executor,
     IDecisionEvidenceSink evidence)
 {
     public GovernanceDecision Handle(AccountDisableRequest request)
     {
         AccountDisableContext context = contextBuilder.Build(request);
-        GovernanceDecision decision = policy.Evaluate(context);
+        GovernanceDecision decision = AccountDisablePolicy.Evaluate(context);
 
         evidence.Append(new DecisionEvidenceRecord(
             "decision",
@@ -331,8 +334,9 @@ public sealed class AccountDisableDecisionPipeline(
 
 public static class SampleData
 {
-    public static InMemoryAccountRepository CreateRepository() =>
-        new(
+    public static InMemoryAccountRepository CreateRepository()
+    {
+        return new(
             new AccountSnapshot(
                 "acct-protected",
                 "tenant-a",
@@ -365,6 +369,7 @@ public static class SampleData
                 RequiresManualReview: false,
                 IsDisabled: false,
                 Version: 3));
+    }
 }
 
 public static class Program
@@ -453,7 +458,6 @@ public static class Program
         var evidence = new RecordingDecisionEvidenceSink();
         var pipeline = new AccountDisableDecisionPipeline(
             new AccountDisableContextBuilder(repository),
-            new AccountDisablePolicy(),
             executor,
             evidence);
 

@@ -41,7 +41,9 @@ public sealed record LedgerRecord(
     GovernanceDecisionReceipt Receipt,
     string Fingerprint)
 {
-    public LedgerRecordCore ToCore() => new(
+    public LedgerRecordCore ToCore()
+    {
+        return new(
         ArtifactType,
         LedgerId,
         SequenceNumber,
@@ -51,6 +53,7 @@ public sealed record LedgerRecord(
         CanonicalizationVersion,
         HashAlgorithm,
         Receipt);
+    }
 }
 
 public sealed record LedgerCheckpoint

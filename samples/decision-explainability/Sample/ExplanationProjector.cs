@@ -4,7 +4,7 @@ public sealed class ExplanationProjector
 {
     public const string CurrentProjectionVersion = "decision-explanation-v1";
 
-    private static readonly IReadOnlyDictionary<string, ReasonTemplate> Templates =
+    private static readonly IReadOnlyDictionary<string, ReasonTemplate> _templates =
         new Dictionary<string, ReasonTemplate>(StringComparer.Ordinal)
         {
             ["regional.data-residency"] = new(
@@ -62,16 +62,15 @@ public sealed class ExplanationProjector
                 OperatorWithholdsKnownDetail: true)
         };
 
-    public ExplanationProjection Project(
+    public static ExplanationProjection Project(
         DecisionEvidence evidence,
         ExplanationAudience audience)
     {
         ArgumentNullException.ThrowIfNull(evidence);
 
-        ReasonEvidence[] orderedReasons = evidence.Reasons
+        ReasonEvidence[] orderedReasons = [.. evidence.Reasons
             .OrderBy(reason => reason.DisplayPriority)
-            .ThenBy(reason => reason.ReasonCode, StringComparer.Ordinal)
-            .ToArray();
+            .ThenBy(reason => reason.ReasonCode, StringComparer.Ordinal)];
 
         List<string> details = [];
         bool withheld = false;
@@ -80,7 +79,7 @@ public sealed class ExplanationProjector
 
         foreach (ReasonEvidence reason in orderedReasons)
         {
-            if (!Templates.TryGetValue(reason.ReasonCode, out ReasonTemplate? template) ||
+            if (!_templates.TryGetValue(reason.ReasonCode, out ReasonTemplate? template) ||
                 template is null)
             {
                 if (!unmappedFallbackAdded)
@@ -140,19 +139,17 @@ public sealed class ExplanationProjector
                 "This explanation is incomplete because one or more structured reasons have no approved mapping in this projection version.",
             DisclosureStatus.PartiallyWithheldAndIncomplete =>
                 "Some decision details are intentionally withheld for this audience, and the explanation is also incomplete because one or more structured reasons have no approved mapping in this projection version.",
+            DisclosureStatus.Complete => null,
             _ => null
         };
 
-        PolicyReference[] sourcePolicies = orderedReasons
+        PolicyReference[] sourcePolicies = [.. orderedReasons
             .Select(reason => reason.Policy)
             .Distinct()
             .OrderBy(policy => policy.PolicyId, StringComparer.Ordinal)
-            .ThenBy(policy => policy.PolicyVersion, StringComparer.Ordinal)
-            .ToArray();
+            .ThenBy(policy => policy.PolicyVersion, StringComparer.Ordinal)];
 
-        string[] sourceReasonCodes = orderedReasons
-            .Select(reason => reason.ReasonCode)
-            .ToArray();
+        string[] sourceReasonCodes = [.. orderedReasons.Select(reason => reason.ReasonCode)];
 
         if (details.Count == 0)
         {
@@ -176,8 +173,9 @@ public sealed class ExplanationProjector
 
     private static string Headline(
         DecisionOutcome outcome,
-        ExplanationAudience audience) =>
-        (outcome, audience) switch
+        ExplanationAudience audience)
+    {
+        return (outcome, audience) switch
         {
             (DecisionOutcome.Allowed, ExplanationAudience.EndUser) =>
                 "This operation may continue to the next governed step.",
@@ -198,24 +196,28 @@ public sealed class ExplanationProjector
                 outcome,
                 "Unknown decision outcome.")
         };
+    }
 
-    private static string DefaultDetail(DecisionOutcome outcome) => outcome switch
+    private static string DefaultDetail(DecisionOutcome outcome)
     {
-        DecisionOutcome.Allowed =>
-            "The current governed decision permits continuation, but this explanation does not assert that execution occurred.",
-        DecisionOutcome.Denied =>
-            "The current governed decision does not permit the operation.",
-        DecisionOutcome.Deferred =>
-            "The request remains deferred because a current governed result cannot be established yet.",
-        DecisionOutcome.AcknowledgmentRequired =>
-            "A bound acknowledgment is required before current policy can be reevaluated for continuation.",
-        DecisionOutcome.EscalationRecommended =>
-            "The request requires another review path; this does not guarantee approval.",
-        _ => throw new ArgumentOutOfRangeException(
-            nameof(outcome),
-            outcome,
-            "Unknown decision outcome.")
-    };
+        return outcome switch
+        {
+            DecisionOutcome.Allowed =>
+                "The current governed decision permits continuation, but this explanation does not assert that execution occurred.",
+            DecisionOutcome.Denied =>
+                "The current governed decision does not permit the operation.",
+            DecisionOutcome.Deferred =>
+                "The request remains deferred because a current governed result cannot be established yet.",
+            DecisionOutcome.AcknowledgmentRequired =>
+                "A bound acknowledgment is required before current policy can be reevaluated for continuation.",
+            DecisionOutcome.EscalationRecommended =>
+                "The request requires another review path; this does not guarantee approval.",
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(outcome),
+                outcome,
+                "Unknown decision outcome.")
+        };
+    }
 
     private sealed record ReasonTemplate(
         DecisionOutcome Outcome,

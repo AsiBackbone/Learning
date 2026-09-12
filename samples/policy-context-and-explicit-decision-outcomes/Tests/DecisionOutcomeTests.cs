@@ -7,7 +7,7 @@ public sealed class DecisionOutcomeTests
     [Fact]
     public void DeniedOutcomeIsExplicitAndCannotProceed()
     {
-        GovernanceDecision decision = new DisableAccountPolicy().Evaluate(
+        GovernanceDecision decision = DisableAccountPolicy.Evaluate(
             CreateContext(isAdministrator: false));
 
         Assert.Equal(GovernanceDecisionOutcome.Denied, decision.Outcome);
@@ -20,7 +20,7 @@ public sealed class DecisionOutcomeTests
     [Fact]
     public void DeferredOutcomeIsExplicitAndCannotProceed()
     {
-        GovernanceDecision decision = new DisableAccountPolicy().Evaluate(
+        GovernanceDecision decision = DisableAccountPolicy.Evaluate(
             CreateContext(maintenanceHoldActive: true));
 
         Assert.Equal(GovernanceDecisionOutcome.Deferred, decision.Outcome);
@@ -33,7 +33,7 @@ public sealed class DecisionOutcomeTests
     [Fact]
     public void AcknowledgmentRequiredOutcomeIsExplicitAndCannotProceed()
     {
-        GovernanceDecision decision = new DisableAccountPolicy().Evaluate(
+        GovernanceDecision decision = DisableAccountPolicy.Evaluate(
             CreateContext(reason: string.Empty));
 
         Assert.Equal(
@@ -48,7 +48,7 @@ public sealed class DecisionOutcomeTests
     [Fact]
     public void AllowedOutcomeCanProceedWithoutReasonCodes()
     {
-        GovernanceDecision decision = new DisableAccountPolicy().Evaluate(
+        GovernanceDecision decision = DisableAccountPolicy.Evaluate(
             CreateContext());
 
         Assert.Equal(GovernanceDecisionOutcome.Allowed, decision.Outcome);

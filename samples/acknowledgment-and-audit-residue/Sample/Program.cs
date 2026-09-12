@@ -137,7 +137,7 @@ static WorkflowResult RunScenario(
 
     var audit = new List<AuditResidue>();
     DisableAccountPolicyContext context = scenario.Context;
-    GovernanceDecision decision = policy.Evaluate(context);
+    GovernanceDecision decision = DisableAccountPolicy.Evaluate(context);
 
     AddDecisionResidue(
         audit,
@@ -185,7 +185,7 @@ static WorkflowResult RunScenario(
             responseUtc);
 
     AcknowledgmentValidation validation =
-        validator.Validate(
+        AcknowledgmentValidator.Validate(
             challenge,
             response,
             responseUtc);
@@ -245,7 +245,7 @@ static WorkflowResult RunScenario(
             : context.Account
     };
 
-    decision = policy.Evaluate(context);
+    decision = DisableAccountPolicy.Evaluate(context);
     nowUtc = responseUtc.AddSeconds(1);
 
     AddDecisionResidue(
@@ -417,9 +417,7 @@ static void VerifyScenario(
             $"but observed {executorInvocations}.");
     }
 
-    string[] stages = result.AuditTrail
-        .Select(residue => residue.Stage)
-        .ToArray();
+    string[] stages = [.. result.AuditTrail.Select(residue => residue.Stage)];
 
     if (!stages.SequenceEqual(
             scenario.ExpectedStages,
@@ -511,34 +509,42 @@ public sealed record GovernanceDecision(
     public bool CanProceed =>
         Outcome == GovernanceDecisionOutcome.Allowed;
 
-    public static GovernanceDecision Allow() =>
-        new(GovernanceDecisionOutcome.Allowed, []);
+    public static GovernanceDecision Allow()
+    {
+        return new(GovernanceDecisionOutcome.Allowed, []);
+    }
 
     public static GovernanceDecision Deny(
         string code,
-        string message) =>
-        new(
+        string message)
+    {
+        return new(
             GovernanceDecisionOutcome.Denied,
             [new DecisionReason(code, message)]);
+    }
 
     public static GovernanceDecision RequireAcknowledgment(
         string code,
-        string message) =>
-        new(
+        string message)
+    {
+        return new(
             GovernanceDecisionOutcome.AcknowledgmentRequired,
             [new DecisionReason(code, message)]);
+    }
 
     public static GovernanceDecision Escalate(
         string code,
-        string message) =>
-        new(
+        string message)
+    {
+        return new(
             GovernanceDecisionOutcome.EscalationRecommended,
             [new DecisionReason(code, message)]);
+    }
 }
 
 public sealed class DisableAccountPolicy
 {
-    public GovernanceDecision Evaluate(
+    public static GovernanceDecision Evaluate(
         DisableAccountPolicyContext context)
     {
         if (!context.Actor.IsAdministrator)
@@ -558,22 +564,16 @@ public sealed class DisableAccountPolicy
                 "The actor and account belong to different tenants.");
         }
 
-        if (context.Account.IsProtected)
-        {
-            return GovernanceDecision.Escalate(
+        return context.Account.IsProtected
+            ? GovernanceDecision.Escalate(
                 "account.disable.protected-account",
-                "Protected accounts require escalation.");
-        }
-
-        if (string.IsNullOrWhiteSpace(context.Intent.Reason) &&
-            !context.RequiredAcknowledgmentSatisfied)
-        {
-            return GovernanceDecision.RequireAcknowledgment(
+                "Protected accounts require escalation.")
+            : string.IsNullOrWhiteSpace(context.Intent.Reason) &&
+            !context.RequiredAcknowledgmentSatisfied
+            ? GovernanceDecision.RequireAcknowledgment(
                 "account.disable.reason-required",
-                "The missing administrative reason requires explicit acknowledgment.");
-        }
-
-        return GovernanceDecision.Allow();
+                "The missing administrative reason requires explicit acknowledgment.")
+            : GovernanceDecision.Allow();
     }
 }
 
@@ -603,7 +603,7 @@ public sealed record AcknowledgmentValidation(
 
 public sealed class AcknowledgmentValidator
 {
-    public AcknowledgmentValidation Validate(
+    public static AcknowledgmentValidation Validate(
         AcknowledgmentChallenge challenge,
         AcknowledgmentResponse response,
         DateTimeOffset nowUtc)
@@ -629,17 +629,9 @@ public sealed class AcknowledgmentValidator
             return new(false, "acknowledgment.code-mismatch");
         }
 
-        if (challenge.CorrelationId != response.CorrelationId)
-        {
-            return new(false, "acknowledgment.correlation-mismatch");
-        }
-
-        if (nowUtc > challenge.ExpiresUtc)
-        {
-            return new(false, "acknowledgment.expired");
-        }
-
-        return new(true, "acknowledgment.accepted");
+        return challenge.CorrelationId != response.CorrelationId
+            ? new(false, "acknowledgment.correlation-mismatch")
+            : nowUtc > challenge.ExpiresUtc ? new(false, "acknowledgment.expired") : new(true, "acknowledgment.accepted");
     }
 }
 

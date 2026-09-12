@@ -134,8 +134,8 @@ public sealed class FederatedGovernanceCoordinationTests
             CurrentRegion = "delta"
         };
 
-        Assert.True(service.IsCurrent(originalDecision, original));
-        Assert.False(service.IsCurrent(originalDecision, moved));
+        Assert.True(FederatedGovernanceService.IsCurrent(originalDecision, original));
+        Assert.False(FederatedGovernanceService.IsCurrent(originalDecision, moved));
     }
 
     [Fact]

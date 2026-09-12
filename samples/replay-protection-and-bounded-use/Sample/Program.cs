@@ -18,7 +18,6 @@ var atomicExecutor = new RecordingProtectedOperationExecutor(
     writeToConsole: true);
 var atomicEvidence = new InMemoryReplayEvidenceSink();
 var atomicGateway = new ProtectedOperationGateway(
-    new ExecutionCapabilityValidator(),
     atomicStore,
     atomicExecutor,
     atomicEvidence);
@@ -80,7 +79,6 @@ var unsafeStore =
     new DeliberatelyUnsafeCheckThenActCapabilityUseStore();
 var unsafeExecutor = new RecordingProtectedOperationExecutor();
 var unsafeGateway = new ProtectedOperationGateway(
-    new ExecutionCapabilityValidator(),
     unsafeStore,
     unsafeExecutor,
     new InMemoryReplayEvidenceSink());
@@ -110,7 +108,6 @@ Console.WriteLine();
 var invalidStore = new AtomicInMemoryCapabilityUseStore();
 var invalidExecutor = new RecordingProtectedOperationExecutor();
 var invalidGateway = new ProtectedOperationGateway(
-    new ExecutionCapabilityValidator(),
     invalidStore,
     invalidExecutor,
     new InMemoryReplayEvidenceSink());

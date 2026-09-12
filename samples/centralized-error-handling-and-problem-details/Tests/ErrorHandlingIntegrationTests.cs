@@ -12,6 +12,9 @@ namespace CentralizedErrorHandlingAndProblemDetails.Tests;
 
 public sealed class ErrorHandlingIntegrationTests
 {
+    private static readonly JsonSerializerOptions _jsonOptions =
+        new(JsonSerializerDefaults.Web);
+
     [Fact]
     public async Task Denied_governance_decision_is_explicit_403_without_exception_handler_log()
     {
@@ -189,7 +192,7 @@ public sealed class ErrorHandlingIntegrationTests
         ProblemDetails? parsed =
             JsonSerializer.Deserialize<ProblemDetails>(
                 body,
-                new JsonSerializerOptions(JsonSerializerDefaults.Web));
+                _jsonOptions);
 
         return Assert.IsType<ProblemDetails>(parsed);
     }
@@ -204,7 +207,7 @@ public sealed class ErrorHandlingIntegrationTests
         string? value = element.GetString();
 
         Assert.False(string.IsNullOrWhiteSpace(value));
-        return value!;
+        return value;
     }
 }
 
@@ -258,16 +261,16 @@ internal sealed class TestApplication : IAsyncDisposable
 
 internal sealed class CapturingLoggerProvider : ILoggerProvider
 {
-    private readonly ConcurrentQueue<CapturedLogEntry> entries = new();
+    private readonly ConcurrentQueue<CapturedLogEntry> _entries = new();
 
     public IReadOnlyCollection<CapturedLogEntry> Entries =>
-        entries.ToArray();
+        _entries.ToArray();
 
     public ILogger CreateLogger(string categoryName)
     {
         return new CapturingLogger(
             categoryName,
-            entries);
+            _entries);
     }
 
     public void Dispose()

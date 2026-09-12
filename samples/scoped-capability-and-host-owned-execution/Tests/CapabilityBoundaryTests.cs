@@ -4,19 +4,19 @@ namespace ScopedCapabilityAndHostOwnedExecution.Tests;
 
 public sealed class CapabilityBoundaryTests
 {
-    private static readonly DateTimeOffset IssuedUtc =
+    private static readonly DateTimeOffset _issuedUtc =
         new(2026, 8, 14, 14, 0, 0, TimeSpan.Zero);
 
     [Fact]
     public async Task ValidCapabilityReachesExecutorExactlyOnce()
     {
         var executor = new RecordingDisableAccountExecutor();
-        var gateway = CreateGateway(executor);
+        DisableAccountGateway gateway = CreateGateway(executor);
         ExecutionCapability capability = CreateCapability();
 
         CapabilityExecutionResult result = await gateway.ExecuteAsync(
             capability,
-            CreateRequest(nowUtc: IssuedUtc.AddMinutes(1)),
+            CreateRequest(nowUtc: _issuedUtc.AddMinutes(1)),
             CancellationToken.None);
 
         Assert.True(result.Executed);
@@ -29,7 +29,7 @@ public sealed class CapabilityBoundaryTests
     public async Task ExpiredCapabilityDoesNotReachExecutor()
     {
         var executor = new RecordingDisableAccountExecutor();
-        var gateway = CreateGateway(executor);
+        DisableAccountGateway gateway = CreateGateway(executor);
         ExecutionCapability capability = CreateCapability();
 
         CapabilityExecutionResult result = await gateway.ExecuteAsync(
@@ -46,14 +46,14 @@ public sealed class CapabilityBoundaryTests
     public async Task ResourceChangedAfterApprovalDoesNotReachExecutor()
     {
         var executor = new RecordingDisableAccountExecutor();
-        var gateway = CreateGateway(executor);
+        DisableAccountGateway gateway = CreateGateway(executor);
         ExecutionCapability capability = CreateCapability(resourceVersion: 7);
 
         CapabilityExecutionResult result = await gateway.ExecuteAsync(
             capability,
             CreateRequest(
                 resourceVersion: 8,
-                nowUtc: IssuedUtc.AddMinutes(1)),
+                nowUtc: _issuedUtc.AddMinutes(1)),
             CancellationToken.None);
 
         Assert.False(result.Executed);
@@ -67,13 +67,13 @@ public sealed class CapabilityBoundaryTests
     public async Task WrongResourceDoesNotReachExecutor()
     {
         var executor = new RecordingDisableAccountExecutor();
-        var gateway = CreateGateway(executor);
+        DisableAccountGateway gateway = CreateGateway(executor);
 
         CapabilityExecutionResult result = await gateway.ExecuteAsync(
             CreateCapability(),
             CreateRequest(
                 resourceId: "user-999",
-                nowUtc: IssuedUtc.AddMinutes(1)),
+                nowUtc: _issuedUtc.AddMinutes(1)),
             CancellationToken.None);
 
         Assert.False(result.Executed);
@@ -87,13 +87,13 @@ public sealed class CapabilityBoundaryTests
     public async Task WrongActorDoesNotReachExecutor()
     {
         var executor = new RecordingDisableAccountExecutor();
-        var gateway = CreateGateway(executor);
+        DisableAccountGateway gateway = CreateGateway(executor);
 
         CapabilityExecutionResult result = await gateway.ExecuteAsync(
             CreateCapability(),
             CreateRequest(
                 subjectId: "operator-99",
-                nowUtc: IssuedUtc.AddMinutes(1)),
+                nowUtc: _issuedUtc.AddMinutes(1)),
             CancellationToken.None);
 
         Assert.False(result.Executed);
@@ -107,13 +107,13 @@ public sealed class CapabilityBoundaryTests
     public async Task WrongOperationDoesNotReachExecutor()
     {
         var executor = new RecordingDisableAccountExecutor();
-        var gateway = CreateGateway(executor);
+        DisableAccountGateway gateway = CreateGateway(executor);
 
         CapabilityExecutionResult result = await gateway.ExecuteAsync(
             CreateCapability(),
             CreateRequest(
                 operationName: "account.delete",
-                nowUtc: IssuedUtc.AddMinutes(1)),
+                nowUtc: _issuedUtc.AddMinutes(1)),
             CancellationToken.None);
 
         Assert.False(result.Executed);
@@ -127,13 +127,13 @@ public sealed class CapabilityBoundaryTests
     public async Task WrongAudienceDoesNotReachExecutor()
     {
         var executor = new RecordingDisableAccountExecutor();
-        var gateway = CreateGateway(executor);
+        DisableAccountGateway gateway = CreateGateway(executor);
 
         CapabilityExecutionResult result = await gateway.ExecuteAsync(
             CreateCapability(),
             CreateRequest(
                 audience: "billing-gateway",
-                nowUtc: IssuedUtc.AddMinutes(1)),
+                nowUtc: _issuedUtc.AddMinutes(1)),
             CancellationToken.None);
 
         Assert.False(result.Executed);
@@ -149,12 +149,12 @@ public sealed class CapabilityBoundaryTests
         var factory = new ExecutionCapabilityFactory();
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
-            () => factory.Create(
+            () => ExecutionCapabilityFactory.Create(
                 CreateContext(),
                 GovernanceDecision.Deny(
                     "account.disable.denied",
                     "The operation is not allowed."),
-                IssuedUtc,
+                _issuedUtc,
                 acknowledgmentId: null));
 
         Assert.Contains(
@@ -167,17 +167,16 @@ public sealed class CapabilityBoundaryTests
         RecordingDisableAccountExecutor executor)
     {
         return new DisableAccountGateway(
-            new ExecutionCapabilityValidator(),
             executor);
     }
 
     private static ExecutionCapability CreateCapability(
         int resourceVersion = 7)
     {
-        return new ExecutionCapabilityFactory().Create(
+        return ExecutionCapabilityFactory.Create(
             CreateContext(resourceVersion),
             GovernanceDecision.Allow(),
-            IssuedUtc,
+            _issuedUtc,
             acknowledgmentId: "ack-77");
     }
 
