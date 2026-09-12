@@ -45,16 +45,23 @@ is expected to match it.
 
 ## Required status checks
 
-The ruleset carries forward the four required GitHub Actions checks already
-enforced on `main`:
+The ruleset requires eight universal GitHub Actions checks on `main`:
 
+- `Dependency review`
 - `Build DocFX documentation`
 - `Validate documentation links`
 - `Restore, build, and test samples`
 - `Analyze C# with CodeQL`
+- `Validate workflows with actionlint`
+- `Analyze workflows with zizmor`
+- `Analyze dependencies with OWASP Dependency-Check`
 
 The checks are bound to the GitHub Actions integration and use strict status-check
 policy so a pull request must be validated against the current target branch.
+Each required workflow runs on every pull request targeting `main`; path-filtered
+workflows are not suitable required checks because a skipped workflow cannot
+report the required success for that commit. OpenSSF Scorecard remains scheduled
+and advisory rather than becoming a pull-request gate.
 
 ## Dependabot security updates
 
@@ -83,7 +90,7 @@ Until signing is adopted and verified end to end, the compensating controls are:
 
 - every ordinary change reaches `main` through a pull request;
 - only squash merge is permitted by the ruleset;
-- all four required checks must pass unless the documented emergency bypass is
+- all eight required checks must pass unless the documented emergency bypass is
   explicitly used;
 - stale reviews are dismissed when reviewable content changes;
 - review threads must be resolved;
@@ -158,14 +165,14 @@ approval, stale-review behavior, signed commits, and the bypass list.
 The ruleset targets only `refs/heads/main`. It does not target tags or the GitHub
 Pages deployment environment.
 
-Normal pull requests continue to run the same documentation, link, sample, and
-CodeQL checks already required by branch protection. Dependabot security-update
-pull requests use the same review and CI path.
+Normal pull requests run the documentation, link, sample, CodeQL,
+workflow-security, OWASP Dependency-Check, and dependency-review gates.
+Dependabot security-update pull requests use the same review and CI path.
 
 After first applying or materially changing the live controls:
 
 1. run the read-only repository-control audit;
-2. open a normal PR and confirm all four required checks are present;
+2. open a normal PR and confirm all eight required checks are present;
 3. confirm the PR can merge normally by squash after the checks pass;
 4. confirm the resulting `main` push still starts the documentation publishing
    workflow as expected;
