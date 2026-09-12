@@ -180,6 +180,11 @@ Use the [Zenodo concept DOI](https://doi.org/10.5281/zenodo.21938556) when citin
 
 When reproducibility depends on the exact material reviewed, cite the version-specific DOI shown on that release's Zenodo record and include the corresponding Learning version or GitHub tag. [GitHub Releases](https://github.com/AsiBackbone/Learning/releases) provides the versioned repository trail.
 
+Stable GitHub Releases also attach durable, anonymously downloadable release
+notes, a scoped SPDX sample/dependency inventory, and a SHA-256 evidence
+manifest. See the [Stable Release Evidence Runbook](RELEASE.md) for scope and
+verification commands.
+
 ## License
 
 ASI Backbone Learning uses component-specific licensing:
