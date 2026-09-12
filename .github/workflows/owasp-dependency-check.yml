@@ -21,19 +21,10 @@ on:
   schedule:
     - cron: '30 9 * * 0'
 
-  # Re-scan when dependency manifests change
+  # Required main-branch gate; every pull request must report a result.
   pull_request:
-    paths:
-      - '**/*.csproj'
-      - '**/*.sln'
-      - '**/*.slnx' 
-      - '**/packages.config'
-      - '**/packages.lock.json'
-      - '**/packages.*.lock.json'
-      - '**/Directory.Packages.props'
-      - '**/Directory.Build.props'
-      - 'dependency-check-suppressions.xml'
-      - '.github/workflows/owasp-dependency-check.yml'
+    branches:
+      - main
 
 # Deny all token permissions unless granted by a job.
 permissions: {}
@@ -45,6 +36,7 @@ jobs:
     timeout-minutes: 20
 
     permissions:
+      contents: read
       # Needed to upload SARIF results to the code-scanning dashboard.
       security-events: write
 
