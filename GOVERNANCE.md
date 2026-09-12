@@ -108,7 +108,8 @@ During this bootstrap posture:
 
 - changes to `main` still require a pull request;
 - stale reviews are dismissed when reviewable content changes;
-- required documentation, link, sample, and CodeQL checks remain blocking;
+- required documentation, link, sample, CodeQL, workflow-security, and
+  dependency checks remain blocking;
 - review threads must be resolved;
 - the required approving-review count remains `0`;
 - Code Owner approval and last-push approval remain disabled because both require
