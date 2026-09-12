@@ -11,9 +11,9 @@ on:
     paths:
       - '.github/workflows/publish-release-evidence.yml'
       - 'scripts/Assert-GitHubReleaseAssets.ps1'
-      - 'scripts/New-LearningReleaseEvidence.ps1'
+      - 'scripts/New-ReleaseEvidence.ps1'
       - 'scripts/New-LearningSamplesSbom.ps1'
-      - 'scripts/Test-LearningReleaseEvidence.ps1'
+      - 'scripts/Test-ReleaseEvidence.ps1'
       - 'RELEASE.md'
       - 'SECURITY.md'
       - 'samples/**'
@@ -54,7 +54,7 @@ jobs:
 
       - name: Test release evidence tooling
         shell: pwsh
-        run: ./scripts/Test-LearningReleaseEvidence.ps1
+        run: ./scripts/Test-ReleaseEvidence.ps1
 
       - name: Validate stable release identity
         if: github.event_name == 'release'
@@ -125,7 +125,7 @@ jobs:
             -SourceCommit $sourceCommit `
             -Repository $env:REPOSITORY
 
-          ./scripts/New-LearningReleaseEvidence.ps1 `
+          ./scripts/New-ReleaseEvidence.ps1 `
             -SbomDirectory "$env:RUNNER_TEMP/samples-sbom" `
             -ReleaseNotesPath $notesPath `
             -OutputDirectory "$env:RUNNER_TEMP/release-evidence" `

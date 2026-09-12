@@ -84,7 +84,7 @@ $manifest = [ordered]@{
     assets = @($assets.ToArray())
     tools = [ordered]@{
         sbomGenerator = [ordered]@{ name = 'New-LearningSamplesSbom.ps1'; powershellVersion = [string]$metadata.generator.powershellVersion }
-        evidenceGenerator = [ordered]@{ name = 'New-LearningReleaseEvidence.ps1'; powershellVersion = [string]$PSVersionTable.PSVersion }
+        evidenceGenerator = [ordered]@{ name = 'New-ReleaseEvidence.ps1'; powershellVersion = [string]$PSVersionTable.PSVersion }
     }
     commands = [ordered]@{
         restore = 'dotnet restore samples/Samples.slnx --locked-mode'

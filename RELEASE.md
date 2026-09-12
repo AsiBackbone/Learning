@@ -16,7 +16,7 @@ dotnet test samples/Samples.slnx --no-build
 dotnet run --file tools/validate-docfx-template-baseline.cs
 dotnet tool restore
 dotnet tool run docfx docs/docfx.json --warningsAsErrors
-./scripts/Test-LearningReleaseEvidence.ps1
+./scripts/Test-ReleaseEvidence.ps1
 ```
 
 The workflow also fails if the stable tag is invalid, the tag and checked-out commit disagree, the published release or its notes cannot be resolved, evidence generation fails, provenance cannot be generated and verified, upload fails, an expected asset is absent, or an asset is not anonymously downloadable.

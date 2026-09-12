@@ -49,7 +49,7 @@ try {
     }
 
     Set-Content -LiteralPath $releaseNotesPath -Value '# Release 9.8.7' -Encoding utf8 -NoNewline
-    & (Join-Path $PSScriptRoot 'New-LearningReleaseEvidence.ps1') `
+    & (Join-Path $PSScriptRoot 'New-ReleaseEvidence.ps1') `
         -SbomDirectory $sbomDirectory `
         -ReleaseNotesPath $releaseNotesPath `
         -OutputDirectory $evidenceDirectory `
@@ -75,7 +75,7 @@ try {
     Set-Content -LiteralPath $sbomPath -Value '{"spdxVersion":"tampered"}' -Encoding utf8 -NoNewline
     $tamperRejected = $false
     try {
-        & (Join-Path $PSScriptRoot 'New-LearningReleaseEvidence.ps1') `
+        & (Join-Path $PSScriptRoot 'New-ReleaseEvidence.ps1') `
             -SbomDirectory $sbomDirectory `
             -ReleaseNotesPath $releaseNotesPath `
             -OutputDirectory $tamperedEvidenceDirectory `
@@ -89,7 +89,7 @@ try {
         throw 'Tampered SBOM input was not rejected.'
     }
 
-    Write-Host 'Learning release evidence tests passed.'
+    Write-Host 'Release evidence tests passed.'
 }
 finally {
     if (Test-Path -LiteralPath $testRoot) {
