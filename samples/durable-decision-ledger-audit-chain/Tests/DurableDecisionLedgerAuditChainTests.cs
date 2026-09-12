@@ -1,4 +1,3 @@
-using DurableDecisionLedgerAuditChain;
 using Xunit;
 
 namespace DurableDecisionLedgerAuditChain.Tests;

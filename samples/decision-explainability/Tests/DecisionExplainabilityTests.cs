@@ -1,4 +1,3 @@
-using DecisionExplainability;
 using Xunit;
 
 namespace DecisionExplainability.Tests;

@@ -1,4 +1,3 @@
-using CrossSystemCapabilityExchange;
 using Xunit;
 
 namespace CrossSystemCapabilityExchange.Tests;

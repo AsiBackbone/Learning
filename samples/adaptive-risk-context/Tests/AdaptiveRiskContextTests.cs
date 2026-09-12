@@ -1,4 +1,3 @@
-using AdaptiveRiskContext;
 using Xunit;
 
 namespace AdaptiveRiskContext.Tests;

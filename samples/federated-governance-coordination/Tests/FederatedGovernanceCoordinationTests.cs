@@ -1,4 +1,3 @@
-using FederatedGovernanceCoordination;
 using Xunit;
 
 namespace FederatedGovernanceCoordination.Tests;
