@@ -1,4 +1,3 @@
-using DistributedAcknowledgmentContinuation;
 using Xunit;
 
 namespace DistributedAcknowledgmentContinuation.Tests;
