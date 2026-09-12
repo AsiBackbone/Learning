@@ -6,8 +6,9 @@ public static class SampleScenarios
         "internal-route=eu-central-1/storage-cluster-42";
 
     public static DecisionEvidence RegionalResidencyDenial(
-        string policyVersion = "7.3") =>
-        new(
+        string policyVersion = "7.3")
+    {
+        return new(
             DecisionId: "dec-regional-1042",
             Outcome: DecisionOutcome.Denied,
             Reasons:
@@ -29,9 +30,11 @@ public static class SampleScenarios
                 0,
                 0,
                 TimeSpan.Zero));
+    }
 
-    public static DecisionEvidence DeferredContextUnavailable() =>
-        new(
+    public static DecisionEvidence DeferredContextUnavailable()
+    {
+        return new(
             DecisionId: "dec-deferred-2001",
             Outcome: DecisionOutcome.Deferred,
             Reasons:
@@ -50,9 +53,11 @@ public static class SampleScenarios
                 5,
                 0,
                 TimeSpan.Zero));
+    }
 
-    public static DecisionEvidence AcknowledgmentRequired() =>
-        new(
+    public static DecisionEvidence AcknowledgmentRequired()
+    {
+        return new(
             DecisionId: "dec-ack-3001",
             Outcome: DecisionOutcome.AcknowledgmentRequired,
             Reasons:
@@ -71,9 +76,11 @@ public static class SampleScenarios
                 10,
                 0,
                 TimeSpan.Zero));
+    }
 
-    public static DecisionEvidence EscalationRecommended() =>
-        new(
+    public static DecisionEvidence EscalationRecommended()
+    {
+        return new(
             DecisionId: "dec-review-4001",
             Outcome: DecisionOutcome.EscalationRecommended,
             Reasons:
@@ -92,9 +99,11 @@ public static class SampleScenarios
                 15,
                 0,
                 TimeSpan.Zero));
+    }
 
-    public static DecisionEvidence Allowed() =>
-        new(
+    public static DecisionEvidence Allowed()
+    {
+        return new(
             DecisionId: "dec-allow-5001",
             Outcome: DecisionOutcome.Allowed,
             Reasons:
@@ -113,6 +122,7 @@ public static class SampleScenarios
                 20,
                 0,
                 TimeSpan.Zero));
+    }
 
     public static DecisionEvidence MultiReasonDenial(bool reverse = false)
     {

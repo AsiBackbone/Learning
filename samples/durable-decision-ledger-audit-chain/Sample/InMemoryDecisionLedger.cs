@@ -2,7 +2,7 @@ namespace DurableDecisionLedgerAuditChain;
 
 public sealed class InMemoryDecisionLedger
 {
-    private readonly object _gate = new();
+    private readonly Lock _gate = new();
     private readonly List<LedgerRecord> _records = [];
     private readonly Dictionary<string, LedgerRecord> _recordsById = new(StringComparer.Ordinal);
 
@@ -26,13 +26,10 @@ public sealed class InMemoryDecisionLedger
             // Idempotency is checked before sequence/head reconstruction.
             if (_recordsById.TryGetValue(recordId, out LedgerRecord? existing))
             {
-                if (existing.Receipt != receipt)
-                {
-                    throw new InvalidOperationException(
-                        $"RecordId '{recordId}' already exists with different governance evidence.");
-                }
-
-                return existing;
+                return existing.Receipt != receipt
+                    ? throw new InvalidOperationException(
+                        $"RecordId '{recordId}' already exists with different governance evidence.")
+                    : existing;
             }
 
             long sequenceNumber = _records.Count == 0

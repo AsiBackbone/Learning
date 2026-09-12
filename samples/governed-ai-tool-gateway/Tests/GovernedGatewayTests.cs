@@ -4,7 +4,7 @@ namespace GovernedAiToolGateway.Tests;
 
 public sealed class GovernedGatewayTests
 {
-    private static readonly DateTimeOffset NowUtc =
+    private static readonly DateTimeOffset _nowUtc =
         new(2026, 8, 14, 15, 0, 0, TimeSpan.Zero);
 
     [Fact]
@@ -18,7 +18,7 @@ public sealed class GovernedGatewayTests
                 recipient: null,
                 template: null),
             CreateActor(),
-            NowUtc,
+            _nowUtc,
             acknowledgmentResponse: null,
             CancellationToken.None);
 
@@ -38,7 +38,7 @@ public sealed class GovernedGatewayTests
                 recipient: "employee@example.internal",
                 template: null),
             CreateActor(),
-            NowUtc,
+            _nowUtc,
             acknowledgmentResponse: null,
             CancellationToken.None);
 
@@ -58,7 +58,7 @@ public sealed class GovernedGatewayTests
                 recipient: "employee@example.internal",
                 template: "case-update"),
             CreateActor(),
-            NowUtc,
+            _nowUtc,
             acknowledgmentResponse: null,
             CancellationToken.None);
 
@@ -81,7 +81,7 @@ public sealed class GovernedGatewayTests
                 template: "case-update",
                 claimedClassification: "internal"),
             CreateActor(),
-            NowUtc,
+            _nowUtc,
             acknowledgmentResponse: null,
             CancellationToken.None);
 
@@ -110,7 +110,7 @@ public sealed class GovernedGatewayTests
                 recipient: "recipient@blocked.example",
                 template: "case-update"),
             CreateActor(),
-            NowUtc,
+            _nowUtc,
             acknowledgmentResponse: null,
             CancellationToken.None);
 
@@ -131,7 +131,7 @@ public sealed class GovernedGatewayTests
                 recipient: "recipient@unclassified.test",
                 template: "case-update"),
             CreateActor(),
-            NowUtc,
+            _nowUtc,
             acknowledgmentResponse: null,
             CancellationToken.None);
 
@@ -155,7 +155,7 @@ public sealed class GovernedGatewayTests
         GatewayResult first = await host.Gateway.ExecuteAsync(
             proposal,
             CreateActor(),
-            NowUtc,
+            _nowUtc,
             acknowledgmentResponse: null,
             CancellationToken.None);
 
@@ -166,12 +166,12 @@ public sealed class GovernedGatewayTests
         GatewayResult result = await host.Gateway.ExecuteAsync(
             proposal,
             CreateActor(),
-            NowUtc.AddSeconds(5),
+            _nowUtc.AddSeconds(5),
             new AcknowledgmentResponse(
                 challenge.ChallengeId,
                 "operator-7",
                 Accepted: false,
-                RespondedUtc: NowUtc.AddSeconds(5)),
+                RespondedUtc: _nowUtc.AddSeconds(5)),
             CancellationToken.None);
 
         Assert.Equal(GatewayStatus.Rejected, result.Status);
@@ -191,7 +191,7 @@ public sealed class GovernedGatewayTests
         GatewayResult first = await host.Gateway.ExecuteAsync(
             proposal,
             CreateActor(),
-            NowUtc,
+            _nowUtc,
             acknowledgmentResponse: null,
             CancellationToken.None);
 
@@ -202,12 +202,12 @@ public sealed class GovernedGatewayTests
         GatewayResult result = await host.Gateway.ExecuteAsync(
             proposal,
             CreateActor(),
-            NowUtc.AddSeconds(5),
+            _nowUtc.AddSeconds(5),
             new AcknowledgmentResponse(
                 challenge.ChallengeId,
                 "different-actor",
                 Accepted: true,
-                RespondedUtc: NowUtc.AddSeconds(5)),
+                RespondedUtc: _nowUtc.AddSeconds(5)),
             CancellationToken.None);
 
         Assert.Equal(GatewayStatus.Rejected, result.Status);
@@ -227,7 +227,7 @@ public sealed class GovernedGatewayTests
         GatewayResult first = await host.Gateway.ExecuteAsync(
             proposal,
             CreateActor(),
-            NowUtc,
+            _nowUtc,
             acknowledgmentResponse: null,
             CancellationToken.None);
 
@@ -238,12 +238,12 @@ public sealed class GovernedGatewayTests
         GatewayResult result = await host.Gateway.ExecuteAsync(
             proposal,
             CreateActor(),
-            NowUtc.AddSeconds(5),
+            _nowUtc.AddSeconds(5),
             new AcknowledgmentResponse(
                 challenge.ChallengeId,
                 "operator-7",
                 Accepted: true,
-                RespondedUtc: NowUtc.AddSeconds(5)),
+                RespondedUtc: _nowUtc.AddSeconds(5)),
             CancellationToken.None);
 
         Assert.Equal(GatewayStatus.WouldExecute, result.Status);
@@ -271,7 +271,7 @@ public sealed class GovernedGatewayTests
         GatewayResult first = await host.Gateway.ExecuteAsync(
             originalProposal,
             CreateActor(),
-            NowUtc,
+            _nowUtc,
             acknowledgmentResponse: null,
             CancellationToken.None);
 
@@ -287,12 +287,12 @@ public sealed class GovernedGatewayTests
         GatewayResult result = await host.Gateway.ExecuteAsync(
             changedProposal,
             CreateActor(),
-            NowUtc.AddSeconds(5),
+            _nowUtc.AddSeconds(5),
             new AcknowledgmentResponse(
                 originalChallenge.ChallengeId,
                 "operator-7",
                 Accepted: true,
-                RespondedUtc: NowUtc.AddSeconds(5)),
+                RespondedUtc: _nowUtc.AddSeconds(5)),
             CancellationToken.None);
 
         Assert.Equal(GatewayStatus.Rejected, result.Status);
@@ -311,30 +311,30 @@ public sealed class GovernedGatewayTests
         ToolDescriptor descriptor =
             Assert.IsType<ToolDescriptor>(
                 host.ToolRegistry.Find("notification.send"));
-        AiToolPolicyContext originalContext = host.ContextFactory.Create(
+        AiToolPolicyContext originalContext = HostPolicyContextFactory.Create(
             proposal,
             descriptor,
             CreateActor()) with
         {
             SatisfiedAcknowledgmentId = "ack-1"
         };
-        GovernanceDecision decision = host.Policy.Evaluate(originalContext);
-        ExecutionCapability capability = host.CapabilityIssuer.Issue(
+        GovernanceDecision decision = NotificationPolicy.Evaluate(originalContext);
+        ExecutionCapability capability = ExecutionCapabilityIssuer.Issue(
             originalContext,
             decision,
             descriptor,
-            NowUtc);
+            _nowUtc);
         AiToolPolicyContext changedContext = originalContext with
         {
             Recipient = "other@example.net"
         };
 
         CapabilityValidationResult validation =
-            host.CapabilityValidator.Validate(
+            ExecutionCapabilityValidator.Validate(
                 capability,
                 changedContext,
                 descriptor,
-                NowUtc.AddSeconds(10));
+                _nowUtc.AddSeconds(10));
 
         Assert.False(validation.IsValid);
         Assert.Equal("capability.resource-mismatch", validation.ReasonCode);
@@ -347,22 +347,22 @@ public sealed class GovernedGatewayTests
         ToolDescriptor descriptor =
             Assert.IsType<ToolDescriptor>(
                 host.ToolRegistry.Find("notification.send"));
-        AiToolPolicyContext context = host.ContextFactory.Create(
+        AiToolPolicyContext context = HostPolicyContextFactory.Create(
             CreateProposal(
                 proposalId: "proposal-expiration",
                 recipient: "employee@example.internal",
                 template: "case-update"),
             descriptor,
             CreateActor());
-        GovernanceDecision decision = host.Policy.Evaluate(context);
-        ExecutionCapability capability = host.CapabilityIssuer.Issue(
+        GovernanceDecision decision = NotificationPolicy.Evaluate(context);
+        ExecutionCapability capability = ExecutionCapabilityIssuer.Issue(
             context,
             decision,
             descriptor,
-            NowUtc);
+            _nowUtc);
 
         CapabilityValidationResult validation =
-            host.CapabilityValidator.Validate(
+            ExecutionCapabilityValidator.Validate(
                 capability,
                 context,
                 descriptor,
@@ -384,14 +384,14 @@ public sealed class GovernedGatewayTests
         GatewayResult first = await host.Gateway.ExecuteAsync(
             proposal,
             CreateActor(),
-            NowUtc,
+            _nowUtc,
             acknowledgmentResponse: null,
             CancellationToken.None);
 
         GatewayResult second = await host.Gateway.ExecuteAsync(
             proposal,
             CreateActor(),
-            NowUtc.AddSeconds(10),
+            _nowUtc.AddSeconds(10),
             acknowledgmentResponse: null,
             CancellationToken.None);
 
@@ -413,15 +413,13 @@ public sealed class GovernedGatewayTests
                 recipient: "employee@example.internal",
                 template: "case-update"),
             CreateActor(),
-            NowUtc,
+            _nowUtc,
             acknowledgmentResponse: null,
             CancellationToken.None);
 
         Assert.Equal(GatewayStatus.WouldExecute, result.Status);
 
-        AuditResidue[] entries = host.AuditSink.Entries
-            .Where(entry => entry.CorrelationId == proposalId)
-            .ToArray();
+        AuditResidue[] entries = [.. host.AuditSink.Entries.Where(entry => entry.CorrelationId == proposalId)];
 
         Assert.NotEmpty(entries);
         Assert.All(
@@ -434,8 +432,10 @@ public sealed class GovernedGatewayTests
         Assert.Contains(entries, entry => entry.Stage == "execution");
     }
 
-    private static HostActor CreateActor() =>
-        new("operator-7", "tenant-a");
+    private static HostActor CreateActor()
+    {
+        return new("operator-7", "tenant-a");
+    }
 
     private static AiToolProposal CreateProposal(
         string proposalId = "proposal-test",

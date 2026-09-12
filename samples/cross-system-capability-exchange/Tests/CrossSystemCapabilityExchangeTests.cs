@@ -4,7 +4,7 @@ namespace CrossSystemCapabilityExchange.Tests;
 
 public sealed class CrossSystemCapabilityExchangeTests
 {
-    private static readonly DateTimeOffset IssuedUtc =
+    private static readonly DateTimeOffset _issuedUtc =
         SampleScenarios.IssuedUtc;
 
     [Fact]
@@ -56,7 +56,7 @@ public sealed class CrossSystemCapabilityExchangeTests
         GatewayResult result = await gateway.ExecuteAsync(
             SampleScenarios.CreateArtifact(),
             SampleScenarios.CreateContext(
-                nowUtc: IssuedUtc.AddMinutes(6)),
+                nowUtc: _issuedUtc.AddMinutes(6)),
             CancellationToken.None);
 
         Assert.False(result.Executed);
@@ -73,7 +73,7 @@ public sealed class CrossSystemCapabilityExchangeTests
 
         GatewayResult result = await gateway.ExecuteAsync(
             SampleScenarios.CreateArtifact(
-                expiresAtUtc: IssuedUtc.AddMinutes(6)),
+                expiresAtUtc: _issuedUtc.AddMinutes(6)),
             SampleScenarios.CreateContext(),
             CancellationToken.None);
 
@@ -92,14 +92,14 @@ public sealed class CrossSystemCapabilityExchangeTests
         CrossSystemGateway gateway =
             SampleScenarios.CreateGateway(executor);
 
-        DateTimeOffset futureIssued = IssuedUtc.AddMinutes(2);
+        DateTimeOffset futureIssued = _issuedUtc.AddMinutes(2);
 
         GatewayResult result = await gateway.ExecuteAsync(
             SampleScenarios.CreateArtifact(
                 issuedAtUtc: futureIssued,
                 expiresAtUtc: futureIssued.AddMinutes(5)),
             SampleScenarios.CreateContext(
-                nowUtc: IssuedUtc),
+                nowUtc: _issuedUtc),
             CancellationToken.None);
 
         Assert.False(result.Executed);
@@ -169,7 +169,7 @@ public sealed class CrossSystemCapabilityExchangeTests
             SampleScenarios.CreateGateway(executor);
 
         DelegationHop[] unexpectedChain =
-        {
+        [
             new(
                 "system-a",
                 "system-c",
@@ -180,7 +180,7 @@ public sealed class CrossSystemCapabilityExchangeTests
                 "system-b",
                 HopPosition: 1,
                 RemainingDelegationDepth: 0)
-        };
+        ];
 
         GatewayResult result = await gateway.ExecuteAsync(
             SampleScenarios.CreateArtifact(
@@ -399,7 +399,7 @@ public sealed class CrossSystemCapabilityExchangeTests
         using var start = new ManualResetEventSlim(false);
 
         Task<GatewayResult>[] tasks =
-            Enumerable.Range(0, 2)
+            [.. Enumerable.Range(0, 2)
                 .Select(_ => Task.Run(async () =>
                 {
                     ready.Signal();
@@ -409,8 +409,7 @@ public sealed class CrossSystemCapabilityExchangeTests
                         artifact,
                         context,
                         CancellationToken.None);
-                }))
-                .ToArray();
+                }))];
 
         Assert.True(
             ready.Wait(

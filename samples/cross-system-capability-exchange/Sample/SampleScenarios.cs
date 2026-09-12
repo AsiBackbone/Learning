@@ -8,13 +8,15 @@ public static class SampleScenarios
 
     public static readonly DateTimeOffset IssuedUtc =
         new(2032, 4, 10, 12, 0, 0, TimeSpan.Zero);
+    private static readonly string[] _collection = ["a-2032-04"];
 
-    public static RecipientIssuerPolicy CreateIssuerPolicy() =>
-        new(
+    public static RecipientIssuerPolicy CreateIssuerPolicy()
+    {
+        return new(
             Issuer: "system-a",
             RecipientSystemId: RecipientSystemId,
             AcceptedKeyIds: new HashSet<string>(
-                new[] { "a-2032-04" },
+                _collection,
                 StringComparer.Ordinal),
             Audience: "system-b:records-export",
             Operation: "records.export",
@@ -22,6 +24,7 @@ public static class SampleScenarios
             MaxClockSkew: TimeSpan.FromSeconds(30),
             MaximumRemainingDelegationDepth: 0,
             AllowChainedDelegation: false);
+    }
 
     public static CrossSystemGateway CreateGateway(
         IExportExecutor executor,

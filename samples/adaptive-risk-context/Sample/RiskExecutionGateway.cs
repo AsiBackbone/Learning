@@ -8,22 +8,15 @@ public interface IPaymentExecutor
         CancellationToken cancellationToken);
 }
 
-public sealed class RecordingPaymentExecutor : IPaymentExecutor
+public sealed class RecordingPaymentExecutor(
+    string acceptedAudience = PaymentExecutionContract.Audience,
+    string acceptedOperation = PaymentExecutionContract.Operation,
+    DateTimeOffset? executionNowUtc = null) : IPaymentExecutor
 {
-    private readonly string _acceptedAudience;
-    private readonly string _acceptedOperation;
-    private readonly DateTimeOffset? _executionNowUtc;
+    private readonly string _acceptedAudience = acceptedAudience;
+    private readonly string _acceptedOperation = acceptedOperation;
+    private readonly DateTimeOffset? _executionNowUtc = executionNowUtc;
     private int _invocationCount;
-
-    public RecordingPaymentExecutor(
-        string acceptedAudience = PaymentExecutionContract.Audience,
-        string acceptedOperation = PaymentExecutionContract.Operation,
-        DateTimeOffset? executionNowUtc = null)
-    {
-        _acceptedAudience = acceptedAudience;
-        _acceptedOperation = acceptedOperation;
-        _executionNowUtc = executionNowUtc;
-    }
 
     public int InvocationCount =>
         Volatile.Read(ref _invocationCount);
@@ -100,21 +93,12 @@ public sealed class RecordingPaymentExecutor : IPaymentExecutor
     }
 }
 
-public sealed class RiskExecutionGateway
+public sealed class RiskExecutionGateway(
+    IExecutionAuthorityClaimStore claimStore,
+    IPaymentExecutor executor)
 {
-    private readonly ExecutionFreshnessEvaluator _freshnessEvaluator;
-    private readonly IExecutionAuthorityClaimStore _claimStore;
-    private readonly IPaymentExecutor _executor;
-
-    public RiskExecutionGateway(
-        ExecutionFreshnessEvaluator freshnessEvaluator,
-        IExecutionAuthorityClaimStore claimStore,
-        IPaymentExecutor executor)
-    {
-        _freshnessEvaluator = freshnessEvaluator;
-        _claimStore = claimStore;
-        _executor = executor;
-    }
+    private readonly IExecutionAuthorityClaimStore _claimStore = claimStore;
+    private readonly IPaymentExecutor _executor = executor;
 
     public async Task<ExecutionResult> TryExecuteAsync(
         ExecutionAuthority authority,
@@ -124,7 +108,7 @@ public sealed class RiskExecutionGateway
         DateTimeOffset nowUtc,
         CancellationToken cancellationToken)
     {
-        FreshnessAssessment freshness = _freshnessEvaluator.Evaluate(
+        FreshnessAssessment freshness = ExecutionFreshnessEvaluator.Evaluate(
             authority,
             currentContext,
             currentRisk,
@@ -172,15 +156,12 @@ public sealed class RiskExecutionGateway
             command,
             cancellationToken);
 
-        if (!attempt.Executed)
-        {
-            return new ExecutionResult(
+        return !attempt.Executed
+            ? new ExecutionResult(
                 Executed: false,
                 Action: FreshnessAction.Reject,
-                ReasonCode: attempt.ReasonCode);
-        }
-
-        return new ExecutionResult(
+                ReasonCode: attempt.ReasonCode)
+            : new ExecutionResult(
             Executed: true,
             Action: FreshnessAction.Proceed,
             ReasonCode: attempt.ReasonCode);

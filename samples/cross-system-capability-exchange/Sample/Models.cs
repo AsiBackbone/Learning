@@ -59,11 +59,15 @@ public sealed record CapabilityValidationResult(
     bool Accepted,
     string ReasonCode)
 {
-    public static CapabilityValidationResult Accept() =>
-        new(true, "capability.accepted");
+    public static CapabilityValidationResult Accept()
+    {
+        return new(true, "capability.accepted");
+    }
 
-    public static CapabilityValidationResult Reject(string reasonCode) =>
-        new(false, reasonCode);
+    public static CapabilityValidationResult Reject(string reasonCode)
+    {
+        return new(false, reasonCode);
+    }
 }
 
 public sealed record CapabilityClaimResult(
@@ -86,11 +90,15 @@ public sealed record ExportExecutionResult(
     bool Succeeded,
     string ReasonCode)
 {
-    public static ExportExecutionResult Success() =>
-        new(true, "executor.completed");
+    public static ExportExecutionResult Success()
+    {
+        return new(true, "executor.completed");
+    }
 
-    public static ExportExecutionResult Reject(string reasonCode) =>
-        new(false, reasonCode);
+    public static ExportExecutionResult Reject(string reasonCode)
+    {
+        return new(false, reasonCode);
+    }
 }
 
 public sealed record GatewayResult(
@@ -102,32 +110,38 @@ public sealed record GatewayResult(
 {
     public static GatewayResult Rejected(
         string recipientDecisionId,
-        string internalReasonCode) =>
-        new(
+        string internalReasonCode)
+    {
+        return new(
             false,
             internalReasonCode,
             "request.not-accepted",
             recipientDecisionId,
             null);
+    }
 
     public static GatewayResult ExecutionFailed(
         string recipientDecisionId,
         string executionId,
-        string internalReasonCode) =>
-        new(
+        string internalReasonCode)
+    {
+        return new(
             false,
             internalReasonCode,
             "request.not-completed",
             recipientDecisionId,
             executionId);
+    }
 
     public static GatewayResult ExecutedSuccessfully(
         string recipientDecisionId,
-        string executionId) =>
-        new(
+        string executionId)
+    {
+        return new(
             true,
             "execution.completed",
             "request.completed",
             recipientDecisionId,
             executionId);
+    }
 }

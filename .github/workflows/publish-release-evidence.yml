@@ -1,0 +1,213 @@
+name: Publish Stable Release Evidence
+
+on:
+  release:
+    types:
+      - published
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/publish-release-evidence.yml'
+      - 'scripts/Assert-GitHubReleaseAssets.ps1'
+      - 'scripts/New-LearningReleaseEvidence.ps1'
+      - 'scripts/New-LearningSamplesSbom.ps1'
+      - 'scripts/Test-LearningReleaseEvidence.ps1'
+      - 'RELEASE.md'
+      - 'SECURITY.md'
+      - 'samples/**'
+
+permissions: {}
+
+concurrency:
+  group: stable-release-evidence-${{ github.event.release.tag_name || github.ref }}
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  validate-and-build-evidence:
+    name: Validate release and build evidence
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout release source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.event.pull_request.head.sha }}
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Display .NET information
+        run: dotnet --info
+
+      - name: Test release evidence tooling
+        shell: pwsh
+        run: ./scripts/Test-LearningReleaseEvidence.ps1
+
+      - name: Validate stable release identity
+        if: github.event_name == 'release'
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if ($env:RELEASE_TAG -notmatch '^v\d+\.\d+\.\d+$') {
+              throw "Only stable vMAJOR.MINOR.PATCH releases are supported: $($env:RELEASE_TAG)"
+          }
+
+          $sourceCommit = (git rev-parse HEAD).Trim()
+          $tagCommit = (git rev-list -n 1 $env:RELEASE_TAG).Trim()
+          if ($sourceCommit -ne $tagCommit) {
+              throw "Checked-out commit $sourceCommit does not match tag commit $tagCommit."
+          }
+
+      - name: Restore samples
+        working-directory: samples
+        run: dotnet restore Samples.slnx --locked-mode
+
+      - name: Build samples
+        working-directory: samples
+        run: dotnet build Samples.slnx --no-restore
+
+      - name: Verify sample formatting
+        working-directory: samples
+        run: dotnet format Samples.slnx --verify-no-changes --no-restore --verbosity minimal
+
+      - name: Test samples
+        working-directory: samples
+        run: dotnet test Samples.slnx --no-build
+
+      - name: Validate DocFX template baseline
+        run: dotnet run --file tools/validate-docfx-template-baseline.cs
+
+      - name: Restore .NET tools
+        run: dotnet tool restore
+
+      - name: Build DocFX site
+        run: dotnet tool run docfx docs/docfx.json --warningsAsErrors
+
+      - name: Build durable release evidence
+        if: github.event_name == 'release'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          $releaseJson = gh release view $env:RELEASE_TAG --repo $env:REPOSITORY --json body,tagName,targetCommitish
+          if ($LASTEXITCODE -ne 0) {
+              throw "Published release $($env:RELEASE_TAG) could not be resolved."
+          }
+          $release = $releaseJson | ConvertFrom-Json
+          if ($release.tagName -ne $env:RELEASE_TAG -or [string]::IsNullOrWhiteSpace([string]$release.body)) {
+              throw "Published release $($env:RELEASE_TAG) is missing its expected identity or release notes."
+          }
+
+          $sourceCommit = (git rev-parse HEAD).Trim().ToLowerInvariant()
+          $notesPath = Join-Path $env:RUNNER_TEMP 'release-notes.md'
+          Set-Content -LiteralPath $notesPath -Value ([string]$release.body) -Encoding utf8 -NoNewline
+
+          ./scripts/New-LearningSamplesSbom.ps1 `
+            -RepositoryRoot . `
+            -OutputDirectory "$env:RUNNER_TEMP/samples-sbom" `
+            -TagName $env:RELEASE_TAG `
+            -SourceCommit $sourceCommit `
+            -Repository $env:REPOSITORY
+
+          ./scripts/New-LearningReleaseEvidence.ps1 `
+            -SbomDirectory "$env:RUNNER_TEMP/samples-sbom" `
+            -ReleaseNotesPath $notesPath `
+            -OutputDirectory "$env:RUNNER_TEMP/release-evidence" `
+            -TagName $env:RELEASE_TAG `
+            -SourceCommit $sourceCommit `
+            -Repository $env:REPOSITORY
+
+      - name: Upload diagnostic workflow artifact
+        if: github.event_name == 'release'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: learning-release-evidence-${{ github.event.release.tag_name }}
+          path: ${{ runner.temp }}/release-evidence
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-evidence:
+    name: Attest and publish durable evidence
+    if: github.event_name == 'release'
+    needs: validate-and-build-evidence
+    runs-on: ubuntu-latest
+
+    permissions:
+      attestations: write
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout verification tooling
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Download diagnostic workflow artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: learning-release-evidence-${{ github.event.release.tag_name }}
+          path: release-evidence
+
+      - name: Attest durable release evidence
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: release-evidence/*
+
+      - name: Verify generated provenance
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          foreach ($asset in Get-ChildItem -LiteralPath release-evidence -File) {
+              gh attestation verify $asset.FullName --repo $env:REPOSITORY
+              if ($LASTEXITCODE -ne 0) {
+                  throw "Provenance verification failed for '$($asset.Name)'."
+              }
+          }
+
+      - name: Upload durable evidence to GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          $assets = @(Get-ChildItem -LiteralPath release-evidence -File | Sort-Object Name | Select-Object -ExpandProperty FullName)
+          if ($assets.Count -ne 3) {
+              throw "Expected exactly three durable evidence files, found $($assets.Count)."
+          }
+          gh release upload $env:RELEASE_TAG @assets --clobber --repo $env:REPOSITORY
+          if ($LASTEXITCODE -ne 0) {
+              exit $LASTEXITCODE
+          }
+
+      - name: Verify public GitHub release assets
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: >-
+          ./scripts/Assert-GitHubReleaseAssets.ps1
+          -TagName $env:RELEASE_TAG
+          -EvidenceDirectory release-evidence
+          -Repository $env:REPOSITORY
