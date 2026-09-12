@@ -9,12 +9,14 @@ public sealed class InMemoryIssuerTrustStore(
     IReadOnlyList<RecipientIssuerPolicy> policies)
     : IIssuerTrustStore
 {
-    public RecipientIssuerPolicy? Find(string issuer) =>
-        policies.FirstOrDefault(
+    public RecipientIssuerPolicy? Find(string issuer)
+    {
+        return policies.FirstOrDefault(
             policy => string.Equals(
                 policy.Issuer,
                 issuer,
                 StringComparison.Ordinal));
+    }
 }
 
 public interface IRevocationStore
@@ -54,7 +56,7 @@ public interface ICapabilityUseStore
 
 public sealed class InMemoryCapabilityUseStore : ICapabilityUseStore
 {
-    private readonly object _gate = new();
+    private readonly Lock _gate = new();
     private readonly Dictionary<string, int> _useCounts =
         new(StringComparer.Ordinal);
 

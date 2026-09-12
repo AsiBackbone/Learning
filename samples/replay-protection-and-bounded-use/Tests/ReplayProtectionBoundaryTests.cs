@@ -4,7 +4,7 @@ namespace ReplayProtectionAndBoundedUse.Tests;
 
 public sealed class ReplayProtectionBoundaryTests
 {
-    private static readonly DateTimeOffset IssuedUtc =
+    private static readonly DateTimeOffset _issuedUtc =
         new(2026, 8, 19, 18, 0, 0, TimeSpan.Zero);
 
     [Fact]
@@ -12,7 +12,7 @@ public sealed class ReplayProtectionBoundaryTests
     {
         var store = new AtomicInMemoryCapabilityUseStore();
         var executor = new RecordingProtectedOperationExecutor();
-        var gateway = CreateGateway(store, executor);
+        ProtectedOperationGateway gateway = CreateGateway(store, executor);
         ExecutionCapability capability = CreateCapability();
 
         CapabilityExecutionResult result = await gateway.ExecuteAsync(
@@ -23,7 +23,7 @@ public sealed class ReplayProtectionBoundaryTests
         Assert.True(result.ExecutionCompleted);
         Assert.Equal("execution.completed", result.ReasonCode);
         Assert.NotNull(result.Consumption);
-        Assert.True(result.Consumption!.Accepted);
+        Assert.True(result.Consumption.Accepted);
         Assert.Equal(1, store.GetObservedUseCount(capability.CapabilityId));
         Assert.Equal(1, executor.InvocationCount);
     }
@@ -33,7 +33,7 @@ public sealed class ReplayProtectionBoundaryTests
     {
         var store = new AtomicInMemoryCapabilityUseStore();
         var executor = new RecordingProtectedOperationExecutor();
-        var gateway = CreateGateway(store, executor);
+        ProtectedOperationGateway gateway = CreateGateway(store, executor);
         ExecutionCapability capability = CreateCapability();
 
         CapabilityExecutionResult first = await gateway.ExecuteAsync(
@@ -58,7 +58,7 @@ public sealed class ReplayProtectionBoundaryTests
     {
         var store = new AtomicInMemoryCapabilityUseStore();
         var executor = new RecordingProtectedOperationExecutor();
-        var gateway = CreateGateway(store, executor);
+        ProtectedOperationGateway gateway = CreateGateway(store, executor);
         ExecutionCapability capability = CreateCapability(maximumUses: 1);
 
         CapabilityExecutionResult[] results = await RunTwoConcurrentAsync(
@@ -86,7 +86,7 @@ public sealed class ReplayProtectionBoundaryTests
         var store =
             new DeliberatelyUnsafeCheckThenActCapabilityUseStore();
         var executor = new RecordingProtectedOperationExecutor();
-        var gateway = CreateGateway(store, executor);
+        ProtectedOperationGateway gateway = CreateGateway(store, executor);
         ExecutionCapability capability = CreateCapability(
             capabilityId: "cap-unsafe-race",
             maximumUses: 1);
@@ -112,7 +112,7 @@ public sealed class ReplayProtectionBoundaryTests
     {
         var store = new AtomicInMemoryCapabilityUseStore();
         var executor = new RecordingProtectedOperationExecutor();
-        var gateway = CreateGateway(store, executor);
+        ProtectedOperationGateway gateway = CreateGateway(store, executor);
         ExecutionCapability capability = CreateCapability(maximumUses: 2);
 
         CapabilityExecutionResult first = await gateway.ExecuteAsync(
@@ -141,7 +141,7 @@ public sealed class ReplayProtectionBoundaryTests
     {
         var store = new AtomicInMemoryCapabilityUseStore();
         var executor = new RecordingProtectedOperationExecutor();
-        var gateway = CreateGateway(store, executor);
+        ProtectedOperationGateway gateway = CreateGateway(store, executor);
         ExecutionCapability capability = CreateCapability(
             capabilityId: "cap-bounded-final-use",
             maximumUses: 2);
@@ -175,7 +175,7 @@ public sealed class ReplayProtectionBoundaryTests
     {
         var store = new AtomicInMemoryCapabilityUseStore();
         var executor = new RecordingProtectedOperationExecutor();
-        var gateway = CreateGateway(store, executor);
+        ProtectedOperationGateway gateway = CreateGateway(store, executor);
         ExecutionCapability capability = CreateCapability();
 
         CapabilityExecutionResult result = await gateway.ExecuteAsync(
@@ -195,7 +195,7 @@ public sealed class ReplayProtectionBoundaryTests
     {
         var store = new AtomicInMemoryCapabilityUseStore();
         var executor = new RecordingProtectedOperationExecutor();
-        var gateway = CreateGateway(store, executor);
+        ProtectedOperationGateway gateway = CreateGateway(store, executor);
         ExecutionCapability capability = CreateCapability();
 
         CapabilityExecutionResult result = await gateway.ExecuteAsync(
@@ -216,7 +216,7 @@ public sealed class ReplayProtectionBoundaryTests
         var store = new AtomicInMemoryCapabilityUseStore();
         var executor = new RecordingProtectedOperationExecutor();
         var evidence = new InMemoryReplayEvidenceSink();
-        var gateway = CreateGateway(store, executor, evidence);
+        ProtectedOperationGateway gateway = CreateGateway(store, executor, evidence);
         ExecutionCapability capability = CreateCapability();
 
         _ = await gateway.ExecuteAsync(
@@ -251,7 +251,7 @@ public sealed class ReplayProtectionBoundaryTests
             () => store.TryConsumeAsync(
                     "cap-cancelled",
                     maximumUses: 1,
-                    usedUtc: IssuedUtc,
+                    usedUtc: _issuedUtc,
                     cancellation.Token)
                 .AsTask());
 
@@ -263,7 +263,7 @@ public sealed class ReplayProtectionBoundaryTests
     {
         var executor = new RecordingProtectedOperationExecutor();
         var evidence = new InMemoryReplayEvidenceSink();
-        var gateway = CreateGateway(
+        ProtectedOperationGateway gateway = CreateGateway(
             new UnavailableCapabilityUseStore(),
             executor,
             evidence);
@@ -290,7 +290,7 @@ public sealed class ReplayProtectionBoundaryTests
         var store = new AtomicInMemoryCapabilityUseStore();
         var executor = new ThrowingProtectedOperationExecutor();
         var evidence = new InMemoryReplayEvidenceSink();
-        var gateway = CreateGateway(store, executor, evidence);
+        ProtectedOperationGateway gateway = CreateGateway(store, executor, evidence);
         ExecutionCapability capability = CreateCapability();
 
         await Assert.ThrowsAsync<InvalidOperationException>(
@@ -324,7 +324,6 @@ public sealed class ReplayProtectionBoundaryTests
         IReplayEvidenceSink? evidence = null)
     {
         return new ProtectedOperationGateway(
-            new ExecutionCapabilityValidator(),
             store,
             executor,
             evidence ?? new InMemoryReplayEvidenceSink());
@@ -340,8 +339,8 @@ public sealed class ReplayProtectionBoundaryTests
             OperationName: "account.disable",
             ResourceId: "user-100",
             Audience: "account-admin-gateway",
-            IssuedUtc: IssuedUtc,
-            ExpiresUtc: IssuedUtc.AddMinutes(5),
+            IssuedUtc: _issuedUtc,
+            ExpiresUtc: _issuedUtc.AddMinutes(5),
             MaximumUses: maximumUses);
     }
 
@@ -357,7 +356,7 @@ public sealed class ReplayProtectionBoundaryTests
             OperationName: operationName,
             ResourceId: resourceId,
             Audience: audience,
-            NowUtc: nowUtc ?? IssuedUtc.AddMinutes(1));
+            NowUtc: nowUtc ?? _issuedUtc.AddMinutes(1));
     }
 
     private static async Task<CapabilityExecutionResult[]> RunTwoConcurrentAsync(

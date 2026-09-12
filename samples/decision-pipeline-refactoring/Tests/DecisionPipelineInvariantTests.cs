@@ -135,13 +135,15 @@ public sealed class DecisionPipelineInvariantTests
     private static AccountDisableRequest Request(
         string accountId,
         bool isAdministrator,
-        bool acknowledgmentSatisfied) =>
-        new(
+        bool acknowledgmentSatisfied)
+    {
+        return new(
             CorrelationId: $"corr-{accountId}",
             ActorId: "admin-17",
             AccountId: accountId,
             RequesterIsAdministrator: isAdministrator,
             AcknowledgmentSatisfied: acknowledgmentSatisfied);
+    }
 
     private static Fixture CreateFixture()
     {
@@ -155,7 +157,6 @@ public sealed class DecisionPipelineInvariantTests
         var evidence = new RecordingDecisionEvidenceSink();
         var pipeline = new AccountDisableDecisionPipeline(
             new AccountDisableContextBuilder(repository),
-            new AccountDisablePolicy(),
             executor,
             evidence);
 

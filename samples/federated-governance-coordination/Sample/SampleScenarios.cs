@@ -4,54 +4,63 @@ public static class SampleScenarios
 {
     public static FederationContract CreateContract(
         DisagreementDisposition disagreementDisposition =
-            DisagreementDisposition.PreserveConflict) =>
-        new(
+            DisagreementDisposition.PreserveConflict)
+    {
+        return new(
             ContractId: "records-transfer-federation",
             ContractVersion: "4",
             Strategy:
                 CompositionStrategy.AllRequiredAuthoritiesMustAllow,
             DisagreementDisposition: disagreementDisposition);
+    }
 
     public static FederatedGovernanceService CreateService(
-        FederationContract? contract = null) =>
-        new(
-            new AuthoritySetResolver(),
-            new FederationCoordinator(),
+        FederationContract? contract = null)
+    {
+        return new(
             contract ?? CreateContract());
+    }
 
     public static ResourceState CreateCrossRegionResource(
         string currentRegion = "cedar",
         string destinationRegion = "harbor",
-        string resourceVersion = "v17") =>
-        new(
+        string resourceVersion = "v17")
+    {
+        return new(
             ResourceId: "record-204",
             ResourceVersion: resourceVersion,
             CurrentRegion: currentRegion,
             DestinationRegion: destinationRegion);
+    }
 
     public static ResourceState CreateLocalResource(
         string region = "cedar",
-        string resourceVersion = "v17") =>
-        CreateCrossRegionResource(
+        string resourceVersion = "v17")
+    {
+        return CreateCrossRegionResource(
             currentRegion: region,
             destinationRegion: region,
             resourceVersion: resourceVersion);
+    }
 
     public static EvaluationRequest CreateRequest(
         ResourceState? resource = null,
         bool coordinatorAvailable = true,
-        bool localPolicyAllows = true) =>
-        new(
+        bool localPolicyAllows = true)
+    {
+        return new(
             resource ?? CreateCrossRegionResource(),
             coordinatorAvailable,
             localPolicyAllows);
+    }
 
     public static AuthorityContribution CreateContribution(
         string authorityDomainId,
         AuthorityOutcome? outcome = AuthorityOutcome.Allow,
         ContributionStatus status = ContributionStatus.Available,
-        string resourceVersion = "v17") =>
-        new(
+        string resourceVersion = "v17")
+    {
+        return new(
             AuthorityDomainId: authorityDomainId,
             Status: status,
             Outcome: outcome,
@@ -61,10 +70,13 @@ public static class SampleScenarios
             ReasonCode: status == ContributionStatus.Available
                 ? $"{authorityDomainId}.evaluated"
                 : $"{authorityDomainId}.{status.ToString().ToLowerInvariant()}");
+    }
 
-    public static AuthorityContribution[] CreateAllowedContributions() =>
-    [
+    public static AuthorityContribution[] CreateAllowedContributions()
+    {
+        return [
         CreateContribution("cedar-release"),
         CreateContribution("harbor-intake")
     ];
+    }
 }

@@ -11,14 +11,16 @@ public static class SampleScenarios
         decimal amount = 250_000m,
         bool destinationApproved = true,
         IncidentPosture incidentPosture = IncidentPosture.Normal,
-        string environmentVersion = "env-normal-v1") =>
-        new(
+        string environmentVersion = "env-normal-v1")
+    {
+        return new(
             PaymentId: paymentId,
             ResourceVersion: resourceVersion,
             Amount: amount,
             DestinationApproved: destinationApproved,
             IncidentPosture: incidentPosture,
             EnvironmentVersion: environmentVersion);
+    }
 
     public static RiskObservation CreateObservation(
         decimal fraudProbability = 0.21m,
@@ -30,8 +32,9 @@ public static class SampleScenarios
         string calibrationVersion = "fraud-cal-2026-08",
         ModelHealth modelHealth = ModelHealth.Healthy,
         DateTimeOffset? observedAtUtc = null,
-        DateTimeOffset? providerValidUntilUtc = null) =>
-        new(
+        DateTimeOffset? providerValidUntilUtc = null)
+    {
+        return new(
             ObservationId: observationId,
             SignalName: "payment.fraud-probability",
             FraudProbability: fraudProbability,
@@ -44,6 +47,7 @@ public static class SampleScenarios
             ObservedAtUtc: observedAtUtc ?? BaselineUtc,
             ProviderValidUntilUtc:
                 providerValidUntilUtc ?? BaselineUtc.AddMinutes(10));
+    }
 
     public static RiskGovernancePolicy CreatePolicy(
         string policyVersion = "payment-policy-v12",
@@ -57,8 +61,9 @@ public static class SampleScenarios
         StaleSignalDisposition staleSignalDisposition =
             StaleSignalDisposition.Reevaluate,
         decimal escalationThreshold = 0.70m,
-        decimal denialThreshold = 0.90m) =>
-        new(
+        decimal denialThreshold = 0.90m)
+    {
+        return new(
             PolicyId: "payment-release-risk",
             PolicyVersion: policyVersion,
             ThresholdVersion: thresholdVersion,
@@ -84,6 +89,7 @@ public static class SampleScenarios
             StaleSignalDisposition: staleSignalDisposition,
             EscalationThreshold: escalationThreshold,
             DenialThreshold: denialThreshold);
+    }
 
     public static ExecutionAuthority CreateAuthority(
         RiskGovernancePolicy? policy = null,
@@ -93,26 +99,23 @@ public static class SampleScenarios
     {
         RiskGovernancePolicy selectedPolicy = policy ?? CreatePolicy();
         DateTimeOffset issueTime = issuedAtUtc ?? BaselineUtc.AddMinutes(1);
-        RiskPolicyEvaluator evaluator = new();
-        GovernanceDecision decision = evaluator.Evaluate(
+
+        GovernanceDecision decision = RiskPolicyEvaluator.Evaluate(
             decisionId,
             CreatePayment(),
             RiskSignalInput.Available(CreateObservation()),
             selectedPolicy,
             issueTime);
 
-        AuthorityIssueResult issue = new ExecutionAuthorityIssuer().TryIssue(
+        AuthorityIssueResult issue = ExecutionAuthorityIssuer.TryIssue(
             decision,
             selectedPolicy,
             issueTime,
             maximumAuthorityLifetime);
 
-        if (!issue.Issued || issue.Authority is null)
-        {
-            throw new InvalidOperationException(
-                $"Teaching fixture failed to issue authority: {issue.ReasonCode}.");
-        }
-
-        return issue.Authority;
+        return !issue.Issued || issue.Authority is null
+            ? throw new InvalidOperationException(
+                $"Teaching fixture failed to issue authority: {issue.ReasonCode}.")
+            : issue.Authority;
     }
 }

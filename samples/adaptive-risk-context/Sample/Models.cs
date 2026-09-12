@@ -73,8 +73,10 @@ public sealed record RiskSignalInput(
             observation);
     }
 
-    public static RiskSignalInput Unavailable(string providerId) =>
-        new(RiskSignalAvailability.Unavailable, providerId, Observation: null);
+    public static RiskSignalInput Unavailable(string providerId)
+    {
+        return new(RiskSignalAvailability.Unavailable, providerId, Observation: null);
+    }
 }
 
 public sealed record PaymentContext(
@@ -154,11 +156,13 @@ public sealed record AuthorityIssueResult(
             Authority: authority);
     }
 
-    public static AuthorityIssueResult Reject(string reasonCode) =>
-        new(
+    public static AuthorityIssueResult Reject(string reasonCode)
+    {
+        return new(
             Issued: false,
             ReasonCode: reasonCode,
             Authority: null);
+    }
 }
 
 public sealed record FreshnessAssessment(
@@ -187,11 +191,15 @@ public sealed record PaymentExecutionAttempt(
     bool Executed,
     string ReasonCode)
 {
-    public static PaymentExecutionAttempt Success() =>
-        new(Executed: true, ReasonCode: "execution.completed");
+    public static PaymentExecutionAttempt Success()
+    {
+        return new(Executed: true, ReasonCode: "execution.completed");
+    }
 
-    public static PaymentExecutionAttempt Reject(string reasonCode) =>
-        new(Executed: false, ReasonCode: reasonCode);
+    public static PaymentExecutionAttempt Reject(string reasonCode)
+    {
+        return new(Executed: false, ReasonCode: reasonCode);
+    }
 }
 
 public sealed record ExecutionResult(

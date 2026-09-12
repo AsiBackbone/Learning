@@ -1,6 +1,5 @@
-var policy = new DisableAccountPolicy();
 var executor = new RecordingDisableAccountExecutor();
-var workflow = new DisableAccountWorkflow(policy, executor);
+var workflow = new DisableAccountWorkflow(executor);
 
 DisableAccountContext[] scenarios =
 [
@@ -103,31 +102,41 @@ public sealed record GovernanceDecision(
 {
     public bool CanExecute => Outcome == DecisionOutcome.Allowed;
 
-    public static GovernanceDecision Allow() =>
-        new(
+    public static GovernanceDecision Allow()
+    {
+        return new(
             DecisionOutcome.Allowed,
             "decision.allowed",
             "The operation may proceed.");
+    }
 
     public static GovernanceDecision Deny(
         string code,
-        string reason) =>
-        new(DecisionOutcome.Denied, code, reason);
+        string reason)
+    {
+        return new(DecisionOutcome.Denied, code, reason);
+    }
 
     public static GovernanceDecision Defer(
         string code,
-        string reason) =>
-        new(DecisionOutcome.Deferred, code, reason);
+        string reason)
+    {
+        return new(DecisionOutcome.Deferred, code, reason);
+    }
 
     public static GovernanceDecision RequireAcknowledgment(
         string code,
-        string reason) =>
-        new(DecisionOutcome.AcknowledgmentRequired, code, reason);
+        string reason)
+    {
+        return new(DecisionOutcome.AcknowledgmentRequired, code, reason);
+    }
 
     public static GovernanceDecision Escalate(
         string code,
-        string reason) =>
-        new(DecisionOutcome.EscalationRecommended, code, reason);
+        string reason)
+    {
+        return new(DecisionOutcome.EscalationRecommended, code, reason);
+    }
 }
 
 public sealed record DisableAccountIntent(
@@ -145,7 +154,7 @@ public sealed record DisableAccountContext(
 
 public sealed class DisableAccountPolicy
 {
-    public GovernanceDecision Evaluate(DisableAccountContext context)
+    public static GovernanceDecision Evaluate(DisableAccountContext context)
     {
         if (!context.RequesterIsAdministrator)
         {
@@ -161,21 +170,15 @@ public sealed class DisableAccountPolicy
                 "Protected accounts require escalation.");
         }
 
-        if (context.MaintenanceHoldActive)
-        {
-            return GovernanceDecision.Defer(
+        return context.MaintenanceHoldActive
+            ? GovernanceDecision.Defer(
                 "account.disable.maintenance-hold",
-                "Account changes are temporarily deferred.");
-        }
-
-        if (string.IsNullOrWhiteSpace(context.Intent.Reason))
-        {
-            return GovernanceDecision.RequireAcknowledgment(
+                "Account changes are temporarily deferred.")
+            : string.IsNullOrWhiteSpace(context.Intent.Reason)
+            ? GovernanceDecision.RequireAcknowledgment(
                 "account.disable.reason-required",
-                "A reason must be acknowledged before this operation proceeds.");
-        }
-
-        return GovernanceDecision.Allow();
+                "A reason must be acknowledged before this operation proceeds.")
+            : GovernanceDecision.Allow();
     }
 }
 
@@ -206,14 +209,13 @@ public sealed class RecordingDisableAccountExecutor
 }
 
 public sealed class DisableAccountWorkflow(
-    DisableAccountPolicy policy,
     IDisableAccountExecutor executor)
 {
     public async Task<GovernanceDecision> ExecuteAsync(
         DisableAccountContext context,
         CancellationToken cancellationToken)
     {
-        GovernanceDecision decision = policy.Evaluate(context);
+        GovernanceDecision decision = DisableAccountPolicy.Evaluate(context);
 
         if (!decision.CanExecute)
         {
