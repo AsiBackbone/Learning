@@ -22,6 +22,17 @@ Security-sensitive corrections may result in documentation changes, sample-code 
 
 Versioned release records support provenance and reproducibility. They do not imply long-term security maintenance, backported corrections, runtime compatibility, or package-style support for historical Learning releases.
 
+Stable release evidence is defined in [RELEASE.md](RELEASE.md). Each stable
+release attaches its exact release notes, a scoped SPDX inventory of the tracked
+sample source and locked NuGet dependencies, and a hash manifest directly to the
+GitHub Release. Current-workflow releases also carry GitHub provenance
+attestations for those files. Temporary Actions artifacts are diagnostic copies,
+not the durable record.
+
+The release SBOM is an inventory, not a vulnerability report or proof that the
+samples and dependencies are vulnerability-free. Code-scanning and dependency
+findings remain on their GitHub security surfaces.
+
 ## Repository Security Automation
 
 Learning keeps its source-controlled security automation deliberately proportional to an educational repository:
