@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: A Passing Agent Diff Is Not Project Authority
+  href: 2026/a-passing-agent-diff-is-not-project-authority.md
 - name: Your Audit Log Records the Story, Not the Decision
   href: 2026/your-audit-log-is-not-evidence.md
 - name: Do You Need a Capability Token, or Are Roles and Claims Enough?
