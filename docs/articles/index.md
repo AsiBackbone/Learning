@@ -20,6 +20,14 @@ The Learning site is the canonical publication host. Cross-posted copies should 
 
 ## 2026
 
+### [A Passing Agent Diff Is Not Project Authority](2026/a-passing-agent-diff-is-not-project-authority.md)
+
+**Christopher D. Cavell** · **September 13, 2026**
+
+A case study of AI-assisted development: two pull requests for an optional X publisher show why passing checks, production evidence, and maintainer authority answer different questions.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/a-passing-agent-diff-is-not-project-authority.html`
+
 ### [Your Audit Log Records the Story, Not the Decision](2026/your-audit-log-is-not-evidence.md)
 
 **Christopher D. Cavell** · **September 7, 2026**
