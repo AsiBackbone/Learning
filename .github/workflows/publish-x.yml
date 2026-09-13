@@ -105,12 +105,57 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
+      - name: Check X publisher configuration
+        id: x_config
+        shell: bash
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_KEY_SECRET: ${{ secrets.X_API_KEY_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+          X_ACCOUNT_USER_ID: ${{ vars.X_ACCOUNT_USER_ID }}
+        run: |
+          set -euo pipefail
+
+          names=(
+            X_API_KEY
+            X_API_KEY_SECRET
+            X_ACCESS_TOKEN
+            X_ACCESS_TOKEN_SECRET
+            X_ACCOUNT_USER_ID
+          )
+          configured=0
+          missing=()
+
+          for name in "${names[@]}"; do
+            if [[ -n "${!name:-}" ]]; then
+              ((configured += 1))
+            else
+              missing+=("$name")
+            fi
+          done
+
+          if ((configured == 0)); then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::X publication is disabled because its protected environment has not been configured."
+            exit 0
+          fi
+
+          if ((${#missing[@]} != 0)); then
+            printf '::error::X publisher configuration is incomplete; missing: %s.\n' "${missing[*]}"
+            exit 1
+          fi
+
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+
       - name: Setup .NET SDK
+        if: ${{ steps.x_config.outputs.enabled == 'true' }}
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           global-json-file: global.json
 
       - name: Resolve deployed publication boundary
+        if: ${{ steps.x_config.outputs.enabled == 'true' }}
         id: publication
         shell: bash
         env:
@@ -144,6 +189,7 @@ jobs:
           echo "deployed_revision=$deployed_revision" >> "$GITHUB_OUTPUT"
 
       - name: Prepare durable publisher state worktree
+        if: ${{ steps.x_config.outputs.enabled == 'true' }}
         id: state
         shell: bash
         env:
@@ -161,6 +207,7 @@ jobs:
           echo "directory=$state_directory" >> "$GITHUB_OUTPUT"
 
       - name: Publish and record receipts
+        if: ${{ steps.x_config.outputs.enabled == 'true' }}
         env:
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_KEY_SECRET: ${{ secrets.X_API_KEY_SECRET }}
@@ -178,6 +225,7 @@ jobs:
           --account-id "$X_ACCOUNT_USER_ID"
 
       - name: Persist receipts and checkpoint
+        if: ${{ steps.x_config.outputs.enabled == 'true' }}
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
