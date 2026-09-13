@@ -161,12 +161,21 @@ Use the canonical project surfaces for deeper information rather than treating t
 - **Security policy:** [SECURITY.md](SECURITY.md)
 - **Citation metadata:** [CITATION.cff](CITATION.cff)
 - **Licensing details:** [LICENSING.md](LICENSING.md)
+- **X publication operations:** [X_PUBLISHING.md](X_PUBLISHING.md)
 
 ### Search discovery and change notification
 
 The XML sitemap is the complete canonical discovery inventory for the published Learning site. IndexNow complements that inventory with a narrower post-deployment signal: after GitHub Pages deploys successfully, the publication workflow notifies participating search engines only about canonical Learning URLs that were added, modified, or removed since the previously deployed revision. IndexNow does not replace the sitemap and does not determine whether documentation is publishable.
 
 The site publishes `deployment-revision.txt` so the next publication can compare against the revision actually represented by GitHub Pages rather than assuming the immediately preceding commit was deployed. On the first run, the workflow falls back to the push base revision. The public `indexnow-key.txt` file verifies control of the `/Learning/` URL space through IndexNow `keyLocation`; it is intentionally public protocol verification material, not a private workflow credential. IndexNow service failures are reported as non-blocking warnings after deployment.
+
+An optional, separate post-deployment publisher can announce newly eligible
+`feed: true` documents on X. It consumes the same source frontmatter as RSS but
+does not read or modify `feed.xml`. Durable receipts, canonical-URL
+reconciliation, and a deployed-revision cursor provide retryable,
+effectively-once delivery without making X availability a documentation
+deployment dependency. See the [X Publication Runbook](X_PUBLISHING.md) for the
+security boundary, setup, dry-run, retry, recovery, and disable procedures.
 
 Issues are best used for concrete repository work; Learning Discussions are better suited to exploratory architecture questions, tutorial proposals, alternatives, design debates, and community examples.
 

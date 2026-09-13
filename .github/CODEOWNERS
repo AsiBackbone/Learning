@@ -16,6 +16,9 @@
 /.github/ @cdcavell
 /eng/repository-controls/ @cdcavell
 /scripts/ @cdcavell
+/tools/publish-x.cs @cdcavell
+/.github/workflows/publish-x.yml @cdcavell
+X_PUBLISHING.md @cdcavell
 
 # Executable teaching samples
 /samples/ @cdcavell
