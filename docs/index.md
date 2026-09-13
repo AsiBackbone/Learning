@@ -1,222 +1,173 @@
 ---
+title: "Governed Execution & Secure .NET Architecture Tutorials"
 description: Practical .NET architecture tutorials, labs, and reference patterns for governed execution, secure applications, AI integration, and policy-driven systems.
+_disableAffix: true
+_disableBreadcrumb: true
+_disableToc: true
 ---
 
 # ASI Backbone Learning
 
-**Practical software architecture for governed execution, secure applications, AI integration, and policy-driven systems.**
+<div class="home-hero">
+  <p class="home-kicker">Practical .NET architecture for accountable systems</p>
+  <p class="home-summary">Learn governed execution, secure application design, policy-driven systems, and safe AI integration through focused tutorials, hands-on labs, and runnable examples.</p>
+  <div class="home-actions" aria-label="Start learning">
+    <a class="btn btn-primary" href="getting-started/index.md">Get Started</a>
+    <a class="btn btn-outline-primary" href="getting-started/find-your-path.md">Find Your Path</a>
+    <a class="btn btn-outline-primary" href="articles/index.md">Browse Articles</a>
+  </div>
+  <p class="home-principle">A proposed action should become a governed decision before it becomes real-world execution.</p>
+</div>
 
-ASI Backbone Learning is the educational layer of the ASI Backbone organization.
-
-In this project, **ASI** means **Accountable Systems Infrastructure**. ASI Backbone Learning focuses on software architecture, governed execution, secure .NET applications, and AI integration; it is not affiliated with the Artificial Superintelligence Alliance.
-
-It exists to explain architectural ideas clearly, demonstrate them with focused examples, examine their tradeoffs, and connect those lessons to fuller working implementations.
+ASI Backbone Learning explains architectural ideas, demonstrates them with focused examples, examines their tradeoffs, and connects the lessons to fuller working implementations. **ASI** means **Accountable Systems Infrastructure**.
 
 > **Read it. Run it. Question it. Improve it.**
 
-## Start Here
+## Start with what describes you
+
+<div class="entry-point-grid">
+  <a class="entry-point" href="getting-started/index.md">
+    <strong>New to the project</strong>
+    <span>Follow the recommended introduction to the core concepts.</span>
+  </a>
+  <a class="entry-point" href="getting-started/find-your-path.md">
+    <strong>I have a problem to solve</strong>
+    <span>Choose a short, goal-specific route through the material.</span>
+  </a>
+  <a class="entry-point" href="getting-started/adoption-personas-and-entry-points.md">
+    <strong>I am evaluating by role</strong>
+    <span>Start from your developer, architecture, platform, AI, or security responsibility.</span>
+  </a>
+  <a class="entry-point" href="architecture/terminology-and-established-concepts.md">
+    <strong>The vocabulary is new</strong>
+    <span>Map Learning terms to established architecture concepts.</span>
+  </a>
+  <a class="entry-point" href="architecture/when-aspnet-core-authorization-is-enough.md">
+    <strong>I already use ASP.NET Core authorization</strong>
+    <span>See when framework-native authorization is enough—and when the problem is broader.</span>
+  </a>
+</div>
+
+Learning does not require installing an `AsiBackbone` package. Use it as independent .NET architecture education or connect it to the working repositories.
+
+## The core model
+
+The material uses a recurring separation of responsibilities:
+
+<ol class="process-flow" aria-label="Governed execution flow">
+  <li>Intent</li>
+  <li>Context</li>
+  <li>Constraints</li>
+  <li>Decision</li>
+  <li>Acknowledgment <span>when required</span></li>
+  <li>Scoped authority</li>
+  <li>Host-owned execution</li>
+  <li>Audit residue</li>
+</ol>
+
+## Choose a learning path
+
+<div class="learning-path-grid">
+  <article class="learning-path-card">
+    <span class="path-level">Beginner to advanced</span>
+    <h3>Architecture</h3>
+    <p>Explore boundaries, responsibilities, tradeoffs, and structural patterns behind governed systems.</p>
+    <a href="architecture/index.md" aria-label="Explore Architecture">Explore Architecture <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="learning-path-card">
+    <span class="path-level">Beginner to advanced</span>
+    <h3>Governance</h3>
+    <p>Connect intent, policy context, explicit decisions, acknowledgment, scoped authority, and audit evidence.</p>
+    <a href="governance/index.md" aria-label="Explore Governance">Explore Governance <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="learning-path-card">
+    <span class="path-level">Beginner to intermediate</span>
+    <h3>ASP.NET Core</h3>
+    <p>Study secure defaults, middleware organization, operational structure, and modern .NET implementation patterns.</p>
+    <a href="aspnetcore/index.md" aria-label="Explore ASP.NET Core">Explore ASP.NET Core <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="learning-path-card">
+    <span class="path-level">Beginner to advanced</span>
+    <h3>Security</h3>
+    <p>Examine trust boundaries, least authority, explicit control flow, defensive defaults, and accidental privilege.</p>
+    <a href="security/index.md" aria-label="Explore Security">Explore Security <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="learning-path-card">
+    <span class="path-level">Intermediate to advanced</span>
+    <h3>AI Integration</h3>
+    <p>Apply governed execution to AI-assisted systems, tool calls, agents, workflows, and host-controlled effects.</p>
+    <a href="ai-integration/index.md" aria-label="Explore AI Integration">Explore AI Integration <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="learning-path-card">
+    <span class="path-level">Beginner to intermediate</span>
+    <h3>Tutorials</h3>
+    <p>Move from a familiar implementation through failure modes, tradeoffs, and working references.</p>
+    <a href="tutorials/index.md" aria-label="Browse Tutorials">Browse Tutorials <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="learning-path-card">
+    <span class="path-level">Beginner to intermediate</span>
+    <h3>Executable Samples</h3>
+    <p>Run five small .NET companions with focused tests that make architectural invariants observable.</p>
+    <a href="samples/index.md" aria-label="Browse Executable Samples">Browse Executable Samples <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="learning-path-card">
+    <span class="path-level">Intermediate to advanced</span>
+    <h3>Labs</h3>
+    <p>Practice with exercises, incomplete implementations, architecture critiques, and policy scenarios.</p>
+    <a href="labs/index.md" aria-label="Browse Labs">Browse Labs <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="learning-path-card">
+    <span class="path-level">Intermediate to advanced</span>
+    <h3>Case Studies</h3>
+    <p>See Learning boundaries composed in realistic simulated scenarios without prescribing a production framework.</p>
+    <a href="case-studies/index.md" aria-label="Browse Reference Architecture Case Studies">Browse Reference Architecture Case Studies <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="learning-path-card">
+    <span class="path-level">Advanced</span>
+    <h3>Advanced Topics</h3>
+    <p>Explore complex integration patterns, alternative approaches, and deeper architectural questions.</p>
+    <a href="advanced/index.md" aria-label="Explore Advanced Topics">Explore Advanced Topics <span aria-hidden="true">→</span></a>
+  </article>
+</div>
 
-New to the project?
+## How Learning works
 
-Begin with [Getting Started](getting-started/index.md) for an introduction to the core concepts and recommended learning path.
+Tutorials use a problem-first progression:
 
-Already have a concrete problem in mind? Use [Find Your Path](getting-started/find-your-path.md) to choose a short, goal-specific route through the existing material without reading the repository in sequence.
+<ol class="process-flow process-flow-short" aria-label="Learning progression">
+  <li>Problem</li>
+  <li>Common implementation</li>
+  <li>Failure mode</li>
+  <li>Architectural pattern</li>
+  <li>Teaching example</li>
+  <li>Tradeoffs</li>
+  <li>Working example</li>
+</ol>
 
-Evaluating the material from a developer, system engineering, enterprise architecture, platform, AI integration, or security/compliance role? Use [Adoption Personas and Entry Points](getting-started/adoption-personas-and-entry-points.md) to start from the responsibility you own.
+The goal is to make the reasoning visible—not to prove that one framework or architecture is always correct. Study a pattern, reimplement it, compare alternatives, identify when a simpler design is better, and treat working repositories as specimens rather than unquestioned templates.
 
-If the repository's vocabulary is new to you, use [Terminology and Established Architecture Concepts](architecture/terminology-and-established-concepts.md) to map Learning terms to established authorization, policy, capability, provenance, workflow, and mediation concepts.
+## Working repositories
 
-Already using ASP.NET Core authorization and unsure whether you need a broader governed-execution model? Read [When ASP.NET Core Authorization Is Enough](architecture/when-aspnet-core-authorization-is-enough.md). It presents the simpler framework-native approach first and explains where the architectural problem becomes larger than authorization.
+- [AsiBackbone/AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) — a .NET governance and policy-control framework for explicit, auditable decision pipelines.
+- [AsiBackbone/NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) — an enterprise-oriented ASP.NET Core reference application with secure defaults and operational patterns.
 
-Learning does not require installing an `AsiBackbone` package. The material is intended to be useful as independent .NET architecture education.
+## Recently added
 
-Looking for standalone technical writing rather than a curriculum path? Browse [Articles](articles/index.md). Articles are designed for direct external discovery and keep permanent `/articles/<year>/<slug>` publication URLs.
+This is a living project under active development. Recent publications include:
 
-The material is organized around a recurring separation of responsibilities:
+- [A Passing Agent Diff Is Not Project Authority](articles/2026/a-passing-agent-diff-is-not-project-authority.md)
+- [Why an AI Tool Call Is Only a Proposal](articles/2026/why-ai-tool-call-is-only-a-proposal.md)
+- [Your Audit Log Is Not Evidence](articles/2026/your-audit-log-is-not-evidence.md)
 
-```text
-Intent
-   ↓
-Context
-   ↓
-Constraints
-   ↓
-Decision
-   ↓
-Acknowledgment when required
-   ↓
-Scoped authority
-   ↓
-Host-owned execution
-   ↓
-Audit residue
-```
+<details class="home-details">
+  <summary>Scope, terminology, and important limitations</summary>
 
-The central idea is simple:
+  <p>Canonical patterns document what the working repositories currently do; alternative patterns create room for comparison, criticism, and improvement. Canonical does not mean universal.</p>
 
-> **A proposed action should become a governed decision before it becomes real-world execution.**
+  <p>ASI Backbone Learning is an educational architecture resource—not a compliance certification, legal standard, security guarantee, AI model, AGI or ASI implementation, robotics controller, replacement for application-specific security review, or requirement to use the AsiBackbone package. Examples are teaching artifacts; production systems remain responsible for their own security, infrastructure, persistence, regulatory requirements, safety controls, and execution.</p>
 
-## Choose a Learning Path
-
-### Architecture
-
-Explore the boundaries, responsibilities, tradeoffs, and structural patterns behind governed systems.
-
-[Explore Architecture →](architecture/index.md)
-
-### Governance
-
-Learn how intent, policy context, constraints, explicit decision outcomes, acknowledgment, scoped authority, and audit evidence fit together.
-
-[Explore Governance →](governance/index.md)
-
-### ASP.NET Core
-
-Study practical application architecture, secure defaults, middleware organization, operational structure, and implementation patterns for modern .NET applications.
-
-[Explore ASP.NET Core →](aspnetcore/index.md)
-
-### Security
-
-Examine security boundaries, least authority, explicit control flow, defensive defaults, and architecture that reduces accidental privilege.
-
-[Explore Security →](security/index.md)
-
-### AI Integration
-
-Apply governed-execution principles to AI-assisted systems, tool calls, agents, workflows, and host-controlled execution.
-
-> **The model may propose. The host retains execution authority.**
-
-[Explore AI Integration →](ai-integration/index.md)
-
-### Tutorials
-
-Follow focused, problem-first lessons that move from a common implementation through failure modes, architectural patterns, tradeoffs, and working references.
-
-[Browse Tutorials →](tutorials/index.md)
-
-### Executable Samples
-
-Move from architectural explanation toward runnable demonstrations of the same boundaries.
-
-The foundational sample set now contains five intentionally small .NET companion implementations, one for each foundational tutorial, with focused tests that make the architectural invariants observable.
-
-[Browse Executable Samples →](samples/index.md)
-
-### Labs
-
-Move from reading to reasoning with hands-on exercises, incomplete implementations, architecture critiques, policy scenarios, and design challenges.
-
-[Browse Labs →](labs/index.md)
-
-### Reference Architecture Case Studies
-
-See several Learning boundaries composed inside realistic, simulated scenarios without treating the specimen as a production framework or prescribed application design.
-
-[Browse Reference Architecture Case Studies →](case-studies/index.md)
-
-### Advanced
-
-Explore deeper architectural questions, alternative approaches, complex integration patterns, and topics that build on the foundational material.
-
-[Explore Advanced Topics →](advanced/index.md)
-
-## How Learning Works
-
-Tutorials generally follow a problem-first progression:
-
-```text
-Problem
-   ↓
-Common or naive implementation
-   ↓
-Failure mode or limitation
-   ↓
-Architectural pattern
-   ↓
-Minimal teaching example
-   ↓
-Tradeoffs and alternatives
-   ↓
-Working repository example
-```
-
-The purpose is not to prove that one framework or architecture is always correct.
-
-The purpose is to make the reasoning visible.
-
-You are encouraged to:
-
-- Study a pattern without adopting an entire framework.
-- Reimplement it differently.
-- Compare it with another architecture.
-- Identify cases where a simpler design is better.
-- Challenge assumptions.
-- Document alternative approaches.
-- Use working repositories as architectural specimens rather than unquestioned templates.
-
-## The Working Repositories
-
-Learning connects concepts to two complementary implementation projects.
-
-### ASI Backbone
-
-[AsiBackbone/AsiBackbone](https://github.com/AsiBackbone/AsiBackbone)
-
-A .NET governance and policy-control framework for explicit, auditable, policy-governed decision pipelines.
-
-It provides working implementations of concepts such as policy evaluation, structured decision results, acknowledgment workflows, audit residue, capability-scoped authority, and host-owned execution boundaries.
-
-### .NET Core Application Template
-
-[AsiBackbone/NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)
-
-An enterprise-oriented ASP.NET Core reference application demonstrating secure-by-default application architecture, structured logging, middleware organization, error handling, rate limiting, authentication-ready design, data-access patterns, and operational structure.
-
-Learning uses both repositories as working examples while keeping educational material smaller, more focused, and easier to question.
-
-## Canonical Does Not Mean Universal
-
-Some material may describe a **canonical pattern** aligned with the current ASI Backbone repositories.
-
-Other material may present an **alternative pattern** that solves the same problem differently.
-
-Both are useful.
-
-A canonical approach documents what the working implementations currently do.
-
-An alternative approach creates room for comparison, criticism, experimentation, and improvement.
-
-Architectural disagreement can be educational.
-
-## What This Project Is Not
-
-ASI Backbone Learning is an educational and architectural resource.
-
-It is not:
-
-- A compliance certification
-- A legal standard
-- A security guarantee
-- An AI model
-- An AGI or ASI implementation
-- A robotics controller
-- A replacement for application-specific security review
-- A requirement to use the AsiBackbone package
-- A claim that one architecture is universally correct
-
-Examples are teaching artifacts. Production systems remain responsible for their own security, infrastructure, persistence, regulatory requirements, safety controls, and operational execution.
-
-## Project Status
-
-**Living project — active development**
-
-Learning is expected to grow incrementally through focused tutorials, labs, diagrams, architectural comparisons, community questions, and practical experimentation.
-
-The goal is not to publish a large textbook all at once.
-
-The goal is to build a useful body of architectural knowledge one well-examined pattern at a time.
+  <p>ASI Backbone Learning is not affiliated with the Artificial Superintelligence Alliance.</p>
+</details>
 
 ---
 

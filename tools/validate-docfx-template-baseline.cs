@@ -13,6 +13,7 @@ static class DocFxTemplateBaselineValidator
     private const string BaselineRelativePath = "docs/templates/docfx-template-baseline.json";
     private const string DocFxConfigRelativePath = "docs/docfx.json";
     private const string CustomStylesheetRelativePath = "docs/templates/public/main.css";
+    private const string CustomRuntimeScriptRelativePath = "docs/templates/public/main.js";
     private const string LabAuthoringTemplateRelativePath = "community/lab-acceptance-criteria-template.md";
     private const string LocalTemplateDirectoryRelativePath = "docs/templates";
 
@@ -246,6 +247,14 @@ static class DocFxTemplateBaselineValidator
         {
             errors.Add(
                 $"The custom modern-template stylesheet must exist at '{CustomStylesheetRelativePath}'.");
+        }
+
+        if (!File.Exists(Path.Combine(
+                repositoryRoot,
+                CustomRuntimeScriptRelativePath.Replace('/', Path.DirectorySeparatorChar))))
+        {
+            errors.Add(
+                $"The custom modern-template runtime script must exist at '{CustomRuntimeScriptRelativePath}'.");
         }
 
         if (!File.Exists(Path.Combine(
