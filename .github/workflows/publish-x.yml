@@ -102,6 +102,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Setup .NET SDK
@@ -179,6 +180,7 @@ jobs:
       - name: Persist receipts and checkpoint
         shell: bash
         env:
+          GH_TOKEN: ${{ github.token }}
           STATE_DIRECTORY: ${{ steps.state.outputs.directory }}
           DEPLOYED_REVISION: ${{ steps.publication.outputs.deployed_revision }}
         run: |
@@ -193,4 +195,5 @@ jobs:
           git -C "$STATE_DIRECTORY" config user.name github-actions[bot]
           git -C "$STATE_DIRECTORY" config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git -C "$STATE_DIRECTORY" commit -m "Record X publications through $DEPLOYED_REVISION"
+          gh auth setup-git
           git -C "$STATE_DIRECTORY" push origin "HEAD:refs/heads/$STATE_BRANCH"
