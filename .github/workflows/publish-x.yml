@@ -1,0 +1,199 @@
+name: Publish New Learning Content to X
+
+on:
+  workflow_call:
+    inputs:
+      deployed_revision:
+        description: Commit successfully deployed by the calling documentation workflow
+        required: true
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Show eligible publications without calling X or changing state
+        required: true
+        type: boolean
+        default: true
+
+permissions: {}
+
+concurrency:
+  group: publish-learning-to-x
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  STATE_BRANCH: automation/x-publisher-state
+  STATE_FILE: x-publisher-state.json
+  DEPLOYED_REVISION_URL: https://asibackbone.github.io/Learning/deployment-revision.txt
+  DEPLOYED_SITEMAP_URL: https://asibackbone.github.io/Learning/sitemap.xml
+
+jobs:
+  dry-run:
+    name: Preview X publications
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository without credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Load deployed revision, sitemap, and state
+        id: publication
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          deployed_revision="$(curl --fail --silent --show-error --location --max-time 20 "$DEPLOYED_REVISION_URL")"
+          deployed_revision="${deployed_revision//$'\r'/}"
+          deployed_revision="${deployed_revision//$'\n'/}"
+          git cat-file -e "${deployed_revision}^{commit}"
+          git merge-base --is-ancestor "$deployed_revision" origin/main
+
+          curl --fail --silent --show-error --location --max-time 20 \
+            --output "$RUNNER_TEMP/deployed-sitemap.xml" \
+            "$DEPLOYED_SITEMAP_URL"
+
+          if git fetch --no-tags origin "refs/heads/$STATE_BRANCH:refs/remotes/origin/$STATE_BRANCH"; then
+            git show "origin/$STATE_BRANCH:$STATE_FILE" > "$RUNNER_TEMP/$STATE_FILE"
+          fi
+
+          echo "deployed_revision=$deployed_revision" >> "$GITHUB_OUTPUT"
+
+      - name: Preview publications without X credentials
+        env:
+          DEPLOYED_REVISION: ${{ steps.publication.outputs.deployed_revision }}
+        run: >-
+          dotnet run --file tools/publish-x.cs --
+          --head "$DEPLOYED_REVISION"
+          --sitemap "$RUNNER_TEMP/deployed-sitemap.xml"
+          --state "$RUNNER_TEMP/$STATE_FILE"
+          --account jackdaw-patio
+          --dry-run
+
+  publish:
+    name: Publish eligible content to X
+    if: >-
+      ${{
+        github.event_name != 'workflow_dispatch' ||
+        (github.event_name == 'workflow_dispatch' && !inputs.dry_run)
+      }}
+    runs-on: ubuntu-latest
+    environment: jackdaw-patio-x
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout trusted default branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Resolve deployed publication boundary
+        id: publication
+        shell: bash
+        env:
+          EXPECTED_REVISION: ${{ inputs.deployed_revision }}
+        run: |
+          set -euo pipefail
+
+          deployed_revision=""
+          for attempt in 1 2 3 4 5 6; do
+            deployed_revision="$(curl --fail --silent --show-error --location --max-time 20 "$DEPLOYED_REVISION_URL")"
+            deployed_revision="${deployed_revision//$'\r'/}"
+            deployed_revision="${deployed_revision//$'\n'/}"
+
+            if [[ -z "${EXPECTED_REVISION:-}" || "$deployed_revision" == "$EXPECTED_REVISION" ]]; then
+              break
+            fi
+
+            if [[ "$attempt" == "6" ]]; then
+              echo "Published revision '$deployed_revision' did not reach expected revision '$EXPECTED_REVISION'." >&2
+              exit 1
+            fi
+
+            sleep 10
+          done
+
+          git cat-file -e "${deployed_revision}^{commit}"
+          git merge-base --is-ancestor "$deployed_revision" origin/main
+          curl --fail --silent --show-error --location --max-time 20 \
+            --output "$RUNNER_TEMP/deployed-sitemap.xml" \
+            "$DEPLOYED_SITEMAP_URL"
+          echo "deployed_revision=$deployed_revision" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare durable publisher state worktree
+        id: state
+        shell: bash
+        env:
+          DEPLOYED_REVISION: ${{ steps.publication.outputs.deployed_revision }}
+        run: |
+          set -euo pipefail
+
+          state_directory="$RUNNER_TEMP/x-publisher-state"
+          if git fetch --no-tags origin "refs/heads/$STATE_BRANCH:refs/remotes/origin/$STATE_BRANCH"; then
+            git worktree add --detach "$state_directory" "origin/$STATE_BRANCH"
+          else
+            git worktree add --detach "$state_directory" "$DEPLOYED_REVISION"
+          fi
+
+          echo "directory=$state_directory" >> "$GITHUB_OUTPUT"
+
+      - name: Publish and record receipts
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_KEY_SECRET: ${{ secrets.X_API_KEY_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+          X_ACCOUNT_USER_ID: ${{ vars.X_ACCOUNT_USER_ID }}
+          DEPLOYED_REVISION: ${{ steps.publication.outputs.deployed_revision }}
+          STATE_DIRECTORY: ${{ steps.state.outputs.directory }}
+        run: >-
+          dotnet run --file tools/publish-x.cs --
+          --head "$DEPLOYED_REVISION"
+          --sitemap "$RUNNER_TEMP/deployed-sitemap.xml"
+          --state "$STATE_DIRECTORY/$STATE_FILE"
+          --account jackdaw-patio
+          --account-id "$X_ACCOUNT_USER_ID"
+
+      - name: Persist receipts and checkpoint
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STATE_DIRECTORY: ${{ steps.state.outputs.directory }}
+          DEPLOYED_REVISION: ${{ steps.publication.outputs.deployed_revision }}
+        run: |
+          set -euo pipefail
+
+          git -C "$STATE_DIRECTORY" add "$STATE_FILE"
+          if git -C "$STATE_DIRECTORY" diff --cached --quiet; then
+            echo "Publisher state already reflects $DEPLOYED_REVISION."
+            exit 0
+          fi
+
+          git -C "$STATE_DIRECTORY" config user.name github-actions[bot]
+          git -C "$STATE_DIRECTORY" config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git -C "$STATE_DIRECTORY" commit -m "Record X publications through $DEPLOYED_REVISION"
+          gh auth setup-git
+          git -C "$STATE_DIRECTORY" push origin "HEAD:refs/heads/$STATE_BRANCH"

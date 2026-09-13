@@ -8,6 +8,9 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ### Added
 
+- Optional post-deployment X publication with source-frontmatter selection,
+  durable receipt/checkpoint state, canonical-URL reconciliation, protected
+  OAuth credentials, deterministic dry runs, and offline contract validation.
 - Durable stable-release evidence publishing release notes, a samples SPDX SBOM, a release-evidence manifest, hashes, and provenance attestations.
 - Shared repository formatting, security-policy, workflow-validation, support, and maintainer baselines.
 
