@@ -388,6 +388,7 @@ For code examples:
 - Use meaningful names.
 - Prefer examples that compile and can be tested.
 - Add tests when the lesson depends on behavioral correctness.
+- For executable samples, cover every documented outcome and stable reason code, prove negative side-effect invariants, and include relevant invalid-input and cancellation boundaries with descriptive test names.
 - Avoid embedding real credentials, secrets, tokens, connection strings, or personally identifiable information.
 - Use obviously fictional or placeholder values where examples require identifiers or sensitive-looking data.
 - When adding, renaming, or removing an executable sample, update both sample catalogs. Add or revise its repository-facing entry in `samples/README.md`, and update `docs/samples/index.md` with its learning objective, difficulty, key invariant, run command, and canonical README link so the published sample guide remains current.

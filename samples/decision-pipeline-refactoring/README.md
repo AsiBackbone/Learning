@@ -227,7 +227,7 @@ dotnet test samples/Samples.slnx
 
 ## What the Tests Prove
 
-The test suite includes one diagnostic test for the flawed starter and focused invariants for the refactored pipeline.
+The test suite includes one diagnostic test for the flawed starter and focused invariants for the refactored pipeline. Every outcome asserts its stable reason and decision evidence, blocked paths prove that all protected side-effect counters remain zero, and invalid or unknown account identifiers stop before decision evidence or execution.
 
 ### Starter diagnosis
 

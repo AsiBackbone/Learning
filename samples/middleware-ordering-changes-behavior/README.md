@@ -170,8 +170,10 @@ dotnet test samples/Samples.slnx
 The tests prove:
 
 1. Request and response traversal occur in opposite directions.
-2. The corrected exception boundary handles a fault produced downstream.
-3. The deliberately incorrect order leaves the earlier fault outside that boundary.
+2. The corrected exception boundary handles a downstream fault with the documented controlled response.
+3. A handled fault does not reach inner middleware or the endpoint.
+4. The deliberately incorrect order leaves the earlier fault outside that boundary and observes only the fault probe.
+5. Normal requests reach the endpoint and report the configured pipeline mode.
 
 ## What This Sample Intentionally Omits
 
