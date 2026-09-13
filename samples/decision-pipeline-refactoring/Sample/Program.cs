@@ -203,6 +203,9 @@ public sealed class AccountDisableContextBuilder(IAccountRepository repository)
 {
     public AccountDisableContext Build(AccountDisableRequest request)
     {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.AccountId);
+
         AccountSnapshot account = repository.GetRequired(request.AccountId);
 
         return new AccountDisableContext(

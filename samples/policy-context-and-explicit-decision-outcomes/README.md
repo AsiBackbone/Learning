@@ -56,7 +56,7 @@ From the repository root:
 dotnet test samples/policy-context-and-explicit-decision-outcomes/Tests/PolicyContextAndExplicitDecisionOutcomes.Tests.csproj
 ```
 
-The focused xUnit tests verify representative structured outcomes and confirm that denied, deferred, and acknowledgment-required decisions remain non-proceeding host instructions.
+The focused xUnit tests verify the full structured outcome matrix, stable reason codes, warning and allowed proceed semantics, whitespace input, and intentional rule precedence. Denied, deferred, acknowledgment-required, and escalation-recommended decisions remain non-proceeding host instructions.
 
 The sample evaluates seven deterministic scenarios:
 

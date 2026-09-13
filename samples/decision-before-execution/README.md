@@ -50,7 +50,7 @@ From the repository root:
 dotnet test samples/decision-before-execution/Tests/DecisionBeforeExecution.Tests.csproj
 ```
 
-The focused xUnit tests assert that denied, deferred, and acknowledgment-required decisions never invoke the executor. A positive-control test confirms that an allowed decision crosses the execution boundary exactly once.
+The focused xUnit tests assert every outcome and stable reason code. Denied, deferred, acknowledgment-required, and escalation-recommended decisions never invoke the executor; an allowed decision crosses the boundary exactly once, and cancellation prevents that execution before its side effect is recorded.
 
 The sample evaluates five deterministic scenarios:
 
