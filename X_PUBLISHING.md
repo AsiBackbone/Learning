@@ -38,6 +38,11 @@ modify `feed.xml`.
    `automation/x-publisher-state` at the currently deployed revision. That first
    run intentionally does not backfill the existing archive.
 
+When all five settings are absent, automatic publication reports a notice and
+exits successfully so the optional integration does not make documentation
+publication appear to fail. A partially configured environment fails with the
+names of the missing settings; it never silently disables a broken live setup.
+
 Do not place OAuth credentials in repository variables, source, workflow input,
 logs, issues, or pull requests. The production API root is fixed in the tool and
 cannot be overridden by repository or workflow input.
