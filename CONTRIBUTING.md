@@ -15,7 +15,7 @@ For a typo, broken link, or narrow wording fix, the contribution path is intenti
 3. Let the automated checks run:
    - **Documentation Validation (`docs-validation`)** builds the DocFX site with warnings treated as errors.
    - **Link Validation (`link-validation`)** checks Markdown links for broken or invalid targets, including the `#anchor` part, so renaming a heading also means updating the links that point at it.
-   - **Sample Validation (`samples-validation`)** restores, builds, and tests the executable samples; it runs on every pull request.
+   - **Sample Validation (`samples-validation`)** restores, builds, and tests the executable samples through the repository's explicit `Microsoft.Testing.Platform` runner; it runs on every pull request.
 4. Address review comments if needed. Once the checks and review are satisfied, the change can be merged.
 
 Documentation and educational contributions are accepted under **CC BY 4.0**; executable sample projects and source files under `samples/` are accepted under the **MIT License**. See [LICENSING.md](LICENSING.md) for component-specific details.
@@ -388,6 +388,7 @@ For code examples:
 - Use meaningful names.
 - Prefer examples that compile and can be tested.
 - Add tests when the lesson depends on behavioral correctness.
+- For executable samples, cover every documented outcome and stable reason code, prove negative side-effect invariants, and include relevant invalid-input and cancellation boundaries with descriptive test names.
 - Avoid embedding real credentials, secrets, tokens, connection strings, or personally identifiable information.
 - Use obviously fictional or placeholder values where examples require identifiers or sensitive-looking data.
 - When adding, renaming, or removing an executable sample, update both sample catalogs. Add or revise its repository-facing entry in `samples/README.md`, and update `docs/samples/index.md` with its learning objective, difficulty, key invariant, run command, and canonical README link so the published sample guide remains current.

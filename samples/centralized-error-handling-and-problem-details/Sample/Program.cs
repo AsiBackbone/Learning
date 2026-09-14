@@ -7,7 +7,3 @@ WebApplication app =
     SampleApplication.Configure(builder.Build());
 
 app.Run();
-
-public partial class Program
-{
-}

@@ -31,8 +31,8 @@ Administration permission.
 - force pushes and deletion: blocked on `main`;
 - automatic deletion of merged pull-request head branches: enabled;
 - stale approvals: dismissed on new reviewable pushes;
-- four existing documentation/sample/link/CodeQL GitHub Actions checks: required
-  and strict;
+- eight documentation, sample, CodeQL, workflow-security, and dependency GitHub
+  Actions checks: required and strict;
 - review-thread resolution: required;
 - required approvals / Code Owner approval / last-push approval: disabled while
   the repository has only one active maintainer;
@@ -49,13 +49,21 @@ path to `main`.
 
 ## Required checks captured by the manifest
 
-The current protected `main` branch requires these GitHub Actions checks, and the
-ruleset deliberately carries the same set forward:
+The protected `main` branch requires these universal GitHub Actions checks, and
+the ruleset deliberately carries the same set forward:
 
+- `Dependency review`
 - `Build DocFX documentation`
 - `Validate documentation links`
 - `Restore, build, and test samples`
 - `Analyze C# with CodeQL`
+- `Validate workflows with actionlint`
+- `Analyze workflows with zizmor`
+- `Analyze dependencies with OWASP Dependency-Check`
+
+All eight workflows report on every pull request targeting `main`. Do not add a
+path filter to a required-check workflow: when the workflow does not run, GitHub
+cannot record the required success for that pull-request commit.
 
 The GitHub Actions integration id currently associated with those checks is
 `15368`. If a check is renamed, added, removed, or moves to a different trusted

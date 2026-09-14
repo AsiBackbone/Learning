@@ -9,25 +9,19 @@ public sealed class SimulatedAcknowledgmentEvidenceVerifier(
     public EvidenceVerificationResult Verify(
         AcknowledgmentEvidence evidence)
     {
-        if (forcedStatus == EvidenceVerificationStatus.Unavailable)
-        {
-            return new EvidenceVerificationResult(
+        return forcedStatus == EvidenceVerificationStatus.Unavailable
+            ? new EvidenceVerificationResult(
                 EvidenceVerificationStatus.Unavailable,
-                "evidence.verification-unavailable");
-        }
-
-        if (forcedStatus == EvidenceVerificationStatus.Untrusted ||
+                "evidence.verification-unavailable")
+            : forcedStatus == EvidenceVerificationStatus.Untrusted ||
             !string.Equals(
                 evidence.EvidenceIssuer,
                 trustedEvidenceIssuer,
-                StringComparison.Ordinal))
-        {
-            return new EvidenceVerificationResult(
+                StringComparison.Ordinal)
+            ? new EvidenceVerificationResult(
                 EvidenceVerificationStatus.Untrusted,
-                "evidence.untrusted");
-        }
-
-        return new EvidenceVerificationResult(
+                "evidence.untrusted")
+            : new EvidenceVerificationResult(
             EvidenceVerificationStatus.Trusted,
             "evidence.trusted");
     }
@@ -43,15 +37,12 @@ public sealed class SimulatedCurrentContextProvider(
     {
         _ = challenge;
 
-        if (status == CurrentContextStatus.Unavailable)
-        {
-            return new CurrentContextResult(
+        return status == CurrentContextStatus.Unavailable
+            ? new CurrentContextResult(
                 CurrentContextStatus.Unavailable,
                 null,
-                "context.unavailable");
-        }
-
-        return new CurrentContextResult(
+                "context.unavailable")
+            : new CurrentContextResult(
             CurrentContextStatus.Available,
             context,
             "context.available");

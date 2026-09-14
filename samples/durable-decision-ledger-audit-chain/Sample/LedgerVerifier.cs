@@ -165,17 +165,11 @@ public static class LedgerVerifier
             return LedgerIntegrityStatus.UnsupportedRecordSchemaVersion;
         }
 
-        if (!string.Equals(record.CanonicalizationVersion, LedgerFormat.CanonicalizationVersion, StringComparison.Ordinal))
-        {
-            return LedgerIntegrityStatus.CanonicalizationUnavailable;
-        }
-
-        if (!string.Equals(record.HashAlgorithm, LedgerFormat.HashAlgorithm, StringComparison.Ordinal))
-        {
-            return LedgerIntegrityStatus.UnsupportedHashAlgorithm;
-        }
-
-        return null;
+        return !string.Equals(record.CanonicalizationVersion, LedgerFormat.CanonicalizationVersion, StringComparison.Ordinal)
+            ? LedgerIntegrityStatus.CanonicalizationUnavailable
+            : !string.Equals(record.HashAlgorithm, LedgerFormat.HashAlgorithm, StringComparison.Ordinal)
+            ? LedgerIntegrityStatus.UnsupportedHashAlgorithm
+            : null;
     }
 
     private static LedgerCompletenessStatus EvaluateCheckpoint(
@@ -216,28 +210,17 @@ public static class LedgerVerifier
 
             // With no supplied records, a checkpoint copied into the start boundary
             // only confirms itself. No segment bytes were verified against that head.
-            if (verifiedThroughSequence is null)
-            {
-                return LedgerCompletenessStatus.NotEvaluated;
-            }
-
-            return LedgerCompletenessStatus.VerifiedPastCheckpoint;
+            return verifiedThroughSequence is null ? LedgerCompletenessStatus.NotEvaluated : LedgerCompletenessStatus.VerifiedPastCheckpoint;
         }
 
-        if (checkpoint.SequenceNumber > observedHeadSequence)
-        {
-            return LedgerCompletenessStatus.MissingCheckpointedTail;
-        }
-
-        if (!string.Equals(
+        return checkpoint.SequenceNumber > observedHeadSequence
+            ? LedgerCompletenessStatus.MissingCheckpointedTail
+            : !string.Equals(
                 checkpointObservedFingerprint,
                 checkpoint.HeadFingerprint,
-                StringComparison.Ordinal))
-        {
-            return LedgerCompletenessStatus.CheckpointMismatch;
-        }
-
-        return checkpoint.SequenceNumber == observedHeadSequence
+                StringComparison.Ordinal)
+            ? LedgerCompletenessStatus.CheckpointMismatch
+            : checkpoint.SequenceNumber == observedHeadSequence
             ? LedgerCompletenessStatus.MatchesCheckpoint
             : LedgerCompletenessStatus.VerifiedPastCheckpoint;
     }
@@ -248,17 +231,21 @@ public static class LedgerVerifier
         long? verifiedThroughSequence,
         long sequenceNumber,
         string detail,
-        string? startDetail) =>
-        new(
+        string? startDetail)
+    {
+        return new(
             integrityStatus,
             LedgerCompletenessStatus.NotEvaluated,
             recordsVerified,
             verifiedThroughSequence,
             sequenceNumber,
             CombineDetail(detail, startDetail));
+    }
 
-    private static string CombineDetail(string detail, string? startDetail) =>
-        startDetail is null ? detail : $"{detail} {startDetail}";
+    private static string CombineDetail(string detail, string? startDetail)
+    {
+        return startDetail is null ? detail : $"{detail} {startDetail}";
+    }
 
     private static string SanitizeDetailValue(string value)
     {

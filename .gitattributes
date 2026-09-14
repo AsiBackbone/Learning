@@ -2,7 +2,8 @@
 #
 # Line-ending normalization is defined here rather than left to each
 # contributor's local Git configuration. Text files are stored with LF in the
-# repository and checked out with the platform's native line endings.
+# repository. Source and project files use LF in every checkout so the shared
+# EditorConfig formatting gate behaves consistently on every platform.
 
 * text=auto
 
@@ -20,14 +21,14 @@
 # Source and project files
 # ---------------------------------------------------------------------------
 
-*.cs        text diff=csharp
-*.csproj    text
-*.props     text
-*.targets   text
-*.slnx      text
-*.json      text
-*.yml       text
-*.yaml      text
+*.cs        text eol=lf diff=csharp
+*.csproj    text eol=lf
+*.props     text eol=lf
+*.targets   text eol=lf
+*.slnx      text eol=lf
+*.json      text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
 
 # Visual Studio writes classic solution files with CRLF.
 *.sln       text eol=crlf

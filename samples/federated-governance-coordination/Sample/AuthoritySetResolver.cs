@@ -2,24 +2,21 @@ namespace FederatedGovernanceCoordination;
 
 public sealed class AuthoritySetResolver
 {
-    public AuthoritySetDescriptor Resolve(ResourceState resource)
+    public static AuthoritySetDescriptor Resolve(ResourceState resource)
     {
-        if (string.Equals(
+        return string.Equals(
                 resource.CurrentRegion,
                 resource.DestinationRegion,
-                StringComparison.Ordinal))
-        {
-            return new AuthoritySetDescriptor(
+                StringComparison.Ordinal)
+            ? new AuthoritySetDescriptor(
                 AuthoritySetId: $"records.transfer:{resource.CurrentRegion}:local",
                 AuthoritySetVersion: $"{resource.ResourceVersion}:local",
                 ResourceVersion: resource.ResourceVersion,
                 Mode: CoordinationMode.LocalOnly,
                 RequiredAuthorityDomains: new HashSet<string>(
                     ["records-app-local"],
-                    StringComparer.Ordinal));
-        }
-
-        return new AuthoritySetDescriptor(
+                    StringComparer.Ordinal))
+            : new AuthoritySetDescriptor(
             AuthoritySetId:
                 $"records.transfer:{resource.CurrentRegion}:{resource.DestinationRegion}",
             AuthoritySetVersion:

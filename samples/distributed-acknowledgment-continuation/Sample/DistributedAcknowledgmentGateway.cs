@@ -260,15 +260,12 @@ public sealed class DistributedAcknowledgmentGateway(
                 command,
                 cancellationToken);
 
-        if (!execution.Executed)
-        {
-            return GatewayResult.ExecutionRejected(
+        return !execution.Executed
+            ? GatewayResult.ExecutionRejected(
                 authority.AuthorityId,
                 command.ExecutionId,
-                execution.ReasonCode);
-        }
-
-        return GatewayResult.ExecutedSuccessfully(
+                execution.ReasonCode)
+            : GatewayResult.ExecutedSuccessfully(
             authority.AuthorityId,
             command.ExecutionId);
     }

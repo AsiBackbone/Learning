@@ -19,13 +19,15 @@ public static class RiskFreshnessRules
     public static bool IsStale(
         RiskObservation observation,
         RiskGovernancePolicy policy,
-        DateTimeOffset nowUtc) =>
-        nowUtc >= EffectiveValidUntil(observation, policy);
+        DateTimeOffset nowUtc)
+    {
+        return nowUtc >= EffectiveValidUntil(observation, policy);
+    }
 }
 
 public sealed class RiskPolicyEvaluator
 {
-    public GovernanceDecision Evaluate(
+    public static GovernanceDecision Evaluate(
         string decisionId,
         PaymentContext context,
         RiskSignalInput riskInput,
@@ -163,32 +165,26 @@ public sealed class RiskPolicyEvaluator
                 nowUtc);
         }
 
-        if (observation.FraudProbability >= policy.EscalationThreshold)
-        {
-            return Decision(
+        return observation.FraudProbability >= policy.EscalationThreshold
+            ? Decision(
                 decisionId,
                 DecisionOutcome.EscalationRecommended,
                 "risk.probability-escalated",
                 context,
                 riskInput,
                 policy,
-                nowUtc);
-        }
-
-        if (context.IncidentPosture == IncidentPosture.Elevated &&
-            context.Amount >= 100_000m)
-        {
-            return Decision(
+                nowUtc)
+            : context.IncidentPosture == IncidentPosture.Elevated &&
+            context.Amount >= 100_000m
+            ? Decision(
                 decisionId,
                 DecisionOutcome.EscalationRecommended,
                 "risk.incident-posture-escalated",
                 context,
                 riskInput,
                 policy,
-                nowUtc);
-        }
-
-        return Decision(
+                nowUtc)
+            : Decision(
             decisionId,
             DecisionOutcome.Allowed,
             "risk.acceptable",
@@ -205,8 +201,9 @@ public sealed class RiskPolicyEvaluator
         PaymentContext context,
         RiskSignalInput riskInput,
         RiskGovernancePolicy policy,
-        DateTimeOffset nowUtc) =>
-        new(
+        DateTimeOffset nowUtc)
+    {
+        return new(
             DecisionId: decisionId,
             Outcome: outcome,
             ReasonCode: reasonCode,
@@ -217,4 +214,5 @@ public sealed class RiskPolicyEvaluator
             Context: context,
             RiskInput: riskInput,
             DecidedAtUtc: nowUtc);
+    }
 }

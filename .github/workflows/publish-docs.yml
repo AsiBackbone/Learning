@@ -10,10 +10,12 @@ on:
       - 'tools/generate-feed.cs'
       - 'tools/generate-sitemap.cs'
       - 'tools/prepare-indexnow.cs'
+      - 'tools/publish-x.cs'
       - 'tools/validate-doc-metadata.cs'
       - 'tools/validate-docfx-template-baseline.cs'
       - '.config/dotnet-tools.json'
       - '.github/workflows/publish-docs.yml'
+      - '.github/workflows/publish-x.yml'
 
   workflow_dispatch:
 
@@ -147,6 +149,9 @@ jobs:
       - name: Record deployed revision
         run: printf '%s\n' "$GITHUB_SHA" > docs/_site/deployment-revision.txt
 
+      - name: Remove internal DocFX build manifest
+        run: rm -- docs/_site/manifest.json
+
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
@@ -239,3 +244,12 @@ jobs:
         run: >-
           echo "::warning::IndexNow notification failed after a successful Pages deployment;
           the published documentation remains valid and the sitemap remains available for crawler discovery."
+
+  publish-x:
+    name: Publish eligible content to X
+    needs: deploy-docs
+    permissions:
+      contents: write
+    uses: ./.github/workflows/publish-x.yml
+    with:
+      deployed_revision: ${{ github.sha }}

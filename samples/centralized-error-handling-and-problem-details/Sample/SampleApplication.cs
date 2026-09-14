@@ -9,9 +9,7 @@ public static class SampleApplication
         WebApplicationBuilder builder =
             WebApplication.CreateBuilder(args);
 
-        builder.Services.AddProblemDetails(options =>
-        {
-            options.CustomizeProblemDetails = context =>
+        builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = context =>
             {
                 context.ProblemDetails.Instance ??=
                     context.HttpContext.Request.Path.Value;
@@ -19,8 +17,7 @@ public static class SampleApplication
                 context.ProblemDetails.Extensions["traceId"] =
                     Activity.Current?.TraceId.ToString()
                     ?? context.HttpContext.TraceIdentifier;
-            };
-        });
+            });
 
         builder.Services.AddExceptionHandler<ApplicationExceptionHandler>();
 
@@ -45,19 +42,13 @@ public static class SampleApplication
 
         app.MapGet("/governance/{scenario}", (
             string scenario,
-            HttpContext httpContext) =>
-        {
-            if (!GovernanceDecision.TryFromScenario(
+            HttpContext httpContext) => !GovernanceDecision.TryFromScenario(
                     scenario,
-                    out GovernanceDecision decision))
-            {
-                return Results.NotFound();
-            }
-
-            return GovernanceHttpMapper.ToHttpResult(
+                    out GovernanceDecision decision)
+                ? Results.NotFound()
+                : GovernanceHttpMapper.ToHttpResult(
                 decision,
-                httpContext);
-        });
+                httpContext));
 
         return app;
     }

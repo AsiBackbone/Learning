@@ -6,14 +6,14 @@ namespace ReplayProtectionAndBoundedUse.Tests;
 
 public sealed class ReplayProtectionPropertyTests
 {
-    private static readonly Config FuzzConfig =
+    private static readonly Config _fuzzConfig =
         Config.QuickThrowOnFailure.WithMaxTest(250);
 
     [Fact]
     public void ArbitraryMismatchedSubjectsAreRejected()
     {
         Check.One(
-            FuzzConfig,
+            _fuzzConfig,
             Prop.ForAll<string?>(untrustedInput =>
             {
                 const string expectedSubject = "operator-7";
@@ -39,7 +39,7 @@ public sealed class ReplayProtectionPropertyTests
                     NowUtc: capability.IssuedUtc.AddMinutes(1));
 
                 CapabilityValidationResult result =
-                    new ExecutionCapabilityValidator().Validate(
+                    ExecutionCapabilityValidator.Validate(
                         capability,
                         request);
 
@@ -52,14 +52,14 @@ public sealed class ReplayProtectionPropertyTests
     public void ArbitraryBoundedUseLimitsAreNeverExceeded()
     {
         Check.One(
-            FuzzConfig,
+            _fuzzConfig,
             Prop.ForAll<int>(generatedValue =>
             {
                 int maximumUses = Math.Abs(generatedValue % 16) + 1;
                 string capabilityId = $"cap-fuzz-{generatedValue:X8}";
                 var store = new AtomicInMemoryCapabilityUseStore();
 
-                CapabilityUseResult[] results = Enumerable
+                CapabilityUseResult[] results = [.. Enumerable
                     .Range(0, maximumUses + 2)
                     .Select(_ => store.TryConsumeAsync(
                         capabilityId,
@@ -68,8 +68,7 @@ public sealed class ReplayProtectionPropertyTests
                         CancellationToken.None)
                         .AsTask()
                         .GetAwaiter()
-                        .GetResult())
-                    .ToArray();
+                        .GetResult())];
 
                 return results.Count(result => result.Accepted) ==
                         maximumUses &&

@@ -2,7 +2,7 @@ namespace FederatedGovernanceCoordination;
 
 public sealed class FederationCoordinator
 {
-    public FederatedDecision Compose(
+    public static FederatedDecision Compose(
         AuthoritySetDescriptor authoritySet,
         FederationContract contract,
         IReadOnlyList<AuthorityContribution> contributions)
@@ -83,6 +83,8 @@ public sealed class FederationCoordinator
                             "federation.contribution-invalid",
                         ContributionStatus.Stale =>
                             "federation.contribution-stale",
+                        ContributionStatus.Available =>
+                            "federation.contribution-unacceptable",
                         _ => "federation.contribution-unacceptable"
                     },
                     contributions);
@@ -99,11 +101,10 @@ public sealed class FederationCoordinator
             }
         }
 
-        AuthorityContribution[] required = authoritySet
+        AuthorityContribution[] required = [.. authoritySet
             .RequiredAuthorityDomains
             .OrderBy(value => value, StringComparer.Ordinal)
-            .Select(domain => byDomain[domain])
-            .ToArray();
+            .Select(domain => byDomain[domain])];
 
         if (required.Any(
                 contribution =>
@@ -150,30 +151,24 @@ public sealed class FederationCoordinator
                 required);
         }
 
-        if (anyAllowed &&
+        return anyAllowed &&
             anyDenied &&
             contract.DisagreementDisposition ==
-                DisagreementDisposition.RouteToEscalation)
-        {
-            return Decision(
+                DisagreementDisposition.RouteToEscalation
+            ? Decision(
                 authoritySet,
                 contract,
                 FederatedOutcome.EscalationRecommended,
                 "federation.disagreement-escalation-recommended",
-                required);
-        }
-
-        if (anyDenied)
-        {
-            return Decision(
+                required)
+            : anyDenied
+            ? Decision(
                 authoritySet,
                 contract,
                 FederatedOutcome.Denied,
                 "federation.required-authority-denied",
-                required);
-        }
-
-        return Decision(
+                required)
+            : Decision(
             authoritySet,
             contract,
             FederatedOutcome.Allowed,
@@ -188,7 +183,7 @@ public sealed class FederationCoordinator
         string reasonCode,
         IEnumerable<AuthorityContribution> contributions)
     {
-        ContributionEvidence[] evidence = contributions
+        ContributionEvidence[] evidence = [.. contributions
             .OrderBy(
                 contribution => contribution.AuthorityDomainId,
                 StringComparer.Ordinal)
@@ -199,8 +194,7 @@ public sealed class FederationCoordinator
                     contribution.Outcome,
                     contribution.PolicyId,
                     contribution.PolicyVersion,
-                    contribution.ReasonCode))
-            .ToArray();
+                    contribution.ReasonCode))];
 
         return new FederatedDecision(
             DecisionId:

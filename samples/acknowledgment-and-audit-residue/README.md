@@ -64,7 +64,7 @@ From the repository root:
 dotnet test samples/acknowledgment-and-audit-residue/Tests/AcknowledgmentAndAuditResidue.Tests.csproj
 ```
 
-The focused xUnit tests make the boundary explicit: acknowledgment can satisfy one governance requirement, but it does not itself grant authorization or execution authority. Re-evaluation still controls the next step, and changed resource state can still block execution.
+The focused xUnit tests cover every policy outcome and acknowledgment binding failure, including the expiration boundary and stable reason codes. They also prove that acknowledgment does not grant execution authority, changed resource state can still block execution, and the executable scenarios preserve their correlated audit timelines.
 
 The sample uses deterministic local data and does not call external services.
 

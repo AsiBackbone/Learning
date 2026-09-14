@@ -4,12 +4,11 @@ public static class Program
 {
     public static async Task Main()
     {
-        RiskPolicyEvaluator evaluator = new();
         RiskGovernancePolicy policy = SampleScenarios.CreatePolicy();
 
         Show(
             "Initial low-risk observation",
-            evaluator.Evaluate(
+            RiskPolicyEvaluator.Evaluate(
                 "decision-demo-low-risk",
                 SampleScenarios.CreatePayment(),
                 RiskSignalInput.Available(SampleScenarios.CreateObservation()),
@@ -18,7 +17,7 @@ public static class Program
 
         Show(
             "Risk provider unavailable",
-            evaluator.Evaluate(
+            RiskPolicyEvaluator.Evaluate(
                 "decision-demo-provider-unavailable",
                 SampleScenarios.CreatePayment(),
                 RiskSignalInput.Unavailable("fraud-service"),
@@ -27,7 +26,7 @@ public static class Program
 
         Show(
             "Stale stored observation",
-            evaluator.Evaluate(
+            RiskPolicyEvaluator.Evaluate(
                 "decision-demo-stale",
                 SampleScenarios.CreatePayment(),
                 RiskSignalInput.Available(SampleScenarios.CreateObservation()),
@@ -36,7 +35,7 @@ public static class Program
 
         Show(
             "Current state after model/risk/environment drift",
-            evaluator.Evaluate(
+            RiskPolicyEvaluator.Evaluate(
                 "decision-demo-current-drift",
                 SampleScenarios.CreatePayment(
                     resourceVersion: "pay-981:v2",
@@ -52,7 +51,7 @@ public static class Program
                 policy,
                 SampleScenarios.BaselineUtc.AddMinutes(5)));
 
-        await RunExecutionBoundaryDemoAsync(evaluator, policy);
+        await RunExecutionBoundaryDemoAsync(policy);
 
         Console.WriteLine("Teaching boundary:");
         Console.WriteLine("- risk observations are inputs, not execution credentials");
@@ -62,27 +61,26 @@ public static class Program
     }
 
     private static async Task RunExecutionBoundaryDemoAsync(
-        RiskPolicyEvaluator evaluator,
         RiskGovernancePolicy policy)
     {
         Console.WriteLine("Full execution-boundary demonstration");
 
         PaymentContext payment = SampleScenarios.CreatePayment();
-        RiskSignalInput risk =
+        var risk =
             RiskSignalInput.Available(SampleScenarios.CreateObservation());
         DateTimeOffset decisionTime =
             SampleScenarios.BaselineUtc.AddMinutes(1);
         DateTimeOffset executionTime =
             SampleScenarios.BaselineUtc.AddMinutes(2);
 
-        GovernanceDecision decision = evaluator.Evaluate(
+        GovernanceDecision decision = RiskPolicyEvaluator.Evaluate(
             "decision-demo-execution",
             payment,
             risk,
             policy,
             decisionTime);
 
-        AuthorityIssueResult issue = new ExecutionAuthorityIssuer().TryIssue(
+        AuthorityIssueResult issue = ExecutionAuthorityIssuer.TryIssue(
             decision,
             policy,
             decisionTime);
@@ -100,7 +98,6 @@ public static class Program
             new InMemoryExecutionAuthorityClaimStore();
         RecordingPaymentExecutor executor = new();
         RiskExecutionGateway gateway = new(
-            new ExecutionFreshnessEvaluator(),
             claimStore,
             executor);
 

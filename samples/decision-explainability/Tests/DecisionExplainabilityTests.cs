@@ -1,18 +1,17 @@
-using DecisionExplainability;
 using Xunit;
 
 namespace DecisionExplainability.Tests;
 
 public sealed class DecisionExplainabilityTests
 {
-    private readonly ExplanationProjector _projector = new();
+    private static readonly string[] _expected = ["regional.data-residency", "tenant.operation-restricted"];
 
     [Fact]
     public void RegionalDataResidencyDenialProducesSafeEndUserExplanation()
     {
         DecisionEvidence evidence = SampleScenarios.RegionalResidencyDenial();
 
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             evidence,
             ExplanationAudience.EndUser);
 
@@ -34,7 +33,7 @@ public sealed class DecisionExplainabilityTests
             Reasons = [reason with { ProtectedContextValue = null }]
         };
 
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             evidenceWithoutProtectedPayload,
             ExplanationAudience.EndUser);
 
@@ -47,7 +46,7 @@ public sealed class DecisionExplainabilityTests
     {
         DecisionEvidence evidence = SampleScenarios.RegionalResidencyDenial();
 
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             evidence,
             ExplanationAudience.Operator);
 
@@ -62,7 +61,7 @@ public sealed class DecisionExplainabilityTests
     [Fact]
     public void DeferredExplanationDoesNotClaimPolicyDenial()
     {
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             SampleScenarios.DeferredContextUnavailable(),
             ExplanationAudience.EndUser);
 
@@ -74,7 +73,7 @@ public sealed class DecisionExplainabilityTests
     [Fact]
     public void AcknowledgmentRequiredExplanationDoesNotClaimApproval()
     {
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             SampleScenarios.AcknowledgmentRequired(),
             ExplanationAudience.EndUser);
 
@@ -86,7 +85,7 @@ public sealed class DecisionExplainabilityTests
     [Fact]
     public void EscalationExplanationDoesNotPromiseApproval()
     {
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             SampleScenarios.EscalationRecommended(),
             ExplanationAudience.EndUser);
 
@@ -99,7 +98,7 @@ public sealed class DecisionExplainabilityTests
     [Fact]
     public void MultipleReasonsUseDeterministicPresentationOrder()
     {
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             SampleScenarios.MultiReasonDenial(),
             ExplanationAudience.Operator);
 
@@ -107,17 +106,17 @@ public sealed class DecisionExplainabilityTests
         Assert.Contains("regional", projection.Details[0].ToLowerInvariant());
         Assert.Contains("tenant", projection.Details[1].ToLowerInvariant());
         Assert.Equal(
-            new[] { "regional.data-residency", "tenant.operation-restricted" },
+            _expected,
             projection.SourceReasonCodes.ToArray());
     }
 
     [Fact]
     public void ReasonInputOrderDoesNotChangeProjection()
     {
-        ExplanationProjection first = _projector.Project(
+        ExplanationProjection first = ExplanationProjector.Project(
             SampleScenarios.MultiReasonDenial(reverse: false),
             ExplanationAudience.Operator);
-        ExplanationProjection second = _projector.Project(
+        ExplanationProjection second = ExplanationProjector.Project(
             SampleScenarios.MultiReasonDenial(reverse: true),
             ExplanationAudience.Operator);
 
@@ -150,7 +149,7 @@ public sealed class DecisionExplainabilityTests
     {
         DecisionEvidence evidence = Scenario(scenario);
 
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             evidence,
             audience);
 
@@ -163,10 +162,10 @@ public sealed class DecisionExplainabilityTests
     {
         DecisionEvidence evidence = SampleScenarios.RegionalResidencyDenial();
 
-        ExplanationProjection endUser = _projector.Project(
+        ExplanationProjection endUser = ExplanationProjector.Project(
             evidence,
             ExplanationAudience.EndUser);
-        ExplanationProjection operatorView = _projector.Project(
+        ExplanationProjection operatorView = ExplanationProjector.Project(
             evidence,
             ExplanationAudience.Operator);
 
@@ -187,7 +186,7 @@ public sealed class DecisionExplainabilityTests
     [Fact]
     public void OperatorOnlyReasonIsWithheldFromEndUserProjection()
     {
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             SampleScenarios.MultiReasonDenial(),
             ExplanationAudience.EndUser);
 
@@ -217,7 +216,7 @@ public sealed class DecisionExplainabilityTests
             CorrelationId: "corr-sensitive-7003",
             DecidedAtUtc: DateTimeOffset.UnixEpoch);
 
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             evidence,
             ExplanationAudience.Operator);
 
@@ -245,7 +244,7 @@ public sealed class DecisionExplainabilityTests
             CorrelationId: "corr-withheld-7002",
             DecidedAtUtc: DateTimeOffset.UnixEpoch);
 
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             evidence,
             ExplanationAudience.EndUser);
 
@@ -272,7 +271,7 @@ public sealed class DecisionExplainabilityTests
             ]
         };
 
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             mixedEvidence,
             ExplanationAudience.EndUser);
 
@@ -300,7 +299,7 @@ public sealed class DecisionExplainabilityTests
             CorrelationId: "corr-unknown-7001",
             DecidedAtUtc: DateTimeOffset.UnixEpoch);
 
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             evidence,
             ExplanationAudience.EndUser);
 
@@ -330,7 +329,7 @@ public sealed class DecisionExplainabilityTests
             CorrelationId: "corr-unknown-7004",
             DecidedAtUtc: DateTimeOffset.UnixEpoch);
 
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             evidence,
             ExplanationAudience.EndUser);
 
@@ -350,7 +349,7 @@ public sealed class DecisionExplainabilityTests
             Outcome = DecisionOutcome.Deferred
         };
 
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             evidence,
             ExplanationAudience.EndUser);
 
@@ -365,7 +364,7 @@ public sealed class DecisionExplainabilityTests
     [Fact]
     public void ProjectionVersionIsExplicit()
     {
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             SampleScenarios.RegionalResidencyDenial(),
             ExplanationAudience.EndUser);
 
@@ -378,7 +377,7 @@ public sealed class DecisionExplainabilityTests
     public void NewPolicyDecisionDoesNotRewriteHistoricalProjection()
     {
         DecisionEvidence historicalEvidence = SampleScenarios.RegionalResidencyDenial("7.3");
-        ExplanationProjection historical = _projector.Project(
+        ExplanationProjection historical = ExplanationProjector.Project(
             historicalEvidence,
             ExplanationAudience.Operator);
 
@@ -386,7 +385,7 @@ public sealed class DecisionExplainabilityTests
         {
             DecisionId = "dec-regional-1043"
         };
-        ExplanationProjection current = _projector.Project(
+        ExplanationProjection current = ExplanationProjector.Project(
             currentEvidence,
             ExplanationAudience.Operator);
 
@@ -403,7 +402,7 @@ public sealed class DecisionExplainabilityTests
     [Fact]
     public void AllowedExplanationDoesNotClaimExecutionOccurred()
     {
-        ExplanationProjection projection = _projector.Project(
+        ExplanationProjection projection = ExplanationProjector.Project(
             SampleScenarios.Allowed(),
             ExplanationAudience.EndUser);
 
@@ -413,24 +412,29 @@ public sealed class DecisionExplainabilityTests
         Assert.DoesNotContain("completed", ProjectionText(projection).ToLowerInvariant());
     }
 
-    private static DecisionEvidence Scenario(string scenario) => scenario switch
+    private static DecisionEvidence Scenario(string scenario)
     {
-        "regional-denial" => SampleScenarios.RegionalResidencyDenial(),
-        "deferred" => SampleScenarios.DeferredContextUnavailable(),
-        "acknowledgment" => SampleScenarios.AcknowledgmentRequired(),
-        "escalation" => SampleScenarios.EscalationRecommended(),
-        "allowed" => SampleScenarios.Allowed(),
-        "multi-reason-denial" => SampleScenarios.MultiReasonDenial(),
-        _ => throw new ArgumentOutOfRangeException(
-            nameof(scenario),
-            scenario,
-            "Unknown sample scenario.")
-    };
+        return scenario switch
+        {
+            "regional-denial" => SampleScenarios.RegionalResidencyDenial(),
+            "deferred" => SampleScenarios.DeferredContextUnavailable(),
+            "acknowledgment" => SampleScenarios.AcknowledgmentRequired(),
+            "escalation" => SampleScenarios.EscalationRecommended(),
+            "allowed" => SampleScenarios.Allowed(),
+            "multi-reason-denial" => SampleScenarios.MultiReasonDenial(),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(scenario),
+                scenario,
+                "Unknown sample scenario.")
+        };
+    }
 
-    private static string ProjectionText(ExplanationProjection projection) =>
-        string.Join(
+    private static string ProjectionText(ExplanationProjection projection)
+    {
+        return string.Join(
             " ",
             new[] { projection.Headline }
                 .Concat(projection.Details)
                 .Append(projection.DisclosureNotice ?? string.Empty));
+    }
 }

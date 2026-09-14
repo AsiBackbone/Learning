@@ -1,12 +1,9 @@
-using AdaptiveRiskContext;
 using Xunit;
 
 namespace AdaptiveRiskContext.Tests;
 
 public sealed class AdaptiveRiskContextTests
 {
-    private readonly RiskPolicyEvaluator _policyEvaluator = new();
-    private readonly ExecutionAuthorityIssuer _authorityIssuer = new();
     private int _decisionSequence;
 
     [Fact]
@@ -67,7 +64,7 @@ public sealed class AdaptiveRiskContextTests
     [Fact]
     public void FutureObservationProducesDeferredDecision()
     {
-        GovernanceDecision decision = _policyEvaluator.Evaluate(
+        GovernanceDecision decision = RiskPolicyEvaluator.Evaluate(
             "decision-future-observation",
             SampleScenarios.CreatePayment(),
             RiskSignalInput.Available(
@@ -127,7 +124,7 @@ public sealed class AdaptiveRiskContextTests
     [Fact]
     public void StaleObservationProducesDeferredDecision()
     {
-        GovernanceDecision decision = _policyEvaluator.Evaluate(
+        GovernanceDecision decision = RiskPolicyEvaluator.Evaluate(
             "decision-stale-observation",
             SampleScenarios.CreatePayment(),
             RiskSignalInput.Available(SampleScenarios.CreateObservation()),
@@ -146,7 +143,7 @@ public sealed class AdaptiveRiskContextTests
         RiskObservation observation = SampleScenarios.CreateObservation(
             providerValidUntilUtc: SampleScenarios.BaselineUtc.AddMinutes(30));
 
-        GovernanceDecision decision = _policyEvaluator.Evaluate(
+        GovernanceDecision decision = RiskPolicyEvaluator.Evaluate(
             "decision-host-max-age",
             SampleScenarios.CreatePayment(),
             RiskSignalInput.Available(observation),
@@ -272,13 +269,13 @@ public sealed class AdaptiveRiskContextTests
         RiskGovernancePolicy policy = SampleScenarios.CreatePolicy();
         RiskObservation observation = SampleScenarios.CreateObservation();
 
-        GovernanceDecision current = _policyEvaluator.Evaluate(
+        GovernanceDecision current = RiskPolicyEvaluator.Evaluate(
             "decision-current-risk",
             SampleScenarios.CreatePayment(),
             RiskSignalInput.Available(observation),
             policy,
             SampleScenarios.BaselineUtc.AddMinutes(1));
-        GovernanceDecision stale = _policyEvaluator.Evaluate(
+        GovernanceDecision stale = RiskPolicyEvaluator.Evaluate(
             "decision-stale-risk",
             SampleScenarios.CreatePayment(),
             RiskSignalInput.Available(observation),
@@ -300,7 +297,7 @@ public sealed class AdaptiveRiskContextTests
             RiskSignalInput.Unavailable("fraud-service"),
             SampleScenarios.CreatePolicy());
 
-        AuthorityIssueResult issue = _authorityIssuer.TryIssue(
+        AuthorityIssueResult issue = ExecutionAuthorityIssuer.TryIssue(
             decision,
             SampleScenarios.CreatePolicy(),
             SampleScenarios.BaselineUtc.AddMinutes(1));
@@ -322,7 +319,7 @@ public sealed class AdaptiveRiskContextTests
             RiskInput = RiskSignalInput.Unavailable("fraud-service")
         };
 
-        AuthorityIssueResult issue = _authorityIssuer.TryIssue(
+        AuthorityIssueResult issue = ExecutionAuthorityIssuer.TryIssue(
             missingEvidence,
             SampleScenarios.CreatePolicy(),
             SampleScenarios.BaselineUtc.AddMinutes(1));
@@ -340,7 +337,7 @@ public sealed class AdaptiveRiskContextTests
             RiskSignalInput.Available(SampleScenarios.CreateObservation()),
             SampleScenarios.CreatePolicy());
 
-        AuthorityIssueResult issue = _authorityIssuer.TryIssue(
+        AuthorityIssueResult issue = ExecutionAuthorityIssuer.TryIssue(
             decision,
             SampleScenarios.CreatePolicy(policyVersion: "payment-policy-v13"),
             SampleScenarios.BaselineUtc.AddMinutes(1));
@@ -358,14 +355,14 @@ public sealed class AdaptiveRiskContextTests
         RiskObservation observation = SampleScenarios.CreateObservation(
             providerValidUntilUtc: SampleScenarios.BaselineUtc.AddMinutes(30));
         DateTimeOffset decisionTime = SampleScenarios.BaselineUtc.AddMinutes(1);
-        GovernanceDecision decision = _policyEvaluator.Evaluate(
+        GovernanceDecision decision = RiskPolicyEvaluator.Evaluate(
             "decision-authority-expiry",
             SampleScenarios.CreatePayment(),
             RiskSignalInput.Available(observation),
             policy,
             decisionTime);
 
-        AuthorityIssueResult issue = _authorityIssuer.TryIssue(
+        AuthorityIssueResult issue = ExecutionAuthorityIssuer.TryIssue(
             decision,
             policy,
             decisionTime,
@@ -386,7 +383,7 @@ public sealed class AdaptiveRiskContextTests
             RiskSignalInput.Available(SampleScenarios.CreateObservation()),
             policy);
 
-        AuthorityIssueResult issue = _authorityIssuer.TryIssue(
+        AuthorityIssueResult issue = ExecutionAuthorityIssuer.TryIssue(
             decision,
             policy,
             SampleScenarios.BaselineUtc.AddMinutes(11));
@@ -402,7 +399,7 @@ public sealed class AdaptiveRiskContextTests
         RiskGovernancePolicy policy = SampleScenarios.CreatePolicy();
         ExecutionAuthority authority = SampleScenarios.CreateAuthority(policy);
 
-        FreshnessAssessment assessment = new ExecutionFreshnessEvaluator().Evaluate(
+        FreshnessAssessment assessment = ExecutionFreshnessEvaluator.Evaluate(
             authority,
             SampleScenarios.CreatePayment(),
             RiskSignalInput.Available(SampleScenarios.CreateObservation()),
@@ -476,7 +473,6 @@ public sealed class AdaptiveRiskContextTests
             new InMemoryExecutionAuthorityClaimStore();
         CoordinatedPaymentExecutor executor = new();
         RiskExecutionGateway gateway = new(
-            new ExecutionFreshnessEvaluator(),
             claimStore,
             executor);
 
@@ -950,7 +946,7 @@ public sealed class AdaptiveRiskContextTests
                     modelVersion: "risk-v7")),
             policy);
         ExecutionAuthority oldAuthority = RequireIssued(
-            _authorityIssuer.TryIssue(
+            ExecutionAuthorityIssuer.TryIssue(
                 historical,
                 policy,
                 SampleScenarios.BaselineUtc.AddMinutes(1),
@@ -975,7 +971,7 @@ public sealed class AdaptiveRiskContextTests
             policy,
             SampleScenarios.BaselineUtc.AddMinutes(5),
             CancellationToken.None);
-        GovernanceDecision current = _policyEvaluator.Evaluate(
+        GovernanceDecision current = RiskPolicyEvaluator.Evaluate(
             "decision-current-drift-state",
             currentContext,
             RiskSignalInput.Available(currentObservation),
@@ -996,21 +992,24 @@ public sealed class AdaptiveRiskContextTests
         PaymentContext context,
         RiskSignalInput riskInput,
         RiskGovernancePolicy policy,
-        string? decisionId = null) =>
-        _policyEvaluator.Evaluate(
+        string? decisionId = null)
+    {
+        return RiskPolicyEvaluator.Evaluate(
             decisionId ?? $"decision-test-{Interlocked.Increment(ref _decisionSequence)}",
             context,
             riskInput,
             policy,
             SampleScenarios.BaselineUtc.AddMinutes(1));
+    }
 
     private static RiskExecutionGateway CreateGateway(
         RecordingPaymentExecutor executor,
-        IExecutionAuthorityClaimStore? claimStore = null) =>
-        new(
-            new ExecutionFreshnessEvaluator(),
+        IExecutionAuthorityClaimStore? claimStore = null)
+    {
+        return new(
             claimStore ?? new InMemoryExecutionAuthorityClaimStore(),
             executor);
+    }
 
     private static async Task<ExecutionResult> ExecuteBlocked(
         PaymentContext? currentContext = null,
@@ -1034,8 +1033,9 @@ public sealed class AdaptiveRiskContextTests
     }
 
     private static ValidatedPaymentCommand CreateCommand(
-        ExecutionAuthority authority) =>
-        new(
+        ExecutionAuthority authority)
+    {
+        return new(
             PaymentId: authority.PaymentId,
             ExpectedResourceVersion: authority.ResourceVersion,
             Amount: authority.Amount,
@@ -1052,6 +1052,7 @@ public sealed class AdaptiveRiskContextTests
             PolicyVersion: authority.PolicyVersion,
             ThresholdVersion: authority.ThresholdVersion,
             FreshnessRuleVersion: authority.FreshnessRuleVersion);
+    }
 
     private sealed class CoordinatedPaymentExecutor : IPaymentExecutor
     {
@@ -1066,8 +1067,10 @@ public sealed class AdaptiveRiskContextTests
         public int InvocationCount =>
             Volatile.Read(ref _invocationCount);
 
-        public void Release() =>
+        public void Release()
+        {
             _release.TrySetResult(true);
+        }
 
         public async Task<PaymentExecutionAttempt> ExecuteAsync(
             ExecutionAuthority authority,

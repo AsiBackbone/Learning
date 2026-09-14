@@ -1,5 +1,4 @@
 using Xunit;
-using DecisionPipelineRefactoring;
 
 namespace DecisionPipelineRefactoring.Tests;
 
@@ -40,11 +39,9 @@ public sealed class DecisionPipelineInvariantTests
             acknowledgmentSatisfied: true));
 
         Assert.Equal(DecisionOutcome.Denied, decision.Outcome);
-        Assert.Equal(0, fixture.Executor.InvocationCount);
-        Assert.Equal(0, fixture.Repository.DisableCount);
-        Assert.Equal(0, fixture.Notifications.SendCount);
-        Assert.Equal(0, fixture.Events.PublishCount);
-        Assert.Single(fixture.Evidence.Records);
+        Assert.Equal("account.disable.protected-account", decision.ReasonCode);
+        AssertNoSideEffects(fixture);
+        AssertDecisionEvidence(fixture, decision, "acct-protected", 7);
     }
 
     [Fact]
@@ -58,9 +55,9 @@ public sealed class DecisionPipelineInvariantTests
             acknowledgmentSatisfied: true));
 
         Assert.Equal(DecisionOutcome.Deferred, decision.Outcome);
-        Assert.Equal(0, fixture.Executor.InvocationCount);
-        Assert.Equal(0, fixture.Repository.DisableCount);
-        Assert.Single(fixture.Evidence.Records);
+        Assert.Equal("account.disable.investigation-pending", decision.ReasonCode);
+        AssertNoSideEffects(fixture);
+        AssertDecisionEvidence(fixture, decision, "acct-pending", 4);
     }
 
     [Fact]
@@ -74,9 +71,9 @@ public sealed class DecisionPipelineInvariantTests
             acknowledgmentSatisfied: false));
 
         Assert.Equal(DecisionOutcome.AcknowledgmentRequired, decision.Outcome);
-        Assert.Equal(0, fixture.Executor.InvocationCount);
-        Assert.Equal(0, fixture.Repository.DisableCount);
-        Assert.Single(fixture.Evidence.Records);
+        Assert.Equal("account.disable.acknowledgment-required", decision.ReasonCode);
+        AssertNoSideEffects(fixture);
+        AssertDecisionEvidence(fixture, decision, "acct-standard", 3);
     }
 
     [Fact]
@@ -90,9 +87,9 @@ public sealed class DecisionPipelineInvariantTests
             acknowledgmentSatisfied: true));
 
         Assert.Equal(DecisionOutcome.EscalationRecommended, decision.Outcome);
-        Assert.Equal(0, fixture.Executor.InvocationCount);
-        Assert.Equal(0, fixture.Repository.DisableCount);
-        Assert.Single(fixture.Evidence.Records);
+        Assert.Equal("account.disable.manual-review-required", decision.ReasonCode);
+        AssertNoSideEffects(fixture);
+        AssertDecisionEvidence(fixture, decision, "acct-manual", 11);
     }
 
     [Fact]
@@ -106,6 +103,7 @@ public sealed class DecisionPipelineInvariantTests
             acknowledgmentSatisfied: true));
 
         Assert.Equal(DecisionOutcome.Allowed, decision.Outcome);
+        Assert.Equal("account.disable.allowed", decision.ReasonCode);
         Assert.Equal(1, fixture.Executor.InvocationCount);
         Assert.Equal(1, fixture.Repository.DisableCount);
         Assert.Equal(1, fixture.Notifications.SendCount);
@@ -113,6 +111,17 @@ public sealed class DecisionPipelineInvariantTests
         Assert.Equal(2, fixture.Evidence.Records.Count);
         Assert.Equal("decision", fixture.Evidence.Records[0].Stage);
         Assert.Equal("execution", fixture.Evidence.Records[1].Stage);
+        Assert.All(
+            fixture.Evidence.Records,
+            record =>
+            {
+                Assert.Equal("corr-acct-standard", record.CorrelationId);
+                Assert.Equal("admin-17", record.ActorId);
+                Assert.Equal("acct-standard", record.AccountId);
+                Assert.Equal(3, record.ResourceVersion);
+                Assert.Equal(DecisionOutcome.Allowed, record.Outcome);
+                Assert.Equal("account.disable.allowed", record.ReasonCode);
+            });
     }
 
     [Fact]
@@ -133,16 +142,73 @@ public sealed class DecisionPipelineInvariantTests
         Assert.Equal(3, fixture.Evidence.Records[0].ResourceVersion);
     }
 
+    [Fact]
+    public void Whitespace_account_identifier_is_rejected_before_decision_or_execution()
+    {
+        Fixture fixture = CreateFixture();
+
+        Assert.Throws<ArgumentException>(
+            () => fixture.Pipeline.Handle(Request(
+                accountId: "   ",
+                isAdministrator: true,
+                acknowledgmentSatisfied: true)));
+
+        AssertNoSideEffects(fixture);
+        Assert.Empty(fixture.Evidence.Records);
+    }
+
+    [Fact]
+    public void Unknown_account_is_rejected_before_decision_or_execution()
+    {
+        Fixture fixture = CreateFixture();
+
+        Assert.Throws<KeyNotFoundException>(
+            () => fixture.Pipeline.Handle(Request(
+                accountId: "acct-missing",
+                isAdministrator: true,
+                acknowledgmentSatisfied: true)));
+
+        AssertNoSideEffects(fixture);
+        Assert.Empty(fixture.Evidence.Records);
+    }
+
+    private static void AssertNoSideEffects(Fixture fixture)
+    {
+        Assert.Equal(0, fixture.Executor.InvocationCount);
+        Assert.Equal(0, fixture.Repository.DisableCount);
+        Assert.Equal(0, fixture.Notifications.SendCount);
+        Assert.Equal(0, fixture.Events.PublishCount);
+    }
+
+    private static void AssertDecisionEvidence(
+        Fixture fixture,
+        GovernanceDecision decision,
+        string accountId,
+        int resourceVersion)
+    {
+        DecisionEvidenceRecord record = Assert.Single(fixture.Evidence.Records);
+
+        Assert.Equal("decision", record.Stage);
+        Assert.Equal($"corr-{accountId}", record.CorrelationId);
+        Assert.Equal("admin-17", record.ActorId);
+        Assert.Equal(accountId, record.AccountId);
+        Assert.Equal(resourceVersion, record.ResourceVersion);
+        Assert.Equal(decision.Outcome, record.Outcome);
+        Assert.Equal(decision.ReasonCode, record.ReasonCode);
+    }
+
     private static AccountDisableRequest Request(
         string accountId,
         bool isAdministrator,
-        bool acknowledgmentSatisfied) =>
-        new(
+        bool acknowledgmentSatisfied)
+    {
+        return new(
             CorrelationId: $"corr-{accountId}",
             ActorId: "admin-17",
             AccountId: accountId,
             RequesterIsAdministrator: isAdministrator,
             AcknowledgmentSatisfied: acknowledgmentSatisfied);
+    }
 
     private static Fixture CreateFixture()
     {
@@ -156,7 +222,6 @@ public sealed class DecisionPipelineInvariantTests
         var evidence = new RecordingDecisionEvidenceSink();
         var pipeline = new AccountDisableDecisionPipeline(
             new AccountDisableContextBuilder(repository),
-            new AccountDisablePolicy(),
             executor,
             evidence);
 

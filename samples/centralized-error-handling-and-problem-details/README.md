@@ -181,7 +181,7 @@ From the repository root:
 dotnet test samples/centralized-error-handling-and-problem-details/Tests/CentralizedErrorHandlingAndProblemDetails.Tests.csproj
 ```
 
-The focused tests prove these invariants:
+The focused tests cover every governance-to-HTTP outcome, invalid and unknown scenarios, safe known and unexpected exception responses, and trace correlation. They prove these invariants:
 
 ```text
 Denied governance decision

@@ -1,6 +1,7 @@
+using System.Diagnostics;
 using Xunit;
 
-namespace GovernedAiToolGateway.Tests;
+namespace AsiBackbone.Learning.GovernedAiToolGateway.Tests;
 
 public sealed class GovernanceObservabilityTests
 {
@@ -17,7 +18,7 @@ public sealed class GovernanceObservabilityTests
         using var secondCollector =
             new GovernanceTraceCollector(secondCorrelationId);
 
-        using (var firstActivity =
+        using (Activity? firstActivity =
                GovernanceObservabilityInstrumentation.StartStage(
                    "executor.invoke",
                    firstCorrelationId))
@@ -25,7 +26,7 @@ public sealed class GovernanceObservabilityTests
             Assert.NotNull(firstActivity);
         }
 
-        using (var secondActivity =
+        using (Activity? secondActivity =
                GovernanceObservabilityInstrumentation.StartStage(
                    "host.governance-gateway",
                    secondCorrelationId))

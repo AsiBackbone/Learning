@@ -1,0 +1,4 @@
+# The sibling repositories suppress ShellCheck SC2016 for project-status
+# workflows that embed GitHub expressions in shell strings. Learning does not
+# contain those workflows, so it intentionally requires no path-specific ignores.
+paths: {}

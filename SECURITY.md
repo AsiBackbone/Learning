@@ -22,6 +22,17 @@ Security-sensitive corrections may result in documentation changes, sample-code 
 
 Versioned release records support provenance and reproducibility. They do not imply long-term security maintenance, backported corrections, runtime compatibility, or package-style support for historical Learning releases.
 
+Stable release evidence is defined in [RELEASE.md](RELEASE.md). Each stable
+release attaches its exact release notes, a scoped SPDX inventory of the tracked
+sample source and locked NuGet dependencies, and a hash manifest directly to the
+GitHub Release. Current-workflow releases also carry GitHub provenance
+attestations for those files. Temporary Actions artifacts are diagnostic copies,
+not the durable record.
+
+The release SBOM is an inventory, not a vulnerability report or proof that the
+samples and dependencies are vulnerability-free. Code-scanning and dependency
+findings remain on their GitHub security surfaces.
+
 ## Repository Security Automation
 
 Learning keeps its source-controlled security automation deliberately proportional to an educational repository:
@@ -56,28 +67,43 @@ Please do **not** place exploit details, secrets, proof-of-concept payloads, pri
 
 Preferred reporting path:
 
-1. Use [GitHub private vulnerability reporting](https://github.com/AsiBackbone/Learning/security/advisories/new) when it is available for this repository.
-2. Include a concise title and identify the affected area, such as documentation, `samples/`, DocFX configuration, GitHub Actions, dependency/tooling configuration, or repository metadata.
+1. Open this repository's **Security** tab and select **Report a vulnerability** to use GitHub private vulnerability reporting when it is available.
+2. Include a concise title and identify the affected repository area, version, branch, or commit when known.
 3. Provide reproduction steps, expected behavior, actual behavior, and the practical security impact.
 4. Use synthetic data and redact secrets or identifying information.
 5. Allow reasonable time for review before public disclosure.
 
 If private vulnerability reporting is unavailable, open a minimal public Issue stating only that you have a sensitive security report to share. Do not include technical details or sensitive material in that Issue.
 
-For non-sensitive hardening suggestions, inaccurate security wording, broken examples, defense-in-depth improvements, or ordinary documentation corrections, a normal GitHub Issue or pull request is appropriate.
+For non-sensitive hardening suggestions, documentation corrections, or defense-in-depth improvements, a normal GitHub Issue or pull request is appropriate.
 
 ## Expected Response Posture
 
-This project is community-oriented open-source educational material and does not promise a formal security-response SLA.
+This is a community-maintained open-source project and does not promise a formal security-response SLA or fixed acknowledgment or remediation timelines.
 
 The expected best-effort process is:
 
-1. A maintainer reviews the report and determines whether it is a vulnerability, unsafe teaching example, documentation defect, workflow concern, dependency issue, hardening opportunity, duplicate, or out-of-scope report.
-2. The maintainer may request a reduced reproduction, affected commit information, sanitized logs, or clarification of the demonstrated impact.
-3. Confirmed concerns are addressed through documentation correction, sample changes, workflow hardening, dependency updates, repository configuration changes, or a GitHub security advisory when appropriate.
-4. Public wording will avoid overstating what the Learning repository, its samples, or the referenced ASI Backbone projects guarantee.
+1. A maintainer reviews the report and determines whether it is a vulnerability, documentation issue, sample or template issue, workflow or dependency concern, hardening opportunity, duplicate, or out-of-scope report.
+2. The maintainer may request clarification, affected-version or commit information, sanitized logs, or a reduced reproduction.
+3. Confirmed concerns are addressed through code, documentation, dependency, workflow, repository-configuration, release, or advisory changes appropriate to the risk.
+4. Public communication distinguishes confirmed behavior from suspected risk and avoids overstating security, compliance, legal, or operational guarantees.
 
 Please avoid repeated public disclosure while a sensitive report is being reviewed.
+
+## Sensitive Data Guidance for Reports
+
+When reporting a concern:
+
+- redact passwords, secrets, tokens, private keys, certificates, connection strings, user identifiers, personal information, customer data, and regulated data;
+- use synthetic examples whenever possible;
+- share only the minimum information required to reproduce or understand the concern;
+- clearly identify any material that remains sensitive.
+
+## Safe Public Language Expectations
+
+Public communication should distinguish implemented controls from intended architecture, repository behavior from downstream or consuming-system behavior, and verified evidence from assumptions.
+
+Do not describe a repository, package, template, sample, workflow, or generated application as vulnerability-free, automatically compliant, legally sufficient, tamper-proof, or production-ready solely because a documented control exists or automated checks pass.
 
 ## Security Scope
 
@@ -175,15 +201,6 @@ If a credential, token, key, certificate, connection string, or other secret is 
 
 Repository cleanup does not invalidate a credential that has already been exposed. Rotation or revocation is the primary response.
 
-## Sensitive Data Guidance for Reports
-
-When submitting a report:
-
-* redact passwords, secrets, tokens, private keys, certificates, connection strings, user identifiers, personal information, customer data, and regulated data;
-* use synthetic examples whenever possible;
-* share only the minimum information required to reproduce or understand the concern;
-* clearly identify any material that remains sensitive.
-
 ## Reports for Related Repositories
 
 Learning frequently links to fuller implementations in other ASI Backbone organization repositories.
@@ -194,20 +211,6 @@ Security concerns in those implementations should be reported to the repository 
 * [NetCoreApplicationTemplate security policy](https://github.com/AsiBackbone/NetCoreApplicationTemplate/security/policy)
 
 If a concern exists both in Learning material and in a referenced implementation, mention that relationship in the private report so maintainers can coordinate the correction.
-
-## Safe Public Language
-
-It is accurate to describe ASI Backbone Learning as an educational resource for studying architectural patterns, tradeoffs, examples, and governed-execution boundaries.
-
-It is not accurate to describe this repository as providing:
-
-* a production security guarantee;
-* compliance certification;
-* legal assurance;
-* automatic protection against AI misuse;
-* a production tamper-proof audit system;
-* a production AI or robotics control system;
-* a complete security architecture for consuming applications.
 
 ## Related Documents
 

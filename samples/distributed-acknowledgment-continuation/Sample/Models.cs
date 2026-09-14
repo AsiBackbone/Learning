@@ -103,11 +103,15 @@ public sealed record ContinuationExecutionResult(
     bool Executed,
     string ReasonCode)
 {
-    public static ContinuationExecutionResult Success() =>
-        new(true, "executor.completed");
+    public static ContinuationExecutionResult Success()
+    {
+        return new(true, "executor.completed");
+    }
 
-    public static ContinuationExecutionResult Reject(string reasonCode) =>
-        new(false, reasonCode);
+    public static ContinuationExecutionResult Reject(string reasonCode)
+    {
+        return new(false, reasonCode);
+    }
 }
 
 public sealed record ValidatedContinuationCommand(
@@ -140,32 +144,38 @@ public sealed record GatewayResult(
     string? ContinuationAuthorityId,
     string? ExecutionId)
 {
-    public static GatewayResult Rejected(string reasonCode) =>
-        new(
+    public static GatewayResult Rejected(string reasonCode)
+    {
+        return new(
             false,
             reasonCode,
             "request.not-continued",
             null,
             null);
+    }
 
     public static GatewayResult ExecutionRejected(
         string authorityId,
         string executionId,
-        string reasonCode) =>
-        new(
+        string reasonCode)
+    {
+        return new(
             false,
             reasonCode,
             "request.not-completed",
             authorityId,
             executionId);
+    }
 
     public static GatewayResult ExecutedSuccessfully(
         string authorityId,
-        string executionId) =>
-        new(
+        string executionId)
+    {
+        return new(
             true,
             "execution.completed",
             "request.completed",
             authorityId,
             executionId);
+    }
 }

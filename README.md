@@ -22,6 +22,8 @@ Prefer to see the architecture run before reading the deeper explanation? The fo
 
 **Prerequisite:** .NET 10 SDK
 
+Learning selects `Microsoft.Testing.Platform` in `global.json`, and every sample test project uses the aligned `xunit.v3` runner integration. The same `dotnet test` commands are used locally and in CI.
+
 From a terminal:
 
 ```bash
@@ -159,12 +161,21 @@ Use the canonical project surfaces for deeper information rather than treating t
 - **Security policy:** [SECURITY.md](SECURITY.md)
 - **Citation metadata:** [CITATION.cff](CITATION.cff)
 - **Licensing details:** [LICENSING.md](LICENSING.md)
+- **X publication operations:** [X_PUBLISHING.md](X_PUBLISHING.md)
 
 ### Search discovery and change notification
 
 The XML sitemap is the complete canonical discovery inventory for the published Learning site. IndexNow complements that inventory with a narrower post-deployment signal: after GitHub Pages deploys successfully, the publication workflow notifies participating search engines only about canonical Learning URLs that were added, modified, or removed since the previously deployed revision. IndexNow does not replace the sitemap and does not determine whether documentation is publishable.
 
 The site publishes `deployment-revision.txt` so the next publication can compare against the revision actually represented by GitHub Pages rather than assuming the immediately preceding commit was deployed. On the first run, the workflow falls back to the push base revision. The public `indexnow-key.txt` file verifies control of the `/Learning/` URL space through IndexNow `keyLocation`; it is intentionally public protocol verification material, not a private workflow credential. IndexNow service failures are reported as non-blocking warnings after deployment.
+
+An optional, separate post-deployment publisher can announce newly eligible
+`feed: true` documents on X. It consumes the same source frontmatter as RSS but
+does not read or modify `feed.xml`. Durable receipts, canonical-URL
+reconciliation, and a deployed-revision cursor provide retryable,
+effectively-once delivery without making X availability a documentation
+deployment dependency. See the [X Publication Runbook](X_PUBLISHING.md) for the
+security boundary, setup, dry-run, retry, recovery, and disable procedures.
 
 Issues are best used for concrete repository work; Learning Discussions are better suited to exploratory architecture questions, tutorial proposals, alternatives, design debates, and community examples.
 
@@ -179,6 +190,11 @@ Current development is focused on stronger implementation references, deeper lab
 Use the [Zenodo concept DOI](https://doi.org/10.5281/zenodo.21938556) when citing the evolving Learning work as a whole.
 
 When reproducibility depends on the exact material reviewed, cite the version-specific DOI shown on that release's Zenodo record and include the corresponding Learning version or GitHub tag. [GitHub Releases](https://github.com/AsiBackbone/Learning/releases) provides the versioned repository trail.
+
+Stable GitHub Releases also attach durable, anonymously downloadable release
+notes, a scoped SPDX sample/dependency inventory, and a SHA-256 evidence
+manifest. See the [Stable Release Evidence Runbook](RELEASE.md) for scope and
+verification commands.
 
 ## License
 

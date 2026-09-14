@@ -11,6 +11,8 @@ return MetadataValidator.Run();
 static class MetadataValidator
 {
     private const int MaximumDescriptionLength = 160;
+    private const string SiteDescription = "Practical .NET architecture tutorials, labs, and reference patterns for governed execution, secure applications, AI integration, and policy-driven systems.";
+    private const string LandingPageTitle = "Governed Execution &amp; Secure .NET Architecture Tutorials | ASI Backbone Learning";
 
     private static readonly Uri SiteRoot = new("https://asibackbone.github.io/Learning/");
     private static readonly Uri FeedUri = new(SiteRoot, "feed.xml");
@@ -142,6 +144,8 @@ static class MetadataValidator
         {
             ValidateRepresentativePage(outputRoot, page, errors);
         }
+
+        ValidateLandingPage(outputRoot, errors);
 
         if (pageCount == 0)
         {
@@ -386,6 +390,13 @@ static class MetadataValidator
         string html = File.ReadAllText(path);
         ExpectCount(page.Path, "meta description", DescriptionRegex.Matches(html).Count, 1, errors);
 
+        if (!html.Contains(
+                "<a class=\"skip-link\" href=\"#main-content\">Skip to content</a>",
+                StringComparison.Ordinal))
+        {
+            errors.Add($"{page.Path}: expected a skip link targeting the main content.");
+        }
+
         MatchCollection rssLinks = RssAutodiscoveryRegex.Matches(html);
         ExpectCount(page.Path, "RSS autodiscovery link", rssLinks.Count, 1, errors);
         if (rssLinks.Count == 1)
@@ -451,6 +462,58 @@ static class MetadataValidator
         }
     }
 
+    private static void ValidateLandingPage(string outputRoot, ICollection<string> errors)
+    {
+        const string relativePath = "index.html";
+        string path = Path.Combine(outputRoot, relativePath);
+
+        if (!File.Exists(path))
+        {
+            return;
+        }
+
+        string html = File.ReadAllText(path);
+
+        if (!html.Contains($"<title>{LandingPageTitle}</title>", StringComparison.Ordinal))
+        {
+            errors.Add($"{relativePath}: landing-page title is missing or does not use the descriptive SEO title.");
+        }
+
+        if (!html.Contains("<meta name=\"docfx:defersearch\" content=\"true\">", StringComparison.Ordinal))
+        {
+            errors.Add($"{relativePath}: search-index initialization must be deferred until search is used.");
+        }
+
+        if (html.Contains("<meta name=\"docfx:tocrel\"", StringComparison.OrdinalIgnoreCase))
+        {
+            errors.Add($"{relativePath}: disabled landing-page TOC must not trigger a second toc.json request.");
+        }
+
+        int headingIndex = html.IndexOf("<h1 id=\"asi-backbone-learning\">", StringComparison.Ordinal);
+        int actionsIndex = html.IndexOf("<div class=\"home-actions\"", StringComparison.Ordinal);
+        int nextSectionIndex = headingIndex >= 0
+            ? html.IndexOf("<h2", headingIndex, StringComparison.Ordinal)
+            : -1;
+
+        if (headingIndex < 0 || actionsIndex < headingIndex ||
+            (nextSectionIndex >= 0 && actionsIndex > nextSectionIndex))
+        {
+            errors.Add($"{relativePath}: primary learning calls to action must appear directly below the landing-page heading.");
+        }
+
+        if (html.Contains("<pre><code class=\"lang-text\">", StringComparison.Ordinal))
+        {
+            errors.Add($"{relativePath}: visual learning flows must not be exposed as text code blocks.");
+        }
+
+        string runtimeScriptPath = Path.Combine(outputRoot, "public", "main.js");
+        if (!File.Exists(runtimeScriptPath) ||
+            !File.ReadAllText(runtimeScriptPath).Contains("DeferredWorker", StringComparison.Ordinal))
+        {
+            errors.Add("public/main.js: deferred search runtime was not included in the generated site.");
+        }
+    }
+
     private static void ValidateStructuredData(
         ExpectedPage page,
         JsonElement root,
@@ -483,6 +546,7 @@ static class MetadataValidator
             "alternateName",
             "Accountable Systems Infrastructure (ASI) Backbone Learning",
             errors);
+        ExpectProperty(page.Path, website, "WebSite", "description", SiteDescription, errors);
 
         ExpectProperty(page.Path, publisher, "Organization", "name", "ASI Backbone", errors);
         ExpectProperty(page.Path, publisher, "Organization", "url", "https://github.com/AsiBackbone", errors);

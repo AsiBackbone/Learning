@@ -97,8 +97,9 @@ public static class Program
         string outcome,
         string policyId,
         string policyVersion,
-        DateTimeOffset occurredUtc) =>
-        new(
+        DateTimeOffset occurredUtc)
+    {
+        return new(
             decisionId,
             operation,
             resourceId,
@@ -106,6 +107,7 @@ public static class Program
             policyId,
             policyVersion,
             occurredUtc);
+    }
 
     private static void Show(
         string title,

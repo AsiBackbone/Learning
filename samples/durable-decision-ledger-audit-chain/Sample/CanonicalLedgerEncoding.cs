@@ -75,8 +75,10 @@ public static class CanonicalLedgerEncoding
         return Convert.ToHexStringLower(digest);
     }
 
-    public static string EncodeAsUtf8Text(LedgerRecordCore record) =>
-        Encoding.UTF8.GetString(Encode(record));
+    public static string EncodeAsUtf8Text(LedgerRecordCore record)
+    {
+        return Encoding.UTF8.GetString(Encode(record));
+    }
 
     private static void ValidateCore(LedgerRecordCore record)
     {

@@ -165,9 +165,7 @@ public static class SampleComposition
             Audience: "notification-gateway");
 
         var toolRegistry = new ToolRegistry([notificationTool]);
-        var proposalValidator = new ProposalValidator();
-        var recipientDirectory = new RecipientDirectory();
-        var contextFactory = new HostPolicyContextFactory(recipientDirectory);
+        var contextFactory = new HostPolicyContextFactory();
         var policy = new NotificationPolicy();
         var acknowledgmentService = new AcknowledgmentService();
         var capabilityIssuer = new ExecutionCapabilityIssuer();
@@ -179,12 +177,6 @@ public static class SampleComposition
 
         var gateway = new GovernedAiToolGateway(
             toolRegistry,
-            proposalValidator,
-            contextFactory,
-            policy,
-            acknowledgmentService,
-            capabilityIssuer,
-            capabilityValidator,
             useStore,
             handler,
             auditSink);
@@ -234,16 +226,11 @@ public sealed record ToolDescriptor(
     string RequiredScope,
     string Audience);
 
-public sealed class ToolRegistry
+public sealed class ToolRegistry(IEnumerable<ToolDescriptor> tools)
 {
-    private readonly IReadOnlyDictionary<string, ToolDescriptor> _tools;
-
-    public ToolRegistry(IEnumerable<ToolDescriptor> tools)
-    {
-        _tools = tools.ToDictionary(
+    private readonly IReadOnlyDictionary<string, ToolDescriptor> _tools = tools.ToDictionary(
             tool => tool.Name,
             StringComparer.Ordinal);
-    }
 
     public ToolDescriptor? Find(string toolName)
     {
@@ -258,18 +245,22 @@ public sealed record ProposalValidationResult(
     string ReasonCode,
     IReadOnlyList<string> Errors)
 {
-    public static ProposalValidationResult Valid() =>
-        new(true, "proposal.valid", []);
+    public static ProposalValidationResult Valid()
+    {
+        return new(true, "proposal.valid", []);
+    }
 
     public static ProposalValidationResult Invalid(
         string reasonCode,
-        IReadOnlyList<string> errors) =>
-        new(false, reasonCode, errors);
+        IReadOnlyList<string> errors)
+    {
+        return new(false, reasonCode, errors);
+    }
 }
 
 public sealed class ProposalValidator
 {
-    public ProposalValidationResult Validate(
+    public static ProposalValidationResult Validate(
         AiToolProposal proposal,
         ToolDescriptor descriptor)
     {
@@ -311,26 +302,20 @@ public enum DestinationClassification
 
 public sealed class RecipientDirectory
 {
-    public DestinationClassification Classify(string recipient)
+    public static DestinationClassification Classify(string recipient)
     {
-        if (recipient.EndsWith(
+        return recipient.EndsWith(
                 "@example.internal",
-                StringComparison.OrdinalIgnoreCase))
-        {
-            return DestinationClassification.Internal;
-        }
-
-        if (recipient.EndsWith(
+                StringComparison.OrdinalIgnoreCase)
+            ? DestinationClassification.Internal
+            : recipient.EndsWith(
                 "@example.net",
                 StringComparison.OrdinalIgnoreCase) ||
             recipient.EndsWith(
                 "@blocked.example",
-                StringComparison.OrdinalIgnoreCase))
-        {
-            return DestinationClassification.External;
-        }
-
-        return DestinationClassification.Unknown;
+                StringComparison.OrdinalIgnoreCase)
+            ? DestinationClassification.External
+            : DestinationClassification.Unknown;
     }
 }
 
@@ -346,10 +331,9 @@ public sealed record AiToolPolicyContext(
     string PolicyVersion,
     string? SatisfiedAcknowledgmentId);
 
-public sealed class HostPolicyContextFactory(
-    RecipientDirectory recipientDirectory)
+public sealed class HostPolicyContextFactory
 {
-    public AiToolPolicyContext Create(
+    public static AiToolPolicyContext Create(
         AiToolProposal proposal,
         ToolDescriptor descriptor,
         HostActor actor,
@@ -359,7 +343,7 @@ public sealed class HostPolicyContextFactory(
         string template = proposal.Arguments["template"];
 
         DestinationClassification classification =
-            recipientDirectory.Classify(recipient);
+            RecipientDirectory.Classify(recipient);
 
         return new AiToolPolicyContext(
             Proposal: proposal,
@@ -390,34 +374,42 @@ public sealed record GovernanceDecision(
 {
     public bool CanProceed => Outcome == GovernanceDecisionOutcome.Allowed;
 
-    public static GovernanceDecision Allow() =>
-        new(
+    public static GovernanceDecision Allow()
+    {
+        return new(
             GovernanceDecisionOutcome.Allowed,
             "notification.allowed",
             "Current host policy allows the notification.");
+    }
 
     public static GovernanceDecision Deny(
         string reasonCode,
-        string reason) =>
-        new(GovernanceDecisionOutcome.Denied, reasonCode, reason);
+        string reason)
+    {
+        return new(GovernanceDecisionOutcome.Denied, reasonCode, reason);
+    }
 
     public static GovernanceDecision Defer(
         string reasonCode,
-        string reason) =>
-        new(GovernanceDecisionOutcome.Deferred, reasonCode, reason);
+        string reason)
+    {
+        return new(GovernanceDecisionOutcome.Deferred, reasonCode, reason);
+    }
 
     public static GovernanceDecision RequireAcknowledgment(
         string reasonCode,
-        string reason) =>
-        new(
+        string reason)
+    {
+        return new(
             GovernanceDecisionOutcome.AcknowledgmentRequired,
             reasonCode,
             reason);
+    }
 }
 
 public sealed class NotificationPolicy
 {
-    public GovernanceDecision Evaluate(AiToolPolicyContext context)
+    public static GovernanceDecision Evaluate(AiToolPolicyContext context)
     {
         if (context.Recipient.EndsWith(
                 "@blocked.example",
@@ -428,25 +420,19 @@ public sealed class NotificationPolicy
                 "The host blocks this destination domain.");
         }
 
-        if (context.DestinationClassification ==
-            DestinationClassification.Unknown)
-        {
-            return GovernanceDecision.Defer(
+        return context.DestinationClassification ==
+            DestinationClassification.Unknown
+            ? GovernanceDecision.Defer(
                 "notification.destination-unknown",
-                "The host cannot classify the destination.");
-        }
-
-        if (context.DestinationClassification ==
+                "The host cannot classify the destination.")
+            : context.DestinationClassification ==
                 DestinationClassification.External &&
             string.IsNullOrWhiteSpace(
-                context.SatisfiedAcknowledgmentId))
-        {
-            return GovernanceDecision.RequireAcknowledgment(
+                context.SatisfiedAcknowledgmentId)
+            ? GovernanceDecision.RequireAcknowledgment(
                 "notification.external-acknowledgment-required",
-                "External notifications require acknowledgment.");
-        }
-
-        return GovernanceDecision.Allow();
+                "External notifications require acknowledgment.")
+            : GovernanceDecision.Allow();
     }
 }
 
@@ -472,29 +458,30 @@ public sealed record AcknowledgmentValidationResult(
     string? AcknowledgmentId)
 {
     public static AcknowledgmentValidationResult Success(
-        string acknowledgmentId) =>
-        new(true, "acknowledgment.accepted", acknowledgmentId);
+        string acknowledgmentId)
+    {
+        return new(true, "acknowledgment.accepted", acknowledgmentId);
+    }
 
     public static AcknowledgmentValidationResult Failure(
-        string reasonCode) =>
-        new(false, reasonCode, null);
+        string reasonCode)
+    {
+        return new(false, reasonCode, null);
+    }
 }
 
 public sealed class AcknowledgmentService
 {
-    public AcknowledgmentChallenge CreateChallenge(
+    public static AcknowledgmentChallenge CreateChallenge(
         AiToolPolicyContext context,
         GovernanceDecision decision,
         DateTimeOffset nowUtc)
     {
-        if (decision.Outcome !=
-            GovernanceDecisionOutcome.AcknowledgmentRequired)
-        {
-            throw new InvalidOperationException(
-                "Acknowledgment challenges may only satisfy an acknowledgment-required decision.");
-        }
-
-        return new AcknowledgmentChallenge(
+        return decision.Outcome !=
+            GovernanceDecisionOutcome.AcknowledgmentRequired
+            ? throw new InvalidOperationException(
+                "Acknowledgment challenges may only satisfy an acknowledgment-required decision.")
+            : new AcknowledgmentChallenge(
             ChallengeId: $"{context.CorrelationId}-ack-{context.OperationName}-{context.Recipient}",
             ActorId: context.ActorId,
             OperationName: context.OperationName,
@@ -506,7 +493,7 @@ public sealed class AcknowledgmentService
             ExpiresUtc: nowUtc.AddMinutes(5));
     }
 
-    public AcknowledgmentValidationResult Validate(
+    public static AcknowledgmentValidationResult Validate(
         AcknowledgmentChallenge challenge,
         AcknowledgmentResponse response,
         DateTimeOffset nowUtc)
@@ -529,20 +516,14 @@ public sealed class AcknowledgmentService
                 "acknowledgment.actor-mismatch");
         }
 
-        if (response.RespondedUtc < challenge.IssuedUtc ||
-            nowUtc >= challenge.ExpiresUtc)
-        {
-            return AcknowledgmentValidationResult.Failure(
-                "acknowledgment.expired");
-        }
-
-        if (!response.Accepted)
-        {
-            return AcknowledgmentValidationResult.Failure(
-                "acknowledgment.rejected");
-        }
-
-        return AcknowledgmentValidationResult.Success(
+        return response.RespondedUtc < challenge.IssuedUtc ||
+            nowUtc >= challenge.ExpiresUtc
+            ? AcknowledgmentValidationResult.Failure(
+                "acknowledgment.expired")
+            : !response.Accepted
+            ? AcknowledgmentValidationResult.Failure(
+                "acknowledgment.rejected")
+            : AcknowledgmentValidationResult.Success(
             $"{challenge.ChallengeId}-accepted");
     }
 }
@@ -563,19 +544,16 @@ public sealed record ExecutionCapability(
 
 public sealed class ExecutionCapabilityIssuer
 {
-    public ExecutionCapability Issue(
+    public static ExecutionCapability Issue(
         AiToolPolicyContext context,
         GovernanceDecision decision,
         ToolDescriptor descriptor,
         DateTimeOffset nowUtc)
     {
-        if (!decision.CanProceed)
-        {
-            throw new InvalidOperationException(
-                "A blocked decision cannot produce execution authority.");
-        }
-
-        return new ExecutionCapability(
+        return !decision.CanProceed
+            ? throw new InvalidOperationException(
+                "A blocked decision cannot produce execution authority.")
+            : new ExecutionCapability(
             CapabilityId: $"{context.CorrelationId}-capability",
             Issuer: "learning-governance-host",
             Audience: descriptor.Audience,
@@ -597,17 +575,21 @@ public sealed record CapabilityValidationResult(
     bool IsValid,
     string ReasonCode)
 {
-    public static CapabilityValidationResult Valid() =>
-        new(true, "capability.valid");
+    public static CapabilityValidationResult Valid()
+    {
+        return new(true, "capability.valid");
+    }
 
     public static CapabilityValidationResult Invalid(
-        string reasonCode) =>
-        new(false, reasonCode);
+        string reasonCode)
+    {
+        return new(false, reasonCode);
+    }
 }
 
 public sealed class ExecutionCapabilityValidator
 {
-    public CapabilityValidationResult Validate(
+    public static CapabilityValidationResult Validate(
         ExecutionCapability capability,
         AiToolPolicyContext context,
         ToolDescriptor descriptor,
@@ -685,22 +667,16 @@ public sealed class ExecutionCapabilityValidator
                 "capability.expired");
         }
 
-        if (!string.Equals(
+        return !string.Equals(
                 capability.AcknowledgmentId,
                 context.SatisfiedAcknowledgmentId,
-                StringComparison.Ordinal))
-        {
-            return CapabilityValidationResult.Invalid(
-                "capability.acknowledgment-mismatch");
-        }
-
-        if (capability.MaximumUses != 1)
-        {
-            return CapabilityValidationResult.Invalid(
-                "capability.use-limit-invalid");
-        }
-
-        return CapabilityValidationResult.Valid();
+                StringComparison.Ordinal)
+            ? CapabilityValidationResult.Invalid(
+                "capability.acknowledgment-mismatch")
+            : capability.MaximumUses != 1
+            ? CapabilityValidationResult.Invalid(
+                "capability.use-limit-invalid")
+            : CapabilityValidationResult.Valid();
     }
 }
 
@@ -720,23 +696,19 @@ public sealed record ToolExecutionResult(
     string Recipient,
     string Template);
 
-public sealed class RecordingNotificationHandler
+public sealed class RecordingNotificationHandler(string credentialReference)
 {
-    private readonly string _credentialReference;
-
-    public RecordingNotificationHandler(string credentialReference)
-    {
-        _credentialReference = credentialReference;
-    }
-
     public int InvocationCount { get; private set; }
 
     public string? LastRecipient { get; private set; }
 
-    public string CredentialOwner =>
-        string.IsNullOrWhiteSpace(_credentialReference)
+    public string CredentialOwner
+    {
+        get =>
+        string.IsNullOrWhiteSpace(field)
             ? "none"
             : "host";
+    } = credentialReference;
 
     public Task<ToolExecutionResult> ExecuteDryRunAsync(
         AiToolPolicyContext context,
@@ -820,8 +792,9 @@ public sealed record GatewayResult(
 {
     public static GatewayResult Rejected(
         string correlationId,
-        string reasonCode) =>
-        new(
+        string reasonCode)
+    {
+        return new(
             GatewayStatus.Rejected,
             reasonCode,
             false,
@@ -829,11 +802,13 @@ public sealed record GatewayResult(
             null,
             null,
             null);
+    }
 
     public static GatewayResult Blocked(
         string correlationId,
-        GovernanceDecision decision) =>
-        new(
+        GovernanceDecision decision)
+    {
+        return new(
             GatewayStatus.Blocked,
             decision.ReasonCode,
             false,
@@ -841,12 +816,14 @@ public sealed record GatewayResult(
             decision.Outcome,
             null,
             null);
+    }
 
     public static GatewayResult Awaiting(
         string correlationId,
         GovernanceDecision decision,
-        AcknowledgmentChallenge challenge) =>
-        new(
+        AcknowledgmentChallenge challenge)
+    {
+        return new(
             GatewayStatus.AwaitingAcknowledgment,
             decision.ReasonCode,
             false,
@@ -854,12 +831,14 @@ public sealed record GatewayResult(
             decision.Outcome,
             challenge,
             null);
+    }
 
     public static GatewayResult Executable(
         string correlationId,
         GovernanceDecision decision,
-        string capabilityId) =>
-        new(
+        string capabilityId)
+    {
+        return new(
             GatewayStatus.WouldExecute,
             "execution.would-execute",
             true,
@@ -867,16 +846,11 @@ public sealed record GatewayResult(
             decision.Outcome,
             null,
             capabilityId);
+    }
 }
 
 public sealed class GovernedAiToolGateway(
     ToolRegistry toolRegistry,
-    ProposalValidator proposalValidator,
-    HostPolicyContextFactory contextFactory,
-    NotificationPolicy policy,
-    AcknowledgmentService acknowledgmentService,
-    ExecutionCapabilityIssuer capabilityIssuer,
-    ExecutionCapabilityValidator capabilityValidator,
     InMemoryCapabilityUseStore capabilityUseStore,
     RecordingNotificationHandler handler,
     InMemoryAuditSink auditSink)
@@ -911,7 +885,7 @@ public sealed class GovernedAiToolGateway(
         }
 
         ProposalValidationResult proposalValidation =
-            proposalValidator.Validate(proposal, descriptor);
+            ProposalValidator.Validate(proposal, descriptor);
 
         if (!proposalValidation.IsValid)
         {
@@ -933,7 +907,7 @@ public sealed class GovernedAiToolGateway(
             proposalValidation.ReasonCode);
 
         AiToolPolicyContext context =
-            contextFactory.Create(
+            HostPolicyContextFactory.Create(
                 proposal,
                 descriptor,
                 actor,
@@ -947,7 +921,7 @@ public sealed class GovernedAiToolGateway(
             context.PolicyVersion);
 
         GovernanceDecision decision =
-            policy.Evaluate(context);
+            NotificationPolicy.Evaluate(context);
 
         auditSink.Write(
             context.CorrelationId,
@@ -969,7 +943,7 @@ public sealed class GovernedAiToolGateway(
             GovernanceDecisionOutcome.AcknowledgmentRequired)
         {
             AcknowledgmentChallenge challenge =
-                acknowledgmentService.CreateChallenge(
+                AcknowledgmentService.CreateChallenge(
                     context,
                     decision,
                     nowUtc);
@@ -989,7 +963,7 @@ public sealed class GovernedAiToolGateway(
             }
 
             AcknowledgmentValidationResult acknowledgment =
-                acknowledgmentService.Validate(
+                AcknowledgmentService.Validate(
                     challenge,
                     acknowledgmentResponse,
                     nowUtc);
@@ -1014,7 +988,7 @@ public sealed class GovernedAiToolGateway(
                     acknowledgment.AcknowledgmentId
             };
 
-            decision = policy.Evaluate(context);
+            decision = NotificationPolicy.Evaluate(context);
 
             auditSink.Write(
                 context.CorrelationId,
@@ -1032,7 +1006,7 @@ public sealed class GovernedAiToolGateway(
         }
 
         ExecutionCapability capability =
-            capabilityIssuer.Issue(
+            ExecutionCapabilityIssuer.Issue(
                 context,
                 decision,
                 descriptor,
@@ -1045,7 +1019,7 @@ public sealed class GovernedAiToolGateway(
             "capability.issued");
 
         CapabilityValidationResult capabilityValidation =
-            capabilityValidator.Validate(
+            ExecutionCapabilityValidator.Validate(
                 capability,
                 context,
                 descriptor,

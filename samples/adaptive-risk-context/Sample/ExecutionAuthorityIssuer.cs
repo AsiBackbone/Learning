@@ -2,7 +2,7 @@ namespace AdaptiveRiskContext;
 
 public sealed class ExecutionAuthorityIssuer
 {
-    public AuthorityIssueResult TryIssue(
+    public static AuthorityIssueResult TryIssue(
         GovernanceDecision decision,
         RiskGovernancePolicy policy,
         DateTimeOffset nowUtc,

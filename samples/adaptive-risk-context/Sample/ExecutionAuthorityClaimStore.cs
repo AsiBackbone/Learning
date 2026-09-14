@@ -10,7 +10,7 @@ public interface IExecutionAuthorityClaimStore
 public sealed class InMemoryExecutionAuthorityClaimStore
     : IExecutionAuthorityClaimStore
 {
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
     private readonly HashSet<string> _claimedAuthorityIds =
         new(StringComparer.Ordinal);
 

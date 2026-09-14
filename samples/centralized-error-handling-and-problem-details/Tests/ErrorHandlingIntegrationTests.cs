@@ -2,8 +2,8 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using CentralizedErrorHandlingAndProblemDetails;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
@@ -13,6 +13,26 @@ namespace CentralizedErrorHandlingAndProblemDetails.Tests;
 
 public sealed class ErrorHandlingIntegrationTests
 {
+    private static readonly JsonSerializerOptions _jsonOptions =
+        new(JsonSerializerDefaults.Web);
+
+    [Fact]
+    public async Task Allowed_governance_decision_returns_no_content_without_exception_handler_log()
+    {
+        await using TestApplication application =
+            await TestApplication.StartAsync(TestContext.Current.CancellationToken);
+
+        HttpResponseMessage response = await application.Client.GetAsync(
+            "/governance/allowed",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Empty(await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken));
+        Assert.DoesNotContain(
+            application.LogProvider.Entries,
+            entry => entry.CategoryName == typeof(ApplicationExceptionHandler).FullName);
+    }
+
     [Fact]
     public async Task Denied_governance_decision_is_explicit_403_without_exception_handler_log()
     {
@@ -61,6 +81,88 @@ public sealed class ErrorHandlingIntegrationTests
             application.LogProvider.Entries,
             entry => entry.CategoryName ==
                 typeof(ApplicationExceptionHandler).FullName);
+    }
+
+    [Fact]
+    public async Task Acknowledgment_required_decision_maps_to_explicit_409_problem()
+    {
+        await using TestApplication application =
+            await TestApplication.StartAsync(TestContext.Current.CancellationToken);
+
+        HttpResponseMessage response = await application.Client.GetAsync(
+            "/governance/acknowledgment-required",
+            TestContext.Current.CancellationToken);
+        ProblemDetails problem = await ReadProblemAsync(
+            response,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        Assert.Equal("Acknowledgment Required", problem.Title);
+        Assert.Equal("/problems/acknowledgment-required", problem.Type);
+        Assert.Equal("/governance/acknowledgment-required", problem.Instance);
+        Assert.Equal(
+            "governance.acknowledgment-required",
+            GetExtensionString(problem, "code"));
+    }
+
+    [Fact]
+    public async Task Escalation_recommended_decision_maps_to_distinct_409_problem()
+    {
+        await using TestApplication application =
+            await TestApplication.StartAsync(TestContext.Current.CancellationToken);
+
+        HttpResponseMessage response = await application.Client.GetAsync(
+            "/governance/escalation-recommended",
+            TestContext.Current.CancellationToken);
+        ProblemDetails problem = await ReadProblemAsync(
+            response,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        Assert.Equal("Escalation Recommended", problem.Title);
+        Assert.Equal("/problems/escalation-recommended", problem.Type);
+        Assert.Equal(
+            "governance.escalation-recommended",
+            GetExtensionString(problem, "code"));
+    }
+
+    [Fact]
+    public async Task Unknown_governance_scenario_remains_a_not_found_problem()
+    {
+        await using TestApplication application =
+            await TestApplication.StartAsync(TestContext.Current.CancellationToken);
+
+        HttpResponseMessage response = await application.Client.GetAsync(
+            "/governance/not-a-scenario",
+            TestContext.Current.CancellationToken);
+        ProblemDetails problem = await ReadProblemAsync(
+            response,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Equal(StatusCodes.Status404NotFound, problem.Status);
+        Assert.DoesNotContain(
+            application.LogProvider.Entries,
+            entry => entry.CategoryName == typeof(ApplicationExceptionHandler).FullName);
+    }
+
+    [Fact]
+    public void Empty_governance_scenario_is_rejected_as_invalid_input()
+    {
+        Assert.Throws<ArgumentException>(
+            () => GovernanceDecision.TryFromScenario("   ", out _));
+    }
+
+    [Fact]
+    public void Governance_scenario_matching_is_case_insensitive()
+    {
+        bool found = GovernanceDecision.TryFromScenario(
+            "DeNiEd",
+            out GovernanceDecision decision);
+
+        Assert.True(found);
+        Assert.Equal(GovernanceDecisionOutcome.Denied, decision.Outcome);
+        Assert.Equal("governance.denied", decision.Code);
     }
 
     [Fact]
@@ -190,7 +292,7 @@ public sealed class ErrorHandlingIntegrationTests
         ProblemDetails? parsed =
             JsonSerializer.Deserialize<ProblemDetails>(
                 body,
-                new JsonSerializerOptions(JsonSerializerDefaults.Web));
+                _jsonOptions);
 
         return Assert.IsType<ProblemDetails>(parsed);
     }
@@ -205,7 +307,7 @@ public sealed class ErrorHandlingIntegrationTests
         string? value = element.GetString();
 
         Assert.False(string.IsNullOrWhiteSpace(value));
-        return value!;
+        return value;
     }
 }
 
@@ -259,16 +361,16 @@ internal sealed class TestApplication : IAsyncDisposable
 
 internal sealed class CapturingLoggerProvider : ILoggerProvider
 {
-    private readonly ConcurrentQueue<CapturedLogEntry> entries = new();
+    private readonly ConcurrentQueue<CapturedLogEntry> _entries = new();
 
     public IReadOnlyCollection<CapturedLogEntry> Entries =>
-        entries.ToArray();
+        _entries.ToArray();
 
     public ILogger CreateLogger(string categoryName)
     {
         return new CapturingLogger(
             categoryName,
-            entries);
+            _entries);
     }
 
     public void Dispose()

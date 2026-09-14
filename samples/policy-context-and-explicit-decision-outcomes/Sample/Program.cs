@@ -101,7 +101,7 @@ Console.WriteLine();
 
 foreach (PolicyScenario scenario in scenarios)
 {
-    GovernanceDecision decision = policy.Evaluate(scenario.Context);
+    GovernanceDecision decision = DisableAccountPolicy.Evaluate(scenario.Context);
 
     VerifyScenario(scenario, decision);
 
@@ -161,9 +161,7 @@ static void VerifyScenario(
             $"Scenario '{scenario.Name}' expected {scenario.ExpectedOutcome} but received {decision.Outcome}.");
     }
 
-    string[] reasonCodes = decision.Reasons
-        .Select(reason => reason.Code)
-        .ToArray();
+    string[] reasonCodes = [.. decision.Reasons.Select(reason => reason.Code)];
 
     if (scenario.ExpectedReasonCode is null)
     {
@@ -250,50 +248,62 @@ public sealed record GovernanceDecision(
         Outcome is GovernanceDecisionOutcome.Allowed
             or GovernanceDecisionOutcome.Warning;
 
-    public static GovernanceDecision Allow() =>
-        new(
+    public static GovernanceDecision Allow()
+    {
+        return new(
             GovernanceDecisionOutcome.Allowed,
             []);
+    }
 
     public static GovernanceDecision Warning(
         string code,
-        string message) =>
-        new(
+        string message)
+    {
+        return new(
             GovernanceDecisionOutcome.Warning,
             [new DecisionReason(code, message)]);
+    }
 
     public static GovernanceDecision Deny(
         string code,
-        string message) =>
-        new(
+        string message)
+    {
+        return new(
             GovernanceDecisionOutcome.Denied,
             [new DecisionReason(code, message)]);
+    }
 
     public static GovernanceDecision Defer(
         string code,
-        string message) =>
-        new(
+        string message)
+    {
+        return new(
             GovernanceDecisionOutcome.Deferred,
             [new DecisionReason(code, message)]);
+    }
 
     public static GovernanceDecision RequireAcknowledgment(
         string code,
-        string message) =>
-        new(
+        string message)
+    {
+        return new(
             GovernanceDecisionOutcome.AcknowledgmentRequired,
             [new DecisionReason(code, message)]);
+    }
 
     public static GovernanceDecision Escalate(
         string code,
-        string message) =>
-        new(
+        string message)
+    {
+        return new(
             GovernanceDecisionOutcome.EscalationRecommended,
             [new DecisionReason(code, message)]);
+    }
 }
 
 public sealed class DisableAccountPolicy
 {
-    public GovernanceDecision Evaluate(
+    public static GovernanceDecision Evaluate(
         DisableAccountPolicyContext context)
     {
         if (!context.Actor.IsAdministrator)
@@ -327,21 +337,15 @@ public sealed class DisableAccountPolicy
                 "Protected accounts require escalation.");
         }
 
-        if (context.Environment.MaintenanceHoldActive)
-        {
-            return GovernanceDecision.Defer(
+        return context.Environment.MaintenanceHoldActive
+            ? GovernanceDecision.Defer(
                 "account.disable.maintenance-hold",
-                "Account changes are temporarily deferred.");
-        }
-
-        if (string.IsNullOrWhiteSpace(
-                context.Intent.Reason))
-        {
-            return GovernanceDecision.RequireAcknowledgment(
+                "Account changes are temporarily deferred.")
+            : string.IsNullOrWhiteSpace(
+                context.Intent.Reason)
+            ? GovernanceDecision.RequireAcknowledgment(
                 "account.disable.reason-required",
-                "A reason must be supplied and acknowledged.");
-        }
-
-        return GovernanceDecision.Allow();
+                "A reason must be supplied and acknowledged.")
+            : GovernanceDecision.Allow();
     }
 }

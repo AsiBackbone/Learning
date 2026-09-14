@@ -110,8 +110,9 @@ static SimulationScenario CreateScenario(
     string tenantId,
     RiskLevel risk,
     EnvironmentState environment,
-    string policyVersion) =>
-    new(
+    string policyVersion)
+{
+    return new(
         ScenarioId: scenarioId,
         ActorId: "analyst-7",
         ResourceId: "customer-batch-42",
@@ -121,6 +122,7 @@ static SimulationScenario CreateScenario(
         Risk: risk,
         Environment: environment,
         PolicyVersion: policyVersion);
+}
 
 static void PrintComparison(
     SimulationReport report,
@@ -175,18 +177,13 @@ public sealed record PolicyDefinition(
     IReadOnlySet<string> EscalationTenants,
     bool RequireAcknowledgmentForMediumRisk);
 
-public sealed class PolicyCatalog
+public sealed class PolicyCatalog(IEnumerable<PolicyDefinition> definitions)
 {
     public const string DefaultPolicyId = "customer-export";
 
-    private readonly IReadOnlyDictionary<string, PolicyDefinition> _definitions;
-
-    public PolicyCatalog(IEnumerable<PolicyDefinition> definitions)
-    {
-        _definitions = definitions.ToDictionary(
+    private readonly IReadOnlyDictionary<string, PolicyDefinition> _definitions = definitions.ToDictionary(
             definition => definition.PolicyVersion,
             StringComparer.Ordinal);
-    }
 
     public PolicyDefinition? Resolve(string policyVersion)
     {
@@ -197,8 +194,9 @@ public sealed class PolicyCatalog
             : null;
     }
 
-    public static PolicyCatalog CreateDefault() =>
-        new(
+    public static PolicyCatalog CreateDefault()
+    {
+        return new(
         [
             new PolicyDefinition(
                 PolicyId: DefaultPolicyId,
@@ -221,6 +219,7 @@ public sealed class PolicyCatalog
                     StringComparer.Ordinal),
                 RequireAcknowledgmentForMediumRisk: true)
         ]);
+    }
 }
 
 public sealed record ConstraintObservation(
@@ -240,24 +239,19 @@ public sealed record SimulationResult(
 public sealed record SimulationReport(
     IReadOnlyList<SimulationResult> Results)
 {
-    public SimulationResult Get(string scenarioId) =>
-        Results.Single(
+    public SimulationResult Get(string scenarioId)
+    {
+        return Results.Single(
             result => string.Equals(
                 result.ScenarioId,
                 scenarioId,
                 StringComparison.Ordinal));
+    }
 }
 
-public sealed class PolicySimulationHarness
+public sealed class PolicySimulationHarness(PolicyCatalog catalog)
 {
-    private readonly PolicyCatalog _catalog;
-    private readonly PolicyConstraintEvaluator _evaluator = new();
-    private readonly PolicyDecisionComposer _composer = new();
-
-    public PolicySimulationHarness(PolicyCatalog catalog)
-    {
-        _catalog = catalog;
-    }
+    private readonly PolicyCatalog _catalog = catalog;
 
     public SimulationReport Simulate(
         IEnumerable<SimulationScenario> scenarios)
@@ -291,10 +285,10 @@ public sealed class PolicySimulationHarness
             }
 
             IReadOnlyList<ConstraintObservation> observations =
-                _evaluator.Evaluate(scenario, definition);
+                PolicyConstraintEvaluator.Evaluate(scenario, definition);
 
             ConstraintObservation winner =
-                _composer.Compose(observations);
+                PolicyDecisionComposer.Compose(observations);
 
             results.Add(
                 new SimulationResult(
@@ -313,7 +307,7 @@ public sealed class PolicySimulationHarness
 
 public sealed class PolicyConstraintEvaluator
 {
-    public IReadOnlyList<ConstraintObservation> Evaluate(
+    public static IReadOnlyList<ConstraintObservation> Evaluate(
         SimulationScenario scenario,
         PolicyDefinition policy)
     {
@@ -392,7 +386,7 @@ public sealed class PolicyConstraintEvaluator
 
 public sealed class PolicyDecisionComposer
 {
-    private static readonly IReadOnlyDictionary<DecisionOutcome, int> Precedence =
+    private static readonly IReadOnlyDictionary<DecisionOutcome, int> _precedence =
         new Dictionary<DecisionOutcome, int>
         {
             [DecisionOutcome.Allowed] = 100,
@@ -402,19 +396,16 @@ public sealed class PolicyDecisionComposer
             [DecisionOutcome.Denied] = 500
         };
 
-    public ConstraintObservation Compose(
+    public static ConstraintObservation Compose(
         IReadOnlyList<ConstraintObservation> observations)
     {
-        if (observations.Count == 0)
-        {
-            throw new ArgumentException(
+        return observations.Count == 0
+            ? throw new ArgumentException(
                 "At least one constraint observation is required.",
-                nameof(observations));
-        }
-
-        return observations
+                nameof(observations))
+            : observations
             .OrderByDescending(
-                observation => Precedence[observation.Outcome])
+                observation => _precedence[observation.Outcome])
             .ThenBy(
                 observation => observation.ConstraintId,
                 StringComparer.Ordinal)

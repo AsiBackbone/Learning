@@ -20,12 +20,12 @@ public static class GovernanceObservabilityInstrumentation
     public const string CorrelationIdTagName =
         "governance.correlation_id";
 
-    private static readonly ActivitySource Source =
+    private static readonly ActivitySource _source =
         new(ActivitySourceName, "1.0.0");
 
     public static Activity? StartWorkflow(string correlationId)
     {
-        Activity? activity = Source.StartActivity(
+        Activity? activity = _source.StartActivity(
             "ai.governance.workflow",
             ActivityKind.Internal);
 
@@ -41,7 +41,7 @@ public static class GovernanceObservabilityInstrumentation
         string correlationId,
         string? proposalId = null)
     {
-        Activity? activity = Source.StartActivity(
+        Activity? activity = _source.StartActivity(
             name,
             ActivityKind.Internal);
 
@@ -85,7 +85,7 @@ public static class GovernanceObservabilityInstrumentation
 
 public sealed class GovernanceTraceCollector : IDisposable
 {
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
     private readonly List<GovernanceObservedActivity> _activities = [];
     private readonly string _correlationId;
     private readonly ActivityListener _listener;
@@ -108,10 +108,10 @@ public sealed class GovernanceTraceCollector : IDisposable
                 GovernanceObservabilityInstrumentation.ActivitySourceName,
                 StringComparison.Ordinal),
             Sample = static (
-                ref ActivityCreationOptions<ActivityContext> _) =>
+                ref _) =>
                 ActivitySamplingResult.AllDataAndRecorded,
             SampleUsingParentId = static (
-                ref ActivityCreationOptions<string> _) =>
+                ref _) =>
                 ActivitySamplingResult.AllDataAndRecorded,
             ActivityStopped = activity =>
             {
@@ -125,21 +125,20 @@ public sealed class GovernanceTraceCollector : IDisposable
                     return;
                 }
 
-                Dictionary<string, string> tags = activity.TagObjects
+                var tags = activity.TagObjects
                     .ToDictionary(
                         item => item.Key,
                         item => item.Value?.ToString() ?? string.Empty,
                         StringComparer.Ordinal);
 
-                GovernanceObservedEvent[] events = activity.Events
+                GovernanceObservedEvent[] events = [.. activity.Events
                     .Select(item =>
                         new GovernanceObservedEvent(
                             Name: item.Name,
                             Tags: item.Tags.ToDictionary(
                                 tag => tag.Key,
                                 tag => tag.Value?.ToString() ?? string.Empty,
-                                StringComparer.Ordinal)))
-                    .ToArray();
+                                StringComparer.Ordinal)))];
 
                 lock (_sync)
                 {
@@ -181,10 +180,10 @@ public enum GovernanceObservabilityScenario
 
 public sealed class GovernanceObservabilityFakeModel
 {
-    private const string ModelId =
+    private const string _modelId =
         "deterministic-observability-model-v1";
 
-    public AiToolProposal Propose(
+    public static AiToolProposal Propose(
         string correlationId,
         GovernanceObservabilityScenario scenario)
     {
@@ -197,7 +196,7 @@ public sealed class GovernanceObservabilityFakeModel
                 correlationId,
                 proposalId);
 
-        inference?.SetTag("ai.model.id", ModelId);
+        inference?.SetTag("ai.model.id", _modelId);
         inference?.SetTag("tool.name", "notification.send");
 
         string recipient = scenario switch
@@ -216,7 +215,7 @@ public sealed class GovernanceObservabilityFakeModel
 
         return new AiToolProposal(
             ProposalId: proposalId,
-            ModelId: ModelId,
+            ModelId: _modelId,
             ToolName: "notification.send",
             Arguments: new Dictionary<string, string>(StringComparer.Ordinal)
             {
@@ -238,7 +237,7 @@ public sealed record GovernanceObservabilityRun(
 
 public static class GovernanceObservabilityRunner
 {
-    private static readonly DateTimeOffset NowUtc =
+    private static readonly DateTimeOffset _nowUtc =
         new(2026, 8, 22, 18, 0, 0, TimeSpan.Zero);
 
     public static async Task<GovernanceObservabilityRun> RunAsync(
@@ -256,7 +255,7 @@ public static class GovernanceObservabilityRunner
                GovernanceObservabilityInstrumentation.StartWorkflow(
                    correlationId))
         {
-            proposal = model.Propose(correlationId, scenario);
+            proposal = GovernanceObservabilityFakeModel.Propose(correlationId, scenario);
 
             workflow?.SetTag(
                 "ai.proposal.id",
@@ -272,7 +271,7 @@ public static class GovernanceObservabilityRunner
                 host,
                 proposal,
                 correlationId,
-                NowUtc,
+                _nowUtc,
                 acknowledgmentResponse: null);
 
             if (scenario ==
@@ -301,12 +300,12 @@ public static class GovernanceObservabilityRunner
                     host,
                     proposal,
                     correlationId,
-                    NowUtc.AddSeconds(5),
+                    _nowUtc.AddSeconds(5),
                     new AcknowledgmentResponse(
                         ChallengeId: challenge.ChallengeId,
                         ActorId: "operator-7",
                         Accepted: true,
-                        RespondedUtc: NowUtc.AddSeconds(5)));
+                        RespondedUtc: _nowUtc.AddSeconds(5)));
             }
 
             workflow?.SetTag(
@@ -320,12 +319,11 @@ public static class GovernanceObservabilityRunner
                 host.Handler.InvocationCount);
         }
 
-        AuditResidue[] auditEntries = host.AuditSink.Entries
+        AuditResidue[] auditEntries = [.. host.AuditSink.Entries
             .Where(entry => string.Equals(
                 entry.CorrelationId,
                 correlationId,
-                StringComparison.Ordinal))
-            .ToArray();
+                StringComparison.Ordinal))];
 
         return new GovernanceObservabilityRun(
             CorrelationId: correlationId,

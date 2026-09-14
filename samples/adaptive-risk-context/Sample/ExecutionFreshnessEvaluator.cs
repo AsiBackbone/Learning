@@ -2,7 +2,7 @@ namespace AdaptiveRiskContext;
 
 public sealed class ExecutionFreshnessEvaluator
 {
-    public FreshnessAssessment Evaluate(
+    public static FreshnessAssessment Evaluate(
         ExecutionAuthority authority,
         PaymentContext currentContext,
         RiskSignalInput currentRisk,
@@ -206,27 +206,20 @@ public sealed class ExecutionFreshnessEvaluator
                 return Reevaluate("risk.scoring-method-drift");
             }
 
-            if (!string.Equals(
+            return !string.Equals(
                     authority.CalibrationVersion,
                     observation.CalibrationVersion,
-                    StringComparison.Ordinal))
-            {
-                return Reevaluate("risk.calibration-drift");
-            }
-
-            if (authority.ModelHealth != observation.ModelHealth)
-            {
-                return Reevaluate("risk.model-health-drift");
-            }
-
-            return Reevaluate("risk.observation-drift");
+                    StringComparison.Ordinal)
+                ? Reevaluate("risk.calibration-drift")
+                : authority.ModelHealth != observation.ModelHealth
+                ? Reevaluate("risk.model-health-drift")
+                : Reevaluate("risk.observation-drift");
         }
 
         // Staleness applies only after identity/integrity and policy-acceptance
         // checks establish what current observation is actually being evaluated.
-        if (RiskFreshnessRules.IsStale(observation, currentPolicy, nowUtc))
-        {
-            return currentPolicy.StaleSignalDisposition switch
+        return RiskFreshnessRules.IsStale(observation, currentPolicy, nowUtc)
+            ? currentPolicy.StaleSignalDisposition switch
             {
                 StaleSignalDisposition.Reevaluate =>
                     Reevaluate("risk.signal-stale"),
@@ -236,20 +229,24 @@ public sealed class ExecutionFreshnessEvaluator
                     nameof(currentPolicy),
                     currentPolicy.StaleSignalDisposition,
                     "Unknown stale-signal disposition.")
-            };
-        }
-
-        return new FreshnessAssessment(
+            }
+            : new FreshnessAssessment(
             FreshnessAction.Proceed,
             "freshness.current");
     }
 
-    private static FreshnessAssessment Reevaluate(string reasonCode) =>
-        new(FreshnessAction.Reevaluate, reasonCode);
+    private static FreshnessAssessment Reevaluate(string reasonCode)
+    {
+        return new(FreshnessAction.Reevaluate, reasonCode);
+    }
 
-    private static FreshnessAssessment Defer(string reasonCode) =>
-        new(FreshnessAction.Defer, reasonCode);
+    private static FreshnessAssessment Defer(string reasonCode)
+    {
+        return new(FreshnessAction.Defer, reasonCode);
+    }
 
-    private static FreshnessAssessment Reject(string reasonCode) =>
-        new(FreshnessAction.Reject, reasonCode);
+    private static FreshnessAssessment Reject(string reasonCode)
+    {
+        return new(FreshnessAction.Reject, reasonCode);
+    }
 }

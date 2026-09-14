@@ -153,19 +153,13 @@ public sealed class CrossSystemCapabilityValidator(
                 "lifetime.expired");
         }
 
-        if (revocationStore.IsRevoked(capability.CapabilityId))
-        {
-            return CapabilityValidationResult.Reject(
-                "capability.revoked");
-        }
-
-        if (!context.LocalPolicyAllows)
-        {
-            return CapabilityValidationResult.Reject(
-                "recipient-policy.denied");
-        }
-
-        return CapabilityValidationResult.Accept();
+        return revocationStore.IsRevoked(capability.CapabilityId)
+            ? CapabilityValidationResult.Reject(
+                "capability.revoked")
+            : !context.LocalPolicyAllows
+            ? CapabilityValidationResult.Reject(
+                "recipient-policy.denied")
+            : CapabilityValidationResult.Accept();
     }
 
     private static CapabilityValidationResult ValidateDelegationChain(
@@ -233,13 +227,10 @@ public sealed class CrossSystemCapabilityValidator(
             }
         }
 
-        if (last.RemainingDelegationDepth !=
-            capability.RemainingDelegationDepth)
-        {
-            return CapabilityValidationResult.Reject(
-                "delegation.depth-mismatch");
-        }
-
-        return CapabilityValidationResult.Accept();
+        return last.RemainingDelegationDepth !=
+            capability.RemainingDelegationDepth
+            ? CapabilityValidationResult.Reject(
+                "delegation.depth-mismatch")
+            : CapabilityValidationResult.Accept();
     }
 }

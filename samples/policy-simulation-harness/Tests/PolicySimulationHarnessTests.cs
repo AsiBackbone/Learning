@@ -1,3 +1,4 @@
+using System.Reflection;
 using Xunit;
 
 namespace PolicySimulationHarnessSample.Tests;
@@ -207,13 +208,13 @@ public sealed class PolicySimulationHarnessTests
                     "executor",
                     StringComparison.OrdinalIgnoreCase) ?? false));
 
-        var simulateMethod =
+        MethodInfo? simulateMethod =
             typeof(PolicySimulationHarness).GetMethod(
                 nameof(PolicySimulationHarness.Simulate));
 
         Assert.NotNull(simulateMethod);
         Assert.DoesNotContain(
-            simulateMethod!.GetParameters(),
+            simulateMethod.GetParameters(),
             parameter =>
                 parameter.ParameterType.Name.Contains(
                     "Executor",
@@ -240,18 +241,15 @@ public sealed class PolicySimulationHarnessTests
         SimulationReport first = harness.Simulate(scenarios);
         SimulationReport second = harness.Simulate(scenarios);
 
-        string[] firstProjection = first.Results
-            .Select(Project)
-            .ToArray();
-        string[] secondProjection = second.Results
-            .Select(Project)
-            .ToArray();
+        string[] firstProjection = [.. first.Results.Select(Project)];
+        string[] secondProjection = [.. second.Results.Select(Project)];
 
         Assert.Equal(firstProjection, secondProjection);
     }
 
-    private static string Project(SimulationResult result) =>
-        string.Join(
+    private static string Project(SimulationResult result)
+    {
+        return string.Join(
             "|",
             result.ScenarioId,
             result.Decision,
@@ -262,9 +260,12 @@ public sealed class PolicySimulationHarnessTests
                 ",",
                 result.ConstraintEvidence.Select(
                     item => item.ConstraintId)));
+    }
 
-    private static PolicySimulationHarness CreateHarness() =>
-        new(PolicyCatalog.CreateDefault());
+    private static PolicySimulationHarness CreateHarness()
+    {
+        return new(PolicyCatalog.CreateDefault());
+    }
 
     private static SimulationScenario CreateScenario(
         string scenarioId,
@@ -272,8 +273,9 @@ public sealed class PolicySimulationHarnessTests
         string tenantId = "tenant-a",
         RiskLevel risk = RiskLevel.Low,
         EnvironmentState environment = EnvironmentState.Normal,
-        string policyVersion = "1.0") =>
-        new(
+        string policyVersion = "1.0")
+    {
+        return new(
             ScenarioId: scenarioId,
             ActorId: "analyst-7",
             ResourceId: "customer-batch-42",
@@ -283,4 +285,5 @@ public sealed class PolicySimulationHarnessTests
             Risk: risk,
             Environment: environment,
             PolicyVersion: policyVersion);
+    }
 }

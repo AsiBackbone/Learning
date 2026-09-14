@@ -19,6 +19,7 @@ on:
       - 'tools/generate-feed.cs'
       - 'tools/generate-sitemap.cs'
       - 'tools/prepare-indexnow.cs'
+      - 'tools/publish-x.cs'
       - 'tools/validate-doc-metadata.cs'
       - 'tools/validate-docfx-template-baseline.cs'
       - '.config/dotnet-tools.json'
@@ -87,6 +88,9 @@ jobs:
 
       - name: Validate RSS feed generator contract
         run: dotnet run --file tools/generate-feed.cs -- --self-test
+
+      - name: Validate X publisher contract without credentials
+        run: dotnet run --file tools/publish-x.cs -- --self-test
 
       - name: Generate RSS feed
         run: dotnet run --file tools/generate-feed.cs

@@ -3,7 +3,7 @@ namespace DistributedAcknowledgmentContinuation;
 public sealed class InMemoryAcknowledgmentChallengeStore
     : IAcknowledgmentChallengeStore
 {
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
     private readonly Dictionary<string, AcknowledgmentChallenge> _challenges =
         new(StringComparer.Ordinal);
 
@@ -31,7 +31,7 @@ public sealed class InMemoryAcknowledgmentChallengeStore
 public sealed class InMemoryContinuationStateStore
     : IContinuationStateStore
 {
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
     private readonly Dictionary<string, ContinuationState> _states =
         new(StringComparer.Ordinal);
 
@@ -59,7 +59,7 @@ public sealed class InMemoryContinuationStateStore
 public sealed class InMemoryContinuationClaimStore
     : IContinuationClaimStore
 {
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
     private readonly Dictionary<string, string> _evidenceByChallenge =
         new(StringComparer.Ordinal);
 
