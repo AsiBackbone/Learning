@@ -4,19 +4,45 @@ description: Understand Learning's problem-first model, the roles of tutorials, 
 
 # Learning Model
 
-ASI Backbone Learning is designed as a living architecture-learning resource rather than a product manual or a framework adoption funnel.
+ASI Backbone Learning is a living architecture-learning resource, not a product manual or framework adoption funnel.
 
-The guiding principle is:
+Its purpose is to help a reader understand an architectural boundary, observe it in a small implementation, verify the claimed invariant, challenge the design, and adapt only what is useful.
 
 > **Read it. Run it. Question it. Improve it.**
 
-A reader should be able to study an architectural boundary, observe it in a small implementation, test the claimed invariant, challenge the design, and adapt the useful parts without adopting an entire framework.
-
 You do not need to install an `AsiBackbone` package to use this material.
+
+## The Model at a Glance
+
+| Stage | Purpose | Reader question |
+| --- | --- | --- |
+| **Problem** | Establish the architectural need before discussing implementation | What boundary or failure mode actually exists? |
+| **Tutorial** | Explain the reasoning, pattern, tradeoffs, and alternatives | Why might this pattern help? |
+| **Sample** | Make the boundary observable in a small implementation | What does the pattern look like when it runs? |
+| **Test** | Turn the architectural claim into a repeatable contract | Can I verify the invariant independently? |
+| **Lab** | Require the learner to modify, critique, repair, or extend the design | Do I understand the tradeoff well enough to make a decision? |
+| **Comparison** | Evaluate simpler and alternative approaches | Is this still the smallest architecture that preserves the boundary? |
+| **Working repository** | Inspect fuller implementation context when useful | How is the pattern realized in a larger system? |
+
+The sequence is intentionally evidence-driven:
+
+```text
+Understand the problem
+        ↓
+Observe the boundary
+        ↓
+Verify the invariant
+        ↓
+Experiment with the design
+        ↓
+Compare alternatives
+        ↓
+Inspect fuller implementations when useful
+```
 
 ## Problem First, Product Second
 
-Where practical, tutorials follow a common progression:
+Where practical, tutorials follow this progression:
 
 ```text
 Problem
@@ -36,9 +62,9 @@ Working repository example
 
 The order matters.
 
-The architectural problem should be understandable before a reader is asked to care about a particular implementation. A tutorial should remain useful even when the reader decides that a simpler design, a framework-native feature, or a different architecture is a better fit.
+The architectural problem should be understandable before a reader is asked to care about a particular implementation. A tutorial should remain useful even when the reader concludes that a simpler design, a framework-native feature, or a different architecture is the better fit.
 
-This is why Learning favors questions such as:
+Learning therefore favors questions such as:
 
 - What boundary is missing?
 - What failure becomes possible when responsibilities are combined?
@@ -46,11 +72,11 @@ This is why Learning favors questions such as:
 - What is the smallest architecture that preserves the boundary we need?
 - What tradeoff are we accepting by adding another policy, acknowledgment, capability, or gateway step?
 
-Working repositories are then used as architectural specimens rather than as unquestioned templates.
+Working repositories are architectural specimens, not unquestioned templates.
 
-## Tutorial, Sample, Test, Lab
+## Tutorial → Sample → Test → Lab
 
-The foundational learning path uses four complementary forms:
+The foundational path uses four complementary forms:
 
 ```text
 Tutorial
@@ -62,11 +88,11 @@ Architectural Invariant Tests
 Hands-On Lab
 ```
 
-Each form has a different job.
+Each form has one primary job.
 
 ### Tutorials Explain
 
-Tutorials introduce an architectural problem and walk through one or more ways to reason about it.
+Tutorials introduce an architectural problem and show one or more ways to reason about it.
 
 They should emphasize:
 
@@ -76,17 +102,15 @@ They should emphasize:
 - the architectural pattern being examined,
 - a minimal teaching example,
 - tradeoffs and alternatives,
-- and links to fuller working examples when useful.
+- and fuller working examples when useful.
 
-A tutorial is not a claim that every application requires the demonstrated pattern.
+A tutorial explains a pattern. It does not claim that every application requires it.
 
 ### Samples Demonstrate
 
 Runnable samples make the architectural boundary observable without requiring the reader to extract it from a large application.
 
-A good teaching sample should be intentionally small, deterministic where practical, and focused on the behavior under examination.
-
-For example:
+A good teaching sample is intentionally small, deterministic where practical, and focused on the behavior under examination.
 
 ```text
 Denied decision
@@ -94,7 +118,7 @@ Denied decision
 Executor invocation count = 0
 ```
 
-The sample exists to make the boundary visible, not to serve as a production framework.
+The sample exists to expose the boundary, not to serve as a production framework.
 
 ### Tests Verify
 
@@ -116,11 +140,11 @@ Proposal rejected
 No execution
 ```
 
-When a tutorial says that a boundary exists, the companion test should make that boundary difficult to misunderstand.
+When a tutorial says a boundary exists, the companion test should make that claim difficult to misunderstand.
 
 ### Labs Make You Decide
 
-Labs move from explanation to active reasoning.
+Labs move from explanation to active architectural judgment.
 
 A lab may provide:
 
@@ -128,42 +152,35 @@ A lab may provide:
 - a broken or incomplete architecture,
 - a policy-design exercise,
 - a security or governance scenario,
-- a set of tests that must be made to pass,
+- tests that must be made to pass,
 - or an architecture the learner is asked to critique or improve.
 
 The learner may need to identify hidden side effects, separate evaluation from execution, introduce explicit decision outcomes, preserve acknowledgment boundaries, validate scoped authority, detect stale authority, threat-model an AI gateway, or compare alternate designs.
 
-Tutorials explain. Samples demonstrate. Tests verify. Labs make you decide.
+> **Tutorials explain. Samples demonstrate. Tests verify. Labs make you decide.**
 
 ## Canonical and Alternative Patterns
 
 Learning does not exist to prove that one architecture is always correct.
 
-Material may therefore distinguish between two kinds of patterns.
+Material may therefore distinguish between two pattern types.
 
-### Canonical Pattern
+| Pattern type | What it means | What it does not mean |
+| --- | --- | --- |
+| **Canonical** | Aligned with the current architecture of one or more ASI Backbone organization projects | Universal, mandatory, or superior in every context |
+| **Alternative** | A technically grounded approach that solves the same problem differently | Incorrect merely because it differs from the working repositories |
 
-A canonical pattern is aligned with the current architecture of one or more ASI Backbone organization projects.
-
-It answers a practical question:
+A canonical pattern answers:
 
 > How do the working repositories currently approach this problem?
 
-Canonical does not mean universal, required, or superior in every context.
-
-### Alternative Pattern
-
-An alternative pattern is a technically grounded approach that solves the same problem differently.
-
-Alternative patterns are useful when they make tradeoffs visible, demonstrate that a simpler mechanism is sufficient, or show how another ecosystem solves the same boundary problem.
+An alternative pattern is especially useful when it exposes tradeoffs, demonstrates that a simpler mechanism is sufficient, or shows how another ecosystem handles the same boundary.
 
 The first published alternative-pattern comparison is [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md).
 
-A useful rule is:
-
 > **Use the smallest architecture that preserves the boundaries you actually need.**
 
-Architectural disagreement can be educational when the alternatives are explained clearly and evaluated on their tradeoffs.
+Architectural disagreement is useful when the alternatives are explained clearly and evaluated on their tradeoffs.
 
 ## Framework Independence
 
@@ -173,38 +190,34 @@ Readers are encouraged to:
 
 - study individual patterns without adopting an entire framework,
 - copy or adapt useful ideas into their own systems,
-- compare the demonstrated approach with framework-native or external alternatives,
-- remove complexity that their application does not need,
+- compare demonstrated approaches with framework-native or external alternatives,
+- remove complexity their application does not need,
 - question assumptions and identify tradeoffs,
 - submit corrections, examples, diagrams, tutorials, and alternative approaches,
-- and use the implementation repositories as working architectural specimens.
+- and use implementation repositories as working architectural specimens.
 
-If a developer studies a pattern here, improves it, adapts it to another system, or uses it to make a better architectural decision, Learning is serving its purpose.
+If a developer studies a pattern here and uses it to make a better architectural decision—even by rejecting the demonstrated pattern—Learning is serving its purpose.
 
 ## Why the Material Is Structured This Way
 
-The repository teaches architecture through progressive responsibility:
-
-```text
-Understand the problem
-        ↓
-Observe a boundary
-        ↓
-Verify the invariant
-        ↓
-Experiment with the design
-        ↓
-Compare alternatives
-        ↓
-Inspect fuller implementations when useful
-```
-
-That progression keeps explanation close to evidence while avoiding two common failure modes:
+The repository keeps explanation close to evidence while avoiding two common failure modes:
 
 1. presenting a large implementation before the reader understands the boundary it is trying to preserve; and
 2. presenting an abstract principle without runnable evidence that shows what the principle means in practice.
 
-The result is intentionally layered. The root README is a front door. Getting Started routes readers. Tutorials provide depth. Samples and tests make claims observable. Labs turn reading into architectural judgment. Working repositories provide fuller implementation context.
+The material is intentionally layered:
+
+| Layer | Role |
+| --- | --- |
+| **Root README** | Front door and quick orientation |
+| **Getting Started** | Routes readers toward the right entry point |
+| **Tutorials** | Explain problems, boundaries, patterns, and tradeoffs |
+| **Samples** | Demonstrate the boundary in small executable form |
+| **Tests** | Verify architectural invariants |
+| **Labs** | Turn reading into architectural judgment |
+| **Working repositories** | Provide fuller implementation context |
+
+The structure is meant to support progressive responsibility rather than passive reading.
 
 ## Continue Learning
 
