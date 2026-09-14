@@ -4,49 +4,30 @@ description: Explore software architecture boundaries, responsibilities, failure
 
 # Architecture
 
-The Architecture section explores the structural boundaries, responsibilities, and tradeoffs behind governed software systems.
+The Architecture section examines the boundaries, responsibilities, failure modes, and tradeoffs behind governed software systems.
 
-The goal is not to prescribe one universal architecture.
-
-Instead, this section examines why particular boundaries exist, what problems they address, how they can fail, and when a simpler design may be preferable.
+The goal is not to prescribe one universal design. The goal is to make important boundaries visible enough that you can decide when a governance pattern is justified and when a simpler architecture is better.
 
 > **Good architecture makes important boundaries visible.**
 
-## Terminology and Lineage
+## Start by Question
 
-Learning uses a consistent vocabulary for recurring boundaries, but that vocabulary is not a claim that the underlying architectural ideas originated with ASI Backbone.
-
-Start with the [Architecture Glossary](glossary.md) for canonical Learning definitions of terms such as intent, policy context, decision outcome, acknowledgment, audit residue, scoped capability, execution authority, tool proposal, and trust boundary.
-
-Then use [Terminology and Established Architecture Concepts](terminology-and-established-concepts.md) to connect Learning vocabulary to established software architecture, authorization, security, workflow, provenance, and AI-governance concepts.
-
-## Architectural Status Labels
-
-Substantive pages use a visible `Pattern classification` line when architectural status changes how the material should be interpreted:
-
-| Status | Meaning |
+| If you want to understand... | Start here |
 | --- | --- |
-| **Canonical Pattern** | Aligns with the current architecture of one or more ASI Backbone organization repositories. |
-| **Alternative Pattern** | Presents a viable different approach or a comparison that intentionally departs from the canonical organization pattern. |
-| **Experimental** | Explores architecture that is not presented as an established organization pattern or production-ready design. |
-| **General learning material** | Teaches useful architecture without making a stronger canonical, alternative, or experimental claim. |
+| Learning terminology | [Architecture Glossary](glossary.md) |
+| How Learning terms relate to established concepts | [Terminology and Established Architecture Concepts](terminology-and-established-concepts.md) |
+| The overall governance-spine concept | [Accountable Systems Infrastructure and Governed Execution](accountable-systems-infrastructure-and-governed-execution.md) |
+| Why proposal and side effect should be separated | [Intent to Execution: An Accountability Pattern](intent-to-execution-accountability-pattern.md) |
+| How active constraints shape decisions | [Constraint-Conditioned Decision Model](constraint-conditioned-decision-model.md) |
+| How adjacent governance mechanisms compose | [Governance Tool Selection and Composition](governance-tool-selection-and-composition.md) |
+| The architecture visually | [Governance Spine and Capability Validation Diagrams](governance-spine-and-capability-validation-diagrams.md) |
+| When ASP.NET Core authorization is already enough | [When ASP.NET Core Authorization Is Enough](when-aspnet-core-authorization-is-enough.md) |
+| When a simple application service is enough | [When a Simple Application Service Is Enough](when-a-simple-application-service-is-enough.md) |
+| How application structure should grow | [Growing Beyond a Simple Application Structure](growing-beyond-a-simple-application-structure.md) |
 
-Not every page needs a classification. The labels are descriptive rather than rankings: canonical does not mean universally correct, and experimental does not mean low quality.
+## Core Boundary
 
-## Foundational Organization Concepts
-
-For the broad organization-level concepts that previously appeared inside product documentation, start with:
-
-* [Accountable Systems Infrastructure and Governed Execution](accountable-systems-infrastructure-and-governed-execution.md) — the stack-neutral meaning of the ASI Backbone governance-spine idea.
-* [Intent to Execution: An Accountability Pattern](intent-to-execution-accountability-pattern.md) — the accountability gap between proposal and side effect.
-* [Constraint-Conditioned Decision Model](constraint-conditioned-decision-model.md) — the conceptual structure behind narrowing intent through active constraints.
-* [Governance Tool Selection and Composition](governance-tool-selection-and-composition.md) — how adjacent governance mechanisms protect different boundaries and compose without becoming substitutes.
-
-These pages are educational. Concrete package, API, configuration, compatibility, security, and release behavior remains authoritative in the implementation repositories.
-
-## Current Focus
-
-The current foundational material emphasizes separation among:
+The foundational material repeatedly separates these responsibilities:
 
 ```text
 Intent
@@ -64,94 +45,81 @@ Host-Owned Execution
 Audit Residue
 ```
 
-This separation makes it easier to reason about:
+This makes it easier to answer six questions:
 
-* Who proposes an operation.
-* Which facts influence a decision.
-* Where policy is evaluated.
-* What authority exists after approval.
-* Which component performs the real-world side effect.
-* What evidence remains afterward.
+1. Who proposes the operation?
+2. Which facts influence the decision?
+3. Where is policy evaluated?
+4. What authority exists after approval?
+5. Which component performs the real-world side effect?
+6. What evidence remains afterward?
 
-## Visual Reference
+If those questions are already answered clearly by a simpler design, additional governance machinery may not be necessary.
 
-For a compact orientation to the major boundaries, see [Governance Spine and Capability Validation Diagrams](governance-spine-and-capability-validation-diagrams.md).
+## Pattern Classifications
 
-The visual reference covers:
+Substantive pages may use a visible `Pattern classification` when architectural status changes how the material should be interpreted:
 
-* The governance spine from intent through host-owned execution.
-* Policy context, independent constraints, and explicit decision composition.
-* Metadata inspection versus execution-boundary capability validation.
-* AI proposal versus host authority in a governed tool gateway.
+| Status | Meaning |
+| --- | --- |
+| **Canonical Pattern** | Aligns with the current architecture of one or more ASI Backbone organization repositories. |
+| **Alternative Pattern** | Presents a viable different approach or intentionally departs from the canonical organization pattern. |
+| **Experimental** | Explores architecture that is not presented as an established organization pattern or production-ready design. |
+| **General learning material** | Teaches useful architecture without making a stronger canonical, alternative, or experimental claim. |
 
-The diagrams are reference aids rather than substitutes for the tutorials, samples, tests, and labs.
+These are descriptive labels, not rankings. Canonical does not mean universally correct, and experimental does not mean low quality.
 
-## Start with the Foundational Tutorials
+## Foundational Organization Concepts
 
-If you are new to these architectural ideas, begin with:
+| Concept | What it helps you reason about |
+| --- | --- |
+| [Accountable Systems Infrastructure and Governed Execution](accountable-systems-infrastructure-and-governed-execution.md) | The stack-neutral meaning of the governance-spine idea |
+| [Intent to Execution: An Accountability Pattern](intent-to-execution-accountability-pattern.md) | The accountability gap between proposal and side effect |
+| [Constraint-Conditioned Decision Model](constraint-conditioned-decision-model.md) | How active constraints narrow an intent toward an outcome |
+| [Governance Tool Selection and Composition](governance-tool-selection-and-composition.md) | How adjacent governance mechanisms protect different boundaries without becoming substitutes |
 
-* [Decision Before Execution](../tutorials/decision-before-execution.md)
-* [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
-* [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
-* [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
-* [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md)
+These pages are educational. Concrete package, API, configuration, compatibility, security, and release behavior remains authoritative in the implementation repositories.
 
-The sequence moves from a basic execution boundary toward an end-to-end governed workflow.
+## Foundational Learning Path
 
-## Architectural Questions
+If these boundaries are new, use the five tutorials in order:
 
-Future material in this section may examine questions such as:
+1. [Decision Before Execution](../tutorials/decision-before-execution.md)
+2. [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
+3. [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+4. [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
+5. [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md)
 
-* Where should governance decisions occur?
-* Which components should remain independent?
-* How should policy evaluation relate to authorization?
-* When should acknowledgment interrupt a workflow?
-* How narrowly should execution authority be scoped?
-* How should failure, retry, replay, and cancellation affect authority?
-* Which architectural concerns belong in the host rather than a framework?
-* When is a governance pipeline unnecessary complexity?
+The sequence moves from one execution boundary toward an end-to-end governed workflow.
+
+## Compare Adjacent Architectures
+
+Architecture should be compared against viable alternatives rather than presented as one prescribed design.
+
+| Comparison | Main question |
+| --- | --- |
+| [When ASP.NET Core Authorization Is Enough](when-aspnet-core-authorization-is-enough.md) | Is framework-native endpoint or resource authorization already sufficient? |
+| [Role-Based, Claims-Based, and Capability-Based Authorization](role-based-claims-based-and-capability-based-authorization.md) | When should authority come from roles, claims, narrow capabilities, or a composition of them? |
+| [API Gateways, Service Meshes, Zero Trust, and Governed Execution](api-gateways-service-meshes-zero-trust-and-governed-execution.md) | Which concerns belong to transport, workload identity, infrastructure security, or application decision semantics? |
+| [When a Simple Application Service Is Enough](when-a-simple-application-service-is-enough.md) | Can one immediate application-service workflow preserve the required boundaries without a broader lifecycle? |
+| [Workflow Engines, Human Approval Systems, and Governed Execution](workflow-engines-human-approval-and-governed-execution.md) | Does durable orchestration already provide the process and approval semantics you need? |
+| [Policy Engines, Rules Engines, and Distributed Policy Enforcement](policy-engines-rules-engines-and-distributed-policy-enforcement.md) | Where should domain rules, external policy decisions, PDPs, and PEPs live? |
+| [Agent and Tool Authorization Models and Host-Owned Execution](agent-and-tool-authorization-models-and-host-owned-execution.md) | When are framework-native agent/tool controls enough, and when is a separate execution-authority boundary justified? |
+| [Event Sourcing, Audit Trails, and Governance Decision Provenance](event-sourcing-audit-trails-and-governance-decision-provenance.md) | What evidence problem are logs, audit history, decision receipts, and event sourcing each solving? |
+| [CQRS, Command/Query Separation, and Governed Execution](cqrs-command-query-separation-and-governed-execution.md) | When is a command handler already the correct host-owned execution boundary? |
+
+The purpose is not to make adjacent approaches compete. It is to expose their different responsibilities, trust boundaries, and operational costs.
 
 ## Application Structure Growth
 
-For general application-layering guidance, see [Growing Beyond a Simple Application Structure](growing-beyond-a-simple-application-structure.md). It explains when a compact application is enough, what signals justify Application or Domain boundaries, how dependency direction should be reasoned about, and the tradeoffs around CQRS, MediatR, DDD, and premature layering. NetCoreApplicationTemplate is used as one working reference rather than a universal pattern.
-
-## Alternative Patterns
-
-Architecture should be compared against viable alternatives rather than presented as a single prescribed design.
-
-Start with:
-
-* [When ASP.NET Core Authorization Is Enough](when-aspnet-core-authorization-is-enough.md) — compares the governed-execution model with ASP.NET Core policies, requirements, handlers, and resource-based authorization, including cases where the built-in authorization model is the simpler and better choice.
-* [Role-Based, Claims-Based, and Capability-Based Authorization](role-based-claims-based-and-capability-based-authorization.md) — compares stable role membership, richer claims policies, and narrowly scoped capabilities, including when each model wins and when composition is preferable to replacement.
-* [API Gateways, Service Meshes, Zero Trust, and Governed Execution](api-gateways-service-meshes-zero-trust-and-governed-execution.md) — separates transport, workload identity, infrastructure security strategy, application-level decision semantics, and execution ownership, then shows how the boundaries can be layered without treating them as substitutes.
-* [When a Simple Application Service Is Enough](when-a-simple-application-service-is-enough.md) — examines the middle ground where authorization alone is not the whole use case, but an immediate application-service workflow still expresses the required validation, domain rules, persistence, execution, and audit boundaries without a broader governance lifecycle.
-* [Workflow Engines, Human Approval Systems, and Governed Execution](workflow-engines-human-approval-and-governed-execution.md) — separates durable process orchestration, bound human dispositions, current policy decisions, and scoped execution authority, including cases where a workflow engine already provides the required governance semantics and a second layer would only duplicate them.
-* [Policy Engines, Rules Engines, and Distributed Policy Enforcement](policy-engines-rules-engines-and-distributed-policy-enforcement.md) — distinguishes domain rule evaluation from externalized policy decisions and from the distributed placement of PDPs and PEPs, including policy distribution, stale-policy handling, partitions, local autonomy, and when broader governance lifecycle responsibilities remain separate.
-* [Agent and Tool Authorization Models and Host-Owned Execution](agent-and-tool-authorization-models-and-host-owned-execution.md) — compares model-visible tool selection, framework registration and per-agent permissions, schema validation, host-side authorization, and capability-scoped execution, including when framework-native tool controls are sufficient and when a separate execution-authority boundary is justified.
-* [Event Sourcing, Audit Trails, and Governance Decision Provenance](event-sourcing-audit-trails-and-governance-decision-provenance.md) — compares operational logs, ordinary audit history, governance decision receipts, and event sourcing, including denied decisions, replay, projections, tamper evidence, privacy/deletion tradeoffs, and historical policy reconstruction.
-* [CQRS, Command/Query Separation, and Governed Execution](cqrs-command-query-separation-and-governed-execution.md) — compares command/query separation, immediate command handlers, explicit policy evaluation, and delayed execution with scoped authority, including when a command handler is already the correct host-owned execution boundary.
-
-The purpose of these comparisons is not to make adjacent approaches compete. It is to make their different responsibilities, trust boundaries, and operational costs visible.
+For general layering guidance, see [Growing Beyond a Simple Application Structure](growing-beyond-a-simple-application-structure.md). It covers when a compact application is enough, what signals justify Application or Domain boundaries, dependency direction, and tradeoffs around CQRS, MediatR, DDD, and premature layering.
 
 ## Working Architecture References
 
 Learning uses the organization's implementation repositories as architectural specimens:
 
-### AsiBackbone
-
-[AsiBackbone/AsiBackbone](https://github.com/AsiBackbone/AsiBackbone)
-
-A .NET governance and policy-control framework demonstrating structured decisions, acknowledgment workflows, audit residue, scoped capabilities, and host-owned execution boundaries.
-
-### NetCoreApplicationTemplate
-
-[AsiBackbone/NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)
-
-An ASP.NET Core reference architecture demonstrating middleware organization, secure defaults, logging, error handling, rate limiting, authentication-ready design, and production-oriented application structure.
-
-## Current Status
-
-The Architecture section is established as a learning area and now includes general application-structure growth guidance, a governed-execution visual reference, and concrete alternative-pattern comparisons. It will continue to grow through additional comparisons, diagrams, and cross-repository studies.
+- [AsiBackbone/AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) — a .NET governance and policy-control framework demonstrating structured decisions, acknowledgment workflows, audit residue, scoped capabilities, and host-owned execution boundaries.
+- [AsiBackbone/NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) — an ASP.NET Core reference architecture demonstrating middleware organization, secure defaults, logging, error handling, rate limiting, authentication-ready design, and production-oriented application structure.
 
 For the current learning path, continue with the [Foundational Tutorials](../tutorials/index.md).
 
