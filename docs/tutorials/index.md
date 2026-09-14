@@ -4,9 +4,25 @@ description: Browse problem-first tutorials that expose failure modes, introduce
 
 # Tutorials
 
-Tutorials in ASI Backbone Learning are **problem-first**.
+ASI Backbone Learning tutorials are **problem-first**. They begin with an architectural problem, expose a failure mode or limitation, introduce a pattern, and connect the teaching example to runnable evidence and fuller implementations.
 
-They begin with an architectural problem, examine a common or naive implementation, expose its limitations, introduce a pattern, and then connect the smaller teaching example to fuller working implementations.
+The goal is understanding—not framework adoption.
+
+## Learning Path at a Glance
+
+| Step | Tutorial | Difficulty | Boundary added |
+| --- | --- | --- | --- |
+| 1 | [Decision Before Execution](decision-before-execution.md) | Beginner | Evaluation is separated from protected execution |
+| 2 | [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) | Beginner | Decision facts and outcomes become explicit |
+| 3 | [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) | Intermediate | Acknowledgment and decision evidence remain distinct from authority |
+| 4 | [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) | Intermediate | Execution authority becomes narrow, temporary, and host-validated |
+| 5 | [Governed AI Tool Gateway](governed-ai-tool-gateway.md) | Intermediate | AI proposal is composed with host-owned context, policy, authority, and execution |
+
+All five are currently classified as **Canonical Pattern** material. Difficulty describes conceptual complexity, not production readiness.
+
+If you already know authorization, ABAC, capability security, workflow, audit/provenance, or reference-monitor concepts, use [Terminology and Established Architecture Concepts](../architecture/terminology-and-established-concepts.md) to map that vocabulary to the terms used here.
+
+## How a Tutorial Works
 
 A typical tutorial follows this progression:
 
@@ -26,129 +42,46 @@ Tradeoffs and alternatives
 Working repository example
 ```
 
-The goal is not to require adoption of a specific framework.
+Each foundational tutorial also includes:
 
-Each foundational tutorial also opens with a compact **Pattern Card** summarizing the problem, the architectural pattern, when it is useful, when a simpler approach may be preferable, and the observable invariant carried into the companion sample or tests.
+- a **Pattern Card** for fast orientation,
+- an observable invariant that carries into samples or tests,
+- tradeoffs and simpler alternatives,
+- and a **Check Your Understanding** checklist focused on what you should be able to explain or demonstrate.
 
-The card is an orientation aid, not a substitute for the tutorial's reasoning, tradeoffs, alternatives, or implementation discussion.
+The checklist is not a score or certification.
 
-Each foundational tutorial also closes with a short **Check Your Understanding** checklist. These self-assessments describe capabilities the learner should be able to explain or demonstrate rather than trivia to memorize.
-
-The checklist is not a score or certification. Its purpose is to make the learning objective observable before the learner moves into the companion sample, lab, or deeper material.
-
-A tutorial should remain useful even if you never install the `AsiBackbone` package or use `NetCoreApplicationTemplate`.
-
-If you already know authorization, ABAC, capability security, workflow, audit/provenance, or reference-monitor concepts, read [Terminology and Established Architecture Concepts](../architecture/terminology-and-established-concepts.md) for a bridge between that established vocabulary and the terms used throughout these tutorials.
-
-## Foundational Tutorials
-
-### Learning Path at a Glance
-
-| Tutorial | Pattern classification | Difficulty | Prerequisites |
-| --- | --- | --- | --- |
-| [Decision Before Execution](decision-before-execution.md) | Canonical Pattern | Beginner | None |
-| [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) | Canonical Pattern | Beginner | Tutorial 1 |
-| [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) | Canonical Pattern | Intermediate | Tutorials 1–2 |
-| [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) | Canonical Pattern | Intermediate | Tutorials 1–3 |
-| [Governed AI Tool Gateway](governed-ai-tool-gateway.md) | Canonical Pattern | Intermediate | Tutorials 1–4 |
-
-Difficulty reflects the conceptual complexity of the learning material rather than the production-readiness of the demonstrated patterns.
+## The Five Foundations
 
 ### 1. [Decision Before Execution](decision-before-execution.md)
 
-Understand why a consequential operation should be represented as proposed intent, evaluated, and converted into an explicit decision before the host performs the real-world action.
+Represent a consequential operation as proposed intent, evaluate it, and produce an explicit decision before the host performs the side effect.
 
-Topics include:
-
-- Intent versus execution
-- Authorization versus governance
-- Explicit decision results
-- Policy context
-- Host-owned execution
-- Testing the execution boundary
-- Audit evidence
-- Tradeoffs and failure modes
-- AI-proposed tool actions
+**Core idea:** intent, authorization, governance decision, execution, and evidence should not collapse into one opaque operation.
 
 > **A proposed action should become a governed decision before it becomes real-world execution.**
 
 ### 2. [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md)
 
-Understand why the facts used to make a governance decision should be represented explicitly and why the result should describe what happens next rather than collapse every decision into a boolean.
+Represent the facts used by policy explicitly and return outcomes that describe what happens next rather than reducing every decision to a boolean.
 
-Topics include:
-
-- Facts versus policy rules
-- Actor, resource, operation, and environmental context
-- Context snapshots
-- Explicit governance outcomes
-- Stable reason codes
-- Policy identity
-- Decision composition
-- Determinism
-- Context and outcome testing
-- AI policy context
+**Core ideas:** actor/resource/operation/environment context, context snapshots, stable reason codes, policy identity, determinism, and decision composition.
 
 ### 3. [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md)
 
-Understand how a consequential operation can pause for explicit acknowledgment, resume through a governed boundary, and leave structured evidence explaining the decision path.
+Pause a consequential operation for explicit acknowledgment, resume through a governed boundary, and preserve structured evidence of the decision path.
 
-Topics include:
-
-- Acknowledgment challenges
-- Actor and operation binding
-- Accepted and rejected responses
-- Expiration and replay considerations
-- Re-evaluation after acknowledgment
-- Acknowledgment versus policy override
-- Decision, acknowledgment, and execution evidence
-- Audit residue versus operational logging
-- Correlation and reason codes
-- Durable persistence boundaries
-- AI acknowledgment workflows
+**Core ideas:** response binding, expiration, replay, re-evaluation, acknowledgment versus override, correlation, and durable evidence boundaries.
 
 ### 4. [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md)
 
-Understand why an allowed or acknowledged operation should not automatically become broad execution authority and how a short-lived, narrowly scoped capability can preserve a host-controlled execution boundary.
+Keep approval from becoming broad standing authority by issuing and validating short-lived, narrowly scoped execution authority at the host boundary.
 
-Topics include:
-
-- Approval versus authority
-- Least-privilege scopes
-- Subject, operation, and resource binding
-- Audience and gateway binding
-- Time-bounded authority
-- Policy and acknowledgment binding
-- Execution-boundary validation
-- Replay and bounded use
-- Revocation and cancellation
-- Proof and integrity considerations
-- Host-owned execution
-- AI capability-scoped tool execution
+**Core ideas:** subject/operation/resource/audience binding, time bounds, replay, revocation, current-state validation, and host-owned execution.
 
 ### 5. [Governed AI Tool Gateway](governed-ai-tool-gateway.md)
 
-Compose the first four patterns into an end-to-end AI-assisted execution gateway where the model may propose an action but the host retains authoritative context and execution authority.
-
-Topics include:
-
-- AI proposal versus authority
-- Host-owned tool registry
-- Proposal and argument validation
-- Authoritative policy context
-- Prompt guidance versus enforcement
-- Explicit governance decisions
-- Human acknowledgment
-- Scoped capability issuance
-- Execution-boundary validation
-- Semantic tool design
-- Secret isolation
-- Egress and destination control
-- Replay versus idempotency
-- Dry-run adoption
-- End-to-end testing and audit continuity
-
-The complete foundational flow is:
+Compose the first four patterns around AI-proposed tool execution while keeping authoritative context, credentials, policy, and real-world effects under host control.
 
 ```text
 AI proposal
@@ -170,11 +103,9 @@ Audit residue
 
 > **The model may propose. The host retains execution authority.**
 
-## Continue Beyond the Tutorials
+## Continue into Practice
 
-The tutorials are the explanation layer of the Learning repository.
-
-The broader learning path is:
+Tutorials are the explanation layer. The broader learning path is:
 
 ```text
 Tutorial
@@ -186,23 +117,14 @@ Hands-On Lab
 Working Repository
 ```
 
-After studying a tutorial:
+After a tutorial:
 
-* [Browse Executable Samples](../samples/index.md) for the published sample guide, run commands, architectural invariants, and links to the canonical companion READMEs.
-* [Browse Labs](../labs/index.md) for hands-on exercises and architecture challenges as they are published.
-* [Explore AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) for fuller governance and policy-control implementations.
-* [Explore NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) for a fuller ASP.NET Core reference architecture.
+- [Browse Executable Samples](../samples/index.md) to run focused companion implementations and invariant tests.
+- [Browse Labs](../labs/index.md) to modify, break, repair, critique, or extend the architecture.
+- [Explore AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) for fuller governance and policy-control implementations.
+- [Explore NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) for a fuller ASP.NET Core reference architecture.
 
-The teaching material is intentionally smaller than the working repositories. Use the larger implementations to see how similar ideas behave when more production concerns are present.
-
-
-## Foundational Sequence Complete
-
-The five tutorials form the initial governed-execution curriculum.
-
-They are intended to be reused, questioned, simplified, or adapted rather than treated as a mandatory framework adoption path.
-
-Good next steps include hands-on labs, alternative implementations, ASP.NET Core integration examples, AI gateway simulations, and architecture comparisons.
+The five tutorials form the initial governed-execution curriculum, but they are meant to be questioned, simplified, adapted, or rejected when another design better fits the problem.
 
 ---
 
