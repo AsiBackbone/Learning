@@ -4,21 +4,38 @@ description: Browse standalone ASI Backbone Learning technical articles publishe
 
 # Articles
 
-Articles are standalone technical arguments designed to remain useful when a reader arrives directly from a search engine, newsletter, social link, conference resource list, or external citation. They are not curriculum stages and do not require prior Learning material.
+ASI Backbone Learning articles are standalone technical arguments written for direct discovery, sharing, and citation. A reader can arrive from a search engine, newsletter, social link, conference resource list, or external reference without completing the Learning curriculum first.
 
-A published article keeps a stable address of the form:
+## Start by Topic
+
+| If you are interested in... | Start with |
+| --- | --- |
+| AI-assisted development and maintainer authority | [A Passing Agent Diff Is Not Project Authority](2026/a-passing-agent-diff-is-not-project-authority.md) |
+| Audit evidence and decision provenance | [Your Audit Log Records the Story, Not the Decision](2026/your-audit-log-is-not-evidence.md) |
+| Capability tokens, roles, and claims | [Do You Need a Capability Token, or Are Roles and Claims Enough?](2026/roles-claims-or-capability-token-dotnet.md) |
+| AI tool execution and host authority | [Why an AI Tool Call Is a Proposal, Not Authority](2026/why-ai-tool-call-is-only-a-proposal.md) |
+| ASP.NET Core authorization versus governed execution | [When ASP.NET Core Authorization Is Not Enough](2026/when-aspnet-core-authorization-is-not-enough.md) |
+| Testing protected execution boundaries | [How to Test That a Denied Operation Never Executes](2026/test-denied-operation-never-executes.md) |
+| NuGet package trust and software supply chain evidence | [A Green CI Badge Does Not Prove Your .NET Package Is Trustworthy](2026/ci-badge-does-not-prove-package-integrity.md) |
+| Authorization timing and resource-state decisions | [Your Authorization Check Runs Too Late](2026/authorization-check-runs-too-late.md) |
+
+Prefer new articles as they are published? [Subscribe to the existing Learning RSS feed](https://asibackbone.github.io/Learning/feed.xml).
+
+## Publication Model
+
+Articles are not curriculum stages and do not require prior Learning material.
+
+Each published article keeps a stable year-and-slug address:
 
 ```text
 https://asibackbone.github.io/Learning/articles/<year>/<slug>.html
 ```
 
-Once released, that year-and-slug URL is treated as permanent. Reorganizing tutorials, architecture pages, security material, or other curriculum content does not move an article.
+Once released, that URL is treated as permanent. Reorganizing tutorials, architecture pages, security material, or other curriculum content does not move an article.
 
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
-[Subscribe to the existing Learning RSS feed](https://asibackbone.github.io/Learning/feed.xml).
-
-## 2026
+## 2026 Archive
 
 ### [A Passing Agent Diff Is Not Project Authority](2026/a-passing-agent-diff-is-not-project-authority.md)
 
@@ -94,5 +111,7 @@ Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/authorizati
 | May move as the curriculum evolves | Keeps a permanent publication URL |
 
 Articles may link to tutorials, samples, labs, ADRs, or implementation repositories for deeper study, but those materials are optional follow-up rather than prerequisites.
+
+## Contribute an Article
 
 Want to contribute an article? See the [article publishing guidance](https://github.com/AsiBackbone/Learning/blob/main/CONTRIBUTING.md#publishing-authored-articles).
