@@ -6,56 +6,83 @@ description: Start ASI Backbone Learning with core governed-execution concepts, 
 
 Welcome to **ASI Backbone Learning**.
 
-This section introduces the core ideas used throughout the Learning repository and provides a practical starting point for developers who want to understand the architecture before moving into deeper tutorials, samples, labs, comparisons, or advanced topics.
-
-The goal is not to require adoption of a specific framework. The goal is to make the architectural reasoning clear enough that you can evaluate, adapt, challenge, or reuse the patterns in your own systems.
+This repository teaches governance and controlled-execution architecture through small explanations, runnable examples, invariant tests, and hands-on labs. You do not need to adopt the `AsiBackbone` package or any specific framework to use the material.
 
 > **Read it. Run it. Question it. Improve it.**
 
-Already know the problem you need to solve? [**Find Your Path**](find-your-path.md) routes common reader goals to the shortest relevant sequence of tutorials, samples, labs, simpler alternatives, and deeper references.
+## Start Here
 
-Use the problem-oriented path chooser when you do not need to work through the foundational sequence from the beginning.
+Choose the shortest path that matches how you want to learn:
 
-Prefer a visual curriculum overview? [**Learning Path Map**](learning-path-map.md) shows the recommended foundational sequence, optional problem-first entry points, branch-specific advanced paths, and where hands-on practice reinforces the curriculum.
+| If you want to... | Start here |
+|---|---|
+| Understand the architecture from the beginning | [**Decision Before Execution**](../tutorials/decision-before-execution.md) |
+| Solve a specific architecture problem | [**Find Your Path**](find-your-path.md) |
+| See the complete curriculum visually | [**Learning Path Map**](learning-path-map.md) |
+| Learn by running code | [**Executable Samples**](../samples/index.md) |
+| Practice by changing or challenging the design | [**Hands-On Labs**](../labs/index.md) |
+| Compare a simpler alternative | [**When ASP.NET Core Authorization Is Enough**](../architecture/when-aspnet-core-authorization-is-enough.md) |
 
-## What You Will Learn
+New to the project? Start with **Decision Before Execution** and work through the five-part foundation in order. If you already know the problem you need to solve, **Find Your Path** can route you directly to the most relevant material.
 
-The Learning material is built around a recurring separation of responsibilities:
+## The Architecture in 30 Seconds
+
+The Learning material repeatedly separates **proposing an action** from **authorizing and executing it**:
 
 ```text
-Intent
+Proposed Intent
    ↓
-Context
+Policy Context
    ↓
 Constraints
    ↓
-Decision
+Explicit Decision
    ↓
 Acknowledgment when required
    ↓
-Scoped authority
+Scoped Authority
    ↓
-Host-owned execution
+Host-Owned Execution
    ↓
-Audit residue
+Audit Evidence
 ```
 
-This flow is useful when an application performs operations where a simple request-to-execution path does not provide enough control, explanation, or evidence.
+The two boundaries to remember are:
 
-You will encounter several recurring concepts:
+> **Acknowledgment ≠ Authorization ≠ Execution Authority**
 
-- **Intent** — what action is being proposed.
+> **The model may propose. The host retains execution authority.**
+
+In practice, this means the governance layer can determine whether an operation should proceed without becoming the component that performs the real-world operation itself.
+
+### Core Terms
+
+- **Intent** — the action being proposed.
 - **Policy context** — the facts needed to evaluate that proposal.
 - **Constraints** — the rules or conditions that shape what is allowed.
-- **Decision** — an explicit result such as allow, deny, defer, require acknowledgment, or escalate.
-- **Acknowledgment** — an explicit boundary when a human or system must consciously accept a condition before proceeding.
-- **Scoped authority** — narrow and temporary authority to perform a specific operation.
-- **Host-owned execution** — the application or execution host remains responsible for performing the real-world action.
-- **Audit residue** — structured evidence that explains what was proposed, how it was evaluated, and what happened afterward.
+- **Decision** — an explicit outcome such as allow, deny, defer, require acknowledgment, or escalate.
+- **Acknowledgment** — a deliberate acceptance boundary when one is required before proceeding.
+- **Scoped authority** — narrow, temporary authority to perform a specific operation.
+- **Host-owned execution** — the application or execution host performs the consequential action.
+- **Audit evidence** — structured records explaining what was proposed, evaluated, authorized, and executed.
 
-## The Foundational Learning Path
+## Five-Part Foundation
 
-The initial five-part learning path is now established across four complementary forms:
+The foundation is deliberately progressive. Each topic adds one boundary to the same governed-execution model.
+
+| Step | Topic | Core invariant | Continue with |
+|---|---|---|---|
+| 1 | [**Decision Before Execution**](../tutorials/decision-before-execution.md) | Denied decision → no execution | [Lab](../labs/decision-before-execution.md) |
+| 2 | [**Policy Context and Explicit Decision Outcomes**](../tutorials/policy-context-and-explicit-decision-outcomes.md) | Decisions are explicit, not boolean-only | [Lab](../labs/policy-context-and-explicit-decision-outcomes.md) |
+| 3 | [**Acknowledgment and Audit Residue**](../tutorials/acknowledgment-and-audit-residue.md) | Acknowledgment does not grant execution authority | [Lab](../labs/acknowledgment-and-audit-residue.md) |
+| 4 | [**Scoped Capability and Host-Owned Execution**](../tutorials/scoped-capability-and-host-owned-execution.md) | Expired or stale authority blocks execution | [Lab](../labs/scoped-capability-and-host-owned-execution.md) |
+| 5 | [**Governed AI Tool Gateway**](../tutorials/governed-ai-tool-gateway.md) | Unknown or unauthorized AI tool proposal → no execution | [Lab](../labs/governed-ai-tool-gateway.md) |
+
+The fifth topic is the capstone. It combines intent, policy context, explicit decisions, acknowledgment, scoped authority, host-owned execution, and audit evidence into one governed AI-assisted workflow.
+
+## How Learning Works
+
+Each foundational topic is reinforced across four complementary forms:
 
 ```text
 Tutorial
@@ -67,389 +94,90 @@ Architectural Invariant Tests
 Hands-On Lab
 ```
 
-Tutorials explain the reasoning.
+**Tutorials explain. Samples demonstrate. Tests verify. Labs make you decide.**
 
-Samples make the boundary observable.
+### Tutorials
 
-Tests make the architectural contract executable.
+Tutorials begin with the problem, show the common or naive implementation, expose its failure mode, and then introduce the architectural pattern, tradeoffs, alternatives, and working repository references.
 
-Labs require the learner to modify, critique, repair, or extend the architecture.
+### Samples
 
-If you are new to the project, work through the five foundational topics in order.
+The [`samples/`](../samples/index.md) area contains intentionally small .NET teaching implementations. They favor deterministic local behavior, explicit execution boundaries, focused domain examples, and simulated side effects where appropriate.
 
-### 1. Decision Before Execution
+They are teaching artifacts rather than production frameworks.
 
-[**Read the tutorial**](../tutorials/decision-before-execution.md)
+### Tests
 
-Understand why a consequential operation should be represented as proposed intent before it becomes execution.
-
-The central invariant is simple:
+Sample tests make important architectural claims repeatable and observable. Typical invariants include:
 
 ```text
-Denied Decision
-   ↓
-Executor Invocation Count = 0
+Denied Decision → No Execution
+Expired Capability → Execution Blocked
+Unknown AI Tool → Proposal Rejected → No Execution
 ```
 
-After the tutorial:
+Their purpose is architectural verification, not broad code-coverage demonstration.
 
-- [Browse the executable samples](../samples/index.md)
-- [Complete the Decision Before Execution lab](../labs/decision-before-execution.md)
+### Labs
 
-### 2. Policy Context and Explicit Decision Outcomes
+[Hands-On Labs](../labs/index.md) ask you to modify, critique, repair, or extend the design. Exercises may require you to identify hidden side effects, separate evaluation from execution, preserve acknowledgment boundaries, validate scoped authority, detect stale authority, threat-model an AI tool gateway, or compare alternatives.
 
-[**Read the tutorial**](../tutorials/policy-context-and-explicit-decision-outcomes.md)
+## Where the Pattern Applies
 
-Learn how decision inputs and outcomes can be modeled explicitly instead of being scattered across application code.
+The core separation is broader than AI. The same reasoning can help with:
 
-The lesson moves beyond a boolean result and makes outcomes such as these explicit:
+- administrative operations,
+- deployment workflows,
+- infrastructure changes,
+- sensitive data access,
+- background jobs,
+- human approval workflows,
+- API tool execution,
+- and multi-tenant policy decisions.
 
-```text
-Allow
-Deny
-Defer
-RequireAcknowledgment
-Escalate
-```
+Use the smallest architecture that preserves the boundaries you actually need. In some applications, ordinary ASP.NET Core authorization is enough; in others, the proposal → decision → scoped authority → execution separation adds useful control and evidence.
 
-After the tutorial:
+## Working Repository References
 
-- [Browse the executable samples](../samples/index.md)
-- [Complete the Policy Context and Explicit Decision Outcomes lab](../labs/policy-context-and-explicit-decision-outcomes.md)
+ASI Backbone Learning is the educational layer of the organization. The working repositories provide fuller implementation examples:
 
-### 3. Acknowledgment and Audit Residue
+- [`AsiBackbone/AsiBackbone`](https://github.com/AsiBackbone/AsiBackbone) — a .NET governance and policy-control framework covering policy evaluation, structured decisions, acknowledgment workflows, audit/provenance, capability-scoped authority, host-owned execution, and AI/application governance.
+- [`AsiBackbone/NetCoreApplicationTemplate`](https://github.com/AsiBackbone/NetCoreApplicationTemplate) — an enterprise-oriented ASP.NET Core reference implementation demonstrating middleware organization, structured logging, security defaults, error handling, rate limiting, authentication-ready architecture, data access, and Architecture Decision Records.
 
-[**Read the tutorial**](../tutorials/acknowledgment-and-audit-residue.md)
+Learning uses these repositories as architectural specimens while keeping its teaching examples intentionally smaller and easier to study.
 
-Explore how workflows can pause for acknowledgment while preserving structured evidence of the governed path.
+## Adoption Is Optional
 
-The material preserves the distinction:
+The goal is to make the reasoning clear enough that you can evaluate, adapt, challenge, or reuse the patterns in your own systems.
 
-```text
-Acknowledgment
-   ≠
-Authorization
-   ≠
-Execution Authority
-```
+You are encouraged to reimplement a pattern differently, remove unnecessary complexity, identify cases where a simpler design is better, compare competing architectures, and use the working repositories only as reference material.
 
-After the tutorial:
+Learning may describe a pattern as **canonical** when it aligns with the current organization repositories, or **alternative** when it solves the same problem differently. Canonical does not mean universally correct, and alternative does not mean incorrect.
 
-- [Browse the executable samples](../samples/index.md)
-- [Complete the Acknowledgment and Audit Residue lab](../labs/acknowledgment-and-audit-residue.md)
-
-### 4. Scoped Capability and Host-Owned Execution
-
-[**Read the tutorial**](../tutorials/scoped-capability-and-host-owned-execution.md)
-
-Understand why approval does not necessarily imply broad or permanent authority, and why the host should retain final execution responsibility.
-
-The companion material makes boundaries such as these observable:
-
-```text
-Expired Capability
-   ↓
-Execution Blocked
-```
-
-```text
-Resource Changed After Approval
-   ↓
-Capability Validation Fails
-```
-
-After the tutorial:
-
-- [Browse the executable samples](../samples/index.md)
-- [Complete the Scoped Capability and Host-Owned Execution lab](../labs/scoped-capability-and-host-owned-execution.md)
-
-### 5. Governed AI Tool Gateway
-
-[**Read the tutorial**](../tutorials/governed-ai-tool-gateway.md)
-
-Apply the earlier ideas to an AI-assisted workflow in which a model may propose an operation but does not own execution authority.
-
-The central rule is:
-
-> **The model may propose. The host retains execution authority.**
-
-A representative invariant is:
-
-```text
-AI Proposes Unknown Tool
-   ↓
-Host Rejects Proposal
-   ↓
-No Execution
-```
-
-After the tutorial:
-
-- [Browse the executable samples](../samples/index.md)
-- [Complete the Governed AI Tool Gateway lab](../labs/governed-ai-tool-gateway.md)
-
-The fifth topic serves as the capstone for the foundational sequence because it composes intent, context, explicit decisions, acknowledgment, scoped authority, host-owned execution, and audit residue into one governed flow.
-
-## How to Use the Executable Samples
-
-The `samples/` area contains intentionally small .NET companion implementations for the five foundational tutorials.
-
-The samples are teaching artifacts rather than production frameworks.
-
-They are designed to make architectural boundaries visible through:
-
-- deterministic local behavior,
-- explicit execution boundaries,
-- focused domain examples,
-- dry-run or simulated side effects where appropriate,
-- and tests for important architectural invariants.
-
-Use the published sample guide to choose the relevant executable companion:
-
-[**Browse Executable Samples**](../samples/index.md)
-
-From there, you can move to the canonical sample README and source code in the repository.
-
-## How to Use the Tests
-
-The sample projects include focused tests intended to demonstrate architectural behavior rather than only object construction.
-
-Examples include:
-
-```text
-Denied Decision
-   ↓
-No Execution
-```
-
-```text
-Expired Capability
-   ↓
-Execution Blocked
-```
-
-```text
-Unknown AI Tool
-   ↓
-Proposal Rejected
-   ↓
-No Execution
-```
-
-The purpose of these tests is not broad code coverage.
-
-The purpose is to make important architectural claims independently observable and repeatable.
-
-## How to Use the Labs
-
-The labs move beyond reading and demonstration.
-
-They ask you to reason about the architecture by working with incomplete, deliberately weak, or challenge-oriented scenarios.
-
-A lab may ask you to:
-
-- identify hidden side effects,
-- separate evaluation from execution,
-- introduce explicit decision outcomes,
-- preserve acknowledgment boundaries,
-- add or validate scoped execution authority,
-- detect stale authority,
-- threat-model an AI tool gateway,
-- or compare alternative designs.
-
-[**Browse Hands-On Labs**](../labs/index.md)
-
-Tutorials explain.
-
-Samples demonstrate.
-
-Tests verify.
-
-Labs make you decide.
-
-## The Core Boundary
-
-A recurring design principle throughout this repository is:
-
-> **The model may propose. The host retains execution authority.**
-
-This principle is especially important in AI-assisted systems, but the underlying separation is broader than AI.
-
-The same reasoning can apply to:
-
-- Administrative operations
-- Deployment workflows
-- Infrastructure changes
-- Sensitive data access
-- Background jobs
-- Human approval workflows
-- API tool execution
-- Multi-tenant policy decisions
-
-The governance layer may determine whether an operation should proceed without becoming the component that performs the operation itself.
-
-## Learning Is Problem-First
-
-Tutorials in this repository generally follow a progression like:
-
-```text
-Problem
-   ↓
-Common or naive implementation
-   ↓
-Failure mode or limitation
-   ↓
-Architectural pattern
-   ↓
-Minimal teaching example
-   ↓
-Tradeoffs and alternatives
-   ↓
-Working repository example
-```
-
-This keeps the material useful even if you never install the `AsiBackbone` package or use `NetCoreApplicationTemplate`.
-
-The objective is to understand the architectural boundary first and the implementation second.
-
-## Relationship to the Working Repositories
-
-ASI Backbone Learning is the educational layer of the organization.
-
-The working repositories provide fuller implementation examples.
-
-### AsiBackbone
-
-[`AsiBackbone/AsiBackbone`](https://github.com/AsiBackbone/AsiBackbone)
-
-A .NET governance and policy-control framework that implements patterns such as:
-
-- Policy evaluation
-- Structured decision results
-- Acknowledgment workflows
-- Audit residue and provenance
-- Capability-scoped authority
-- Host-owned execution boundaries
-- AI and application governance
-
-### .NET Core Application Template
-
-[`AsiBackbone/NetCoreApplicationTemplate`](https://github.com/AsiBackbone/NetCoreApplicationTemplate)
-
-An enterprise-oriented ASP.NET Core reference implementation demonstrating areas such as:
-
-- Middleware organization
-- Structured logging
-- Security defaults
-- Error handling
-- Rate limiting
-- Authentication-ready architecture
-- Data access
-- Architecture Decision Records
-
-Learning uses those repositories as working architectural specimens while keeping its own examples intentionally smaller and easier to study.
-
-## You Do Not Need to Adopt the Framework
-
-A Learning tutorial should still be useful if you decide that the demonstrated pattern does not fit your application.
-
-You are encouraged to:
-
-- Reimplement a pattern differently.
-- Compare it with another architecture.
-- Remove unnecessary complexity.
-- Identify cases where a simpler design is better.
-- Challenge assumptions.
-- Document alternative approaches.
-- Use the working repositories only as reference material.
-
-A pattern that survives criticism is more useful than one that is accepted without examination.
-
-## Canonical and Alternative Patterns
-
-Some Learning material may be identified as:
-
-### Canonical Pattern
-
-A pattern aligned with the current architecture of one or more ASI Backbone organization repositories.
-
-### Alternative Pattern
-
-A technically grounded approach that solves the same problem differently.
-
-Canonical does not mean universally correct.
-
-Alternative does not mean incorrect.
-
-The purpose of the distinction is to help readers understand what the working repositories currently implement while preserving room for comparison and experimentation.
-
-The first published alternative-pattern comparison is:
-
-- [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md)
-
-A useful principle is:
-
-> **Use the smallest architecture that preserves the boundaries you actually need.**
-
-## Where the Project Goes Next
-
-The foundational tutorial → sample → test → lab path is established.
-
-Current development is moving toward:
-
-- stronger links to fuller working implementations,
-- deeper diagnostic and failure-mode labs,
-- ASP.NET Core architecture lessons,
-- security and trust architecture,
-- broader governance and policy architecture,
-- additional alternative-pattern comparisons,
-- reference-architecture case studies,
-- and clearly labeled advanced or experimental material.
-
-The repository intentionally favors **depth before breadth**.
-
-A well-connected tutorial with runnable code, meaningful tests, a useful lab, and clear implementation references is more valuable than several disconnected pages of new material.
-
-See [ROADMAP.md](https://github.com/AsiBackbone/Learning/blob/main/ROADMAP.md) for current priorities and longer-term direction.
+For a concrete comparison, see [**When ASP.NET Core Authorization Is Enough**](../architecture/when-aspnet-core-authorization-is-enough.md).
 
 ## Scope and Boundaries
 
-ASI Backbone Learning is an educational and architectural resource.
-
-It is not:
-
-- A compliance certification
-- A legal standard
-- A security guarantee
-- An AI model
-- An AGI or ASI implementation
-- A robotics controller
-- A replacement for application-specific security review
-- A requirement to use any AsiBackbone package
-- A claim that one architecture is universally correct
-
-Examples are teaching artifacts.
+ASI Backbone Learning is an educational and architectural resource. It is **not** a compliance certification, legal standard, security guarantee, AI model, AGI/ASI implementation, robotics controller, or substitute for application-specific security review.
 
 Production systems remain responsible for their own authentication, authorization, infrastructure, persistence, safety controls, regulatory requirements, threat modeling, and operational execution.
 
-## How to Participate
+## Where to Go Next
 
-You can participate without writing framework code.
+After completing the foundation, continue into the area that matches your problem:
 
-Useful contributions include:
+- [**Architecture**](../architecture/index.md) — patterns, comparisons, boundaries, and system structure.
+- [**ASP.NET Core**](../aspnetcore/index.md) — application-level integration and implementation concerns.
+- [**Security**](../security/index.md) — trust boundaries, failure modes, and defensive architecture.
+- [**AI Integration**](../ai-integration/index.md) — governed AI-assisted workflows and tool execution.
+- [**Advanced**](../advanced/index.md) — deeper or more experimental material.
+- [**ROADMAP.md**](https://github.com/AsiBackbone/Learning/blob/main/ROADMAP.md) — current priorities and longer-term direction.
 
-- Questions
-- Corrections
-- Tutorials
-- Labs
-- Diagrams
-- Alternative implementations
-- Failure-mode analysis
-- Architecture critiques
-- Better examples
-- Documentation improvements
+The repository intentionally favors **depth before breadth**: a well-connected tutorial with runnable code, meaningful tests, a useful lab, and clear implementation references is more valuable than several disconnected pages.
 
-See the repository contribution guidance for more information:
+## Participate
+
+You can contribute without writing framework code. Questions, corrections, tutorials, labs, diagrams, alternative implementations, failure-mode analysis, architecture critiques, better examples, and documentation improvements are all useful.
 
 - [CONTRIBUTING.md](https://github.com/AsiBackbone/Learning/blob/main/CONTRIBUTING.md)
 - [CODE_OF_CONDUCT.md](https://github.com/AsiBackbone/Learning/blob/main/CODE_OF_CONDUCT.md)
@@ -458,11 +186,9 @@ See the repository contribution guidance for more information:
 
 ## Next Step
 
-Begin with [**Decision Before Execution**](../tutorials/decision-before-execution.md).
+Begin with [**Decision Before Execution**](../tutorials/decision-before-execution.md), then follow the foundation through [**Governed AI Tool Gateway**](../tutorials/governed-ai-tool-gateway.md).
 
-Then follow the foundational sequence through the related samples, tests, and labs until you reach [**Governed AI Tool Gateway**](../tutorials/governed-ai-tool-gateway.md), which composes the earlier patterns into one end-to-end example.
-
-After completing the foundation, explore the broader [Architecture](../architecture/index.md), [ASP.NET Core](../aspnetcore/index.md), [Security](../security/index.md), [AI Integration](../ai-integration/index.md), and [Advanced](../advanced/index.md) learning areas.
+If you already know what you need, use [**Find Your Path**](find-your-path.md) instead.
 
 ---
 
