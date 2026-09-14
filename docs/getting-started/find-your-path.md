@@ -55,7 +55,7 @@ The goal is not to maximize framework adoption. The goal is to make the architec
 
 **Stop here when:** The operation is ordinary application behavior with no meaningful decision boundary, acknowledgment requirement, scoped authority, or audit obligation. [When a Simple Application Service Is Enough](../architecture/when-a-simple-application-service-is-enough.md) is the comparison point.
 
-**Go deeper when:** Later policy, acknowledgment, capability, or AI boundaries matter. Continue through the [foundational learning path](index.md#the-foundational-learning-path).
+**Go deeper when:** Later policy, acknowledgment, capability, or AI boundaries matter. Continue through the [foundational learning path](index.md#five-part-foundation).
 
 ## I Already Use ASP.NET Core Authorization and Want to Know If That Is Enough
 
