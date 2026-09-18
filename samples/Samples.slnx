@@ -1,6 +1,6 @@
 <Solution>
-  <Project Path="acknowledgment-and-audit-residue/Sample/AcknowledgmentAndAuditResidue.csproj" />
-  <Project Path="acknowledgment-and-audit-residue/Tests/AcknowledgmentAndAuditResidue.Tests.csproj" />
+  <Project Path="decision-receipts-and-acknowledgment/Sample/DecisionReceiptsAndAcknowledgment.csproj" />
+  <Project Path="decision-receipts-and-acknowledgment/Tests/DecisionReceiptsAndAcknowledgment.Tests.csproj" />
   <Project Path="decision-before-execution/Sample/DecisionBeforeExecution.csproj" />
   <Project Path="decision-before-execution/Tests/DecisionBeforeExecution.Tests.csproj" />
   <Project Path="decision-pipeline-refactoring/Sample/DecisionPipelineRefactoring.csproj" />

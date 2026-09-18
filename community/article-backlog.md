@@ -4,7 +4,7 @@ This backlog prioritizes candidate standalone technical articles for `AsiBackbon
 
 It is an editorial planning surface, not a publication quota and not a second curriculum roadmap. `ROADMAP.md` remains the strategic source of truth for Learning. [Requested Topics](requested-topics.md) remains the community intake surface for curriculum ideas. This backlog answers a narrower question:
 
-> **Which existing Learning ideas are strong candidates for a standalone, problem-oriented article that can be useful before a reader knows ASI Backbone terminology?**
+> **Which existing Learning ideas are strong candidates for a standalone, problem-oriented article that can be useful before a reader knows AsiBackbone terminology?**
 
 The current Articles archive demonstrates the intended shape with [Your Authorization Check Runs Too Late](../docs/articles/2026/authorization-check-runs-too-late.md) and [A Green CI Badge Does Not Prove Your .NET Package Is Trustworthy](../docs/articles/2026/ci-badge-does-not-prove-package-integrity.md).
 
@@ -186,7 +186,7 @@ Teams often use `authorized`, `approved`, `confirmed`, and `acknowledged` as if 
 #### Existing Learning support
 
 - [Human-in-the-Loop Governance Workflows](../docs/governance/human-in-the-loop-governance-workflows.md)
-- [Acknowledgment and Audit Residue](../docs/tutorials/acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment](../docs/tutorials/decision-receipts-and-acknowledgment.md)
 - [Workflow Engines, Human Approval Systems, and Governed Execution](../docs/architecture/workflow-engines-human-approval-and-governed-execution.md)
 - [When ASP.NET Core Authorization Is Enough](../docs/architecture/when-aspnet-core-authorization-is-enough.md)
 
@@ -196,7 +196,7 @@ The deeper pages model complete review and workflow lifecycles. This article sho
 
 #### Natural deeper path
 
-Lead to Human-in-the-Loop Governance Workflows for long-running review and to Acknowledgment and Audit Residue for the pause/resume evidence model.
+Lead to Human-in-the-Loop Governance Workflows for long-running review and to Decision Receipts and Acknowledgment for the pause/resume evidence model.
 
 ---
 
@@ -212,7 +212,7 @@ A team already records application or security logs and wants to know whether th
 
 #### Existing Learning support
 
-- [Acknowledgment and Audit Residue](../docs/tutorials/acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment](../docs/tutorials/decision-receipts-and-acknowledgment.md)
 - [Event Sourcing, Audit Trails, and Governance Decision Provenance](../docs/architecture/event-sourcing-audit-trails-and-governance-decision-provenance.md)
 - [Secure Logging Across Trust Boundaries](../docs/security/secure-logging-across-trust-boundaries.md)
 - [Policy Versioning and Decision Provenance](../docs/governance/policy-versioning-and-decision-provenance.md)

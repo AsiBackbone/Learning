@@ -87,7 +87,7 @@ Use the diagrams as orientation, then follow the corresponding lessons for reaso
 - [Getting Started](../getting-started/index.md)
 - [Decision Before Execution](../tutorials/decision-before-execution.md)
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md)
 - [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md)
@@ -96,9 +96,9 @@ Use the diagrams as orientation, then follow the corresponding lessons for reaso
 
 The Learning diagrams are intentionally framework-neutral. The current AsiBackbone implementation repository contains fuller implementation-facing references:
 
-- [Core Governance Flow Diagrams](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/core-governance-flow-diagrams.md)
-- [Core Policy Evaluator Pipeline](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/policy-evaluator-pipeline.md)
-- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md)
+- [Core Governance Flow Diagrams](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/core-governance-flow-diagrams.md)
+- [Core Policy Evaluator Pipeline](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/policy-evaluator-pipeline.md)
+- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/capability-grant-hardening.md)
 
 Those implementation references may use concrete package types and validation profiles. This Learning page keeps the architectural lesson independent of any one API surface.
 

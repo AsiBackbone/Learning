@@ -1,6 +1,6 @@
 # Licensing
 
-ASI Backbone Learning contains educational material and executable
+AsiBackbone Learning contains educational material and executable
 software examples distributed under different licenses.
 
 ## Documentation and Educational Material

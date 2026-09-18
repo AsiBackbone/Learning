@@ -10,7 +10,7 @@ description: Learn how narrow, short-lived capabilities preserve host control be
 
 **Difficulty:** Intermediate  
 
-**Prerequisites:** [Decision Before Execution](decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md), and [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md)
+**Prerequisites:** [Decision Before Execution](decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md), and [Decision Receipts and Acknowledgment](decision-receipts-and-acknowledgment.md)
 
 **Glossary:** [Scoped capability](../architecture/glossary.md#scoped-capability), [capability token](../architecture/glossary.md#capability-token), [execution authority](../architecture/glossary.md#execution-authority), [host-owned execution](../architecture/glossary.md#host-owned-execution), and [trust boundary](../architecture/glossary.md#trust-boundary).
 
@@ -26,13 +26,13 @@ description: Learn how narrow, short-lived capabilities preserve host control be
 >
 > **Observe:** A blocked decision cannot mint execution authority, and expired or stale authority never reaches the executor.
 
-This is the fourth foundational tutorial in ASI Backbone Learning.
+This is the fourth foundational tutorial in AsiBackbone Learning.
 
 It builds on:
 
 1. [Decision Before Execution](decision-before-execution.md)
 2. [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md)
-3. [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md)
+3. [Decision Receipts and Acknowledgment](decision-receipts-and-acknowledgment.md)
 
 The earlier tutorials established that a consequential action should be proposed, evaluated, and—when necessary—acknowledged before execution.
 
@@ -59,7 +59,7 @@ Capability validation
    ↓
 Host-owned execution
    ↓
-Audit residue
+Decision receipt
 ```
 
 The central principle is:
@@ -1351,27 +1351,27 @@ Use these references as an implementation map rather than as required dependenci
 
 | Tutorial concept | Working reference | What to inspect |
 | --- | --- | --- |
-| Narrow, short-lived execution authority | [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) | Compare the tutorial's compact `ExecutionCapability` with the provider-neutral grant metadata for issuer, audience, scopes, time bounds, subject, operation, policy identity, acknowledgment/handshake references, gateway binding, and resource binding. |
-| Execution-boundary versus metadata-only validation | [`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) | Compare `CreateExecutionBoundary(...)`, which requires proof and bounded-use validation by default, with the deliberately weaker `CreateMetadataValidation(...)` profile. |
-| Capability validation pipeline | [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) | Follow proof verification, issuer/audience checks, time bounds, scopes, policy identity, acknowledgment/handshake references, gateway/resource bindings, and optional bounded-use state before a result can allow continuation. |
-| Execution-profile behavior under tests | [`CapabilityGrantValidationProfileTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidationProfileTests.cs) and [`CapabilityGrantValidatorTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidatorTests.cs) | Inspect executable cases for strict execution-boundary defaults, metadata-only behavior, proof failure, unavailable use-state, binding mismatches, expiration, policy evidence, and validation outcomes. |
-| Bounded-use and replay-state seam | [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) and [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Storage.InMemory/CapabilityTokens/InMemoryCapabilityGrantUseStore.cs) | Compare the provider-neutral host contract with the explicitly local in-memory reference implementation. Durable, distributed, atomic replay guarantees remain host-owned. |
-| Bounded-use behavior under tests | [`InMemoryCapabilityGrantUseStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/InMemoryCapabilityGrantUseStoreTests.cs) | Follow first-use, reuse-limit, stopped/cancelled, and local-state behavior without mistaking the in-memory store for distributed replay protection. |
-| Production-oriented capability hardening | [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) | Review execution-boundary profiles, proof handling, binding checks, clock skew, failure behavior, bounded use, and the explicit boundary between capability validation and host authorization/execution. |
-| Proof trust narrowing | [Capability Proof Trust Pinning](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-proof-trust-pinning.md) | See how a host can narrow which otherwise valid signing authority is acceptable for a particular capability-validation context. |
-| Host-owned execution lifecycle | [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) | Follow the broader governed lifecycle and observe that execution remains deliberately outside the governance spine and under host control. |
+| Narrow, short-lived execution authority | [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) | Compare the tutorial's compact `ExecutionCapability` with the provider-neutral grant metadata for issuer, audience, scopes, time bounds, subject, operation, policy identity, acknowledgment/handshake references, gateway binding, and resource binding. |
+| Execution-boundary versus metadata-only validation | [`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) | Compare `CreateExecutionBoundary(...)`, which requires proof and bounded-use validation by default, with the deliberately weaker `CreateMetadataValidation(...)` profile. |
+| Capability validation pipeline | [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) | Follow proof verification, issuer/audience checks, time bounds, scopes, policy identity, acknowledgment/handshake references, gateway/resource bindings, and optional bounded-use state before a result can allow continuation. |
+| Execution-profile behavior under tests | [`CapabilityGrantValidationProfileTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidationProfileTests.cs) and [`CapabilityGrantValidatorTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidatorTests.cs) | Inspect executable cases for strict execution-boundary defaults, metadata-only behavior, proof failure, unavailable use-state, binding mismatches, expiration, policy evidence, and validation outcomes. |
+| Bounded-use and replay-state seam | [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) and [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Storage.InMemory/CapabilityTokens/InMemoryCapabilityGrantUseStore.cs) | Compare the provider-neutral host contract with the explicitly local in-memory reference implementation. Durable, distributed, atomic replay guarantees remain host-owned. |
+| Bounded-use behavior under tests | [`InMemoryCapabilityGrantUseStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/CapabilityTokens/InMemoryCapabilityGrantUseStoreTests.cs) | Follow first-use, reuse-limit, stopped/cancelled, and local-state behavior without mistaking the in-memory store for distributed replay protection. |
+| Production-oriented capability hardening | [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/capability-grant-hardening.md) | Review execution-boundary profiles, proof handling, binding checks, clock skew, failure behavior, bounded use, and the explicit boundary between capability validation and host authorization/execution. |
+| Proof trust narrowing | [Capability Proof Trust Pinning](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/capability-proof-trust-pinning.md) | See how a host can narrow which otherwise valid signing authority is acceptable for a particular capability-validation context. |
+| Host-owned execution lifecycle | [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/intent-to-execution-pattern.md) | Follow the broader governed lifecycle and observe that execution remains deliberately outside the governance spine and under host control. |
 
 ### Follow the Capability Path
 
 For a code-first inspection, follow these references in order:
 
-1. [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — begin with the provider-neutral description of narrow follow-on authority.
-2. [`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) — inspect how the host declares whether it is performing strict execution-boundary validation or intentionally weaker metadata validation.
-3. [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) — follow the configured proof, time, scope, policy, acknowledgment, gateway, resource, and use-state checks.
-4. [`CapabilityGrantValidationProfileTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidationProfileTests.cs) and [`CapabilityGrantValidatorTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidatorTests.cs) — compare the API surface with executable allow, deny, and defer behavior.
-5. [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) and [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Storage.InMemory/CapabilityTokens/InMemoryCapabilityGrantUseStore.cs) — continue into bounded-use state while keeping production persistence and concurrency guarantees host-owned.
-6. [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) — put those source types back into their production-oriented security and failure-handling context.
-7. [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) — finish at the broader lifecycle and the boundary where the host performs the real side effect.
+1. [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — begin with the provider-neutral description of narrow follow-on authority.
+2. [`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) — inspect how the host declares whether it is performing strict execution-boundary validation or intentionally weaker metadata validation.
+3. [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) — follow the configured proof, time, scope, policy, acknowledgment, gateway, resource, and use-state checks.
+4. [`CapabilityGrantValidationProfileTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidationProfileTests.cs) and [`CapabilityGrantValidatorTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidatorTests.cs) — compare the API surface with executable allow, deny, and defer behavior.
+5. [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) and [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Storage.InMemory/CapabilityTokens/InMemoryCapabilityGrantUseStore.cs) — continue into bounded-use state while keeping production persistence and concurrency guarantees host-owned.
+6. [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/capability-grant-hardening.md) — put those source types back into their production-oriented security and failure-handling context.
+7. [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/intent-to-execution-pattern.md) — finish at the broader lifecycle and the boundary where the host performs the real side effect.
 
 ### Teaching Model Versus Working Framework
 
@@ -1448,7 +1448,7 @@ Execution gateway validates capability
    ↓
 Host invokes tool
    ↓
-Audit residue
+Decision receipt
 ```
 
 Example:
@@ -1563,7 +1563,7 @@ Execution-boundary validation
    ↓
 Host invokes tool
    ↓
-Audit residue
+Decision receipt
 ```
 
 The fifth tutorial is therefore not a new architectural primitive.
@@ -1575,7 +1575,7 @@ It is the first full composition of the primitives established so far.
 - [Foundational Tutorial Index](index.md) — view the complete five-tutorial governed-execution learning path.
 - [Do You Need a Capability Token, or Are Roles and Claims Enough?](../articles/2026/roles-claims-or-capability-token-dotnet.md) — use a scenario-driven selection guide before introducing capability infrastructure where roles, claims, or immediate host authorization may already be enough.
 - [Decision Before Execution](decision-before-execution.md) — revisit the foundational boundary between a proposed operation, a governance decision, and the host-owned side effect.
-- [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — review the responsibility and evidence boundaries that may precede issuance of execution authority.
+- [Decision Receipts and Acknowledgment](decision-receipts-and-acknowledgment.md) — review the responsibility and evidence boundaries that may precede issuance of execution authority.
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — revisit the policy facts, outcome semantics, and policy identity that justify a scoped capability.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — go deeper on durable replay state, atomic consumption, distributed races, idempotency, and execution failure windows.
 - [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](../advanced/governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md) — explore the experimental delegation rule that derived authority must not silently become broader than its source authority.

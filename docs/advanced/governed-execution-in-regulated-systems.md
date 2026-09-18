@@ -10,7 +10,7 @@ description: Learn how governed execution can contribute decision evidence in re
 
 **Difficulty:** Advanced
 
-**Prerequisites:** [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md), [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md), and [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md)
+**Prerequisites:** [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md), [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md), and [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md)
 
 Public-sector and regulated systems often need more than proof that an action happened.
 
@@ -110,7 +110,7 @@ That crosswalk is product-owned because it maps named external references to act
 
 - [Regional Policy and Operational Gateways](regional-policy-and-operational-gateways.md)
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md)
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 - [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md)
 - [Decision Explainability for Human Operators](decision-explainability-for-human-operators.md)
 

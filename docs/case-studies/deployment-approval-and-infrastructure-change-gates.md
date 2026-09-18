@@ -720,7 +720,7 @@ BaseStateVersion
 ProviderAccountRef
 ```
 
-Do **not** use governance receipts as a convenient place to retain:
+Do **not** use decision receipts as a convenient place to retain:
 
 - deployment credentials;
 - cloud access tokens;

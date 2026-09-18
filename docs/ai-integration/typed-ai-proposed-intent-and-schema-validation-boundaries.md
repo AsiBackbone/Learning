@@ -1780,7 +1780,7 @@ Execution-boundary validation
    ↓
 Host-owned execution
    ↓
-Audit residue
+Decision receipt
 ```
 
 This tutorial zooms into the first transition:
@@ -1824,8 +1824,8 @@ The Learning repository already contains an executable capstone that demonstrate
 
 The `AsiBackbone/AsiBackbone` repository provides fuller governance references:
 
-- [AI Agent Gateway Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/ai-agent-gateway.md) — keeps AI-proposed action separate from host-owned execution.
-- [Human Approval Before AI Tool Execution](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/human-approval-before-ai-tool-execution.md) — demonstrates acknowledgment as a separate boundary before consequential tool execution.
+- [AI Agent Gateway Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/scenarios/ai-agent-gateway.md) — keeps AI-proposed action separate from host-owned execution.
+- [Human Approval Before AI Tool Execution](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/scenarios/human-approval-before-ai-tool-execution.md) — demonstrates acknowledgment as a separate boundary before consequential tool execution.
 
 These working references do not make raw model output authoritative.
 

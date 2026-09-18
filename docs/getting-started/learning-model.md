@@ -4,7 +4,7 @@ description: Understand Learning's problem-first model, the roles of tutorials, 
 
 # Learning Model
 
-ASI Backbone Learning is a living architecture-learning resource, not a product manual or framework adoption funnel.
+AsiBackbone Learning is a living architecture-learning resource, not a product manual or framework adoption funnel.
 
 Its purpose is to help a reader understand an architectural boundary, observe it in a small implementation, verify the claimed invariant, challenge the design, and adapt only what is useful.
 
@@ -167,7 +167,7 @@ Material may therefore distinguish between two pattern types.
 
 | Pattern type | What it means | What it does not mean |
 | --- | --- | --- |
-| **Canonical** | Aligned with the current architecture of one or more ASI Backbone organization projects | Universal, mandatory, or superior in every context |
+| **Canonical** | Aligned with the current architecture of one or more AsiBackbone organization projects | Universal, mandatory, or superior in every context |
 | **Alternative** | A technically grounded approach that solves the same problem differently | Incorrect merely because it differs from the working repositories |
 
 A canonical pattern answers:

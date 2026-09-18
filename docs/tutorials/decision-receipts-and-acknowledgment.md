@@ -2,7 +2,7 @@
 description: Learn how operations pause for bound acknowledgment, re-evaluate current policy, and preserve distinct decision, acknowledgment, and execution evidence.
 ---
 
-# Acknowledgment and Audit Residue
+# Decision Receipts and Acknowledgment
 
 **Learning objective:** Understand how a consequential operation can pause for explicit acknowledgment, resume through a governed boundary, and leave structured evidence explaining what was proposed, decided, acknowledged, and ultimately performed.
 
@@ -12,7 +12,7 @@ description: Learn how operations pause for bound acknowledgment, re-evaluate cu
 
 **Prerequisites:** [Decision Before Execution](decision-before-execution.md) and [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md)
 
-**Glossary:** [Acknowledgment](../architecture/glossary.md#acknowledgment), [audit residue](../architecture/glossary.md#audit-residue), and [decision provenance](../architecture/glossary.md#decision-provenance).
+**Glossary:** [Acknowledgment](../architecture/glossary.md#acknowledgment), [decision receipt](../architecture/glossary.md#decision-receipt), and [decision provenance](../architecture/glossary.md#decision-provenance).
 
 ## Pattern Card
 
@@ -26,7 +26,7 @@ description: Learn how operations pause for bound acknowledgment, re-evaluate cu
 >
 > **Observe:** A valid acknowledgment does not override policy; changed context can still block execution after acknowledgment.
 
-This is the third foundational tutorial in ASI Backbone Learning.
+This is the third foundational tutorial in AsiBackbone Learning.
 
 It builds on:
 
@@ -48,11 +48,13 @@ Constraints
    ↓
 Decision
    ↓
+Decision receipt
+   ↓
 Acknowledgment when required
    ↓
 Host-owned continuation
    ↓
-Audit residue
+Correlated lifecycle evidence
 ```
 
 The core ideas are:
@@ -61,7 +63,7 @@ The core ideas are:
 
 and:
 
-> **Audit residue should explain the governed path without pretending that an ordinary log line is durable proof.**
+> **A decision receipt should explain the evaluation outcome and its reasons without pretending that an ordinary log line is durable proof—or that a decision proves execution.**
 
 ## The Problem
 
@@ -112,7 +114,7 @@ At the same time, the system may need to answer later:
 - Did execution happen afterward?
 - Which correlation identifier connects these events?
 
-Those questions motivate structured audit residue.
+Those questions motivate structured decision receipt.
 
 ## A Naive Confirmation Dialog
 
@@ -522,10 +524,10 @@ User disabled account.
 
 does not explain the governed path.
 
-A more useful residue might capture:
+A decision receipt might capture:
 
 ```text
-EventId
+ReceiptId
 OccurredUtc
 ActorId
 OperationName
@@ -534,7 +536,6 @@ ReasonCodes
 CorrelationId
 PolicyVersion
 PolicyHash
-DecisionStage
 ```
 
 These policy fields are part of decision provenance, not merely decoration on an audit record. See [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) for the deeper treatment of decision-time identity, policy drift, freshness, and the limits of fingerprints.
@@ -542,8 +543,8 @@ These policy fields are part of decision provenance, not merely decoration on an
 A minimal educational model:
 
 ```csharp
-public sealed record AuditResidue(
-    string EventId,
+public sealed record DecisionReceipt(
+    string ReceiptId,
     DateTimeOffset OccurredUtc,
     string ActorId,
     string OperationName,
@@ -551,11 +552,22 @@ public sealed record AuditResidue(
     IReadOnlyList<string> ReasonCodes,
     string CorrelationId,
     string PolicyVersion,
-    string? PolicyHash,
-    string DecisionStage);
+    string? PolicyHash);
 ```
 
-Examples of stages:
+Acknowledgment and execution are later lifecycle events, not additional claims about what the evaluator decided. A separate event shape can correlate those stages with the original receipt:
+
+```csharp
+public sealed record DecisionReceiptLifecycleEvent(
+    string EventId,
+    DateTimeOffset OccurredUtc,
+    string CorrelationId,
+    string ReceiptId,
+    string Stage,
+    string Outcome);
+```
+
+Examples of lifecycle stages:
 
 ```text
 decision
@@ -568,7 +580,7 @@ execution-completed
 execution-failed
 ```
 
-A single operation can therefore leave multiple related residues.
+A single operation can therefore produce a decision receipt, later lifecycle events, and a fresh decision receipt if policy is re-evaluated. Correlation does not collapse those records into one claim.
 
 ## Think in a Timeline
 
@@ -600,22 +612,21 @@ CorrelationId = req-7d91
 
 This creates a navigable governance timeline without forcing every fact into one giant record.
 
-## Decision Residue
+## Decision Receipt
 
-A helper might create residue from a decision:
+A helper might create receipt from a decision:
 
 ```csharp
-public static AuditResidue FromDecision(
+public static DecisionReceipt FromDecision(
     string actorId,
     string operationName,
     GovernanceDecision decision,
     string correlationId,
     string policyVersion,
-    string? policyHash,
-    string stage)
+    string? policyHash)
 {
-    return new AuditResidue(
-        EventId: Guid.NewGuid().ToString("N"),
+    return new DecisionReceipt(
+        ReceiptId: Guid.NewGuid().ToString("N"),
         OccurredUtc: DateTimeOffset.UtcNow,
         ActorId: actorId,
         OperationName: operationName,
@@ -626,52 +637,43 @@ public static AuditResidue FromDecision(
                 .ToArray(),
         CorrelationId: correlationId,
         PolicyVersion: policyVersion,
-        PolicyHash: policyHash,
-        DecisionStage: stage);
+        PolicyHash: policyHash);
 }
 ```
 
-The host can create a decision residue before execution:
+The host can create a decision receipt before execution:
 
 ```csharp
-AuditResidue residue =
-    AuditResidueFactory.FromDecision(
+DecisionReceipt receipt =
+    DecisionReceiptFactory.FromDecision(
         actor.Id,
         "account.disable",
         decision,
         context.CorrelationId,
         context.PolicyVersion,
-        policyHash: null,
-        stage: "decision");
+        policyHash: null);
 ```
 
-## Acknowledgment Residue
+## Acknowledgment Lifecycle Event
 
 The acknowledgment itself can produce a separate event:
 
 ```csharp
-public static AuditResidue FromAcknowledgment(
+public static DecisionReceiptLifecycleEvent FromAcknowledgment(
+    DecisionReceipt receipt,
     AcknowledgmentChallenge challenge,
     AcknowledgmentResponse response)
 {
-    return new AuditResidue(
+    return new DecisionReceiptLifecycleEvent(
         EventId: response.AcknowledgmentId,
         OccurredUtc: response.OccurredUtc,
-        ActorId: response.ActorId,
-        OperationName: challenge.OperationName,
+        CorrelationId: challenge.CorrelationId,
+        ReceiptId: receipt.ReceiptId,
+        Stage: "acknowledgment",
         Outcome:
             response.Accepted
                 ? "AcknowledgmentAccepted"
-                : "AcknowledgmentRejected",
-        ReasonCodes:
-        [
-            challenge.ReasonCode,
-            challenge.RequiredAcknowledgmentCode
-        ],
-        CorrelationId: challenge.CorrelationId,
-        PolicyVersion: challenge.PolicyVersion,
-        PolicyHash: null,
-        DecisionStage: "acknowledgment");
+                : "AcknowledgmentRejected");
 }
 ```
 
@@ -695,43 +697,32 @@ Host later executed operation
 
 Those are different events.
 
-## Execution Residue
+## Execution Lifecycle Event
 
 After the host operation:
 
 ```csharp
-AuditResidue completed =
+DecisionReceiptLifecycleEvent completed =
     new(
         EventId: Guid.NewGuid().ToString("N"),
         OccurredUtc: DateTimeOffset.UtcNow,
-        ActorId: actor.Id,
-        OperationName: "account.disable",
-        Outcome: "Executed",
-        ReasonCodes: [],
         CorrelationId: context.CorrelationId,
-        PolicyVersion: context.PolicyVersion,
-        PolicyHash: null,
-        DecisionStage: "execution-completed");
+        ReceiptId: receipt.ReceiptId,
+        Stage: "execution-completed",
+        Outcome: "Executed");
 ```
 
 If execution fails:
 
 ```csharp
-AuditResidue failed =
+DecisionReceiptLifecycleEvent failed =
     new(
         EventId: Guid.NewGuid().ToString("N"),
         OccurredUtc: DateTimeOffset.UtcNow,
-        ActorId: actor.Id,
-        OperationName: "account.disable",
-        Outcome: "ExecutionFailed",
-        ReasonCodes:
-        [
-            "account.disable.execution-failed"
-        ],
         CorrelationId: context.CorrelationId,
-        PolicyVersion: context.PolicyVersion,
-        PolicyHash: null,
-        DecisionStage: "execution-failed");
+        ReceiptId: receipt.ReceiptId,
+        Stage: "execution-failed",
+        Outcome: "ExecutionFailed");
 ```
 
 The decision and execution are now distinguishable in the evidence.
@@ -748,7 +739,7 @@ does not mean:
 Executed successfully
 ```
 
-## Logging and Audit Residue Are Different
+## Logging and Decision Receipt Are Different
 
 Operational logging asks questions such as:
 
@@ -757,12 +748,15 @@ Operational logging asks questions such as:
 - Which exception occurred?
 - Which dependency failed?
 
-Audit residue asks questions such as:
+Decision receipts ask questions such as:
 
 - What consequential operation was proposed?
 - What governance outcome was produced?
 - Which reason codes applied?
 - Was acknowledgment required?
+
+Correlated lifecycle evidence asks follow-on questions such as:
+
 - Who acknowledged?
 - What execution state followed?
 
@@ -793,16 +787,16 @@ Timestamp
 Accepted / Rejected
 ```
 
-Structured audit residue gives those concepts a deliberate shape.
+Structured decision receipts and correlated lifecycle events give those concepts deliberate, separate shapes.
 
-## Audit Residue Is Not Automatically Tamper-Proof
+## Decision Receipt Is Not Automatically Tamper-Proof
 
 This boundary is important.
 
 Creating:
 
 ```csharp
-new AuditResidue(...)
+new DecisionReceipt(...)
 ```
 
 does not automatically create:
@@ -866,18 +860,18 @@ Mark delivery status
 This is an implementation concern beyond the minimal tutorial, but it illustrates an important distinction:
 
 ```text
-Create residue
+Create receipt
 ≠
-Persist residue
+Persist receipt
 ≠
-Deliver residue
+Deliver receipt
 ```
 
 Those are separate responsibilities.
 
 ## Keep Audit Data Purposeful
 
-Audit residue should not become a dumping ground.
+A decision receipt should not become a dumping ground.
 
 Avoid copying:
 
@@ -1128,7 +1122,7 @@ A production workflow depends on evidence that may disappear with process restar
 
 Durability requires a persistence design.
 
-### 8. Audit Residue Stores Too Much Sensitive Data
+### 8. Decision Receipt Stores Too Much Sensitive Data
 
 Evidence becomes a secondary data breach surface.
 
@@ -1179,39 +1173,39 @@ This tutorial is framework-neutral, but the working `AsiBackbone` repository con
 
 ### Working Implementation Map
 
-The Learning example keeps acknowledgment and audit residue in one small workflow so the lifecycle is easy to observe. The production framework separates handshake records, ASP.NET Core challenge handling, lifecycle evidence, persistence-ready records, and storage contracts into distinct surfaces.
+The Learning example keeps acknowledgment and decision receipt in one small workflow so the lifecycle is easy to observe. The production framework separates handshake records, ASP.NET Core challenge handling, lifecycle evidence, persistence-ready records, and storage contracts into distinct surfaces.
 
 | Tutorial concept | Working implementation | What to inspect |
 | --- | --- | --- |
-| Decision-derived acknowledgment request | [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) | `FromDecision` carries the decision's reason, correlation ID, trace ID, policy version, and policy hash into a framework-neutral handshake request. |
-| Accepted or rejected actor response | [`LiabilityHandshakeAcknowledgment`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeAcknowledgment.cs) | The separate acknowledgment record preserves handshake identity, responding actor, acknowledgment code, accepted/rejected state, timestamp, and correlation metadata without becoming execution authority. |
-| ASP.NET Core challenge boundary | [`DefaultAsiBackboneAcknowledgmentChallengeService`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Handshakes/DefaultAsiBackboneAcknowledgmentChallengeService.cs) | How an `AcknowledgmentRequired` decision becomes a host-facing challenge and how response handshake IDs and acknowledgment codes are checked before an acknowledgment record is produced. |
-| Challenge behavior under tests | [`AsiBackboneAcknowledgmentChallengeServiceTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.AspNetCore.Tests/Handshakes/AsiBackboneAcknowledgmentChallengeServiceTests.cs) | Executable examples for challenge creation, accepted and rejected responses, mismatch handling, correlation, trace, and policy metadata. |
-| Structured governance evidence | [`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs) | The richer evidence model for actor, operation, outcome, reason codes, correlation/trace data, decision stage, policy identity, and optional observability fields. |
-| Append-style lifecycle evidence | [`AuditResidueLifecycleEvent`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidueLifecycleEvent.cs) and [`AuditResidueLifecycleStage`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidueLifecycleStage.cs) | How acknowledgment, capability, gateway, and emission progress can be represented as separate correlated events without rewriting the original decision residue. |
-| Lifecycle behavior under tests | [`AuditResidueLifecycleEventTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Audit/AuditResidueLifecycleEventTests.cs) | Stable lifecycle-stage sequencing, required correlation, and tests showing that later progress can be recorded without mutating the original residue. |
-| Persistence-ready audit record | [`AuditLedgerRecord`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditLedgerRecord.cs) | The persistence-oriented projection that adds recording time, handshake and acknowledgment references, optional hash/signature metadata, and other durable-record fields. |
-| Host-owned audit persistence | [`IAsiBackboneAuditLedgerStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/IAsiBackboneAuditLedgerStore.cs) | The provider-neutral append and query contract for durable host-owned audit ledger storage. |
-| Audit model and persistence tests | [`AuditLedgerRecordTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Audit/AuditLedgerRecordTests.cs) and [`IAsiBackboneAuditLedgerStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Audit/IAsiBackboneAuditLedgerStoreTests.cs) | Executable coverage for persistence-ready records and the audit ledger storage contract. |
+| Decision-derived acknowledgment request | [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) | `FromDecision` carries the decision's reason, correlation ID, trace ID, policy version, and policy hash into a framework-neutral handshake request. |
+| Accepted or rejected actor response | [`LiabilityHandshakeAcknowledgment`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeAcknowledgment.cs) | The separate acknowledgment record preserves handshake identity, responding actor, acknowledgment code, accepted/rejected state, timestamp, and correlation metadata without becoming execution authority. |
+| ASP.NET Core challenge boundary | [`DefaultAcknowledgmentChallengeService`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.AspNetCore/Handshakes/DefaultAcknowledgmentChallengeService.cs) | How an `AcknowledgmentRequired` decision becomes a host-facing challenge and how response handshake IDs and acknowledgment codes are checked before an acknowledgment record is produced. |
+| Challenge behavior under tests | [`AsiBackboneAcknowledgmentChallengeServiceTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.AspNetCore.Tests/Handshakes/AsiBackboneAcknowledgmentChallengeServiceTests.cs) | Executable examples for challenge creation, accepted and rejected responses, mismatch handling, correlation, trace, and policy metadata. |
+| Structured governance evidence | [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) | The richer evidence model for actor, operation, outcome, reason codes, correlation/trace data, decision stage, policy identity, and optional observability fields. |
+| Append-style lifecycle evidence | [`DecisionReceiptLifecycleEvent`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceiptLifecycleEvent.cs) and [`DecisionReceiptLifecycleStage`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceiptLifecycleStage.cs) | How acknowledgment, capability, gateway, and emission progress can be represented as separate correlated events without rewriting the original decision receipt. |
+| Lifecycle behavior under tests | [`AuditResidueLifecycleEventTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/Audit/AuditResidueLifecycleEventTests.cs) | This compatibility-retained test fixture name exercises the 6.0 `DecisionReceiptLifecycleEvent` stages and shows that later progress can be recorded without mutating the original receipt. |
+| Persistence-ready audit record | [`AuditLedgerRecord`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/AuditLedgerRecord.cs) | The persistence-oriented projection that adds recording time, handshake and acknowledgment references, optional hash/signature metadata, and other durable-record fields. |
+| Host-owned audit persistence | [`IGovernanceAuditLedgerStore`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/IGovernanceAuditLedgerStore.cs) | The provider-neutral append and query contract for durable host-owned audit ledger storage. |
+| Audit model and persistence tests | [`AuditLedgerRecordTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/Audit/AuditLedgerRecordTests.cs) and [`IAsiBackboneAuditLedgerStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/Audit/IAsiBackboneAuditLedgerStoreTests.cs) | Executable coverage for persistence-ready records and the `IGovernanceAuditLedgerStore` contract; the latter test fixture retains its pre-6.0 filename. |
 
 ### Follow the Acknowledgment and Evidence Path
 
 For a code-first inspection, follow these references in order:
 
-1. [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) — begin where an acknowledgment-required governance decision is projected into an explicit responsibility-handshake request.
-2. [`LiabilityHandshakeAcknowledgment`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeAcknowledgment.cs) — inspect the separate accepted/rejected actor response.
-3. [`DefaultAsiBackboneAcknowledgmentChallengeService`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Handshakes/DefaultAsiBackboneAcknowledgmentChallengeService.cs) — see one host-integration boundary for challenge creation and response handling.
-4. [`AsiBackboneAcknowledgmentChallengeServiceTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.AspNetCore.Tests/Handshakes/AsiBackboneAcknowledgmentChallengeServiceTests.cs) — compare the integration behavior with executable challenge and mismatch scenarios.
-5. [`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs) — inspect the evidence object that can retain outcome, reason, correlation, trace, policy, and stage information.
-6. [`AuditResidueLifecycleEvent`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidueLifecycleEvent.cs) and [`AuditResidueLifecycleStage`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidueLifecycleStage.cs) — follow how later acknowledgment and execution progress remains separate from the original decision record.
-7. [`AuditLedgerRecord`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditLedgerRecord.cs) and [`IAsiBackboneAuditLedgerStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/IAsiBackboneAuditLedgerStore.cs) — continue from in-memory evidence shape into persistence-ready records and host-owned durable storage.
+1. [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) — begin where an acknowledgment-required governance decision is projected into an explicit responsibility-handshake request.
+2. [`LiabilityHandshakeAcknowledgment`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeAcknowledgment.cs) — inspect the separate accepted/rejected actor response.
+3. [`DefaultAcknowledgmentChallengeService`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.AspNetCore/Handshakes/DefaultAcknowledgmentChallengeService.cs) — see one host-integration boundary for challenge creation and response handling.
+4. [`AsiBackboneAcknowledgmentChallengeServiceTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.AspNetCore.Tests/Handshakes/AsiBackboneAcknowledgmentChallengeServiceTests.cs) — compare the integration behavior with executable challenge and mismatch scenarios.
+5. [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) — inspect the evidence object that can retain outcome, reason, correlation, trace, policy, and stage information.
+6. [`DecisionReceiptLifecycleEvent`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceiptLifecycleEvent.cs) and [`DecisionReceiptLifecycleStage`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceiptLifecycleStage.cs) — follow how later acknowledgment and execution progress remains separate from the original decision record.
+7. [`AuditLedgerRecord`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/AuditLedgerRecord.cs) and [`IGovernanceAuditLedgerStore`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/IGovernanceAuditLedgerStore.cs) — continue from in-memory evidence shape into persistence-ready records and host-owned durable storage.
 
 For architectural explanation rather than source code, see:
 
-- [Dynamic Liability Handshake](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/dynamic-liability-handshake.md) — documents the broader acknowledgment/responsibility-handshake lifecycle and explicitly keeps execution policy host-owned.
-- [Durable Audit and Outbox Persistence](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/durable-audit-outbox-persistence.md) — explains why local durable evidence should precede optional downstream emission and distinguishes append-style audit evidence from outbox delivery state.
-- [Safe Audit and Telemetry Data Guidance](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/safe-audit-telemetry-data.md) — connects the tutorial's evidence-minimization guidance to production-oriented metadata hygiene.
-- [Signed Audit and Outbox Records](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/signed-audit-and-outbox-records.md) — shows the implemented signing seams while preserving the important distinction between signing and stronger immutability or tamper-evidence claims.
+- [Dynamic Liability Handshake](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/dynamic-liability-handshake.md) — documents the broader acknowledgment/responsibility-handshake lifecycle and explicitly keeps execution policy host-owned.
+- [Durable Audit and Outbox Persistence](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/durable-audit-outbox-persistence.md) — explains why local durable evidence should precede optional downstream emission and distinguishes append-style audit evidence from outbox delivery state.
+- [Safe Audit and Telemetry Data Guidance](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/safe-audit-telemetry-data.md) — connects the tutorial's evidence-minimization guidance to production-oriented metadata hygiene.
+- [Signed Audit and Outbox Records](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/signed-audit-and-outbox-records.md) — shows the implemented signing seams while preserving the important distinction between signing and stronger immutability or tamper-evidence claims.
 
 The production framework carries considerably more metadata and persistence/signing seams than the teaching model because it supports broader integration, observability, and governance scenarios. The Learning records are teaching-specific shapes rather than copies of framework production types.
 
@@ -1253,7 +1247,7 @@ Current decision
    ↓
 Host-controlled execution
    ↓
-Audit residue
+Decision receipt
 ```
 
 The evidence can distinguish:
@@ -1278,7 +1272,7 @@ Add:
 ```text
 AcknowledgmentChallenge
 AcknowledgmentResponse
-AuditResidue
+DecisionReceipt
 ```
 
 Implement this flow:
@@ -1304,7 +1298,7 @@ Decision = Allowed
    ↓
 Executor invoked
    ↓
-Execution residue created
+Execution receipt created
 ```
 
 Write tests proving:
@@ -1314,10 +1308,10 @@ Write tests proving:
 3. An expired challenge is invalid.
 4. A valid acknowledgment satisfies only the intended requirement.
 5. A newly introduced denial still blocks execution after acknowledgment.
-6. Decision, acknowledgment, and execution residues share the same correlation identifier.
+6. Decision, acknowledgment, and execution receipts share the same correlation identifier.
 7. An allowed decision and a successful execution are recorded as distinct states.
 
-For additional practice, persist challenge state and audit residue using an in-memory repository abstraction.
+For additional practice, persist challenge state and decision receipt using an in-memory repository abstraction.
 
 Then simulate a process restart and ask:
 
@@ -1334,7 +1328,7 @@ Before moving on, you should be able to:
 - [ ] Explain why current policy and context may need to be re-evaluated after acknowledgment before execution can proceed.
 - [ ] Demonstrate that rejection, actor mismatch, expiration, replay, or a newly introduced denial still prevents the protected side effect.
 - [ ] Preserve correlated but distinct evidence for decision, acknowledgment, re-evaluation, and execution outcomes.
-- [ ] Explain what audit residue contributes beyond ordinary diagnostics without claiming that an unsigned or mutable store is automatically tamper-proof.
+- [ ] Explain what decision receipt contributes beyond ordinary diagnostics without claiming that an unsigned or mutable store is automatically tamper-proof.
 - [ ] Identify the additional persistence, privacy, and lifecycle responsibilities that appear when acknowledgment and evidence must survive process restarts.
 
 ## Next
@@ -1373,12 +1367,12 @@ This continues the same principle established throughout Learning:
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — revisit the explicit decision inputs and outcomes that can lead to an acknowledgment requirement.
 - [Escalation Patterns in Governed Systems](../governance/escalation-patterns-in-governed-systems.md) — compare acknowledgment with escalation and follow an escalation into a separate authority, evidence, and re-evaluation path.
 - [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — continue from acknowledgment into narrow, short-lived execution authority.
-- [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see acknowledgment, capability, execution, and audit residue composed around AI-proposed actions.
+- [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see acknowledgment, capability, execution, and decision receipt composed around AI-proposed actions.
 - [Threat Modeling as Architecture Reasoning](../security/threat-modeling-as-architecture-reasoning.md) — reason about acknowledgment replay, evidence leakage, alternate continuation paths, and residual risk around responsibility boundaries.
 - [Structured Logging Without Sensitive-Data Sprawl](../aspnetcore/structured-logging-without-sensitive-data-sprawl.md) — compare high-volume operational diagnostics with evidence-oriented governance records that may share correlation without becoming the same artifact.
 - [Secure Logging Across Trust Boundaries](../security/secure-logging-across-trust-boundaries.md) — continue from the log-versus-evidence distinction into provider, export, storage, access, tenant, retention, and degraded-observability trust boundaries.
-- [Acknowledgment and Audit Residue sample](https://github.com/AsiBackbone/Learning/blob/main/samples/acknowledgment-and-audit-residue/README.md) — run the companion workflow and observe bound acknowledgment, re-evaluation, correlation, and distinct evidence stages.
-- [Acknowledgment and Audit Residue intermediate lab](../labs/acknowledgment-and-audit-residue.md) — break and strengthen the acknowledgment boundary, add replay state, preserve evidence behind a store, and distinguish policy decisions from execution failure.
+- [Decision Receipts and Acknowledgment sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-receipts-and-acknowledgment/README.md) — run the companion workflow and observe bound acknowledgment, re-evaluation, correlation, and distinct evidence stages.
+- [Decision Receipts and Acknowledgment intermediate lab](../labs/decision-receipts-and-acknowledgment.md) — break and strengthen the acknowledgment boundary, add replay state, preserve evidence behind a store, and distinguish policy decisions from execution failure.
 - [Executable Samples](../samples/index.md) — explore the published companion-sample guide before following a canonical sample README.
 - [Hands-On Labs](../labs/index.md) — practice acknowledgment, evidence, and governed-continuation boundaries through hands-on exercises.
 

@@ -1,10 +1,10 @@
 ---
-description: Browse hands-on ASI Backbone Learning labs for diagnosing, modifying, testing, and explaining architectural and governed-execution boundaries.
+description: Browse hands-on AsiBackbone Learning labs for diagnosing, modifying, testing, and explaining architectural and governed-execution boundaries.
 ---
 
 # Labs
 
-Labs are the **practice and reasoning layer** of ASI Backbone Learning.
+Labs are the **practice and reasoning layer** of AsiBackbone Learning.
 
 Tutorials explain architectural boundaries.
 
@@ -113,9 +113,9 @@ Related material:
 - [Middleware Ordering Changes Behavior sample](https://github.com/AsiBackbone/Learning/blob/main/samples/middleware-ordering-changes-behavior/README.md)
 - [ASP.NET Core learning area](../aspnetcore/index.md)
 
-### Acknowledgment and Audit Residue
+### Decision Receipts and Acknowledgment
 
-[Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md)
+[Decision Receipts and Acknowledgment](decision-receipts-and-acknowledgment.md)
 
 **Difficulty:** Intermediate
 
@@ -123,8 +123,8 @@ Break the acknowledgment boundary deliberately, add another response-binding fai
 
 Related material:
 
-- [Acknowledgment and Audit Residue tutorial](../tutorials/acknowledgment-and-audit-residue.md)
-- [Acknowledgment and Audit Residue sample](https://github.com/AsiBackbone/Learning/blob/main/samples/acknowledgment-and-audit-residue/README.md)
+- [Decision Receipts and Acknowledgment tutorial](../tutorials/decision-receipts-and-acknowledgment.md)
+- [Decision Receipts and Acknowledgment sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-receipts-and-acknowledgment/README.md)
 
 ### Scoped Capability and Host-Owned Execution
 
@@ -164,7 +164,7 @@ Preserve the policy identity that produced a decision, detect policy drift acros
 Related material:
 
 - [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md)
-- [Acknowledgment and Audit Residue lab](acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment lab](decision-receipts-and-acknowledgment.md)
 - [Scoped Capability and Host-Owned Execution lab](scoped-capability-and-host-owned-execution.md)
 
 ### Policy Simulation and Change-Impact Analysis
@@ -188,13 +188,13 @@ Related material:
 
 **Difficulty:** Intermediate
 
-Extend an authorized ASP.NET Core account-disable endpoint into a governed operation with explicit intent, authoritative context, structured outcomes, acknowledgment, scoped authority, host-owned execution, audit residue, and integration tests that prove blocked paths never invoke the underlying account service.
+Extend an authorized ASP.NET Core account-disable endpoint into a governed operation with explicit intent, authoritative context, structured outcomes, acknowledgment, scoped authority, host-owned execution, decision receipt, and integration tests that prove blocked paths never invoke the underlying account service.
 
 Related material:
 
 - [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md)
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 - [ASP.NET Core learning area](../aspnetcore/index.md)
 
@@ -329,7 +329,7 @@ Topics include:
 
 * Decision before execution
 * Explicit policy context and decision outcomes
-* Acknowledgment and audit residue
+* Acknowledgment and decision receipt
 * Scoped capability and host-owned execution
 * Governed AI tool gateways
 
@@ -351,7 +351,7 @@ After working through a teaching example or lab, compare the smaller architectur
 
 [AsiBackbone/AsiBackbone](https://github.com/AsiBackbone/AsiBackbone)
 
-A .NET governance and policy-control framework providing fuller implementations of policy evaluation, structured decisions, acknowledgment workflows, audit residue, scoped capability, and host-owned execution.
+A .NET governance and policy-control framework providing fuller implementations of policy evaluation, structured decisions, acknowledgment workflows, decision receipt, scoped capability, and host-owned execution.
 
 ## NetCoreApplicationTemplate
 

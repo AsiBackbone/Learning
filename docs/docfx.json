@@ -36,21 +36,21 @@
     ],
     "globalMetadata": {
       "_lang": "en",
-      "_appName": "ASI Backbone Learning",
-      "_appTitle": "ASI Backbone Learning",
+      "_appName": "AsiBackbone Learning",
+      "_appTitle": "AsiBackbone Learning",
       "_appLogoPath": "images/asibackbone-icon-50.png",
       "_appFaviconPath": "images/favicon.ico",
       "_enableSearch": true,
       "_deferSearch": true,
       "_canonicalBaseUrl": "https://asibackbone.github.io/Learning/",
-      "_structuredDataSiteName": "ASI Backbone Learning",
-      "_structuredDataSiteAlternateName": "Accountable Systems Infrastructure (ASI) Backbone Learning",
+      "_structuredDataSiteName": "AsiBackbone Learning",
+      "_structuredDataSiteAlternateName": "AsiBackbone Learning",
       "_structuredDataSiteDescription": "Practical .NET architecture tutorials, labs, and reference patterns for governed execution, secure applications, AI integration, and policy-driven systems.",
-      "_structuredDataPublisherName": "ASI Backbone",
-      "_structuredDataPublisherAlternateName": "Accountable Systems Infrastructure (ASI) Backbone",
+      "_structuredDataPublisherName": "AsiBackbone",
+      "_structuredDataPublisherAlternateName": "AsiBackbone",
       "_structuredDataPublisherUrl": "https://github.com/AsiBackbone",
       "_socialImageUrl": "https://asibackbone.github.io/Learning/images/asibackbone-social.png",
-      "_socialImageAlt": "ASI Backbone Learning — practical .NET architecture, security, and governed execution"
+      "_socialImageAlt": "AsiBackbone Learning — practical .NET architecture, security, and governed execution"
     }
   }
 }

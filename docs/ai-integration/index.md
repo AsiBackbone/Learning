@@ -43,7 +43,7 @@ Execution-Boundary Validation
    ↓
 Host-Owned Tool Execution
    ↓
-Audit Residue
+Decision Receipt
 ```
 
 The model may help determine what operation should be proposed.
@@ -66,9 +66,9 @@ Introduces the separation between proposed intent, governance evaluation, and re
 
 Explores authoritative context, constraints, explicit governance outcomes, reason codes, and policy identity.
 
-### 3. Acknowledgment and Audit Residue
+### 3. Decision Receipts and Acknowledgment
 
-[Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+[Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 
 Examines workflows that pause for acknowledgment and preserve evidence of the governed decision path.
 
@@ -102,7 +102,7 @@ This advanced tutorial distinguishes host-authoritative deterministic facts from
 
 [AI Governance Observability and End-to-End Decision Tracing](ai-governance-observability-and-end-to-end-decision-tracing.md)
 
-This advanced tutorial shows how correlation IDs, proposal IDs, trace/span relationships, structured events, decision reason codes, policy provenance, acknowledgment, scoped authority, executor invocation, and audit residue can be connected without allowing telemetry to become authorization or execution authority. The companion Governed AI Tool Gateway sample includes deterministic allowed, denied, and acknowledgment-required traces that can be inspected locally without a real AI service or telemetry backend.
+This advanced tutorial shows how correlation IDs, proposal IDs, trace/span relationships, structured events, decision reason codes, policy provenance, acknowledgment, scoped authority, executor invocation, and decision receipt can be connected without allowing telemetry to become authorization or execution authority. The companion Governed AI Tool Gateway sample includes deterministic allowed, denied, and acknowledgment-required traces that can be inspected locally without a real AI service or telemetry backend.
 
 ### Multi-Step AI Composition: Governed Multi-Tool Workflows and Recovery Boundaries
 
@@ -346,7 +346,7 @@ Execution Authority
 
 See:
 
-[Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+[Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 
 ## Dry-Run First
 
@@ -373,7 +373,7 @@ This allows developers to observe:
 * Which policy decisions occur.
 * Whether acknowledgment is triggered.
 * Which execution authority would be issued.
-* What audit residue would be preserved.
+* What decision receipt would be preserved.
 
 Real external execution can be introduced after the boundaries are understood and tested.
 

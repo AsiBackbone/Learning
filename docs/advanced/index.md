@@ -1,10 +1,10 @@
 ---
-description: Explore advanced ASI Backbone Learning topics requiring deeper reasoning about interacting boundaries, assumptions, failure modes, and tradeoffs.
+description: Explore advanced AsiBackbone Learning topics requiring deeper reasoning about interacting boundaries, assumptions, failure modes, and tradeoffs.
 ---
 
 # Advanced
 
-The Advanced section is reserved for topics that build on the foundational ASI Backbone Learning material and require deeper architectural reasoning, broader system context, or comparison among competing approaches.
+The Advanced section is reserved for topics that build on the foundational AsiBackbone Learning material and require deeper architectural reasoning, broader system context, or comparison among competing approaches.
 
 Advanced does not mean that a pattern is automatically better.
 
@@ -37,7 +37,7 @@ Readers should generally be familiar with the foundational tutorial sequence:
 
 1. [Decision Before Execution](../tutorials/decision-before-execution.md)
 2. [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
-3. [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+3. [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 4. [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 5. [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md)
 
@@ -58,7 +58,7 @@ Scoped Authority
    ↓
 Host-Owned Execution
    ↓
-Audit Residue
+Decision Receipt
 ```
 
 Advanced material may stretch, combine, distribute, or challenge these boundaries, but it should make those changes explicit.
@@ -268,7 +268,7 @@ Advanced material should ask:
 * Is compensation possible?
 * Does the original capability remain valid?
 * Should a new governance decision be required?
-* What audit residue should distinguish attempted, partial, failed, and completed execution?
+* What correlated lifecycle evidence should distinguish attempted, partial, failed, and completed execution?
 
 Governance does not remove distributed-systems failure modes.
 
@@ -422,7 +422,7 @@ The objective is to make the consequences of each design visible.
 
 ## Challenge the Canonical Pattern
 
-Some Learning material reflects architectural patterns currently used by ASI Backbone organization repositories.
+Some Learning material reflects architectural patterns currently used by AsiBackbone organization repositories.
 
 Those patterns should remain open to criticism.
 
@@ -464,7 +464,7 @@ These scenarios help expose architectural assumptions that may remain hidden dur
 
 ## Working Repository References
 
-Advanced Learning material may use both primary ASI Backbone organization repositories as implementation specimens.
+Advanced Learning material may use both primary AsiBackbone organization repositories as implementation specimens.
 
 ### AsiBackbone
 
@@ -474,7 +474,7 @@ Provides fuller governance and policy-control implementations that can be studie
 
 * Decision pipelines
 * Acknowledgment
-* Audit residue
+* Decision receipt
 * Capability boundaries
 * Host-owned execution
 * AI governance integration

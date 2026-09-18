@@ -447,7 +447,7 @@ Scoped authority when required
    ↓
 Host-owned execution
    ↓
-Audit residue / decision evidence
+Decision receipt / decision evidence
 ```
 
 This model is useful when the application must preserve distinctions that ordinary request admission does not express cleanly.
@@ -614,7 +614,7 @@ They should not be substituted for one another.
 
 A `200` at an API gateway does not explain why a production deployment was approved.
 
-A governance receipt does not prove that the service-to-service channel used mTLS.
+A decision receipt does not prove that the service-to-service channel used mTLS.
 
 The strongest architecture preserves the evidence needed for each boundary and correlates it without pretending that one log is every kind of proof.
 

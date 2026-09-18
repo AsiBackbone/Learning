@@ -10,7 +10,7 @@ description: Learn to model human review as an explicit governed workflow state 
 
 **Difficulty:** Intermediate
 
-**Prerequisites:** [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md), [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md), and [Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md)
+**Prerequisites:** [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md), [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md), and [Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md)
 
 ## At a Glance
 
@@ -110,7 +110,7 @@ Human review can involve several different acts, but the workflow should not col
 | Override | A specifically delegated authority supersedes a policy result within defined limits | Not by itself |
 | Execution authority | Narrow authority accepted at the protected execution boundary | Only when the host validates and uses it |
 
-The foundational meanings of authorization and governance outcomes are already covered in [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md). The acknowledgment boundary is covered in [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md), and execution authority in [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md).
+The foundational meanings of authorization and governance outcomes are already covered in [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md). The acknowledgment boundary is covered in [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md), and execution authority in [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md).
 
 The distinction that matters here is specific to human review: a reviewer can acknowledge that a request is high risk and still reject it, while a requester can acknowledge a warning without having authority to approve the operation.
 
@@ -393,7 +393,7 @@ Reviewer identity may then participate in:
 - Eligibility.
 - Separation-of-duty checks.
 - Delegation.
-- Audit residue.
+- Decision receipt.
 - Quorum.
 - Conflict-of-interest rules.
 - Policy revalidation.
@@ -1210,7 +1210,7 @@ See [Policy Versioning and Decision Provenance](policy-versioning-and-decision-p
 
 ---
 
-## Audit Residue Should Preserve Lifecycle Events
+## Lifecycle Evidence Should Preserve Later Events
 
 Human review creates more than one meaningful event.
 
@@ -1246,7 +1246,7 @@ does not explain:
 - Whether execution actually happened.
 - Whether approval was policy-compliant or an override.
 
-Keep governance residue distinct from ordinary operational logging, following [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md).
+Keep the decision receipt and its correlated lifecycle events distinct from ordinary operational logging, following [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md).
 
 ---
 
@@ -1741,12 +1741,12 @@ The `AsiBackbone/AsiBackbone` repository contains implementation material that s
 
 | Learning concept | Working implementation reference | What to inspect |
 | --- | --- | --- |
-| Decision policy boundary | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/custom-decision-policy-examples.md) | How host-owned decision policy can require acknowledgment or escalation without performing the protected action. |
-| High-consequence administrative flow | [High-Risk Administrative Action Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/high-risk-administrative-action.md) | Host ownership of identity, authorization, UI, persistence, decision handling, acknowledgment, audit, and execution. |
-| Audit lifecycle evidence | [Audit Residue Observability Schema](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/audit-residue-observability-schema.md) | Structured decision and execution evidence suitable for correlation across lifecycle stages. |
-| Host enforcement | [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/host-owned-execution-enforcement.md) | Why decisions and policy results do not themselves perform the protected operation. |
-| Governance decisions | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | The structured outcome consumed by a host-controlled workflow. |
-| Audit lifecycle vocabulary | [`AuditResidueLifecycleStage`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidueLifecycleStage.cs) | Lifecycle-oriented audit stages that can participate in broader host-owned workflow evidence. |
+| Decision policy boundary | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/custom-decision-policy-examples.md) | How host-owned decision policy can require acknowledgment or escalation without performing the protected action. |
+| High-consequence administrative flow | [High-Risk Administrative Action Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/scenarios/high-risk-administrative-action.md) | Host ownership of identity, authorization, UI, persistence, decision handling, acknowledgment, audit, and execution. |
+| Audit lifecycle evidence | [Decision Receipt Observability Schema](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/decision-receipt-observability-schema.md) | Structured decision and execution evidence suitable for correlation across lifecycle stages. |
+| Host enforcement | [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/host-owned-execution-enforcement.md) | Why decisions and policy results do not themselves perform the protected operation. |
+| Governance decisions | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | The structured outcome consumed by a host-controlled workflow. |
+| Audit lifecycle vocabulary | [`DecisionReceiptLifecycleStage`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceiptLifecycleStage.cs) | Lifecycle-oriented audit stages that can participate in broader host-owned workflow evidence. |
 
 The implementation references do not require a particular human-review UI, queue, workflow engine, or persistence product.
 
@@ -1763,7 +1763,7 @@ Scoped continuation authority
       ↓
 Host-owned execution
       ↓
-Audit residue
+Decision receipt
 ```
 
 ---
@@ -1804,7 +1804,7 @@ If several answers are unclear, the system may have an approval screen, but it d
 
 ## Related Content
 
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — distinguish acknowledgment from approval and preserve decision, acknowledgment, re-evaluation, and execution evidence.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — distinguish acknowledgment from approval and preserve decision, acknowledgment, re-evaluation, and execution evidence.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — build the authoritative facts and structured outcomes that can lead into a human-review state.
 - [Risk-Based Decisions in Governed Systems](risk-based-decisions-in-governed-systems.md) — see how changing consequence, likelihood, uncertainty, and environmental context can change whether human review is required.
 - [Escalation Patterns in Governed Systems](escalation-patterns-in-governed-systems.md) — place human review inside a broader escalation lifecycle when another authority must receive and resolve the decision problem.

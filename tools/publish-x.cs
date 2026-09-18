@@ -502,7 +502,7 @@ sealed class GitRepository(string repositoryRoot)
 sealed class JackdawPatioPostComposer : IXPostComposer
 {
     private const int MaximumLength = 280;
-    private const string Prefix = "New from ASI Backbone Learning:\n\n";
+    private const string Prefix = "New from AsiBackbone Learning:\n\n";
 
     public string Compose(LearningPublication publication)
     {

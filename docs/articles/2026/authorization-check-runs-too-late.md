@@ -528,7 +528,7 @@ The separation has clear relatives in established software and security architec
 - command validation and application-service boundaries;
 - workflow state machines and explicit result types.
 
-ASI Backbone Learning uses terms such as **Decision Before Execution**, **Governed Execution**, and **Host-Owned Execution** to keep the composed boundary visible while teaching it. Those labels are not claims that the underlying ideas originated in this repository.
+AsiBackbone Learning uses terms such as **Decision Before Execution**, **Governed Execution**, and **Host-Owned Execution** to keep the composed boundary visible while teaching it. Those labels are not claims that the underlying ideas originated in this repository.
 
 The reusable lesson is independent of the vocabulary:
 

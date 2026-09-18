@@ -105,14 +105,14 @@ PrintResult(
 
 Console.WriteLine("Observed audit stages for the acknowledged proposal:");
 
-foreach (AuditResidue residue in host.AuditSink.Entries.Where(
+foreach (DecisionReceipt receipt in host.AuditSink.Entries.Where(
              entry => string.Equals(
                  entry.CorrelationId,
                  externalProposal.ProposalId,
                  StringComparison.Ordinal)))
 {
     Console.WriteLine(
-        $"- {residue.Stage}: {residue.Outcome} ({residue.ReasonCode})");
+        $"- {receipt.Stage}: {receipt.Outcome} ({receipt.ReasonCode})");
 }
 
 Console.WriteLine();
@@ -741,7 +741,7 @@ public sealed class RecordingNotificationHandler(string credentialReference)
     }
 }
 
-public sealed record AuditResidue(
+public sealed record DecisionReceipt(
     string CorrelationId,
     string Stage,
     string Outcome,
@@ -750,9 +750,9 @@ public sealed record AuditResidue(
 
 public sealed class InMemoryAuditSink
 {
-    private readonly List<AuditResidue> _entries = [];
+    private readonly List<DecisionReceipt> _entries = [];
 
-    public IReadOnlyList<AuditResidue> Entries => _entries;
+    public IReadOnlyList<DecisionReceipt> Entries => _entries;
 
     public void Write(
         string correlationId,
@@ -761,15 +761,15 @@ public sealed class InMemoryAuditSink
         string reasonCode,
         string? policyVersion = null)
     {
-        var residue = new AuditResidue(
+        var receipt = new DecisionReceipt(
             correlationId,
             stage,
             outcome,
             reasonCode,
             policyVersion);
 
-        _entries.Add(residue);
-        GovernanceObservabilityInstrumentation.RecordAuditEvent(residue);
+        _entries.Add(receipt);
+        GovernanceObservabilityInstrumentation.RecordAuditEvent(receipt);
     }
 }
 

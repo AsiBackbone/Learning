@@ -19,7 +19,7 @@ feed: true
 
 > **Industry anchors:** Frameworks and ecosystems such as LangChain, Semantic Kernel, AutoGen, and Model Context Protocol (MCP) servers/registries expose different ways to register, discover, or provide tools and functions. They are orientation points for searchability, not endorsements or definitions of the authorization boundary. In particular, tool discovery or registration through one of these mechanisms does not by itself establish resource-level permission or execution authority.
 
-> **Standalone-reader note:** In this article, **Learning** means the ASI Backbone Learning repository and tutorial series. Its recurring rule is: **The model may propose. The host retains execution authority.** The host may be a conventional application, an agent runtime that is deliberately trusted as the execution boundary, a background worker, a tool gateway, or another component that owns the real side effect.
+> **Standalone-reader note:** In this article, **Learning** means the AsiBackbone Learning repository and tutorial series. Its recurring rule is: **The model may propose. The host retains execution authority.** The host may be a conventional application, an agent runtime that is deliberately trusted as the execution boundary, a background worker, a tool gateway, or another component that owns the real side effect.
 
 Use this page as the **detailed reference comparison** across tool visibility, framework registration, agent permissions, authorization, capabilities, credential custody, and host-owned execution. If you want the shorter standalone argument that isolates the proposal-versus-authority boundary around one minimal `case.add-note` loop, start with [Why an AI Tool Call Is a Proposal, Not Authority](../articles/2026/why-ai-tool-call-is-only-a-proposal.md).
 
@@ -1378,7 +1378,7 @@ Use these pages for deeper treatment of specific boundaries:
 - [Governed Multi-Tool Workflows and Recovery Boundaries](../ai-integration/governed-multi-tool-workflows-and-recovery-boundaries.md) — step-scoped execution, replanning, retry, and recovery.
 - [AI Proposal Rejection, Uncertainty, and Recovery Patterns](../ai-integration/ai-proposal-rejection-uncertainty-and-recovery-patterns.md) — bounded retry and proposal rejection without weakening the host boundary.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — authoritative context and explicit decision semantics.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — acknowledgment as a distinct governance boundary.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — acknowledgment as a distinct governance boundary.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — narrow delegated execution authority.
 - [Role-Based, Claims-Based, and Capability-Based Authorization](role-based-claims-based-and-capability-based-authorization.md) — standing identity/claims authority compared with bounded capabilities.
 - [Workflow Engines, Human Approval Systems, and Governed Execution](workflow-engines-human-approval-and-governed-execution.md) — approval, workflow state, policy, and execution authority as separate or composable concerns.

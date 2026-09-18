@@ -10,7 +10,7 @@ description: Learn to preserve policy identity and decision provenance, detect p
 
 **Difficulty:** Intermediate
 
-**Prerequisites:** [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) and [Constraint Composition and Policy Precedence](constraint-composition-and-policy-precedence.md). Familiarity with [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) is helpful for the continuation examples.
+**Prerequisites:** [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) and [Constraint Composition and Policy Precedence](constraint-composition-and-policy-precedence.md). Familiarity with [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) is helpful for the continuation examples.
 
 ## At a Glance
 
@@ -1100,7 +1100,7 @@ Do not make the second claim unless the required artifacts are actually retained
 
 ---
 
-## Preserve Provenance Across Audit Residue
+## Preserve Provenance Across Decision Receipt
 
 A useful audit timeline can retain both historical and current policy identity without overwriting either.
 
@@ -1121,7 +1121,7 @@ Decision B created under 4.3
 An evidence record for the freshness check could contain:
 
 ```csharp
-public sealed record PolicyFreshnessResidue(
+public sealed record PolicyFreshnessReceipt(
     string EventId,
     string CorrelationId,
     string DecisionId,
@@ -1385,25 +1385,25 @@ The current `AsiBackbone` implementation provides several useful working referen
 
 ### GovernanceDecision
 
-[`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) carries optional `PolicyVersion` and `PolicyHash` values on the decision itself.
+[`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) carries optional `PolicyVersion` and `PolicyHash` values on the decision itself.
 
 That demonstrates the important boundary that policy evidence can travel with the result rather than remaining only in transient evaluation context.
 
 The current type does not define a dedicated `PolicyId` property. A host that needs a stable logical policy-family identifier should model that requirement explicitly rather than pretending `PolicyVersion` means both identity and revision.
 
-### AuditResidue
+### DecisionReceipt
 
-[`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs) carries optional policy version/hash evidence and preserves those values when residue is created from a `GovernanceDecision`.
+[`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) carries optional policy version/hash evidence and preserves those values when receipt is created from a `GovernanceDecision`.
 
 That is an example of policy evidence propagating into later governance evidence.
 
 ### CapabilityTokenGrant
 
-[`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) can carry optional `PolicyVersion` and `PolicyHash` bindings into short-lived execution authority.
+[`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) can carry optional `PolicyVersion` and `PolicyHash` bindings into short-lived execution authority.
 
 ### CapabilityGrantValidationOptions
 
-[`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) allows an execution boundary to state expected policy version/hash values during capability validation.
+[`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) allows an execution boundary to state expected policy version/hash values during capability validation.
 
 These references show concrete implementation seams.
 
@@ -1482,7 +1482,7 @@ The lab starts from the existing Policy Context sample and asks you to:
 - Simulate policy drift.
 - Choose an execution-freshness rule.
 - Carry policy evidence through acknowledgment and capability issuance.
-- Correlate historical and current policy identity in audit residue.
+- Correlate historical and current policy identity in decision receipt.
 - Add a policy fingerprint without overclaiming what it proves.
 
 After that exercise, continue with [Policy Simulation and Change-Impact Analysis](../labs/policy-simulation-and-change-impact-analysis.md) to replay identical contexts against a baseline and candidate policy before rollout.
@@ -1510,7 +1510,7 @@ AsiBackbone working implementation references
 - [Constraint Composition and Policy Precedence](constraint-composition-and-policy-precedence.md) — examine how several rule results and composition behavior become one final governance decision.
 - [Practical Policy Testing and Decision-Table Strategies](practical-policy-testing-and-decision-table-strategies.md) — test policy versions, drift, structured outcomes, and non-execution invariants as a coherent decision system.
 - [Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md) — preserve multiple contributor identities and reason about precedence, override authority, regional or tenant drift, and composite execution freshness.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — connect decision provenance to acknowledgment, re-evaluation, and durable governance evidence.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — connect decision provenance to acknowledgment, re-evaluation, and durable governance evidence.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — see policy identity carried into narrow execution authority.
 - [Policy-Version Evidence in Governance Decisions lab](../labs/policy-version-evidence-in-governance-decisions.md) — practice preserving provenance and detecting policy drift.
 - [Policy Simulation and Change-Impact Analysis lab](../labs/policy-simulation-and-change-impact-analysis.md) — compare baseline and candidate behavior using identical contexts while keeping simulation non-executable.

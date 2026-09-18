@@ -1912,11 +1912,11 @@ The working `AsiBackbone` repository provides useful governance primitives and e
 
 Useful implementation specimens include:
 
-- [AI Agent Gateway Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/ai-agent-gateway.md) — establishes the single-agent boundary where the agent proposes and the host owns policy context, execution, and operational safeguards.
-- [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — provides provider-neutral capability metadata that can be studied for subject, operation, resource, audience, scope, policy, and time bindings.
-- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) — covers proof, binding, failure, time, and bounded-use concerns at the execution boundary.
-- [`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs) — provides structured governance evidence that can participate in a larger host-owned decision chain.
-- [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) — reinforces that governance artifacts do not themselves perform the protected side effect.
+- [AI Agent Gateway Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/scenarios/ai-agent-gateway.md) — establishes the single-agent boundary where the agent proposes and the host owns policy context, execution, and operational safeguards.
+- [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — provides provider-neutral capability metadata that can be studied for subject, operation, resource, audience, scope, policy, and time bindings.
+- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/capability-grant-hardening.md) — covers proof, binding, failure, time, and bounded-use concerns at the execution boundary.
+- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) — provides structured governance evidence that can participate in a larger host-owned decision chain.
+- [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/intent-to-execution-pattern.md) — reinforces that governance artifacts do not themselves perform the protected side effect.
 
 These references provide building blocks to inspect.
 
@@ -2028,7 +2028,7 @@ If those answers are unclear, adding more agents may have increased orchestratio
 - [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md) — identify where agent and service hops change what the system is willing to trust.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — examine replay, atomic consumption, distributed use state, and idempotency boundaries.
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) — preserve policy identity and reason about stale decisions during long-running workflows.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — keep human responsibility and durable evidence distinct from agent-generated approval language.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — keep human responsibility and durable evidence distinct from agent-generated approval language.
 
 ---
 

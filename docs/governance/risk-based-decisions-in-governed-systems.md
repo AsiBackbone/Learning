@@ -1567,11 +1567,11 @@ This tutorial is framework-neutral, but the `AsiBackbone/AsiBackbone` repository
 
 | Learning concept | Working implementation reference | What to inspect |
 | --- | --- | --- |
-| Host/domain decision policy | [`IAsiBackboneDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IAsiBackboneDecisionPolicy.cs) | The post-composition boundary where host policy can refine a decision without executing the protected action. |
-| Risk-aware policy example | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/custom-decision-policy-examples.md) | The regional overlay example reads host-provided `risk` metadata and can require acknowledgment while preserving host-owned execution. |
-| High-risk workflow | [High-Risk Administrative Action Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/high-risk-administrative-action.md) | A concrete scenario where actor, target, risk, policy metadata, acknowledgment, audit residue, and host execution remain separate responsibilities. |
-| Structured decision result | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | The outcome and reason structure consumed by the host. |
-| Policy evaluation | [`DefaultAsiBackbonePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultAsiBackbonePolicyEvaluator.cs) | Constraint evaluation, base composition, and the optional decision-policy boundary. |
+| Host/domain decision policy | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | The post-composition boundary where host policy can refine a decision without executing the protected action. |
+| Risk-aware policy example | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/custom-decision-policy-examples.md) | The regional overlay example reads host-provided `risk` metadata and can require acknowledgment while preserving host-owned execution. |
+| High-risk workflow | [High-Risk Administrative Action Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/scenarios/high-risk-administrative-action.md) | A concrete scenario where actor, target, risk, policy metadata, acknowledgment, decision receipt, and host execution remain separate responsibilities. |
+| Structured decision result | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | The outcome and reason structure consumed by the host. |
+| Policy evaluation | [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) | Constraint evaluation, base composition, and the optional decision-policy boundary. |
 
 The implementation repository does not require every host to adopt the qualitative model used in this tutorial.
 
@@ -1627,7 +1627,7 @@ If several answers are unclear, the system may have a risk score, but it does no
 - [Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md) — preserve policy identity, drift, freshness, and reconstructable decision evidence.
 - [Practical Policy Testing and Decision-Table Strategies](practical-policy-testing-and-decision-table-strategies.md) — test risk thresholds, equivalence classes, failure posture, and decision boundaries systematically.
 - [Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md) — model how multiple policy authorities may narrow, override, or otherwise influence the final decision through an explicit overlay contract.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — continue from `AcknowledgmentRequired` into a governed acknowledgment lifecycle and durable evidence.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — continue from `AcknowledgmentRequired` into a governed acknowledgment lifecycle and durable evidence.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — keep approval and risk posture separate from the authority used at the execution boundary.
 - [Safe Degraded Mode and Fail-Safe Governance lab](../labs/safe-degraded-mode-and-fail-safe-governance.md) — decide deliberately how unavailable dependencies affect governed execution.
 - [Threat Modeling as Architecture Reasoning](../security/threat-modeling-as-architecture-reasoning.md) — examine source-of-authority, bypass, tampering, stale-input, and dependency-failure threats around risk signals.

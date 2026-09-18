@@ -986,7 +986,7 @@ For operational data-minimization guidance, see [Secure Logging Across Trust Bou
 A minimized recovery record might include:
 
 ```csharp
-public sealed record ProposalAttemptResidue(
+public sealed record ProposalAttemptReceipt(
     string WorkflowId,
     string CorrelationId,
     string ProposalId,

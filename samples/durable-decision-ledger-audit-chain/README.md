@@ -33,10 +33,10 @@ dotnet test samples/Samples.slnx
 
 ## What the Console Demonstrates
 
-The console appends two governance receipts, retries the first logical append, captures a checkpoint at the current head, and then verifies several views:
+The console appends two decision receipts, retries the first logical append, captures a checkpoint at the current head, and then verifies several views:
 
 ```text
-Governance receipts
+Decision receipts
         ↓
 Deterministic canonical bytes
         ↓

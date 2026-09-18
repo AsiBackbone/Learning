@@ -73,5 +73,5 @@
   <path d="M530 1277 V1315" class="arrow"/>
   <rect x="270" y="1320" width="520" height="92" rx="14" fill="#edf2f7" stroke="#627d98" stroke-width="3"/>
   <text x="530" y="1365" class="boxtext">Audit / Lifecycle Evidence</text>
-  <text x="530" y="1395" class="small">decision, acknowledgment, authority, and outcome residue</text>
+  <text x="530" y="1395" class="small">decision, acknowledgment, authority, and outcome receipt</text>
 </svg>

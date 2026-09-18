@@ -44,7 +44,7 @@ Execution-boundary validation
    ↓
 Host-owned dry-run handler
    ↓
-Audit residue
+Decision receipt
 ```
 
 The sample deliberately keeps the proposer and executor separate.
@@ -389,7 +389,7 @@ Policy version where recorded
 Acknowledgment challenge identity
 Capability identity
 Executor invocation
-Audit residue
+Decision receipt
 ```
 
 The sample deliberately preserves this distinction:
@@ -489,15 +489,15 @@ The sample exists to make the **ordering and ownership of authority** observable
 
 Compare the small teaching implementation with the fuller working `AsiBackbone` repository:
 
-- [AI Agent Gateway Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/ai-agent-gateway.md)
-- [Human Approval Before AI Tool Execution](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/human-approval-before-ai-tool-execution.md)
-- [GovernanceDecision](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs)
-- [AuditResidue](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs)
-- [CapabilityTokenGrant](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs)
-- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md)
-- [`AsiBackbone.OpenTelemetry` README](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/README.md)
-- [`OpenTelemetryGovernanceInstrumentation`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/OpenTelemetryGovernanceInstrumentation.cs)
-- [`OpenTelemetryGovernanceAttributes`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/OpenTelemetryGovernanceAttributes.cs)
+- [AI Agent Gateway Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/scenarios/ai-agent-gateway.md)
+- [Human Approval Before AI Tool Execution](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/scenarios/human-approval-before-ai-tool-execution.md)
+- [GovernanceDecision](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs)
+- [DecisionReceipt](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs)
+- [CapabilityTokenGrant](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs)
+- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/capability-grant-hardening.md)
+- [`AsiBackbone.OpenTelemetry` README](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.OpenTelemetry/README.md)
+- [`OpenTelemetryGovernanceInstrumentation`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.OpenTelemetry/OpenTelemetryGovernanceInstrumentation.cs)
+- [`OpenTelemetryGovernanceAttributes`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.OpenTelemetry/OpenTelemetryGovernanceAttributes.cs)
 
 The Learning sample remains framework-neutral so the architectural pattern can be studied independently of package adoption.
 

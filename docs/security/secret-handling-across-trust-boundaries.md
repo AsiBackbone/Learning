@@ -1961,7 +1961,7 @@ The organization repositories provide useful specimens for specific boundaries w
 | CI/workflow authority | [Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md) | Workflow permissions, checkout credentials, OIDC identity, environment secrets, package credentials, cloud credentials, and the separation between validation and publication authority. |
 | AI host-owned credential boundary | [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) | Why a model proposes an action while the host-owned tool handler keeps infrastructure credentials outside model-visible context. |
 | Narrow follow-on authority | [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) | Actor, operation, resource, audience, time, and use bindings that provide an architectural analogue for reducing credential authority. |
-| Audit/telemetry hygiene | [Safe Audit and Telemetry Data Guidance](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/safe-audit-telemetry-data.md) | Host responsibility for keeping credentials, tokens, connection strings, prompts, and uncontrolled payloads out of durable governance and telemetry paths. |
+| Audit/telemetry hygiene | [Safe Audit and Telemetry Data Guidance](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/safe-audit-telemetry-data.md) | Host responsibility for keeping credentials, tokens, connection strings, prompts, and uncontrolled payloads out of durable governance and telemetry paths. |
 
 Use these as working specimens rather than as a claim that every deployment needs the same secret manager, identity provider, or credential type.
 
@@ -1985,7 +1985,7 @@ For each credential or secret, answer:
 12. **Can a short-lived token replace a long-lived distributed secret?**
 13. **Can workload identity remove the need to distribute the secret at all?**
 14. **Can command-line, URL, environment, debugging, or process inspection reveal it?**
-15. **Can it enter logs, traces, metrics, exceptions, audit residue, or public errors?**
+15. **Can it enter logs, traces, metrics, exceptions, decision receipt, or public errors?**
 16. **Can it enter an AI prompt, conversation, tool argument, evaluation set, or provider trace?**
 17. **Which CI jobs can access it?**
 18. **Does a validation job receive publication or deployment authority unnecessarily?**

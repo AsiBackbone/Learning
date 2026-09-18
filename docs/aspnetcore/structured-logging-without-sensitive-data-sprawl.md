@@ -8,7 +8,7 @@ description: Design structured ASP.NET Core logging with stable event identity, 
 
 **Difficulty:** Intermediate
 
-**Prerequisites:** Basic familiarity with ASP.NET Core, dependency injection, and `ILogger`. The [ASP.NET Core learning area](index.md) provides the broader application-architecture context. [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) is useful when comparing operational telemetry with governance evidence.
+**Prerequisites:** Basic familiarity with ASP.NET Core, dependency injection, and `ILogger`. The [ASP.NET Core learning area](index.md) provides the broader application-architecture context. [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) is useful when comparing operational telemetry with governance evidence.
 
 **Learning objective:** Design structured operational events that answer specific diagnostic questions without turning logging into uncontrolled data collection. Choose stable event identity, useful low-risk properties, correlation context, exception boundaries, log levels, and retention intentionally; distinguish logs from metrics and traces; and preserve a hard boundary between operational logging and governance audit evidence.
 
@@ -804,7 +804,7 @@ Long retention increases cost and the impact of accidental sensitive-data collec
 
 ## Operational Logs Are Not Governance Audit Evidence
 
-This is the central boundary for ASI Backbone Learning.
+This is the central boundary for AsiBackbone Learning.
 
 Operational logging answers questions such as:
 
@@ -839,7 +839,7 @@ May be filtered, sampled, rotated, or short-retained
 versus:
 
 ```text
-Governance Receipt
+Decision Receipt
       ↓
 Decision Reconstruction / Evidence
       ↓
@@ -866,7 +866,7 @@ ElapsedMilliseconds = 12
       ↓
 Troubleshooting
 
-Governance receipt
+Decision receipt
 Outcome = Denied
 ReasonCodes = ["resource.protected"]
 PolicyVersion = 4.1
@@ -946,8 +946,8 @@ Learning keeps the examples provider-neutral and intentionally small.
 | Logging levels, enrichment, and bounded local retention | [`appsettings.json`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/appsettings.json) | Provider-level minimums, correlation/trace properties, file rolling, retention limits, file-size limits, and request-logging options. Treat the concrete values as one implementation choice, not universal defaults. |
 | Repository decision behind the current logging provider | [ADR-0001: Use Structured Serilog Logging](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/0001-use-structured-serilog-logging.md) | Review why the template chose Serilog for its own structured-logging baseline, including the alternatives and tradeoffs it recorded. The Learning guidance remains provider-neutral. |
 | Tracing and metrics as separate observability concerns | [`OpenTelemetryServiceExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/OpenTelemetryServiceExtensions.cs) | Independent tracing/metrics enablement, ASP.NET Core and `HttpClient` instrumentation, service resource identity, and optional OTLP export. |
-| Governance evidence rather than ordinary telemetry | [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) | The Learning boundary between operational logs and structured decision/acknowledgment/execution evidence. |
-| Production-oriented audit/telemetry hygiene | [Safe Audit and Telemetry Data Guidance](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/safe-audit-telemetry-data.md) | How the governance implementation discusses safe metadata handling across audit and telemetry surfaces without collapsing them into one store. |
+| Governance evidence rather than ordinary telemetry | [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) | The Learning boundary between operational logs and structured decision/acknowledgment/execution evidence. |
+| Production-oriented audit/telemetry hygiene | [Safe Audit and Telemetry Data Guidance](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/safe-audit-telemetry-data.md) | How the governance implementation discusses safe metadata handling across audit and telemetry surfaces without collapsing them into one store. |
 
 Use these repositories as working specimens rather than as package requirements for the tutorial.
 
@@ -961,7 +961,7 @@ Before adding a new event, ask:
 
 1. What exact operational question will this event answer?
 2. Is there already another event at the correct architectural boundary?
-3. Should this be a log, metric, trace attribute/span, health signal, or governance receipt instead?
+3. Should this be a log, metric, trace attribute/span, health signal, or decision receipt instead?
 4. Does the event have a stable operation/event identity?
 5. Are the property names stable and meaningful?
 6. Can any property contain a password, key, token, cookie, authorization header, verification code, or secret?
@@ -1035,7 +1035,7 @@ Before moving on, you should be able to answer:
 13. How can high-cardinality properties affect observability cost?
 14. Why should environment-specific logging change verbosity without relaxing secret-handling rules?
 15. Why is retention part of logging architecture?
-16. Why is a structured operational log not automatically a governance audit receipt?
+16. Why is a structured operational log not automatically a decision receipt?
 17. How can one correlation ID connect operational telemetry and governance evidence while preserving separate purposes?
 
 ## Related Content
@@ -1043,7 +1043,7 @@ Before moving on, you should be able to answer:
 - [ASP.NET Core learning area](index.md)
 - [Middleware Ordering Changes Behavior](middleware-ordering-changes-behavior.md)
 - [Secure-by-Default ASP.NET Core Configuration](secure-by-default-configuration.md)
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 - [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md)
 - [Secure Logging Across Trust Boundaries](../security/secure-logging-across-trust-boundaries.md)
 - [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)

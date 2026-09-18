@@ -16,7 +16,7 @@ The goal is not to prescribe one universal design. The goal is to make important
 | --- | --- |
 | Learning terminology | [Architecture Glossary](glossary.md) |
 | How Learning terms relate to established concepts | [Terminology and Established Architecture Concepts](terminology-and-established-concepts.md) |
-| The overall governance-spine concept | [Accountable Systems Infrastructure and Governed Execution](accountable-systems-infrastructure-and-governed-execution.md) |
+| The overall governance-spine concept | [AsiBackbone and Governed Execution](asibackbone-and-governed-execution.md) |
 | Why proposal and side effect should be separated | [Intent to Execution: An Accountability Pattern](intent-to-execution-accountability-pattern.md) |
 | How active constraints shape decisions | [Constraint-Conditioned Decision Model](constraint-conditioned-decision-model.md) |
 | How adjacent governance mechanisms compose | [Governance Tool Selection and Composition](governance-tool-selection-and-composition.md) |
@@ -42,7 +42,7 @@ Scoped Authority
    ↓
 Host-Owned Execution
    ↓
-Audit Residue
+Decision Receipt
 ```
 
 This makes it easier to answer six questions:
@@ -62,7 +62,7 @@ Substantive pages may use a visible `Pattern classification` when architectural 
 
 | Status | Meaning |
 | --- | --- |
-| **Canonical Pattern** | Aligns with the current architecture of one or more ASI Backbone organization repositories. |
+| **Canonical Pattern** | Aligns with the current architecture of one or more AsiBackbone organization repositories. |
 | **Alternative Pattern** | Presents a viable different approach or intentionally departs from the canonical organization pattern. |
 | **Experimental** | Explores architecture that is not presented as an established organization pattern or production-ready design. |
 | **General learning material** | Teaches useful architecture without making a stronger canonical, alternative, or experimental claim. |
@@ -73,7 +73,7 @@ These are descriptive labels, not rankings. Canonical does not mean universally 
 
 | Concept | What it helps you reason about |
 | --- | --- |
-| [Accountable Systems Infrastructure and Governed Execution](accountable-systems-infrastructure-and-governed-execution.md) | The stack-neutral meaning of the governance-spine idea |
+| [AsiBackbone and Governed Execution](asibackbone-and-governed-execution.md) | The stack-neutral meaning of the governance-spine idea |
 | [Intent to Execution: An Accountability Pattern](intent-to-execution-accountability-pattern.md) | The accountability gap between proposal and side effect |
 | [Constraint-Conditioned Decision Model](constraint-conditioned-decision-model.md) | How active constraints narrow an intent toward an outcome |
 | [Governance Tool Selection and Composition](governance-tool-selection-and-composition.md) | How adjacent governance mechanisms protect different boundaries without becoming substitutes |
@@ -86,7 +86,7 @@ If these boundaries are new, use the five tutorials in order:
 
 1. [Decision Before Execution](../tutorials/decision-before-execution.md)
 2. [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
-3. [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+3. [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 4. [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 5. [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md)
 
@@ -118,7 +118,7 @@ For general layering guidance, see [Growing Beyond a Simple Application Structur
 
 Learning uses the organization's implementation repositories as architectural specimens:
 
-- [AsiBackbone/AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) — a .NET governance and policy-control framework demonstrating structured decisions, acknowledgment workflows, audit residue, scoped capabilities, and host-owned execution boundaries.
+- [AsiBackbone/AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) — a .NET governance and policy-control framework demonstrating structured decisions, acknowledgment workflows, decision receipt, scoped capabilities, and host-owned execution boundaries.
 - [AsiBackbone/NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) — an ASP.NET Core reference architecture demonstrating middleware organization, secure defaults, logging, error handling, rate limiting, authentication-ready design, and production-oriented application structure.
 
 For the current learning path, continue with the [Foundational Tutorials](../tutorials/index.md).

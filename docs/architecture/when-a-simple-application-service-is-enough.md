@@ -15,7 +15,7 @@ feed: true
 
 **Prerequisites:** [When ASP.NET Core Authorization Is Enough](when-aspnet-core-authorization-is-enough.md) and [Decision Before Execution](../tutorials/decision-before-execution.md). Familiarity with [Data Access Boundaries and Transaction Reasoning](../aspnetcore/data-access-boundaries-and-transaction-reasoning.md) is helpful.
 
-> **Terminology note:** Learning uses terms such as governed execution, host-owned execution, policy context, scoped authority, and audit residue as teaching labels for architectural boundaries. See [Terminology and Established Architecture Concepts](terminology-and-established-concepts.md) for their relationship to established authorization, application-service, workflow, capability, provenance, and mediation concepts.
+> **Terminology note:** Learning uses terms such as governed execution, host-owned execution, policy context, scoped authority, and decision receipt as teaching labels for architectural boundaries. See [Terminology and Established Architecture Concepts](terminology-and-established-concepts.md) for their relationship to established authorization, application-service, workflow, capability, provenance, and mediation concepts.
 
 A broader governed-execution pipeline is not automatically the best architecture for every mutation.
 
@@ -1087,7 +1087,7 @@ Use these comparisons in sequence when useful:
 2. **When a Simple Application Service Is Enough** — asks whether the authorized use case can remain an immediate application workflow.
 3. [Decision Before Execution](../tutorials/decision-before-execution.md) — introduces an explicit decision/execution boundary when the operation needs one.
 4. [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — expands decisions into reviewable facts and outcomes.
-5. [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — adds interrupted lifecycle and evidence.
+5. [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — adds interrupted lifecycle and evidence.
 6. [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — adds narrow post-decision authority.
 7. [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — controls reuse when authority becomes a reusable artifact.
 

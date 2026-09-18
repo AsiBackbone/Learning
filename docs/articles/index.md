@@ -1,10 +1,10 @@
 ---
-description: Browse standalone ASI Backbone Learning technical articles published at stable year-and-slug URLs for direct external discovery and citation.
+description: Browse standalone AsiBackbone Learning technical articles published at stable year-and-slug URLs for direct external discovery and citation.
 ---
 
 # Articles
 
-ASI Backbone Learning articles are standalone technical arguments written for direct discovery, sharing, and citation. A reader can arrive from a search engine, newsletter, social link, conference resource list, or external reference without completing the Learning curriculum first.
+AsiBackbone Learning articles are standalone technical arguments written for direct discovery, sharing, and citation. A reader can arrive from a search engine, newsletter, social link, conference resource list, or external reference without completing the Learning curriculum first.
 
 ## Start by Topic
 

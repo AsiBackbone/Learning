@@ -2,7 +2,7 @@
 
 Thank you for taking the time to report security concerns responsibly.
 
-ASI Backbone Learning is an educational repository for practical .NET architecture, governed execution, policy-driven systems, secure application design, AI integration, and related architectural patterns.
+AsiBackbone Learning is an educational repository for practical .NET architecture, governed execution, policy-driven systems, secure application design, AI integration, and related architectural patterns.
 
 The repository contains documentation, diagrams, exercises, executable teaching samples, and documentation/build automation. It is not a production security product, compliance certification, AI model, AGI or ASI implementation, autonomous-agent runtime, or robotics controller.
 
@@ -110,7 +110,7 @@ Do not describe a repository, package, template, sample, workflow, or generated 
 Areas especially relevant to this repository include:
 
 * executable teaching samples under `samples/`;
-* examples that demonstrate policy evaluation, acknowledgment, audit residue, scoped capability, or host-owned execution;
+* examples that demonstrate policy evaluation, acknowledgment, decision receipt, scoped capability, or host-owned execution;
 * AI tool-gateway examples and host-side execution boundaries;
 * sample handling of secrets, credentials, tokens, connection strings, or sensitive-looking data;
 * documentation that could materially misstate a security boundary or encourage unsafe production behavior;
@@ -203,7 +203,7 @@ Repository cleanup does not invalidate a credential that has already been expose
 
 ## Reports for Related Repositories
 
-Learning frequently links to fuller implementations in other ASI Backbone organization repositories.
+Learning frequently links to fuller implementations in other AsiBackbone organization repositories.
 
 Security concerns in those implementations should be reported to the repository that owns the affected code:
 

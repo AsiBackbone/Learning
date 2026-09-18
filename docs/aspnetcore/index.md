@@ -4,7 +4,7 @@ description: Explore practical ASP.NET Core architecture for middleware, secure 
 
 # ASP.NET Core
 
-The ASP.NET Core section connects the architectural ideas in ASI Backbone Learning to practical application structure in modern .NET web applications.
+The ASP.NET Core section connects the architectural ideas in AsiBackbone Learning to practical application structure in modern .NET web applications.
 
 The focus is not on teaching every ASP.NET Core feature.
 
@@ -26,7 +26,7 @@ Continue with the [Identify Middleware Ordering Problems lab](../labs/identify-m
 
 [Centralized Error Handling and Problem Details](centralized-error-handling-and-problem-details.md) then establishes one application-level exception boundary for unexpected failures, safe RFC 9457 Problem Details responses, deliberate status mapping, correlation with operational logs, and explicit HTTP translation of expected governance outcomes without converting those outcomes into exceptions. Its [companion sample](https://github.com/AsiBackbone/Learning/blob/main/samples/centralized-error-handling-and-problem-details/README.md) includes focused integration tests for safe `500` responses, known failure mapping, governance-result translation, correlation, and status-code Problem Details.
 
-[Data-Access Boundaries and Transaction Reasoning with EF Core](data-access-boundaries-and-transaction-reasoning.md) continues from application behavior into durable state. It compares direct `DbContext` usage with meaningful persistence abstractions, explains default and explicit transaction boundaries, distinguishes generic database auditing from governance audit residue, examines `SaveChanges` interceptors, and keeps local relational atomicity separate from external side effects, idempotency, outbox/inbox patterns, and recovery.
+[Data-Access Boundaries and Transaction Reasoning with EF Core](data-access-boundaries-and-transaction-reasoning.md) continues from application behavior into durable state. It compares direct `DbContext` usage with meaningful persistence abstractions, explains default and explicit transaction boundaries, distinguishes generic database auditing from governance decision receipt, examines `SaveChanges` interceptors, and keeps local relational atomicity separate from external side effects, idempotency, outbox/inbox patterns, and recovery.
 
 [Architecture Decision Records Preserve Architectural Reasoning](architecture-decision-records-preserve-architectural-reasoning.md) then shifts from runtime structure to architectural memory. It explains when a decision deserves an ADR, what belongs in the record, how ADRs differ from other documentation, and how context, alternatives, consequences, and review conditions preserve reasoning that code alone cannot show.
 
@@ -95,7 +95,7 @@ Scoped Authority
    ↓
 Host-Owned Execution
    ↓
-Response + Audit Residue
+Response + Decision Receipt
 ```
 
 The appropriate amount of structure depends on the application.

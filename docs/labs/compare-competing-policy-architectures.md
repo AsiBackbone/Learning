@@ -215,7 +215,7 @@ Scoped execution authority when needed
    ↓
 Host-owned execution
    ↓
-Audit residue
+Decision receipt
 ```
 
 Natural strengths include:
@@ -455,7 +455,7 @@ Treat these as facts:
 8. Policy changes may ship with the application.
 9. The team wants to minimize new infrastructure and keep debugging local.
 10. A policy failure in Harbor Admin must not become a shared dependency outage for unrelated applications; no shared policy runtime exists today.
-11. Current compliance needs are satisfied by normal security and operational logs. If you introduce a separate durable governance receipt, justify the reconstruction question that requires it.
+11. Current compliance needs are satisfied by normal security and operational logs. If you introduce a separate durable decision receipt, justify the reconstruction question that requires it.
 
 ### Your Task
 
