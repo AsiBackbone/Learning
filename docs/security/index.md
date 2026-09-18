@@ -6,7 +6,7 @@ description: Explore trust boundaries, least privilege, secrets, secure logging,
 
 The Security section examines architectural boundaries that can reduce accidental authority, hidden execution paths, unsafe defaults, and ambiguous control flow.
 
-Security in ASI Backbone Learning is approached as an architectural responsibility rather than a single feature or package.
+Security in AsiBackbone Learning is approached as an architectural responsibility rather than a single feature or package.
 
 > **Section status:** Focused security learning now covers trust boundaries, least privilege, secret handling, secure logging, replay protection, cryptographic evidence boundaries, software supply-chain integrity, and threat modeling as architecture reasoning. Start with [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), continue with [Secret Handling Across Trust Boundaries](secret-handling-across-trust-boundaries.md) to follow authority-bearing values through custody, delivery, use, rotation, and revocation, then use [Secure Logging Across Trust Boundaries](secure-logging-across-trust-boundaries.md) to examine observability as an outbound data boundary. Continue with [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md), and [Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md). Finish with [Threat Modeling as Architecture Reasoning](threat-modeling-as-architecture-reasoning.md) to synthesize those controls into a repeatable architecture-review method before returning to the [Foundational Tutorials](../tutorials/index.md) and governed-execution path.
 
@@ -108,7 +108,7 @@ See:
 ## Related Foundational Material
 
 * [Decision Before Execution](../tutorials/decision-before-execution.md)
-* [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+* [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 * [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 * [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md)
 

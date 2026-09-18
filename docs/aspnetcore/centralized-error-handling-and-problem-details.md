@@ -929,7 +929,7 @@ trace ID
 
 That does not make it the durable record of why a consequential governance decision occurred.
 
-A governance receipt may need different evidence such as:
+A decision receipt may need different evidence such as:
 
 ```text
 Decision ID
@@ -944,7 +944,7 @@ Correlation ID
 The relationship can be:
 
 ```text
-Governance receipt
+Decision receipt
       ↓
 Purpose-built evidence store
 
@@ -957,9 +957,9 @@ Shared correlation / decision reference
 Links the two when appropriate
 ```
 
-Do not copy the entire governance receipt into the public response merely because both are structured JSON.
+Do not copy the entire decision receipt into the public response merely because both are structured JSON.
 
-See [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) for the evidence boundary.
+See [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) for the evidence boundary.
 
 ---
 
@@ -1177,7 +1177,7 @@ Before moving on, you should be able to answer:
 14. Why can an already-started response prevent normal Problem Details replacement?
 15. What should happen to an exception that has no deliberate mapping?
 16. Why does cancellation need its own host policy rather than automatic `500` mapping?
-17. Why is a Problem Details response not a governance audit receipt?
+17. Why is a Problem Details response not a decision receipt?
 18. Which integration tests protect the public disclosure and mapping contract?
 19. When would framework defaults or a smaller result-mapping function be enough?
 
@@ -1192,7 +1192,7 @@ If these answers are unclear, the application may have error responses, but it d
 - [Secure-by-Default ASP.NET Core Configuration](secure-by-default-configuration.md)
 - [Structured Logging Without Sensitive-Data Sprawl](structured-logging-without-sensitive-data-sprawl.md)
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 - [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md)
 - [Centralized Error Handling and Problem Details sample](https://github.com/AsiBackbone/Learning/blob/main/samples/centralized-error-handling-and-problem-details/README.md)
 - [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)

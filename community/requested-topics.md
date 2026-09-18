@@ -14,7 +14,7 @@ Standalone article candidates are curated separately in the [Problem-Oriented St
 
 ## How to Request a Topic
 
-For a new topic request, prefer opening an [ASI Backbone Organization Discussion](https://github.com/orgs/AsiBackbone/discussions) when the subject is exploratory, architectural, or likely to benefit from community input.
+For a new topic request, prefer opening an [AsiBackbone Organization Discussion](https://github.com/orgs/AsiBackbone/discussions) when the subject is exploratory, architectural, or likely to benefit from community input.
 
 Use an Issue when the requested work is already concrete and well scoped.
 
@@ -24,7 +24,7 @@ A useful request includes:
 - Why the topic matters in practice.
 - What level of detail would be most useful.
 - Whether you would prefer a tutorial, lab, diagram, comparison, or worked example.
-- Any existing ASI Backbone or NetCoreApplicationTemplate implementation that appears relevant.
+- Any existing AsiBackbone or NetCoreApplicationTemplate implementation that appears relevant.
 - Any specific tradeoff or failure mode you want examined.
 
 You do not need to know the solution before requesting a topic.
@@ -57,7 +57,7 @@ A topic may be **Published** here while a narrower follow-up, alternative treatm
 
 These topics shaped the initial Learning roadmap and now have published coverage in the foundational tutorial/sample/test/lab path. Their original questions and suggested formats are retained below as historical planning context.
 
-The published foundation consists of [Decision Before Execution](../docs/tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../docs/tutorials/policy-context-and-explicit-decision-outcomes.md), [Acknowledgment and Audit Residue](../docs/tutorials/acknowledgment-and-audit-residue.md), [Scoped Capability and Host-Owned Execution](../docs/tutorials/scoped-capability-and-host-owned-execution.md), and [Governed AI Tool Gateway](../docs/tutorials/governed-ai-tool-gateway.md), with corresponding runnable samples under [`samples/`](../samples/README.md) and learner labs under [`docs/labs/`](../docs/labs/index.md).
+The published foundation consists of [Decision Before Execution](../docs/tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../docs/tutorials/policy-context-and-explicit-decision-outcomes.md), [Decision Receipts and Acknowledgment](../docs/tutorials/decision-receipts-and-acknowledgment.md), [Scoped Capability and Host-Owned Execution](../docs/tutorials/scoped-capability-and-host-owned-execution.md), and [Governed AI Tool Gateway](../docs/tutorials/governed-ai-tool-gateway.md), with corresponding runnable samples under [`samples/`](../samples/README.md) and learner labs under [`docs/labs/`](../docs/labs/index.md).
 
 ### Decision Before Execution
 
@@ -160,7 +160,7 @@ Suggested format:
 
 ---
 
-### Audit Residue and Provenance
+### Decision Receipt and Provenance
 
 **Status:** Published
 
@@ -169,7 +169,7 @@ Explain the difference between normal application logs and durable governance ev
 Questions to address:
 
 - What should survive a decision?
-- What is a useful audit receipt?
+- What is a useful decision receipt?
 - How should reason codes, policy versions, hashes, correlation IDs, and timestamps be used?
 - What should not be placed in an audit record?
 - How should privacy and sensitive data affect audit design?
@@ -752,7 +752,7 @@ Clarify when orchestration and governance overlap and when they should remain se
 ### Intermediate
 
 - [ ] Add acknowledgment to a sensitive operation.
-- [ ] Generate an audit receipt.
+- [ ] Generate an decision receipt.
 - [ ] Add a scoped capability.
 - [ ] Refactor scattered policy checks into a governance pipeline.
 - [ ] Add tests for policy edge cases.
@@ -780,7 +780,7 @@ Requested diagrams include:
 - [ ] Capability issuance and validation.
 - [ ] Host-owned execution boundary.
 - [ ] AI tool gateway.
-- [ ] Logging versus audit residue.
+- [ ] Logging versus decision receipt.
 - [ ] Authentication/authorization/governance comparison.
 - [ ] Policy composition.
 - [ ] Regional policy overlay.

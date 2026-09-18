@@ -10,7 +10,7 @@ description: Follow a stack-neutral accountability pattern from proposed intent 
 
 **Difficulty:** Intermediate
 
-**Prerequisites:** [Decision Before Execution](../tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), and [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+**Prerequisites:** [Decision Before Execution](../tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), and [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 
 Most systems can answer two questions well:
 
@@ -36,7 +36,7 @@ Explicit decision
   |
 Acknowledgment when required
   |
-Audit residue
+Decision receipt
   |
 Scoped continuation authority when required
   |
@@ -95,7 +95,7 @@ This is difficult when execution is delayed, retried, delegated, or performed by
 
 ### Trustworthiness of the record
 
-Structured audit residue is not automatically tamper-evident.
+Structured decision receipt is not automatically tamper-evident.
 
 Signing, key custody, append-only persistence, integrity chaining, independent storage, and external anchoring are separate design choices.
 
@@ -139,9 +139,9 @@ Its own documentation remains authoritative for public types, supported outcomes
 
 ## Continue learning
 
-- [Accountable Systems Infrastructure and Governed Execution](accountable-systems-infrastructure-and-governed-execution.md)
+- [AsiBackbone and Governed Execution](asibackbone-and-governed-execution.md)
 - [Decision Before Execution](../tutorials/decision-before-execution.md)
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 - [Event Sourcing, Audit Trails, and Governance Decision Provenance](event-sourcing-audit-trails-and-governance-decision-provenance.md)
 

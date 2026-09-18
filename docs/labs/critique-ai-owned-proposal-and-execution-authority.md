@@ -1196,7 +1196,7 @@ Classify each control.
 | Scoped authority |  |  |  |  |
 | Replay protection |  |  |  |  |
 | Retry budget |  |  |  |  |
-| Audit residue |  |  |  |  |
+| Decision receipt |  |  |  |  |
 
 Many controls legitimately span more than one category.
 

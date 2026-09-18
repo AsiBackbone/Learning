@@ -12,11 +12,11 @@ description: Derive audience-appropriate explanations from structured governance
 
 **Difficulty:** Advanced
 
-**Required prerequisites:** [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) and [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md).
+**Required prerequisites:** [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) and [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md).
 
 **Recommended background:** [AI Governance Observability and End-to-End Decision Tracing](../ai-integration/ai-governance-observability-and-end-to-end-decision-tracing.md), [Structured Logging Without Sensitive-Data Sprawl](../aspnetcore/structured-logging-without-sensitive-data-sprawl.md), and [Secure Logging Across Trust Boundaries](../security/secure-logging-across-trust-boundaries.md).
 
-**Glossary:** [Audit residue](../architecture/glossary.md#audit-residue), [decision provenance](../architecture/glossary.md#decision-provenance), [governed execution](../architecture/glossary.md#governed-execution), and [trust boundary](../architecture/glossary.md#trust-boundary).
+**Glossary:** [Decision receipt](../architecture/glossary.md#decision-receipt), [decision provenance](../architecture/glossary.md#decision-provenance), [governed execution](../architecture/glossary.md#governed-execution), and [trust boundary](../architecture/glossary.md#trust-boundary).
 
 > **Scope:** This article treats explanation as a derived presentation layer over structured governance evidence. It does not define a legal right-to-explanation standard, a universal explanation schema, a localization framework, a production redaction engine, or a generative-AI product architecture.
 
@@ -539,7 +539,7 @@ Audience
 CorrelationId
 ```
 
-The projection should not replace the evidence store with only those fields. They are lineage references, not a complete governance receipt.
+The projection should not replace the evidence store with only those fields. They are lineage references, not a complete decision receipt.
 
 ---
 
@@ -844,7 +844,7 @@ No downstream authorization or execution component should parse the explanation 
 
 Use the structured decision object for machine behavior.
 
-This keeps the familiar ASI Backbone boundary intact:
+This keeps the familiar AsiBackbone boundary intact:
 
 > **Presentation may describe authority. Presentation does not create authority.**
 
@@ -1001,7 +1001,7 @@ The companion tests make the presentation boundaries explicit.
 Continue with:
 
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) for policy identity, historical evidence, and drift.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) for decision, acknowledgment, and evidence separation.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) for decision, acknowledgment, and evidence separation.
 - [AI Governance Observability and End-to-End Decision Tracing](../ai-integration/ai-governance-observability-and-end-to-end-decision-tracing.md) for telemetry and end-to-end correlation.
 - [Structured Logging Without Sensitive-Data Sprawl](../aspnetcore/structured-logging-without-sensitive-data-sprawl.md) for minimizing operational event data.
 - [Secure Logging Across Trust Boundaries](../security/secure-logging-across-trust-boundaries.md) for provider, transport, storage, access, and retention boundaries around telemetry.

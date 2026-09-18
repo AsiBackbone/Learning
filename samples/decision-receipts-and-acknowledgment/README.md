@@ -1,6 +1,6 @@
-# Acknowledgment and Audit Residue Sample
+# Decision Receipts and Acknowledgment Sample
 
-This executable companion sample demonstrates the architectural boundary taught in the [Acknowledgment and Audit Residue](../../docs/tutorials/acknowledgment-and-audit-residue.md) tutorial.
+This executable companion sample demonstrates the architectural boundary taught in the [Decision Receipts and Acknowledgment](../../docs/tutorials/decision-receipts-and-acknowledgment.md) tutorial.
 
 The sample makes the acknowledgment lifecycle and its evidence visible:
 
@@ -10,6 +10,8 @@ Intent
 Policy evaluation
    ↓
 AcknowledgmentRequired
+   ↓
+Decision receipt
    ↓
 Challenge issued
    ↓
@@ -21,9 +23,11 @@ Current context reconstructed
    ↓
 Policy re-evaluated
    ↓
+Fresh decision receipt
+   ↓
 Host-owned execution or stop
    ↓
-Audit residue
+Correlated lifecycle evidence
 ```
 
 The central invariants are:
@@ -53,7 +57,7 @@ Intermediate
 From the repository root:
 
 ```bash
-dotnet run --project samples/acknowledgment-and-audit-residue/Sample/AcknowledgmentAndAuditResidue.csproj
+dotnet run --project samples/decision-receipts-and-acknowledgment/Sample/DecisionReceiptsAndAcknowledgment.csproj
 ```
 
 ## Run the Tests
@@ -61,7 +65,7 @@ dotnet run --project samples/acknowledgment-and-audit-residue/Sample/Acknowledgm
 From the repository root:
 
 ```bash
-dotnet test samples/acknowledgment-and-audit-residue/Tests/AcknowledgmentAndAuditResidue.Tests.csproj
+dotnet test samples/decision-receipts-and-acknowledgment/Tests/DecisionReceiptsAndAcknowledgment.Tests.csproj
 ```
 
 The focused xUnit tests cover every policy outcome and acknowledgment binding failure, including the expiration boundary and stable reason codes. They also prove that acknowledgment does not grant execution authority, changed resource state can still block execution, and the executable scenarios preserve their correlated audit timelines.
@@ -139,7 +143,7 @@ The context-drift scenario changes the resource to protected after acknowledgmen
 
 ### 4. Correlation Connects the Timeline
 
-Every `AuditResidue` for a scenario carries the same correlation identifier.
+Every lifecycle event for a scenario carries the same correlation identifier, and decision-derived events reference a distinct `DecisionReceipt`.
 
 A successful flow produces stages such as:
 
@@ -155,7 +159,7 @@ A rejected or invalid response stops earlier and therefore leaves a shorter time
 
 ### 5. Policy Identity Remains Visible
 
-The sample carries `PolicyVersion` through the challenge and audit residue.
+The sample carries `PolicyVersion` through the challenge and each decision receipt.
 
 This keeps policy identity connected to the governed path without implying that version metadata alone creates tamper-evident proof.
 
@@ -170,20 +174,22 @@ It checks that:
 3. An expired challenge produces zero executor invocations.
 4. A valid acknowledgment can continue only after re-evaluation.
 5. A newly active protected-resource constraint still blocks execution after acknowledgment.
-6. Every residue in one workflow preserves the same correlation identifier.
+6. Every lifecycle event in one workflow preserves the same correlation identifier.
 7. The audit stage sequence matches the expected lifecycle.
 
 The runtime checks remain useful because they make failures visible while learners execute the demonstration directly.
 
 The companion xUnit project now provides structured test results for the same class of architectural invariants and is included in the shared sample solution for CI execution.
 
-## Audit Residue Is Not the Same as Logging
+## Decision Receipt Is Not the Same as Logging
 
 The sample prints the timeline to the console so the learner can observe it.
 
 That console output is not presented as durable governance evidence.
 
-The `AuditResidue` objects model evidence-oriented data such as:
+The `DecisionReceipt` objects record evaluation outcomes and reasons. Separate `GovernanceLifecycleEvent` objects correlate acknowledgment and execution progress without implying that the original decision proves execution.
+
+The combined evidence includes:
 
 - Event identity
 - Actor
@@ -194,7 +200,7 @@ The `AuditResidue` objects model evidence-oriented data such as:
 - Policy version
 - Lifecycle stage
 
-A production system would still need to decide how residue is persisted, protected, retained, delivered, and possibly signed.
+A production system would still need to decide how receipts and lifecycle events are persisted, protected, retained, delivered, and possibly signed.
 
 Do not infer from this sample that an in-memory list or console output is:
 
@@ -233,21 +239,22 @@ Useful experiments include:
 2. Change the response correlation identifier and add a scenario for `acknowledgment.correlation-mismatch`.
 3. Add a one-time challenge-consumption flag and demonstrate why replay state needs persistence.
 4. Add a policy version change between challenge issuance and acknowledgment, then decide whether the host should reject or re-evaluate under the new policy.
-5. Add a durable `IAuditResidueStore` abstraction backed by an in-memory implementation.
-6. Simulate an execution failure and add a distinct `execution-failed` residue instead of rewriting the `Allowed` decision.
+5. Add a durable `IDecisionReceiptStore` abstraction backed by an in-memory implementation.
+6. Simulate an execution failure and add a distinct `execution-failed` lifecycle event instead of rewriting the `Allowed` decision receipt.
 7. Add a policy hash or fingerprint and discuss what additional architecture is required before calling the resulting history tamper-evident.
 
 ## Related Material
 
-- [Acknowledgment and Audit Residue tutorial](../../docs/tutorials/acknowledgment-and-audit-residue.md)
-- [Acknowledgment and Audit Residue intermediate lab](../../docs/labs/acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment tutorial](../../docs/tutorials/decision-receipts-and-acknowledgment.md)
+- [Decision Receipts and Acknowledgment intermediate lab](../../docs/labs/decision-receipts-and-acknowledgment.md)
 - [Policy Context and Explicit Decision Outcomes sample](../policy-context-and-explicit-decision-outcomes/README.md)
 - [Scoped Capability and Host-Owned Execution](../../docs/tutorials/scoped-capability-and-host-owned-execution.md)
-- [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) - compare the teaching challenge with the fuller working handshake request.
-- [`LiabilityHandshakeAcknowledgment`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeAcknowledgment.cs) - inspect the working acknowledgment model.
-- [`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs) - compare the small teaching residue with the framework's richer governance evidence model.
-- [`Dynamic Liability Handshake`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/dynamic-liability-handshake.md) - review the fuller handshake lifecycle.
-- [`Durable Audit Outbox Persistence`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/durable-audit-outbox-persistence.md) - review production-oriented persistence and delivery concerns.
+- [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) - compare the teaching challenge with the fuller working handshake request.
+- [`LiabilityHandshakeAcknowledgment`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeAcknowledgment.cs) - inspect the working acknowledgment model.
+- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) - compare the small teaching receipt with the framework's decision-outcome record.
+- [`DecisionReceiptLifecycleEvent`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceiptLifecycleEvent.cs) - compare the sample's correlated lifecycle events with the framework's acknowledgment, capability, gateway, and emission stages.
+- [`Dynamic Liability Handshake`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/dynamic-liability-handshake.md) - review the fuller handshake lifecycle.
+- [`Durable Audit Outbox Persistence`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/durable-audit-outbox-persistence.md) - review production-oriented persistence and delivery concerns.
 
 ## License
 

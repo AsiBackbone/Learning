@@ -2,7 +2,7 @@
 
 ## Our Commitment
 
-The ASI Backbone Learning community is intended to be a constructive, technically rigorous, and welcoming place for people to learn, question, experiment, and contribute.
+The AsiBackbone Learning community is intended to be a constructive, technically rigorous, and welcoming place for people to learn, question, experiment, and contribute.
 
 We are committed to providing a community environment that is respectful and free from harassment, intimidation, and discrimination for everyone, regardless of experience level, background, identity, disability, appearance, nationality, race, ethnicity, religion, age, sex, gender identity or expression, sexual orientation, or other personal characteristics.
 
@@ -46,7 +46,7 @@ A useful standard is:
 
 > Critique the pattern, implementation, evidence, or reasoning — not the person.
 
-Canonical ASI Backbone patterns may be documented alongside alternative approaches when those alternatives are technically grounded and clearly identified.
+Canonical AsiBackbone patterns may be documented alongside alternative approaches when those alternatives are technically grounded and clearly identified.
 
 ## Scope
 
@@ -58,7 +58,7 @@ This Code of Conduct applies to participation in project spaces, including:
 - Code reviews
 - Documentation contributions
 - Repository-hosted community interactions
-- Other public spaces where a participant is representing the ASI Backbone Learning project or organization
+- Other public spaces where a participant is representing the AsiBackbone Learning project or organization
 
 It also applies when behavior outside the repository has a direct and material effect on the safety or effective participation of project contributors.
 
@@ -110,6 +110,6 @@ The goal is to preserve an environment where participants can:
 
 ## Attribution
 
-This Code of Conduct is maintained by the ASI Backbone Learning project and may evolve as the community grows.
+This Code of Conduct is maintained by the AsiBackbone Learning project and may evolve as the community grows.
 
 Suggestions for improving the Code of Conduct may be proposed through the repository's normal contribution process.

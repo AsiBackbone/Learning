@@ -13,7 +13,7 @@ feed: true
 
 **Difficulty:** Intermediate
 
-**Prerequisites:** Basic familiarity with .NET builds, NuGet packages, and CI terminology. No ASI Backbone knowledge is required.
+**Prerequisites:** Basic familiarity with .NET builds, NuGet packages, and CI terminology. No AsiBackbone knowledge is required.
 
 A repository looks healthy: build passing, tests passing, dependency updates automated, release published.
 
@@ -229,6 +229,6 @@ When the unresolved question is what a hash, signature, or attestation actually 
 
 If publication authority depends on CI/CD credentials or federated identities, [Secret Handling Across Trust Boundaries](../../security/secret-handling-across-trust-boundaries.md) addresses scope, exposure, rotation, revocation, and compromise response at that boundary.
 
-To compare those ideas with a working package pipeline, inspect the [AsiBackbone package repository workflows](https://github.com/AsiBackbone/AsiBackbone/tree/main/.github/workflows). They are an optional specimen for package validation, artifact handoff, SBOM, provenance, and publication-boundary patterns; they are not a specimen for NuGet author signing.
+To compare those ideas with a working package pipeline, inspect the [AsiBackbone package repository workflows](https://github.com/AsiBackbone/AsiBackbone/tree/release/6.0.0/.github/workflows). They are an optional specimen for package validation, artifact handoff, SBOM, provenance, and publication-boundary patterns; they are not a specimen for NuGet author signing.
 
 The point is not to copy one repository's release stack. The point is to explain, narrowly and verifiably, how reviewed source became the artifact a consumer received.

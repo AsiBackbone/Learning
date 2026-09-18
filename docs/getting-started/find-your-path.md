@@ -1,10 +1,10 @@
 ---
-description: Choose a short, problem-oriented route through ASI Backbone Learning based on common ASP.NET Core, governance, AI, security, and architecture goals.
+description: Choose a short, problem-oriented route through AsiBackbone Learning based on common ASP.NET Core, governance, AI, security, and architecture goals.
 ---
 
 # Find Your Path
 
-ASI Backbone Learning can be used as a sequential course, but you do not need to read it that way.
+AsiBackbone Learning can be used as a sequential course, but you do not need to read it that way.
 
 If you already know the problem you are trying to solve, start with the shortest route that makes the relevant boundary visible. Stop when the simpler design preserves the behavior, evidence, and control you need; go deeper only when it does not.
 
@@ -79,7 +79,7 @@ The goal is not to maximize framework adoption. The goal is to make the architec
 
 **Start:** [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md).
 
-**Build the lifecycle:** Continue with [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md), then [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md).
+**Build the lifecycle:** Continue with [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md), then [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md).
 
 ```text
 Administrative intent
@@ -92,7 +92,7 @@ Scoped capability
       ↓
 Host-owned execution
       ↓
-Audit residue
+Decision receipt
 ```
 
 **See the composition:** [Governed Administrative Operation](../case-studies/governed-administrative-operation.md) follows one fictional `account.disable` request through standing authorization, authoritative context, policy evaluation, acknowledgment or escalation, scoped authority, executor invocation, and correlated evidence.

@@ -1024,7 +1024,7 @@ Preserve the distinction through:
 * Stable reason codes.
 * Operational logging.
 * Metrics or alerts where useful.
-* Audit residue.
+* Decision receipt.
 * Exception telemetry that does not leak sensitive data.
 
 A reviewer should be able to tell the difference between:
@@ -1229,12 +1229,12 @@ The `AsiBackbone/AsiBackbone` repository provides a fuller implementation of the
 
 | Learning concept | Working implementation reference | What to inspect |
 | --- | --- | --- |
-| Core policy vocabulary | [Core Domain Language](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/core-domain-language.md) | Context, constraints, active policy structure, decisions, and host boundary |
-| Constraint evaluation and base composition | [Policy Evaluator Pipeline](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/policy-evaluator-pipeline.md) | Deny/warning/allow composition, empty-policy behavior, short-circuiting, exception posture, and reason handling |
-| Post-composition policy | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/custom-decision-policy-examples.md) | Warning preservation, regional overlays, acknowledgment, escalation, and host-owned execution |
-| Concrete evaluator | [`DefaultAsiBackbonePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultAsiBackbonePolicyEvaluator.cs) | Source-level evaluation and composition behavior |
-| Decision-policy contract | [`IAsiBackboneDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IAsiBackboneDecisionPolicy.cs) | Boundary between base composition and host/domain decision transformation |
-| End-to-end behavior | [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) | Executable policy-evaluator invariants |
+| Core policy vocabulary | [Core Domain Language](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/core-domain-language.md) | Context, constraints, active policy structure, decisions, and host boundary |
+| Constraint evaluation and base composition | [Policy Evaluator Pipeline](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/policy-evaluator-pipeline.md) | Deny/warning/allow composition, empty-policy behavior, short-circuiting, exception posture, and reason handling |
+| Post-composition policy | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/custom-decision-policy-examples.md) | Warning preservation, regional overlays, acknowledgment, escalation, and host-owned execution |
+| Concrete evaluator | [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) | Source-level evaluation and composition behavior |
+| Decision-policy contract | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | Boundary between base composition and host/domain decision transformation |
+| End-to-end behavior | [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) | Executable policy-evaluator invariants |
 
 The Learning article remains framework-neutral on purpose.
 
@@ -1271,7 +1271,7 @@ If several answers are unclear, the system may have policy logic, but it does no
 - [Risk-Based Decisions in Governed Systems](risk-based-decisions-in-governed-systems.md) — add risk assessment as an explicit, reviewable input without allowing risk scoring to bypass deterministic constraints or host-owned execution.
 - [Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md) — extend composition from multiple constraints inside one policy boundary to multiple policy authorities with explicit narrowing, override, conflict, and provenance rules.
 - [Decision Before Execution](../tutorials/decision-before-execution.md) — revisit the boundary between a governance decision and the protected side effect.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — continue from final decisions into acknowledgment and governance evidence.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — continue from final decisions into acknowledgment and governance evidence.
 - [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md) — compare the richer governance model with a simpler built-in authorization approach.
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — see composition participate in an end-to-end AI-assisted workflow while the host retains execution authority.
 

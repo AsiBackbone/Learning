@@ -72,7 +72,7 @@ Scoped authority
    ↓
 Host-owned execution
    ↓
-Audit residue
+Decision receipt
 ```
 
 A useful design principle is:
@@ -183,7 +183,7 @@ Significant decisions include:
 - Changes to licensing
 - Changes to project scope
 - Removal or deprecation of major tutorial areas
-- Changes that materially alter how the project relates to other ASI Backbone repositories
+- Changes that materially alter how the project relates to other AsiBackbone repositories
 
 These should normally be discussed publicly before implementation.
 
@@ -205,7 +205,7 @@ Learning content may be classified to help readers understand its status.
 
 ### Canonical Pattern
 
-A pattern aligned with the current documented architecture of one or more ASI Backbone organization repositories.
+A pattern aligned with the current documented architecture of one or more AsiBackbone organization repositories.
 
 Canonical does not mean universally correct.
 

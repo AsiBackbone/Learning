@@ -534,14 +534,14 @@ Use `git status` first so you understand which local work will be affected.
 
 - [Scoped Capability and Host-Owned Execution tutorial](../tutorials/scoped-capability-and-host-owned-execution.md) — review the architectural reasoning behind the lab.
 - [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/README.md#scoped-capability-and-host-owned-execution) — return to the executable baseline used by the exercise.
-- [Acknowledgment and Audit Residue lab](acknowledgment-and-audit-residue.md) — revisit acknowledgment, re-evaluation, and evidence before execution authority is issued.
+- [Decision Receipts and Acknowledgment lab](decision-receipts-and-acknowledgment.md) — revisit acknowledgment, re-evaluation, and evidence before execution authority is issued.
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — continue into the end-to-end composition where AI may propose and the host retains execution authority.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — connect this lab's in-memory single-use exercise to durable, atomic, multi-instance replay protection and idempotency boundaries.
 - [Replay Protection and Bounded-Use Authority lab](replay-protection-and-bounded-use.md) — continue from the introductory single-use exercise into a dedicated concurrency race, atomic consume repair, bounded-use contention, and failure-window analysis.
-- [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — compare the teaching capability with the working framework model.
-- [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) — inspect fuller execution-boundary validation.
-- [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) — compare the lab's in-memory replay exercise with the provider-neutral production seam.
-- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) — review proof, binding, replay, time, and failure-handling guidance.
+- [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — compare the teaching capability with the working framework model.
+- [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) — inspect fuller execution-boundary validation.
+- [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) — compare the lab's in-memory replay exercise with the provider-neutral production seam.
+- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/capability-grant-hardening.md) — review proof, binding, replay, time, and failure-handling guidance.
 - [Foundational Tutorial Index](../tutorials/index.md) — view the complete foundational learning path.
 
 ---

@@ -2,7 +2,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Use Tutorial Ideas to propose new tutorials, labs, examples, learning paths, or educational topics for ASI Backbone Learning.
+        Use Tutorial Ideas to propose new tutorials, labs, examples, learning paths, or educational topics for AsiBackbone Learning.
 
         A good proposal starts with the learning problem before prescribing a particular product or implementation.
 

@@ -1,5 +1,5 @@
 ---
-description: Compare logs, audit trails, governance receipts, and event sourcing across diagnostics, accountability, authority provenance, and state reconstruction.
+description: Compare logs, audit trails, decision receipts, and event sourcing across diagnostics, accountability, authority provenance, and state reconstruction.
 title: Event Sourcing, Audit Trails, and Governance Decision Provenance
 author: Christopher D. Cavell
 published: "2026-08-24"
@@ -13,13 +13,13 @@ feed: true
 
 **Difficulty:** Advanced
 
-**Prerequisites:** Recommended — [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) and [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md). [Secure Logging Across Trust Boundaries](../security/secure-logging-across-trust-boundaries.md) is useful when comparing operational telemetry with evidence-oriented records.
+**Prerequisites:** Recommended — [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) and [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md). [Secure Logging Across Trust Boundaries](../security/secure-logging-across-trust-boundaries.md) is useful when comparing operational telemetry with evidence-oriented records.
 
-> **Terminology note:** This comparison uses `operational log`, `audit trail`, `decision receipt`, `audit residue`, `domain event`, `event stream`, `projection`, `replay`, and `event sourcing` as architectural terms. Products and organizations use these words differently. The comparison is about what record owns which responsibility, not about prescribing one storage product or event framework.
+> **Terminology note:** This comparison uses `operational log`, `audit trail`, `decision receipt`, `decision receipt`, `domain event`, `event stream`, `projection`, `replay`, and `event sourcing` as architectural terms. Products and organizations use these words differently. The comparison is about what record owns which responsibility, not about prescribing one storage product or event framework.
 
 > **Industry anchors:** EventStoreDB and Axon Framework are commonly associated with event-sourced architectures. Apache Kafka, Amazon SNS, and Amazon EventBridge are commonly used for event transport or event-driven integration, but using one of them does not by itself make domain events the source of application state. These names are included only for orientation and searchability.
 
-> **Standalone-reader note:** In this article, **Learning** means the ASI Backbone Learning repository and tutorial series. `Audit residue` means structured evidence left by a governed lifecycle; it does not imply that a log line, database row, event stream, or hash is automatically immutable, tamper-evident, legally sufficient, or complete.
+> **Standalone-reader note:** In this article, **Learning** means the AsiBackbone Learning repository and tutorial series. `Decision receipt` means structured evidence left by a governed lifecycle; it does not imply that a log line, database row, event stream, or hash is automatically immutable, tamper-evident, legally sufficient, or complete.
 
 ## Executive Summary
 
@@ -27,7 +27,7 @@ History serves different purposes:
 
 - **Operational logs** explain runtime behavior.
 - **Audit trails** explain who changed what and when.
-- **Governance receipts / audit residue** explain why authority proceeded, stopped, paused, or transferred.
+- **Decision receipts / decision receipt** explain why authority proceeded, stopped, paused, or transferred.
 - **Event sourcing** makes domain events the source used to reconstruct application state.
 
 A system may use several of these at once. None automatically implies the others.
@@ -62,7 +62,7 @@ A full event-sourced architecture is unnecessary when durable governance evidenc
 | --- | --- | --- | --- | --- |
 | Operational logging | What happened inside the running system? | No | Diagnostics, telemetry, debugging, service health, incident investigation | Complete business history, decision provenance, append-only retention, tamper evidence |
 | Traditional audit trail | Who changed what, when, and sometimes from what to what? | Usually no | Accountability, change history, user/resource attribution | Policy identity, reason codes, acknowledgment lineage, execution authority, replayable domain state |
-| Governance decision receipt / audit residue | Why did authority proceed, stop, pause, or transfer? | No | Intent identity, context provenance, outcome, reasons, policy evidence, acknowledgment/capability/execution linkage | Complete domain history or automatic reconstruction of current domain state |
+| Governance decision receipt / decision receipt | Why did authority proceed, stop, pause, or transfer? | No | Intent identity, context provenance, outcome, reasons, policy evidence, acknowledgment/capability/execution linkage | Complete domain history or automatic reconstruction of current domain state |
 | Event sourcing | What domain facts occurred, and what state results from replaying them? | Yes, by design | Full domain history, temporal state reconstruction, projections, event-driven integration | Decision reasons, denied attempts, policy evidence, privacy handling, tamper evidence, or safe replay of side effects |
 
 A mature architecture can combine these records deliberately.
@@ -72,7 +72,7 @@ For example:
 ```text
 Operational logs
         +
-Governance receipts
+Decision receipts
         +
 Event-sourced domain stream
         +
@@ -91,7 +91,7 @@ A governed event-sourced operation may produce two distinct historical facts:
 flowchart TD
     A["Intent"] --> B["Authoritative context + policy"]
     B --> C["Governance decision"]
-    C --> D["Decision receipt / audit residue"]
+    C --> D["Decision receipt / decision receipt"]
     C -->|"Denied / deferred / acknowledgment required"| E["No protected domain side effect"]
     C -->|"Allowed + valid execution authority"| F["Host-owned executor"]
     F --> G["Domain event appended"]
@@ -293,7 +293,7 @@ That is a valid design. The name of the table matters less than the semantics pr
 
 ---
 
-## 3. Governance Decision Receipts and Audit Residue
+## 3. Governance Decision Receipts and Decision Receipt
 
 Governance evidence exists to reconstruct the governed path around consequential authority.
 
@@ -361,12 +361,12 @@ creates evidence requirements that are not identical to domain-state requirement
 | --- | --- |
 | Operational logging | A rejection log may exist, but it can be filtered, sampled, or expired unless retention is deliberately stronger |
 | Traditional audit trail | Often no resource-change record exists because no resource changed; an application may add an attempt audit separately |
-| Governance decision receipt / audit residue | A durable `Denied` decision can preserve intent, reasons, policy evidence, correlation, and `execution = none` |
+| Governance decision receipt / decision receipt | A durable `Denied` decision can preserve intent, reasons, policy evidence, correlation, and `execution = none` |
 | Event-sourced domain stream | Usually no accepted domain event is appended because the protected state transition never occurred |
 
 The comparison is intentionally asymmetric. A denied attempt can be important governance evidence while correctly being absent from the domain event stream and ordinary change history.
 
-### Audit Residue Is a Lifecycle, Not One Mandatory Storage Technology
+### Decision Receipt Is a Lifecycle, Not One Mandatory Storage Technology
 
 Governance evidence may be stored in:
 
@@ -377,7 +377,7 @@ Governance evidence may be stored in:
 - An event-sourced governance subsystem.
 - Another storage model that meets the application's reconstruction and integrity requirements.
 
-Learning does not require event sourcing for audit residue.
+Learning does not require event sourcing for decision receipt.
 
 It requires that the architecture preserve the distinctions it claims to preserve.
 
@@ -603,7 +603,7 @@ A system may use either, both, or neither.
 
 ### Event-Store and Evidence-Store Retention May Diverge
 
-Even when domain events and governance receipts are correlated, their retention responsibilities may differ.
+Even when domain events and decision receipts are correlated, their retention responsibilities may differ.
 
 For example:
 
@@ -903,7 +903,7 @@ Actor/workload identity
 PolicyVersion or policy evidence reference
 ```
 
-A denied freeze request produces a governance receipt but no `AccountFrozen` event.
+A denied freeze request produces a decision receipt but no `AccountFrozen` event.
 
 This architecture uses event sourcing where it is valuable—the domain state—and governance evidence where it is valuable—the authority lifecycle.
 
@@ -974,7 +974,7 @@ Operational logs may generate the highest raw volume because they record technic
 
 Traditional audit trails usually record selected business changes.
 
-Governance receipts record decision lifecycle evidence and may be relatively compact but long-lived.
+Decision receipts record decision lifecycle evidence and may be relatively compact but long-lived.
 
 Event sourcing records the domain transitions needed to reconstruct state, potentially indefinitely.
 
@@ -1010,7 +1010,7 @@ Common strategies include:
 - Upcasters/adapters at read time.
 - Explicit migration of historical events under controlled rules.
 
-The same principle applies to governance receipts: version the evidence schema deliberately if historical readers must survive application evolution.
+The same principle applies to decision receipts: version the evidence schema deliberately if historical readers must survive application evolution.
 
 ### Replay
 
@@ -1286,7 +1286,7 @@ Use the simplest record model that answers the required historical question.
 | --- | --- |
 | Debug requests, failures, latency, service health | Operational structured logging / telemetry |
 | Know who changed ordinary CRUD data and when | Traditional audit fields or history table |
-| Reconstruct why a consequential decision allowed, denied, deferred, acknowledged, or escalated | Durable governance decision receipt / audit residue |
+| Reconstruct why a consequential decision allowed, denied, deferred, acknowledged, or escalated | Durable governance decision receipt / decision receipt |
 | Bind later execution to earlier policy, acknowledgment, or capability evidence | Decision receipt plus explicit correlation and execution receipt |
 | Reconstruct aggregate/domain state from its complete history | Event sourcing |
 | Build multiple read models from domain history | Event sourcing + projections |
@@ -1408,7 +1408,7 @@ If those questions have explicit answers, the architecture is much easier to rea
 
 Continue with:
 
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) for the distinction between acknowledgment, decision evidence, and execution evidence.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) for the distinction between acknowledgment, decision evidence, and execution evidence.
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) for policy identity, historical evidence, fingerprints, and drift.
 - [Secure Logging Across Trust Boundaries](../security/secure-logging-across-trust-boundaries.md) for the operational-logging boundary, minimization, retention, and the limits of ordinary telemetry.
 - [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md) when the threat model requires integrity properties beyond ordinary durable persistence.
@@ -1420,13 +1420,13 @@ Continue with:
 
 ## Scope and Boundaries
 
-This comparison does not claim that event sourcing is inherently stronger or weaker than CRUD persistence, audit tables, or governance receipts.
+This comparison does not claim that event sourcing is inherently stronger or weaker than CRUD persistence, audit tables, or decision receipts.
 
 It also does not claim that:
 
 - Event sourcing guarantees tamper evidence.
 - Event stores are legally immutable records.
-- Governance receipts establish regulatory compliance.
+- Decision receipts establish regulatory compliance.
 - A policy fingerprint proves authorship or authorization.
 - Append-only storage prevents every privileged rewrite or truncation attack.
 - Permanent retention is appropriate for every event.

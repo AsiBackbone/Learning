@@ -41,7 +41,7 @@ Intermediate
 - .NET 10 SDK
 - [Decision Before Execution](../../docs/tutorials/decision-before-execution.md)
 - [Policy Context and Explicit Decision Outcomes](../../docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
-- [Acknowledgment and Audit Residue](../../docs/tutorials/acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment](../../docs/tutorials/decision-receipts-and-acknowledgment.md)
 
 ## Run the Sample
 
@@ -205,11 +205,11 @@ This sample exposes the capability boundary with intentionally small, determinis
 
 | Teaching sample | Working reference | Important difference |
 | --- | --- | --- |
-| `ExecutionCapability` | [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) | The framework grant is provider-neutral metadata and adds fields such as not-before time, policy hash, handshake reference, gateway binding, resource binding, metadata, and schema version. It is explicitly not a bearer-token format. |
-| `ExecutionCapabilityValidator` | [`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) and [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) | The framework distinguishes strict execution-boundary validation from intentionally weaker metadata validation and can add proof verification plus bounded-use checks. |
-| Deterministic validation scenarios | [`CapabilityGrantValidationProfileTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidationProfileTests.cs) and [`CapabilityGrantValidatorTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidatorTests.cs) | The framework tests cover the richer validation surface, including proof, use-state availability, time, scope, policy, acknowledgment, gateway, and resource behavior. |
-| Replay deliberately omitted from the baseline | [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs), [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Storage.InMemory/CapabilityTokens/InMemoryCapabilityGrantUseStore.cs), and [`InMemoryCapabilityGrantUseStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/InMemoryCapabilityGrantUseStoreTests.cs) | The framework provides a bounded-use seam and a local reference store, while durable distributed replay protection remains a host responsibility. |
-| `DisableAccountGateway` owns the simulated side effect | [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) and [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) | The framework validates governance authority but deliberately does not become the external account, robotics, deployment, or tool executor. The host still owns the real action. |
+| `ExecutionCapability` | [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) | The framework grant is provider-neutral metadata and adds fields such as not-before time, policy hash, handshake reference, gateway binding, resource binding, metadata, and schema version. It is explicitly not a bearer-token format. |
+| `ExecutionCapabilityValidator` | [`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) and [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) | The framework distinguishes strict execution-boundary validation from intentionally weaker metadata validation and can add proof verification plus bounded-use checks. |
+| Deterministic validation scenarios | [`CapabilityGrantValidationProfileTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidationProfileTests.cs) and [`CapabilityGrantValidatorTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/CapabilityTokens/CapabilityGrantValidatorTests.cs) | The framework tests cover the richer validation surface, including proof, use-state availability, time, scope, policy, acknowledgment, gateway, and resource behavior. |
+| Replay deliberately omitted from the baseline | [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs), [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Storage.InMemory/CapabilityTokens/InMemoryCapabilityGrantUseStore.cs), and [`InMemoryCapabilityGrantUseStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/CapabilityTokens/InMemoryCapabilityGrantUseStoreTests.cs) | The framework provides a bounded-use seam and a local reference store, while durable distributed replay protection remains a host responsibility. |
+| `DisableAccountGateway` owns the simulated side effect | [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/capability-grant-hardening.md) and [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/intent-to-execution-pattern.md) | The framework validates governance authority but deliberately does not become the external account, robotics, deployment, or tool executor. The host still owns the real action. |
 
 The sample's `ResourceVersion` deserves special attention. It exists so a learner can observe state drift directly:
 
@@ -234,18 +234,18 @@ Useful experiments include:
 4. Change the audience to another gateway and decide whether cross-gateway reuse should be allowed.
 5. Add `NotBeforeUtc` and test the exact lower time boundary.
 6. Add a single-use store and demonstrate first-use success followed by replay rejection.
-7. Record capability issuance and validation as distinct audit-residue events.
+7. Record capability issuance and validation as distinct decision-receipt events.
 
 ## Related Material
 
 - [Scoped Capability and Host-Owned Execution tutorial](../../docs/tutorials/scoped-capability-and-host-owned-execution.md)
 - [Scoped Capability and Host-Owned Execution intermediate lab](../../docs/labs/scoped-capability-and-host-owned-execution.md)
-- [Acknowledgment and Audit Residue sample](../acknowledgment-and-audit-residue/README.md)
-- [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) - compare the teaching capability with the working framework's provider-neutral grant metadata.
-- [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) - inspect fuller execution-context validation.
-- [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) - review the working seam for bounded-use and replay-state enforcement.
-- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) - review production-oriented proof, binding, time, replay, and failure guidance.
-- [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) - place capability validation in the fuller governed flow.
+- [Decision Receipts and Acknowledgment sample](../decision-receipts-and-acknowledgment/README.md)
+- [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) - compare the teaching capability with the working framework's provider-neutral grant metadata.
+- [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) - inspect fuller execution-context validation.
+- [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) - review the working seam for bounded-use and replay-state enforcement.
+- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/capability-grant-hardening.md) - review production-oriented proof, binding, time, replay, and failure guidance.
+- [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/intent-to-execution-pattern.md) - place capability validation in the fuller governed flow.
 
 ## License
 

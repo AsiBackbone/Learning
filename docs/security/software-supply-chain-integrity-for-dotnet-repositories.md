@@ -84,7 +84,7 @@ If your starting question is whether a green CI run proves the NuGet package you
 
 ## What This Walkthrough Uses as Working Specimens
 
-This article uses three ASI Backbone organization repositories selectively:
+This article uses three AsiBackbone organization repositories selectively:
 
 - [`AsiBackbone/Learning`](https://github.com/AsiBackbone/Learning) — an educational repository with documentation and sample validation, SHA-pinned workflow dependencies, grouped Dependabot update automation, and repository-maintained CodeQL analysis for C# source.
 - [`AsiBackbone/AsiBackbone`](https://github.com/AsiBackbone/AsiBackbone) — a package-producing .NET repository with central dependency management, locked restore, release validation, SBOM generation, provenance attestations, and package publication automation.
@@ -2083,10 +2083,10 @@ Pinned DocFX tool manifest
 ### AsiBackbone
 
 - [AsiBackbone repository](https://github.com/AsiBackbone/AsiBackbone)
-- [AsiBackbone workflow directory](https://github.com/AsiBackbone/AsiBackbone/tree/main/.github/workflows)
-- [Directory.Build.props](https://github.com/AsiBackbone/AsiBackbone/blob/main/Directory.Build.props)
-- [Directory.Packages.props](https://github.com/AsiBackbone/AsiBackbone/blob/main/Directory.Packages.props)
-- [Dependabot configuration](https://github.com/AsiBackbone/AsiBackbone/blob/main/.github/dependabot.yml)
+- [AsiBackbone workflow directory](https://github.com/AsiBackbone/AsiBackbone/tree/release/6.0.0/.github/workflows)
+- [Directory.Build.props](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/Directory.Build.props)
+- [Directory.Packages.props](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/Directory.Packages.props)
+- [Dependabot configuration](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/.github/dependabot.yml)
 
 Inspect it for:
 

@@ -1,4 +1,4 @@
-# Contributing to ASI Backbone Learning
+# Contributing to AsiBackbone Learning
 
 Thank you for your interest in contributing to `AsiBackbone/Learning`.
 
@@ -106,7 +106,7 @@ Choose the category that best matches the conversation:
 - **Tutorial Ideas** — proposals for tutorials, labs, examples, learning paths, or future educational material.
 - **Show and tell** — projects, experiments, adaptations, diagrams, or implementations inspired by Learning concepts and patterns.
 
-Use [**ASI Backbone Organization Discussions**](https://github.com/orgs/AsiBackbone/discussions) when a topic genuinely spans multiple ASI Backbone repositories or concerns the organization as a whole.
+Use [**AsiBackbone Organization Discussions**](https://github.com/orgs/AsiBackbone/discussions) when a topic genuinely spans multiple AsiBackbone repositories or concerns the organization as a whole.
 
 A useful flow is:
 
@@ -167,7 +167,7 @@ Where useful, distinguish among:
 
 - **Architecture Pattern** — the general idea
 - **Minimal Teaching Example** — the simplified demonstration
-- **Working Repository Example** — the fuller implementation in another ASI Backbone repository
+- **Working Repository Example** — the fuller implementation in another AsiBackbone repository
 
 Do not duplicate large portions of canonical implementation documentation when a direct reference will serve better.
 
@@ -188,7 +188,7 @@ Where appropriate, include:
 
 Architectural disagreement can be educational.
 
-Contributions may present approaches that differ from the current ASI Backbone implementation when those approaches are:
+Contributions may present approaches that differ from the current AsiBackbone implementation when those approaches are:
 
 - Technically grounded
 - Clearly explained
@@ -206,7 +206,7 @@ When architectural status materially affects how a page should be interpreted, u
 
 Use one of these values:
 
-- **Canonical Pattern** — aligned with the current architecture of one or more ASI Backbone organization repositories.
+- **Canonical Pattern** — aligned with the current architecture of one or more AsiBackbone organization repositories.
 - **Alternative Pattern** — a viable different approach, or a comparison centered on an approach that intentionally differs from the current canonical organization pattern.
 - **Experimental** — exploratory architecture that tests or extends boundaries without claiming an established organization pattern or production-ready design. Experimental pages should state important assumptions, unknowns, and limits explicitly.
 - **General learning material** — educational material for which no stronger architectural-status claim is necessary.
@@ -524,7 +524,7 @@ Do not introduce category directories such as `articles/security/`, `articles/go
 
 ### Problem-Oriented Titles and Slugs
 
-Lead with a developer problem rather than repository vocabulary. Use lowercase kebab-case slugs that remain meaningful outside the ASI Backbone organization.
+Lead with a developer problem rather than repository vocabulary. Use lowercase kebab-case slugs that remain meaningful outside the AsiBackbone organization.
 
 Prefer:
 
@@ -564,7 +564,7 @@ Before publishing a new standalone article, normally confirm that:
 - [ ] `feed: true` opts the article into the existing publication feed.
 - [ ] The article stands alone without requiring earlier tutorials or Learning-specific background.
 - [ ] The opening establishes a concrete technical problem before introducing repository-specific language.
-- [ ] The article does not assume that the reader adopts `AsiBackbone` or another ASI Backbone implementation.
+- [ ] The article does not assume that the reader adopts `AsiBackbone` or another AsiBackbone implementation.
 - [ ] Established concepts are distinguished from repository-specific terminology where appropriate.
 - [ ] Deeper tutorials, samples, labs, ADRs, or implementation material are linked rather than reproduced wholesale.
 - [ ] Contextual links identify a small number of natural next steps and explain why each destination is relevant; reciprocal links are added only where they improve reader flow.
@@ -869,7 +869,7 @@ These requests are part of maintaining a useful learning resource.
 
 Do not report security vulnerabilities through a public Issue when disclosure could create risk.
 
-Follow the security reporting guidance provided by the repository or ASI Backbone organization when available.
+Follow the security reporting guidance provided by the repository or AsiBackbone organization when available.
 
 Never include:
 
@@ -912,7 +912,7 @@ The project may recognize contributors through Git history, release notes, contr
 
 ## Questions
 
-If you are unsure whether an idea belongs in the repository, start an [ASI Backbone Organization Discussion](https://github.com/orgs/AsiBackbone/discussions).
+If you are unsure whether an idea belongs in the repository, start an [AsiBackbone Organization Discussion](https://github.com/orgs/AsiBackbone/discussions).
 
 If you have identified a concrete problem, open an Issue.
 

@@ -1563,8 +1563,8 @@ The Learning repository and the `AsiBackbone` implementation repository contain 
 | --- | --- | --- |
 | Explicit outcome assertions | [`DecisionOutcomeTests`](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/Tests/DecisionOutcomeTests.cs) | Direct assertions for `Denied`, `Deferred`, `AcknowledgmentRequired`, and `Allowed` |
 | Table-like scenario coverage | [Policy Context sample program](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/Sample/Program.cs) | Named policy scenarios covering all major disable-account outcomes |
-| Composition invariants | [`DefaultAsiBackbonePolicyEvaluatorTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Evaluation/DefaultAsiBackbonePolicyEvaluatorTests.cs) | Empty-policy behavior, warning/denial composition, exception posture, short-circuiting, and decision-policy interaction |
-| End-to-end evaluator behavior | [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) | Policy-evaluator invariants across the real implementation pipeline |
+| Composition invariants | [`DefaultAsiBackbonePolicyEvaluatorTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/Evaluation/DefaultAsiBackbonePolicyEvaluatorTests.cs) | Compatibility-retained test fixture covering the 6.0 `DefaultGovernancePolicyEvaluator`: empty-policy behavior, warning/denial composition, exception posture, short-circuiting, and decision-policy interaction |
+| End-to-end evaluator behavior | [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) | Policy-evaluator invariants across the real implementation pipeline |
 | Policy provenance | [Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md) | Historical identity, drift, freshness, and version/hash boundaries |
 | Bounded execution authority | [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) | Replay/use-state validation at the execution boundary |
 
@@ -1622,7 +1622,7 @@ Repeatable automated test
 - [Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md) — extend regression cases across historical policy identity and drift.
 - [Policy Simulation and Change-Impact Analysis lab](../labs/policy-simulation-and-change-impact-analysis.md) — replay identical contexts against baseline and candidate policy versions, compare changed outcomes and reasons, and preserve a strict no-execution simulation boundary.
 - [Decision Before Execution](../tutorials/decision-before-execution.md) — revisit the boundary between a decision and a protected side effect.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — test delayed continuation without turning acknowledgment into authorization.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — test delayed continuation without turning acknowledgment into authorization.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — test capability issuance and host-owned execution boundaries.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — test replay, expiry, revocation, and bounded-use authority separately from policy approval.
 - [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md) — compare the richer governance test surface with ordinary authorization requirements.

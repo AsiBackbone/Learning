@@ -26,13 +26,13 @@ description: Learn an AI tool gateway pattern where models propose actions while
 >
 > **Observe:** Unknown or invalid proposals never reach the handler, model-provided claims cannot override authoritative host context, and stale or replayed execution authority is rejected.
 
-This is the fifth foundational tutorial in ASI Backbone Learning.
+This is the fifth foundational tutorial in AsiBackbone Learning.
 
 It builds on:
 
 1. [Decision Before Execution](decision-before-execution.md)
 2. [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md)
-3. [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md)
+3. [Decision Receipts and Acknowledgment](decision-receipts-and-acknowledgment.md)
 4. [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md)
 
 The first four tutorials introduced individual architectural boundaries.
@@ -62,7 +62,7 @@ Execution-boundary validation
    ↓
 Host-owned tool invocation
    ↓
-Audit residue
+Decision receipt
 ```
 
 The central rule is:
@@ -428,7 +428,7 @@ switch (decision.Outcome)
     case GovernanceDecisionOutcome.Deferred:
     case GovernanceDecisionOutcome.EscalationRecommended:
         await auditSink.WriteAsync(
-            CreateDecisionResidue(
+            CreateDecisionReceipt(
                 context,
                 decision),
             cancellationToken);
@@ -706,7 +706,7 @@ public sealed class GovernedAiToolGateway(
             policy.Evaluate(context);
 
         await auditSink.WriteAsync(
-            AuditResidueFactory.FromDecision(
+            DecisionReceiptFactory.FromDecision(
                 context,
                 decision),
             cancellationToken);
@@ -732,7 +732,7 @@ public sealed class GovernedAiToolGateway(
                         cancellationToken);
 
             await auditSink.WriteAsync(
-                AuditResidueFactory
+                DecisionReceiptFactory
                     .FromAcknowledgment(
                         context,
                         acknowledgment),
@@ -761,7 +761,7 @@ public sealed class GovernedAiToolGateway(
                     });
 
             await auditSink.WriteAsync(
-                AuditResidueFactory.FromDecision(
+                DecisionReceiptFactory.FromDecision(
                     context,
                     decision,
                     stage: "re-evaluation"),
@@ -789,7 +789,7 @@ public sealed class GovernedAiToolGateway(
                     cancellationToken);
 
         await auditSink.WriteAsync(
-            AuditResidueFactory
+            DecisionReceiptFactory
                 .FromCapabilityValidation(
                     context,
                     validation),
@@ -812,7 +812,7 @@ public sealed class GovernedAiToolGateway(
                 cancellationToken);
 
         await auditSink.WriteAsync(
-            AuditResidueFactory
+            DecisionReceiptFactory
                 .FromExecution(
                     context,
                     result),
@@ -1574,13 +1574,13 @@ This tutorial is framework-neutral, but the working `AsiBackbone` repository doc
 
 Useful references include:
 
-- [`AI Agent Gateway Scenario`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/ai-agent-gateway.md) — positions AsiBackbone as a governance checkpoint between an AI-proposed action and host-owned execution.
-- [`Human Approval Before AI Tool Execution`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/human-approval-before-ai-tool-execution.md) — focuses on acknowledgment before an AI-proposed consequential action proceeds.
-- [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — structured decision outcomes and reason data.
-- [`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs) — structured governance evidence.
-- [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) — framework-neutral acknowledgment/handshake request.
-- [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — short-lived, provider-neutral capability metadata for governed follow-on execution.
-- [`Capability Grant Hardening`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) — execution-boundary validation, proof handling, bindings, failure behavior, and bounded-use guidance.
+- [`AI Agent Gateway Scenario`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/scenarios/ai-agent-gateway.md) — positions AsiBackbone as a governance checkpoint between an AI-proposed action and host-owned execution.
+- [`Human Approval Before AI Tool Execution`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/scenarios/human-approval-before-ai-tool-execution.md) — focuses on acknowledgment before an AI-proposed consequential action proceeds.
+- [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — structured decision outcomes and reason data.
+- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) — structured governance evidence.
+- [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) — framework-neutral acknowledgment/handshake request.
+- [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — short-lived, provider-neutral capability metadata for governed follow-on execution.
+- [`Capability Grant Hardening`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/capability-grant-hardening.md) — execution-boundary validation, proof handling, bindings, failure behavior, and bounded-use guidance.
 
 The working project makes the responsibility boundary explicit:
 
@@ -1666,7 +1666,7 @@ Execution validation
    ↓
 Simulated notification handler
    ↓
-Audit residue
+Decision receipt
 ```
 
 Do **not** send a real message initially.
@@ -1717,7 +1717,7 @@ You have now completed the five foundational patterns:
         ↓
 2. Policy Context and Explicit Decision Outcomes
         ↓
-3. Acknowledgment and Audit Residue
+3. Decision Receipts and Acknowledgment
         ↓
 4. Scoped Capability and Host-Owned Execution
         ↓
@@ -1787,7 +1787,7 @@ Learning is intended to make those tradeoffs visible rather than prescribe one u
 - [AI Proposal Rejection, Uncertainty, and Recovery Patterns](../ai-integration/ai-proposal-rejection-uncertainty-and-recovery-patterns.md) — classify failed proposal stages, preserve uncertainty, bound retries and feedback, and terminate or escalate without weakening host authority.
 - [Governed Multi-Tool Workflows and Recovery Boundaries](../ai-integration/governed-multi-tool-workflows-and-recovery-boundaries.md) — repeat the gateway boundary per step while handling drift, partial failure, replanning, idempotency, compensation, cancellation, and recovery.
 - [Agent Memory and Governance Boundaries](../ai-integration/agent-memory-and-governance-boundaries.md) — retain useful context without allowing remembered facts, prior approvals, stale observations, or model-generated notes to bypass current host context and authority.
-- [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — explore responsibility boundaries, re-evaluation, correlation, and evidence across consequential workflows.
+- [Decision Receipts and Acknowledgment](decision-receipts-and-acknowledgment.md) — explore responsibility boundaries, re-evaluation, correlation, and evidence across consequential workflows.
 - [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — examine narrow execution authority, capability bindings, replay considerations, and execution-boundary validation.
 - [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](../advanced/governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md) — extend the single-agent gateway into an explicitly experimental multi-agent model without treating agent agreement, planning, or delegation requests as execution authority.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — distinguish single-use capability enforcement from request idempotency and exactly-once execution claims.

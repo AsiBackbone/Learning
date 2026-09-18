@@ -8,7 +8,7 @@ Publish a stable release only from a clean commit on protected `main`. Before pu
 
 The `Publish Stable Release Evidence` workflow runs again when the GitHub Release is published. It checks out the exact tag and fails unless all of these operations succeed:
 
-The repository-level `global.json` makes `Microsoft.Testing.Platform` the canonical test runner for these commands, matching the runner posture used across the ASI Backbone repositories.
+The repository-level `global.json` makes `Microsoft.Testing.Platform` the canonical test runner for these commands, matching the runner posture used across the AsiBackbone repositories.
 
 ```powershell
 dotnet restore samples/Samples.slnx --locked-mode

@@ -118,7 +118,7 @@ function buildStructuredData(model) {
     return null
   }
 
-  var siteName = firstText(model._structuredDataSiteName, model._appName, 'ASI Backbone Learning')
+  var siteName = firstText(model._structuredDataSiteName, model._appName, 'AsiBackbone Learning')
   var siteAlternateName = firstText(model._structuredDataSiteAlternateName)
   var siteDescription = firstText(model._structuredDataSiteDescription)
   var publisherName = firstText(model._structuredDataPublisherName)

@@ -1,27 +1,27 @@
 ---
-description: Map ASI Backbone Learning terminology to established software architecture, authorization, security, workflow, provenance, and AI-governance concepts.
+description: Map AsiBackbone Learning terminology to established software architecture, authorization, security, workflow, provenance, and AI-governance concepts.
 ---
 
 # Terminology and Established Architecture Concepts
 
-ASI Backbone Learning uses a consistent vocabulary to make recurring architectural boundaries easier to teach, test, and compare.
+AsiBackbone Learning uses a consistent vocabulary to make recurring architectural boundaries easier to teach, test, and compare.
 
 For concise canonical definitions, start with the [Architecture Glossary](glossary.md). This page focuses on terminology lineage, established concept anchors, and the distinctions between Learning composition terms and broader industry vocabulary.
 
-That vocabulary is **not** a claim that the underlying software architecture, security, authorization, workflow, provenance, or AI-governance ideas originated with ASI Backbone.
+That vocabulary is **not** a claim that the underlying software architecture, security, authorization, workflow, provenance, or AI-governance ideas originated with AsiBackbone.
 
 Many of the related concepts predate this repository by years or decades.
 
-Some labels, including `Governed Execution`, `Audit Residue`, `Host-Owned Execution`, and `Governed AI Tool Gateway`, are repository-local teaching or composition terms rather than external standards terminology. They are signposts for boundaries that the tutorials want to keep visible.
+Some labels, including `Governed Execution`, `Host-Owned Execution`, and `Governed AI Tool Gateway`, are repository-local teaching or composition terms rather than external standards terminology. They are signposts for boundaries that the tutorials want to keep visible. `Decision receipt` is the canonical name for the concrete record produced by policy evaluation.
 
-> **ASI Backbone Learning often gives a consistent name to a boundary or composition of established architectural ideas. The terminology is intended to make those boundaries teachable and reusable, not to erase their technical lineage.**
+> **AsiBackbone Learning often gives a consistent name to a boundary or composition of established architectural ideas. The terminology is intended to make those boundaries teachable and reusable, not to erase their technical lineage.**
 
 The intended relationship is:
 
 ```text
 Established concept
         ↓
-ASI Backbone Learning terminology
+AsiBackbone Learning terminology
         ↓
 Specific teaching boundary or composition
 ```
@@ -43,12 +43,12 @@ Renamed as something new
 | **Policy Context** | ABAC subject/object/action/environment attributes, authorization context, request/resource context | Decision-relevant facts are assembled explicitly and preferably from authoritative sources rather than discovered implicitly throughout execution. |
 | **Explicit Decision Outcomes** | Result types, workflow states, policy decisions, state-machine transitions | The decision communicates what should happen next instead of compressing all non-success states into `false` or an authorization failure. |
 | **Acknowledgment Boundary** | Consent flows, attestation, approval workflows, human-in-the-loop controls | Acknowledgment records that a condition was presented and accepted. It remains distinct from authentication, authorization, approval by another authority, and execution authority. |
-| **Audit Residue** | Audit trails, decision logs, event records, provenance | The term describes structured evidence left by the governed lifecycle, including correlation, policy identity, reasons, acknowledgment, authority, and execution evidence. It does not prescribe one logging or storage technology. |
+| **Decision Receipt** | Audit trails, decision logs, event records, provenance | The receipt records a decision, its outcome, and its reasons. Related acknowledgment, authority, and execution events can be correlated without implying that the decision record itself proves execution. |
 | **Capability-Scoped Authority** | Capability-based security, least privilege, scoped credentials, short-lived access tokens | Authority is narrowly bound to the actor, operation, resource, audience, state, lifetime, and when needed use count or acknowledgment. Merely using a short-lived token does not by itself create the full boundary. |
 | **Host-Owned Execution** | Reference monitor, complete mediation, trusted execution boundary, application service boundary | A policy evaluator or model may recommend or permit an action, but the trusted host retains control of the component that performs the real side effect. |
 | **Governed AI Tool Gateway** | Tool mediation, agent/tool gateways, reference-monitor patterns, human oversight, application authorization | Model output is treated as a proposal, not authority. The host owns the tool registry, reconstructs authoritative context, evaluates policy, validates execution authority, and invokes the tool. |
-| **Governance Spine** | Policy pipeline, orchestration pipeline, control plane, workflow state machine | Learning uses the term for the end-to-end sequence that preserves the boundaries among intent, context, decision, acknowledgment, scoped authority, execution, and evidence. |
-| **Canonical Pattern** | Reference architecture, preferred implementation, repository convention | `Canonical` means aligned with the current ASI Backbone reference implementations and teaching path. It does **not** mean an industry standard, universally correct architecture, or requirement for adopters. |
+| **Governance Spine** | Policy pipeline, orchestration pipeline, control plane, workflow state machine | Use this as high-level architectural positioning for the end-to-end sequence. Use familiar terms such as policy decision pipeline when explaining low-level behavior. |
+| **Canonical Pattern** | Reference architecture, preferred implementation, repository convention | `Canonical` means aligned with the current AsiBackbone reference implementations and teaching path. It does **not** mean an industry standard, universally correct architecture, or requirement for adopters. |
 
 The established concepts in the middle column are conceptual anchors, not declarations of exact equivalence.
 
@@ -184,15 +184,15 @@ OAuth access tokens provide a familiar example of credentials with scope and lif
 
 The key lesson is to validate the authority **where the side effect is about to occur**, not merely when the artifact is created.
 
-## Audit Residue, Logging, and Provenance
+## Decision Receipts, Logging, and Provenance
 
-`Audit residue` is a Learning term for evidence that remains from the governed lifecycle.
+A decision receipt records a policy decision, its outcome, and its reasons.
 
 It may be stored in logs, events, a database, append-only storage, or another audit system.
 
-The term is intentionally broader than a single log message.
+It is more structured than a single log message, but it does not by itself prove that the host executed the operation.
 
-Useful residue may connect:
+A useful receipt may identify:
 
 ```text
 proposal
@@ -200,11 +200,10 @@ policy context identity
 policy version or hash
 decision outcome
 reason codes
-acknowledgment
-capability issuance and validation
-execution result
 correlation identifiers
 ```
+
+Acknowledgment, capability, and execution events may be stored separately and correlated with the decision receipt as the governed lifecycle continues.
 
 A structured log can carry some or all of this information.
 
@@ -216,7 +215,7 @@ logging technology ≠ decision provenance model
 
 The architecture still has to decide which events exist, how they correlate, which identifiers are stable, and which records require durable or integrity-protected storage.
 
-W3C PROV is one established vocabulary for representing provenance relationships. Learning does not attempt to replace it; `audit residue` is a smaller teaching label for the evidence left by the repository's governed-execution lifecycle.
+W3C PROV is one established vocabulary for representing provenance relationships. Learning does not attempt to replace it; `decision receipt` is a smaller label for the evaluation record within the repository's governed-execution lifecycle.
 
 ## Policy Decision Versus Execution Authority
 
@@ -280,7 +279,7 @@ NIST's AI Risk Management Framework provides a broader governance and human-over
 
 ## What `Canonical` Means Here
 
-Within ASI Backbone Learning, **Canonical Pattern** means:
+Within AsiBackbone Learning, **Canonical Pattern** means:
 
 > The pattern currently aligned with the organization's reference implementations and foundational teaching sequence.
 
@@ -319,7 +318,7 @@ Foundational tutorials:
 
 1. [Decision Before Execution](../tutorials/decision-before-execution.md)
 2. [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
-3. [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+3. [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 4. [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 5. [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md)
 
@@ -346,7 +345,7 @@ These references are intentionally selective. They provide established terminolo
 
 The useful question is not:
 
-> Which familiar idea has ASI Backbone renamed?
+> Which familiar idea has AsiBackbone renamed?
 
 It is:
 

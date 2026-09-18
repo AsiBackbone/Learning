@@ -1,12 +1,12 @@
 ---
-description: Canonical quick-reference definitions for ASI Backbone Learning architecture terminology across governance, security, AI integration, and host-owned execution.
+description: Canonical quick-reference definitions for AsiBackbone Learning architecture terminology across governance, security, AI integration, and host-owned execution.
 ---
 
 # Architecture Glossary
 
-This glossary is the canonical vocabulary reference for ASI Backbone Learning.
+This glossary is the canonical vocabulary reference for AsiBackbone Learning.
 
-It defines how recurring architecture terms are used across tutorials, labs, samples, governance material, security material, and AI-integration material. It does not claim that the underlying architecture or security concepts originated with ASI Backbone, and it does not redefine established industry terminology when an established meaning is already sufficient.
+It defines how recurring architecture terms are used across tutorials, labs, samples, governance material, security material, and AI-integration material. It does not claim that the underlying architecture or security concepts originated with AsiBackbone, and it does not redefine established industry terminology when an established meaning is already sufficient.
 
 > **Canonical here means canonical within the Learning repository.** It does not mean standardized by an external body, universally correct for every system, or permanently coupled to one implementation API.
 
@@ -17,10 +17,27 @@ Use [Terminology and Established Architecture Concepts](terminology-and-establis
 Each definition is labeled with one or more scopes:
 
 - **General architecture** — an established or broadly recognizable software architecture, security, workflow, or provenance concept.
-- **Learning usage** — a term whose meaning is narrowed, composed, or emphasized in a specific way by ASI Backbone Learning.
+- **Learning usage** — a term whose meaning is narrowed, composed, or emphasized in a specific way by AsiBackbone Learning.
 - **Implementation correspondence** — a current `AsiBackbone/AsiBackbone` API or type that embodies the term. Implementation mappings can evolve without changing the architectural definition.
 
 The glossary deliberately separates architectural meaning from product-specific type names. A tutorial may use framework-neutral sample types while the `AsiBackbone` package uses different concrete names.
+
+## Canonical 6.0 Vocabulary
+
+Use ordinary engineering language first. Reserve specialized wording for distinctions that affect architecture, security, or runtime behavior.
+
+| Canonical term | Short educational definition | Usage rule |
+| --- | --- | --- |
+| AsiBackbone | A governance framework for accountable software execution. | Treat `AsiBackbone` as the product name. Keep the historical expansion of `ASI` in project-history context rather than ordinary onboarding. |
+| Policy decision pipeline | Rules evaluate request facts and produce a structured decision before execution. | Lead with this familiar description. Use **governance spine** only for high-level architectural positioning. |
+| Decision receipt | A record of a policy decision, its outcome, and its reasons. | A receipt proves what evaluation produced; it does not prove that the host performed the operation. |
+| Acknowledgment | An actor responds to a defined challenge or responsibility statement before continuation. | Use **handshake** only for the actual multi-step request/response protocol or an exact retained API name. |
+| Capability grant | Short-lived, scoped authority for a bounded continuation. | Keep this term because it identifies a real delegated-authority boundary. |
+| Outbox | Durable local records awaiting reliable delivery. | Use **outbox** in educational prose. Use **governance outbox** only for an exact API, schema, artifact, or specialized stream identity. |
+| Host-owned execution | The host application performs or refuses the protected operation after inspecting the decision and current authority. | Keep this term because it distinguishes evaluation from the real side effect. |
+| Context, constraint, decision, evaluator | Familiar inputs, rules, results, and composition services. | Prefer these established engineering terms without extra branding. |
+
+Introduce the vocabulary progressively: context, constraint, decision, and decision receipt first; acknowledgment next; then capability scope and expiration; outbox delivery; signing, verification, and trust policy; and finally advanced DLP, classification, and metadata controls.
 
 ## Request, Policy, and Decision Vocabulary
 
@@ -114,13 +131,13 @@ A recorded response showing that a defined challenge, condition, warning, or res
 
 Acknowledgment is distinct from authentication, authorization, approval by another authority, and execution authority.
 
-### Audit Residue
+### Decision Receipt
 
-The structured evidence left by a governed lifecycle so that the path from proposal to decision and execution can be reconstructed.
+A record of a policy decision, its outcome, and its reasons.
 
 **Scope:** Learning usage; implementation correspondence.
 
-Audit residue may include correlation identifiers, policy identity, policy version or fingerprint, decision outcomes, reason codes, acknowledgment evidence, capability events, and execution results. The term does not prescribe one storage technology and does not by itself claim durability, immutability, cryptographic signing, or tamper evidence.
+A decision receipt may include correlation identifiers, policy identity, a policy version or fingerprint, the outcome, and reason codes. Later acknowledgment, capability, and execution evidence may be correlated with it, but those later events do not turn the original receipt into proof that execution occurred. The term does not prescribe one storage technology and does not by itself claim durability, immutability, cryptographic signing, or tamper evidence.
 
 ### Decision Provenance
 
@@ -240,16 +257,16 @@ An allowlist blocks unknown or unapproved tool names from reaching handlers. Mem
 
 ## Current AsiBackbone Implementation Correspondence
 
-The Learning glossary is architectural first. The current [`AsiBackbone/AsiBackbone` implementation glossary](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/glossary.md) provides the implementation-side vocabulary and API cross-references.
+The Learning glossary is architectural first. The current [`AsiBackbone/AsiBackbone` implementation glossary](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/glossary.md) provides the implementation-side vocabulary and API cross-references.
 
 The most direct correspondences are:
 
 | Learning term | Current AsiBackbone correspondence |
 | --- | --- |
-| Intent / request | `AsiBackboneConstraintEvaluationContext` carries proposed operation data; there is not one universal `Intent` base type. |
-| Policy context | `IAsiBackboneConstraintEvaluationContext`, `AsiBackboneConstraintEvaluationContext` |
-| Constraint | `IAsiBackboneConstraint<TContext>`, `ConstraintEvaluationResult` |
-| Policy evaluation | `IAsiBackbonePolicyEvaluator<TContext>`, `DefaultAsiBackbonePolicyEvaluator<TContext>` |
+| Intent / request | `GovernanceEvaluationContext` carries proposed operation data; there is not one universal `Intent` base type. |
+| Policy context | `IGovernanceEvaluationContext`, `GovernanceEvaluationContext` |
+| Constraint | `IGovernanceConstraint<TContext>`, `ConstraintEvaluationResult` |
+| Policy evaluation | `IGovernancePolicyEvaluator<TContext>`, `DefaultGovernancePolicyEvaluator<TContext>` |
 | Decision outcome | `GovernanceDecision`, `GovernanceDecisionOutcome` |
 | Allow | `GovernanceDecisionOutcome.Allowed` |
 | Deny | `GovernanceDecisionOutcome.Denied` |
@@ -257,7 +274,7 @@ The most direct correspondences are:
 | Require acknowledgment | `GovernanceDecisionOutcome.AcknowledgmentRequired` |
 | Escalate | `GovernanceDecisionOutcome.EscalationRecommended` |
 | Acknowledgment | `LiabilityHandshakeAcknowledgment`; ASP.NET Core challenge support also exposes acknowledgment challenge types and services. |
-| Audit residue | `AuditResidue`; durable ledger support includes `AuditLedgerRecord` and `IAsiBackboneAuditLedgerStore`. |
+| Decision receipt | `DecisionReceipt`; durable ledger support includes `AuditLedgerRecord` and `IGovernanceAuditLedgerStore`. |
 | Policy version | `GovernanceDecision.PolicyVersion` |
 | Policy fingerprint | `GovernanceDecision.PolicyHash` |
 | Scoped capability / capability token | `CapabilityTokenGrant`, `CapabilityGrantValidator` |
@@ -278,7 +295,7 @@ Not every Learning term has, or should have, a one-to-one concrete type. Terms s
 | Policy version ≠ policy fingerprint | A version is a label; a fingerprint is content-derived identity. |
 | Tool proposal ≠ tool invocation | Model output remains proposal data until the host validates and authorizes execution. |
 | Tool allowlist ≠ permission to invoke | Eligibility is only one gate in a governed execution path. |
-| Audit residue ≠ tamper-proof evidence | Storage, durability, signing, integrity, and retention are separate implementation concerns. |
+| Decision receipt ≠ tamper-proof evidence | Storage, durability, signing, integrity, and retention are separate implementation concerns. |
 | Decision outcome ≠ operation result | Governance may block execution entirely, while an allowed operation can still fail when executed. |
 
 ## Related Learning Material
@@ -287,7 +304,7 @@ Foundational tutorials introduce the terms in context:
 
 1. [Decision Before Execution](../tutorials/decision-before-execution.md)
 2. [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
-3. [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+3. [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 4. [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 5. [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md)
 

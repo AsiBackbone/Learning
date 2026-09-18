@@ -1,6 +1,6 @@
-# ASI Backbone Learning Samples
+# AsiBackbone Learning Samples
 
-The `samples/` directory is the executable companion-code area for **ASI Backbone Learning**.
+The `samples/` directory is the executable companion-code area for **AsiBackbone Learning**.
 
 It is intended to contain intentionally small .NET examples that complement the architectural tutorials and make important system boundaries observable through runnable code and tests.
 
@@ -154,15 +154,15 @@ Escalate
 
 It should make information such as actor, resource, operation, and environment visible rather than hiding policy inputs throughout application code.
 
-### Acknowledgment and Audit Residue
+### Decision Receipts and Acknowledgment
 
 Related tutorial:
 
-[Acknowledgment and Audit Residue](../docs/tutorials/acknowledgment-and-audit-residue.md)
+[Decision Receipts and Acknowledgment](../docs/tutorials/decision-receipts-and-acknowledgment.md)
 
 Executable companion:
 
-[Acknowledgment and Audit Residue sample](acknowledgment-and-audit-residue/README.md)
+[Decision Receipts and Acknowledgment sample](decision-receipts-and-acknowledgment/README.md)
 
 The sample demonstrates a workflow that can pause for explicit acknowledgment while preserving evidence of the governed path.
 
@@ -185,7 +185,7 @@ The sample makes these concerns visible:
 * Re-evaluation
 * Reason codes
 * Correlation
-* Audit residue
+* Decision receipt
 
 ### Scoped Capability and Host-Owned Execution
 
@@ -264,7 +264,7 @@ Execution-Boundary Validation
    ↓
 Host-Owned Dry-Run Tool Execution
    ↓
-Audit Residue
+Decision Receipt
 ```
 
 Important invariants include:
@@ -586,7 +586,7 @@ The sample uses an in-memory append store to isolate deterministic canonicalizat
 Its central evidence boundary is:
 
 ```text
-Governance receipts
+Decision receipts
         ↓
 Canonical record fingerprints
         ↓
@@ -1009,7 +1009,7 @@ Provides fuller governance and policy-control implementations, including areas s
 * Policy evaluation
 * Structured decisions
 * Acknowledgment workflows
-* Audit residue
+* Decision receipt
 * Capability boundaries
 * Host-owned execution
 * AI governance scenarios
@@ -1034,7 +1034,7 @@ Learning samples should remain smaller than these repositories by design.
 
 ## Licensing
 
-ASI Backbone Learning uses component-specific licensing.
+AsiBackbone Learning uses component-specific licensing.
 
 Executable source code and sample projects added under `samples/` are licensed under the **MIT License** unless otherwise noted.
 

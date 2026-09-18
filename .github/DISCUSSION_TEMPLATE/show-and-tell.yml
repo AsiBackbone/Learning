@@ -2,9 +2,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Use Show and tell to share projects, experiments, adaptations, diagrams, or implementations inspired by concepts and patterns from ASI Backbone Learning.
+        Use Show and tell to share projects, experiments, adaptations, diagrams, or implementations inspired by concepts and patterns from AsiBackbone Learning.
 
-        Sharing an implementation does not make it a canonical ASI Backbone pattern. Please describe what you changed, learned, and would like feedback on.
+        Sharing an implementation does not make it a canonical AsiBackbone pattern. Please describe what you changed, learned, and would like feedback on.
 
   - type: textarea
     id: project

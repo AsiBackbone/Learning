@@ -16,7 +16,7 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ### Changed
 
-- Aligned all sample tests on `Microsoft.Testing.Platform` and `xunit.v3`, matching the shared ASI Backbone repository posture.
+- Aligned all sample tests on `Microsoft.Testing.Platform` and `xunit.v3`, matching the shared AsiBackbone repository posture.
 
 ## [0.15.0] - 2026-09-11
 

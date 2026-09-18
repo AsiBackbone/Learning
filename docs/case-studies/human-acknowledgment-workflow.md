@@ -10,7 +10,7 @@ description: Follow a bulk change through an acknowledgment-required decision, d
 
 **Difficulty:** Intermediate
 
-**Prerequisites:** Recommended — [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md). [Human-in-the-Loop Governance Workflows](../governance/human-in-the-loop-governance-workflows.md) is useful when the requirement is independent review rather than acknowledgment.
+**Prerequisites:** Recommended — [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md). [Human-in-the-Loop Governance Workflows](../governance/human-in-the-loop-governance-workflows.md) is useful when the requirement is independent review rather than acknowledgment.
 
 **Estimated study time:** 35–50 minutes for the guided path or approximately 75–95 minutes for a careful full read including the persistence, race, evidence, and failure sections.
 
@@ -1749,7 +1749,7 @@ It demonstrates the boundaries and the questions an implementation needs to answ
 
 Continue with:
 
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — foundational challenge, response, and audit-residue concepts.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — foundational challenge, response, and decision-receipt concepts.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — narrow authority after a current allowed decision.
 - [Human-in-the-Loop Governance Workflows](../governance/human-in-the-loop-governance-workflows.md) — approval/review lifecycles and reviewer eligibility.
 - [Escalation Patterns in Governed Systems](../governance/escalation-patterns-in-governed-systems.md) — when policy routes to additional authority rather than acknowledgment.

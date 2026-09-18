@@ -1,10 +1,10 @@
 ---
-description: Learn the Accountable Systems Infrastructure framing and how governed execution separates proposed intent from consequential side effects.
+description: Learn how AsiBackbone frames governed execution by separating proposed intent from consequential side effects.
 ---
 
-# Accountable Systems Infrastructure and Governed Execution
+# AsiBackbone and Governed Execution
 
-**Learning objective:** Understand the Accountable Systems Infrastructure framing and how it separates intent, context, decision, acknowledgment, authority, execution, and evidence without assuming every application needs the pattern.
+**Learning objective:** Understand how AsiBackbone separates intent, context, decision, acknowledgment, authority, execution, and evidence without assuming every application needs the pattern.
 
 **Pattern classification:** General learning material
 
@@ -12,7 +12,7 @@ description: Learn the Accountable Systems Infrastructure framing and how govern
 
 **Prerequisites:** None. [Decision Before Execution](../tutorials/decision-before-execution.md) is a useful next step for applying the framing.
 
-Within the ASI Backbone organization, **ASI** means **Accountable Systems Infrastructure**.
+`AsiBackbone` is the product name. Historically, **ASI** expanded to **Accountable Systems Infrastructure**; that project-history detail is not a separate runtime concept and is not required vocabulary for using the architecture.
 
 The phrase describes an architectural concern rather than a specific package: consequential software actions should pass through an explicit, reviewable decision boundary before a trusted host performs the real-world side effect.
 
@@ -31,21 +31,22 @@ A third question becomes important when actions are consequential, delayed, dele
 
 > **Why was this exact action permitted, under which policy and context, with what acknowledgment or scoped authority, before execution occurred?**
 
-Accountable Systems Infrastructure focuses on that gap.
+AsiBackbone focuses on that gap.
 
-## A reusable governance spine
+## A reusable policy decision pipeline
 
-A stack-neutral governance spine can be expressed as:
+A stack-neutral policy decision pipeline can be expressed as:
 
 ~~~text
 Intent or proposed action
   -> Authoritative policy context
   -> Constraint evaluation
   -> Explicit decision outcome
+  -> Decision receipt
   -> Acknowledgment or escalation when required
   -> Scoped continuation authority when required
   -> Host-owned execution
-  -> Audit residue and reconciliation
+  -> Correlated lifecycle evidence and reconciliation
 ~~~
 
 The stages are logical responsibilities. They may live in one process, several services, a workflow engine, or a gateway architecture.
@@ -63,7 +64,7 @@ The important separation is between **proposal**, **decision**, **authority**, a
 | Acknowledgment | Record a required human or system responsibility checkpoint without treating it as execution authority by itself. |
 | Scoped authority | Carry narrow, short-lived authority across a delay, process boundary, or executor boundary when that is justified. |
 | Host-owned execution | Let the component with the real credentials and side-effect capability make the final enforcement decision. |
-| Audit residue | Preserve enough structured evidence to reconstruct why the path was taken. |
+| Decision receipt | Preserve enough structured evidence to reconstruct why the path was taken. |
 
 ## Why host-owned execution matters
 
@@ -81,7 +82,7 @@ The trusted host or executor still owns concerns such as:
 - physical or external-system safety controls;
 - legal and compliance interpretation.
 
-The governance spine can inform, constrain, record, and sometimes issue narrow continuation authority. It does not remove those responsibilities.
+The policy decision pipeline can inform, constrain, record, and sometimes issue narrow continuation authority. It does not remove those responsibilities. At an architectural level, the complete end-to-end arrangement may be described as a governance spine.
 
 ## When the pattern is useful
 
@@ -97,7 +98,7 @@ The pattern becomes more valuable when one or more of these conditions exist:
 
 ## When a simpler design is better
 
-Do not introduce a governance spine merely because the pattern exists.
+Do not introduce a broader governance pipeline merely because the pattern exists.
 
 A simpler authorization handler or application service is often better when:
 

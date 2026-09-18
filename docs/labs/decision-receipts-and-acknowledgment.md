@@ -2,17 +2,17 @@
 description: Practice acknowledgment as a narrowly bound governance event, re-evaluate policy afterward, and preserve correlated evidence across decisions and execution.
 ---
 
-# Lab — Acknowledgment and Audit Residue
+# Lab — Decision Receipts and Acknowledgment
 
 **Learning objective:** Practice treating acknowledgment as a narrowly bound governance event rather than permission, preserving re-evaluation after acknowledgment, and maintaining a correlated audit timeline that distinguishes decisions, acknowledgments, and execution outcomes.
 
 **Difficulty:** Intermediate  
 
-**Prerequisites:** Complete the [Acknowledgment and Audit Residue tutorial](../tutorials/acknowledgment-and-audit-residue.md) and run the [Acknowledgment and Audit Residue sample](https://github.com/AsiBackbone/Learning/blob/main/samples/acknowledgment-and-audit-residue/README.md).
+**Prerequisites:** Complete the [Decision Receipts and Acknowledgment tutorial](../tutorials/decision-receipts-and-acknowledgment.md) and run the [Decision Receipts and Acknowledgment sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-receipts-and-acknowledgment/README.md).
 
 This lab builds directly on the third foundational tutorial and its executable companion sample.
 
-The tutorial explains the acknowledgment boundary and the purpose of structured audit residue.
+The tutorial explains the acknowledgment boundary and the purpose of structured decision receipt.
 
 The sample demonstrates five deterministic workflows, including rejected, mismatched, expired, successful, and context-drift paths.
 
@@ -45,7 +45,7 @@ Policy re-evaluated
    ↓
 Host-owned execution or stop
    ↓
-Audit residue
+Decision receipt
 ```
 
 The important invariants are:
@@ -85,13 +85,13 @@ Work on a temporary branch or disposable copy of the repository so you can modif
 For example:
 
 ```bash
-git switch -c lab/acknowledgment-audit-residue
+git switch -c lab/acknowledgment-decision-receipt
 ```
 
 From the repository root, run the companion sample before making changes:
 
 ```bash
-dotnet run --project samples/acknowledgment-and-audit-residue/Sample/AcknowledgmentAndAuditResidue.csproj
+dotnet run --project samples/decision-receipts-and-acknowledgment/Sample/DecisionReceiptsAndAcknowledgment.csproj
 ```
 
 Before continuing, locate these elements in `Program.cs`:
@@ -102,9 +102,9 @@ Before continuing, locate these elements in `Program.cs`:
 4. `AcknowledgmentValidator`
 5. `DisableAccountPolicyContext`
 6. `DisableAccountPolicy`
-7. `AuditResidue`
-8. `AddDecisionResidue`
-9. `AddResidue`
+7. `DecisionReceipt`
+8. `AddDecisionReceipt`
+9. `AddReceipt`
 10. `RecordingExecutor`
 11. `WorkflowScenario`
 12. `VerifyScenario`
@@ -286,9 +286,9 @@ You do not need a database for this lab. The objective is to identify where pers
 
 ---
 
-## Part 4 — Preserve Audit Residue Behind a Store Boundary
+## Part 4 — Preserve Decision Receipt Behind a Store Boundary
 
-The sample currently builds a local `List<AuditResidue>` inside each workflow.
+The sample currently builds a local `List<GovernanceLifecycleEvent>` inside each workflow. Decision-derived events reference a separate `DecisionReceipt`.
 
 That makes the lifecycle easy to observe, but the list disappears with the process.
 
@@ -297,18 +297,22 @@ Introduce a small evidence-store abstraction.
 For example:
 
 ```csharp
-public interface IAuditResidueStore
+public interface IGovernanceEvidenceStore
 {
-    void Append(AuditResidue residue);
+    void Append(DecisionReceipt receipt);
+    void Append(DecisionReceiptLifecycleEvent lifecycleEvent);
 
-    IReadOnlyList<AuditResidue> ReadByCorrelationId(
+    IReadOnlyList<DecisionReceipt> ReadReceiptsByCorrelationId(
+        string correlationId);
+
+    IReadOnlyList<DecisionReceiptLifecycleEvent> ReadLifecycleByCorrelationId(
         string correlationId);
 }
 ```
 
 Implement it in memory for the lab.
 
-Refactor the sample so every residue is appended through the store rather than existing only as a local implementation detail.
+Refactor the sample so every decision receipt and lifecycle event is appended through the store rather than existing only as a local implementation detail.
 
 Preserve these properties:
 
@@ -345,7 +349,7 @@ For the context-drift scenario, confirm the timeline ends at:
 re-evaluation
 ```
 
-and contains no `execution-completed` residue.
+and contains no `execution-completed` lifecycle event.
 
 ### Do Not Overclaim the Store
 
@@ -402,7 +406,7 @@ and:
 Execution outcome = Failed
 ```
 
-Add a final residue such as:
+Add a final lifecycle event such as:
 
 ```text
 Stage: execution-failed
@@ -490,7 +494,7 @@ A single mutable `PolicyVersion` field may no longer be enough if those identiti
 
 ## Part 7 — Review the Evidence Surface
 
-Inspect the final `AuditResidue` model and your in-memory store.
+Inspect the final `DecisionReceipt` and `GovernanceLifecycleEvent` models and your in-memory store.
 
 For each field, classify it as one of:
 
@@ -503,7 +507,7 @@ Policy provenance
 Operational detail
 ```
 
-Then identify information that should **not** be copied into residue merely because it is available.
+Then identify information that should **not** be copied into a receipt or lifecycle event merely because it is available.
 
 Examples include:
 
@@ -534,7 +538,7 @@ Run the modified sample and confirm all of the following:
 - Wrong correlation is rejected with a stable reason code.
 - Replaying an already consumed acknowledgment is blocked while consumption state exists.
 - Recreating the in-memory consumption store demonstrates why durable replay protection is a separate concern.
-- Audit residue is appended through an explicit store boundary.
+- Decision receipts and lifecycle events are appended through an explicit store boundary.
 - Stored records can be read back by correlation identifier in lifecycle order.
 - A failed executor produces `execution-failed` evidence without changing the earlier policy decision into a denial.
 - Policy identity drift is handled according to a documented rule.
@@ -585,7 +589,7 @@ Host-owned execution attempt
         ↓
 Distinct execution result
         ↓
-Correlated audit residue
+Correlated decision receipt
 ```
 
 You should also be able to explain why each of these statements is different:
@@ -606,7 +610,7 @@ Create three separate in-memory stores:
 ```text
 Challenge store
 Consumption store
-Audit residue store
+Decision receipt store
 ```
 
 Run a workflow through challenge issuance, then construct new workflow objects while selectively preserving or replacing each store.
@@ -633,7 +637,7 @@ git diff
 To restore the companion sample:
 
 ```bash
-git restore samples/acknowledgment-and-audit-residue/Sample/Program.cs
+git restore samples/decision-receipts-and-acknowledgment/Sample/Program.cs
 ```
 
 Use `git status` first so you understand which local work will be affected.
@@ -642,16 +646,16 @@ Use `git status` first so you understand which local work will be affected.
 
 ### Related Content
 
-- [Acknowledgment and Audit Residue tutorial](../tutorials/acknowledgment-and-audit-residue.md) — review the architectural reasoning behind the lab.
-- [Acknowledgment and Audit Residue sample](https://github.com/AsiBackbone/Learning/blob/main/samples/acknowledgment-and-audit-residue/README.md) — return to the executable baseline used by this exercise.
+- [Decision Receipts and Acknowledgment tutorial](../tutorials/decision-receipts-and-acknowledgment.md) — review the architectural reasoning behind the lab.
+- [Decision Receipts and Acknowledgment sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-receipts-and-acknowledgment/README.md) — return to the executable baseline used by this exercise.
 - [Policy Context and Explicit Decision Outcomes lab](policy-context-and-explicit-decision-outcomes.md) — revisit explicit decision inputs, reason codes, and precedence.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — continue from acknowledged governance requirements into narrow execution authority.
 - [Foundational Tutorial Index](../tutorials/index.md) — view the complete foundational learning path.
-- [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) — compare the teaching challenge with the fuller framework handshake request.
-- [`LiabilityHandshakeAcknowledgment`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeAcknowledgment.cs) — inspect the working accepted/rejected acknowledgment model.
-- [`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs) — compare the lab's small evidence model with the framework's richer governance residue.
-- [`Dynamic Liability Handshake`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/dynamic-liability-handshake.md) — review the fuller handshake lifecycle.
-- [`Durable Audit Outbox Persistence`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/durable-audit-outbox-persistence.md) — study production-oriented durability and delivery concerns after completing the in-memory exercise.
+- [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) — compare the teaching challenge with the fuller framework handshake request.
+- [`LiabilityHandshakeAcknowledgment`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeAcknowledgment.cs) — inspect the working accepted/rejected acknowledgment model.
+- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) — compare the lab's small evidence model with the framework's richer decision receipt.
+- [`Dynamic Liability Handshake`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/dynamic-liability-handshake.md) — review the fuller handshake lifecycle.
+- [`Durable Audit Outbox Persistence`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/durable-audit-outbox-persistence.md) — study production-oriented durability and delivery concerns after completing the in-memory exercise.
 
 ---
 

@@ -12,7 +12,7 @@ static class MetadataValidator
 {
     private const int MaximumDescriptionLength = 160;
     private const string SiteDescription = "Practical .NET architecture tutorials, labs, and reference patterns for governed execution, secure applications, AI integration, and policy-driven systems.";
-    private const string LandingPageTitle = "Governed Execution &amp; Secure .NET Architecture Tutorials | ASI Backbone Learning";
+    private const string LandingPageTitle = "Governed Execution &amp; Secure .NET Architecture Tutorials | AsiBackbone Learning";
 
     private static readonly Uri SiteRoot = new("https://asibackbone.github.io/Learning/");
     private static readonly Uri FeedUri = new(SiteRoot, "feed.xml");
@@ -27,7 +27,7 @@ static class MetadataValidator
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     private static readonly Regex RssAutodiscoveryRegex = new(
-        "<link\\s+rel=\"alternate\"\\s+type=\"application/rss\\+xml\"\\s+title=\"ASI Backbone Learning\"\\s+href=\"(?<href>[^\"]+)\">",
+        "<link\\s+rel=\"alternate\"\\s+type=\"application/rss\\+xml\"\\s+title=\"AsiBackbone Learning\"\\s+href=\"(?<href>[^\"]+)\">",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     private static readonly Regex OpenGraphUrlRegex = new(
@@ -489,7 +489,7 @@ static class MetadataValidator
             errors.Add($"{relativePath}: disabled landing-page TOC must not trigger a second toc.json request.");
         }
 
-        int headingIndex = html.IndexOf("<h1 id=\"asi-backbone-learning\">", StringComparison.Ordinal);
+        int headingIndex = html.IndexOf("<h1 id=\"asibackbone-learning\">", StringComparison.Ordinal);
         int actionsIndex = html.IndexOf("<div class=\"home-actions\"", StringComparison.Ordinal);
         int nextSectionIndex = headingIndex >= 0
             ? html.IndexOf("<h2", headingIndex, StringComparison.Ordinal)
@@ -538,17 +538,17 @@ static class MetadataValidator
         JsonElement? article = FindNode(graph, "Article");
 
         ExpectProperty(page.Path, website, "WebSite", "url", SiteRoot.AbsoluteUri, errors);
-        ExpectProperty(page.Path, website, "WebSite", "name", "ASI Backbone Learning", errors);
+        ExpectProperty(page.Path, website, "WebSite", "name", "AsiBackbone Learning", errors);
         ExpectProperty(
             page.Path,
             website,
             "WebSite",
             "alternateName",
-            "Accountable Systems Infrastructure (ASI) Backbone Learning",
+            "AsiBackbone Learning",
             errors);
         ExpectProperty(page.Path, website, "WebSite", "description", SiteDescription, errors);
 
-        ExpectProperty(page.Path, publisher, "Organization", "name", "ASI Backbone", errors);
+        ExpectProperty(page.Path, publisher, "Organization", "name", "AsiBackbone", errors);
         ExpectProperty(page.Path, publisher, "Organization", "url", "https://github.com/AsiBackbone", errors);
         ExpectProperty(page.Path, webPage, "WebPage", "url", page.CanonicalUrl, errors);
 

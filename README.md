@@ -1,6 +1,6 @@
 ![Learning social image](https://raw.githubusercontent.com/AsiBackbone/Learning/main/docs/images/asibackbone-social.png)
 
-# ASI Backbone Learning
+# AsiBackbone Learning
 
 [![Documentation Validation](https://github.com/AsiBackbone/Learning/actions/workflows/docs-validation.yml/badge.svg?branch=main)](https://github.com/AsiBackbone/Learning/actions/workflows/docs-validation.yml)
 [![Samples Validation](https://github.com/AsiBackbone/Learning/actions/workflows/samples-validation.yml/badge.svg?branch=main)](https://github.com/AsiBackbone/Learning/actions/workflows/samples-validation.yml)
@@ -14,7 +14,7 @@
 
 **You can use this material without installing the `AsiBackbone` framework.** Tutorials, samples, comparisons, and labs are intended to remain useful as independent architecture education.
 
-In this project, **ASI** means **Accountable Systems Infrastructure**. Learning is the educational layer of the ASI Backbone organization; it is not an artificial general intelligence or artificial superintelligence implementation.
+`AsiBackbone` is the product name. Learning is the educational layer of the AsiBackbone organization and keeps its architecture lessons useful independently of the product implementation.
 
 ## Quick Start — Run It in 10 Minutes
 
@@ -114,7 +114,7 @@ The established five-part sequence moves from proposed intent to governed AI-ass
 
 1. [Decision Before Execution](docs/tutorials/decision-before-execution.md)
 2. [Policy Context and Explicit Decision Outcomes](docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
-3. [Acknowledgment and Audit Residue](docs/tutorials/acknowledgment-and-audit-residue.md)
+3. [Decision Receipts and Acknowledgment](docs/tutorials/decision-receipts-and-acknowledgment.md)
 4. [Scoped Capability and Host-Owned Execution](docs/tutorials/scoped-capability-and-host-owned-execution.md)
 5. [Governed AI Tool Gateway](docs/tutorials/governed-ai-tool-gateway.md)
 
@@ -122,7 +122,7 @@ Each foundational topic is reinforced by runnable samples, focused architectural
 
 Want to understand why Learning uses a problem-first tutorial model, how tutorials differ from labs, or how canonical and alternative patterns are handled? See the [Learning Model](docs/getting-started/learning-model.md).
 
-## ASI Backbone Ecosystem
+## AsiBackbone Ecosystem
 
 The organization contains complementary projects with different responsibilities:
 
@@ -136,7 +136,7 @@ Learning connects to the implementation repositories when fuller examples are us
 
 ## Scope and Boundaries
 
-ASI Backbone Learning is an educational and architectural resource.
+AsiBackbone Learning is an educational and architectural resource.
 
 - It teaches architectural patterns; it does not certify compliance or guarantee security.
 - Examples do not replace application-specific security, legal, regulatory, safety, or operational review.
@@ -156,7 +156,7 @@ Use the canonical project surfaces for deeper information rather than treating t
 - **Contribution guidance:** [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Project status and planned work:** [ROADMAP.md](ROADMAP.md)
 - **Learning discussions:** [AsiBackbone/Learning Discussions](https://github.com/AsiBackbone/Learning/discussions)
-- **Organization-wide discussion:** [ASI Backbone Organization Discussions](https://github.com/orgs/AsiBackbone/discussions)
+- **Organization-wide discussion:** [AsiBackbone Organization Discussions](https://github.com/orgs/AsiBackbone/discussions)
 - **Governance:** [GOVERNANCE.md](GOVERNANCE.md)
 - **Security policy:** [SECURITY.md](SECURITY.md)
 - **Citation metadata:** [CITATION.cff](CITATION.cff)
@@ -198,7 +198,7 @@ verification commands.
 
 ## License
 
-ASI Backbone Learning uses component-specific licensing:
+AsiBackbone Learning uses component-specific licensing:
 
 - Documentation, educational material, and diagrams: **CC BY 4.0**
 - Executable sample code under `samples/`: **MIT License**
@@ -208,6 +208,6 @@ See [LICENSING.md](LICENSING.md) for the complete licensing policy.
 
 ---
 
-**ASI Backbone Learning is not intended to provide doctrine. It is intended to provide patterns worth examining.**
+**AsiBackbone Learning is not intended to provide doctrine. It is intended to provide patterns worth examining.**
 
 Read them. Test them. Challenge them. Adapt them. Improve them.

@@ -8,7 +8,7 @@ description: Learn how signatures, verification, key custody, rotation, fingerpr
 
 **Difficulty:** Advanced
 
-**Prerequisites:** [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), and [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md). Familiarity with [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) is helpful.
+**Prerequisites:** [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), and [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md). Familiarity with [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) is helpful.
 
 **Learning objective:** Distinguish content fingerprints from digital signatures, separate signing from verification and authorization, place signing and verification at explicit trust boundaries, reason about key ownership and rotation, and explain what signed or tamper-evident evidence can and cannot prove.
 
@@ -1576,9 +1576,9 @@ Cryptographic authenticity and replay state are complementary controls.
 
 ---
 
-## Audit Residue as Signed Evidence
+## Decision Receipt as Signed Evidence
 
-Audit residue can preserve:
+Decision receipt can preserve:
 
 ```text
 What decision occurred?
@@ -2199,12 +2199,12 @@ The current `AsiBackbone/AsiBackbone` repository provides useful working referen
 
 | Learning concept | Working reference | What to inspect |
 | --- | --- | --- |
-| Canonical payloads, hashes, signing metadata, and provider-neutral interfaces | [Signing-Ready Receipts and Key Handling](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/signing-ready-receipts-and-key-handling.md) | Deterministic canonical payloads, key ID/version metadata, signing seams, and explicit wording limits. |
-| Signed is not verified | [Verification Policy and Result Handling](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/verification-policy-and-result-handling.md) | Verification categories, host policy actions, trust-context checks, and failure handling. |
-| Rotation and historical verification | [Key Rotation and Retired-Key Verification](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/key-rotation-and-retired-key-verification.md) | Active, retired, revoked, expired, disabled, and unknown key states plus historical verification guidance. |
-| Signed governance artifacts | [Signed Audit and Outbox Records](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/signed-audit-and-outbox-records.md) | Signing points for audit and outbox artifacts and the boundary between signed records and tamper-evident trails. |
-| Narrow proof authority | [Capability Proof Trust Pinning](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-proof-trust-pinning.md) | Why a cryptographically valid proof can still fail when key, version, provider, algorithm, or policy expectations do not match. |
-| Production security wording and non-goals | [Cryptographic Security Posture and Production Guidance](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/cryptographic-security-posture.md) | Host responsibilities, provider boundaries, security non-goals, and safe production claims. |
+| Canonical payloads, hashes, signing metadata, and provider-neutral interfaces | [Signing-Ready Receipts and Key Handling](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/signing-ready-receipts-and-key-handling.md) | Deterministic canonical payloads, key ID/version metadata, signing seams, and explicit wording limits. |
+| Signed is not verified | [Verification Policy and Result Handling](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/verification-policy-and-result-handling.md) | Verification categories, host policy actions, trust-context checks, and failure handling. |
+| Rotation and historical verification | [Key Rotation and Retired-Key Verification](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/key-rotation-and-retired-key-verification.md) | Active, retired, revoked, expired, disabled, and unknown key states plus historical verification guidance. |
+| Signed governance artifacts | [Signed Audit and Outbox Records](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/signed-audit-and-outbox-records.md) | Signing points for audit and outbox artifacts and the boundary between signed records and tamper-evident trails. |
+| Narrow proof authority | [Capability Proof Trust Pinning](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/capability-proof-trust-pinning.md) | Why a cryptographically valid proof can still fail when key, version, provider, algorithm, or policy expectations do not match. |
+| Production security wording and non-goals | [Cryptographic Security Posture and Production Guidance](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/cryptographic-security-posture.md) | Host responsibilities, provider boundaries, security non-goals, and safe production claims. |
 
 These references are implementation specimens rather than universal prescriptions.
 
@@ -2222,7 +2222,7 @@ The Learning boundary remains:
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) — distinguish policy identity and fingerprints from authenticity and tamper-evidence claims.
 - [Durable Decision Ledgers and Cryptographic Audit Chains](../advanced/durable-decision-ledgers-and-cryptographic-audit-chains.md) — continue from hash/signature primitives into ordered append semantics, protected checkpoints, tail-truncation detection, key lifecycle, archival, migration, restore, and corrupted-chain handling.
 - [Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md) — apply provenance, checksum, signing, and verification distinctions to build and release artifacts without treating any one mechanism as proof of artifact safety.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — connect signatures to durable governance evidence without treating acknowledgment as an execution override.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — connect signatures to durable governance evidence without treating acknowledgment as an execution override.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — apply verification as one execution-boundary check around narrow authority.
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — preserve the rule that AI may propose while host-owned code retains verification, policy, and execution authority.
 

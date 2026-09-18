@@ -4,7 +4,7 @@
 
 This page collects tutorial concepts that may become future Learning material.
 
-Unlike [requested-topics.md](requested-topics.md), which tracks subjects the community would like to see addressed, this page focuses on **possible tutorial shapes**: concrete lessons that could be written, demonstrated, tested, and connected to the working ASI Backbone repositories.
+Unlike [requested-topics.md](requested-topics.md), which tracks subjects the community would like to see addressed, this page focuses on **possible tutorial shapes**: concrete lessons that could be written, demonstrated, tested, and connected to the working AsiBackbone repositories.
 
 These ideas are not release commitments.
 
@@ -111,7 +111,7 @@ Scoped Authority
    ↓
 Host-Owned Execution
    ↓
-Audit Residue
+Decision Receipt
 ```
 
 #### Teaching Opportunities
@@ -290,7 +290,7 @@ Add acknowledgment to an already authenticated and authorized administrative wor
 
 ---
 
-### 6. Designing an Acknowledgment Handshake
+### 6. Designing an Acknowledgment Flow
 
 #### Working Title
 
@@ -347,7 +347,7 @@ Review three approval dialogs and determine which one actually supports informed
 
 ## Audit and Provenance Tutorials
 
-### 8. Logging Is Not an Audit Receipt
+### 8. Logging Is Not an Decision Receipt
 
 #### Working Title
 
@@ -355,7 +355,7 @@ Review three approval dialogs and determine which one actually supports informed
 
 #### Learning Objective
 
-Understand why logs and audit residue serve different purposes.
+Understand why logs and decision receipt serve different purposes.
 
 #### Comparison Areas
 
@@ -379,13 +379,13 @@ Understand why logs and audit residue serve different purposes.
 
 #### Possible Lab
 
-Given a set of application logs, design the smallest useful governance receipt.
+Given a set of application logs, design the smallest useful decision receipt.
 
-**Status:** Published — covered by Acknowledgment and Audit Residue
+**Status:** Published — covered by Decision Receipts and Acknowledgment
 
 ---
 
-### 9. Designing an Audit Receipt
+### 9. Designing an Decision Receipt
 
 #### Working Title
 
@@ -583,7 +583,7 @@ Host Tool Gateway
    ↓
 Tool Execution
    ↓
-Audit Residue
+Decision Receipt
 ```
 
 #### Teaching Opportunities
@@ -896,7 +896,7 @@ Understand the supply-chain value of immutable action references.
 
 #### Possible Working Reference
 
-Use existing ASI Backbone workflow patterns as examples.
+Use existing AsiBackbone workflow patterns as examples.
 
 **Status:** Candidate
 
@@ -1286,7 +1286,7 @@ Identify missing boundaries:
 - Explicit decision.
 - Scoped authority.
 - Host-owned execution.
-- Audit residue.
+- Decision receipt.
 
 **Status:** High-value AI failure-mode tutorial
 
@@ -1300,7 +1300,7 @@ Identify missing boundaries:
 2. Policy Context
 3. Explicit Decision Outcomes
 4. Acknowledgment
-5. Audit Residue
+5. Decision Receipt
 6. Scoped Capability
 7. Host-Owned Execution
 
@@ -1402,7 +1402,7 @@ Uses failing tests to reveal an architectural requirement.
 
 ## Ideas for Beginner-Friendly Tutorials
 
-Potential beginner contributions should avoid requiring deep familiarity with the complete ASI Backbone architecture.
+Potential beginner contributions should avoid requiring deep familiarity with the complete AsiBackbone architecture.
 
 Examples:
 
@@ -1411,7 +1411,7 @@ Examples:
 - Why middleware order matters.
 - What is a reason code?
 - Authentication versus authorization.
-- What is an audit receipt?
+- What is an decision receipt?
 - Why validate configuration at startup?
 - Why avoid logging secrets?
 - What does a lock file do?
@@ -1465,7 +1465,7 @@ Use AsiBackbone for:
 - Decision
 - Acknowledgment
 - Capability
-- Audit residue
+- Decision receipt
 
 #### Learning Goal
 
@@ -1538,7 +1538,7 @@ What architectural pattern addresses the problem?
 
 ### Working Reference
 
-Is there relevant code, documentation, an ADR, or a test in another ASI Backbone repository?
+Is there relevant code, documentation, an ADR, or a test in another AsiBackbone repository?
 
 ### Suggested Format
 
@@ -1643,7 +1643,7 @@ The list is retained to show how the original curriculum shaped the current repo
 2. **Policy Context**
 3. **Beyond `bool`: Explicit Decision Outcomes**
 4. **Acknowledgment Is Not Authentication**
-5. **Logging Is Not an Audit Receipt**
+5. **Logging Is Not an Decision Receipt**
 6. **Approval Is Not Permanent Authority**
 7. **Host-Owned Execution**
 8. **Building a Governed AI Tool Gateway in ASP.NET Core**
