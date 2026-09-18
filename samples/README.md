@@ -4,6 +4,8 @@ The `samples/` directory is the executable companion-code area for **AsiBackbone
 
 It is intended to contain intentionally small .NET examples that complement the architectural tutorials and make important system boundaries observable through runnable code and tests.
 
+> **Code scope:** Sample projects compile Learning-owned, framework-neutral teaching models. They do not currently reference `AsiBackbone.*` packages, and similarly named local types are not package API signatures. Use the [AsiBackbone 6.0 API Boundary](../docs/getting-started/asibackbone-6-api-boundary.md) for exact current namespaces, evaluator construction, endpoint markers, and migration guidance.
+
 > **Read it. Run it. Question it. Improve it.**
 
 ## Current Status

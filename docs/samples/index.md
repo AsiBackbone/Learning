@@ -7,6 +7,8 @@ _disableBreadcrumb: true
 
 Executable samples are the **runnable demonstration layer** of AsiBackbone Learning.
 
+> **Code scope:** These projects compile Learning-owned, framework-neutral teaching models. They do not currently reference `AsiBackbone.*` packages, and similarly named local types are not package API signatures. See the [AsiBackbone 6.0 API Boundary](../getting-started/asibackbone-6-api-boundary.md) for exact current API names, namespaces, and supported construction patterns.
+
 They sit between the problem-first tutorials and the hands-on labs:
 
 ```text

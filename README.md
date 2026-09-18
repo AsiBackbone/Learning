@@ -83,6 +83,7 @@ Want to understand why this boundary exists or experiment with it?
 | Learn the foundational governed-execution boundary | [Decision Before Execution](docs/tutorials/decision-before-execution.md) |
 | Route from a problem you already recognize | [Find Your Path](docs/getting-started/find-your-path.md) |
 | See the curriculum and prerequisites at a glance | [Learning Path Map](docs/getting-started/learning-path-map.md) |
+| Copy exact AsiBackbone 6.0 API syntax | [AsiBackbone 6.0 API Boundary](docs/getting-started/asibackbone-6-api-boundary.md) |
 | Decide whether ASP.NET Core authorization is already enough | [When ASP.NET Core Authorization Is Enough](docs/architecture/when-aspnet-core-authorization-is-enough.md) |
 
 ## What This Architecture Looks Like in Practice
@@ -140,6 +141,7 @@ AsiBackbone Learning is an educational and architectural resource.
 
 - It teaches architectural patterns; it does not certify compliance or guarantee security.
 - Examples do not replace application-specific security, legal, regulatory, safety, or operational review.
+- Learning-owned sample types are framework-neutral teaching models, not `AsiBackbone.*` package API signatures.
 - Learning is not an AI model, an artificial general intelligence or artificial superintelligence implementation, or a robotics controller.
 - No `AsiBackbone` package is required, and no pattern is presented as universally correct.
 

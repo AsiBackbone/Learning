@@ -20,6 +20,7 @@ Choose the shortest path that matches how you want to learn:
 | Solve a specific architecture problem | [**Find Your Path**](find-your-path.md) |
 | See the complete curriculum visually | [**Learning Path Map**](learning-path-map.md) |
 | Learn by running code | [**Executable Samples**](../samples/index.md) |
+| Copy exact AsiBackbone 6.0 API syntax | [**AsiBackbone 6.0 API Boundary**](asibackbone-6-api-boundary.md) |
 | Practice by changing or challenging the design | [**Hands-On Labs**](../labs/index.md) |
 | Compare a simpler alternative | [**When ASP.NET Core Authorization Is Enough**](../architecture/when-aspnet-core-authorization-is-enough.md) |
 
@@ -105,6 +106,8 @@ Tutorials begin with the problem, show the common or naive implementation, expos
 The [`samples/`](../samples/index.md) area contains intentionally small .NET teaching implementations. They favor deterministic local behavior, explicit execution boundaries, focused domain examples, and simulated side effects where appropriate.
 
 They are teaching artifacts rather than production frameworks.
+
+Their local types are not package API signatures. Use the [AsiBackbone 6.0 API Boundary](asibackbone-6-api-boundary.md) when you need exact current namespaces, evaluator construction, endpoint markers, or migration guidance.
 
 ### Tests
 

@@ -664,6 +664,8 @@ One correlation identifier connects the lifecycle, but different records answer 
 
 Use one explicit linkage envelope across the three core evidence types—decision, grant, and execution:
 
+> **Illustrative API:** The receipt records below are case-study models, not `AsiBackbone.*` package signatures. Compare the exact 6.0 receipt surface in the [AsiBackbone 6.0 API Boundary](../getting-started/asibackbone-6-api-boundary.md).
+
 ```csharp
 public sealed record EvidenceCorrelation(
     string CorrelationId,
