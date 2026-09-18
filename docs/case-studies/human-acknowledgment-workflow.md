@@ -443,6 +443,7 @@ The client cannot create a privileged acknowledgment challenge simply by request
 A challenge should survive beyond one HTTP request or browser session when the workflow can pause.
 
 ```csharp
+// Illustrative case-study model; not an AsiBackbone package API.
 public enum AcknowledgmentChallengeStatus
 {
     Pending,

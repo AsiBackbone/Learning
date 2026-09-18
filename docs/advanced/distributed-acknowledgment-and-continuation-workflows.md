@@ -150,6 +150,8 @@ accounts.bulk-suspend
 
 System A evaluates a tenant administrator's request to suspend a bounded set of fictional accounts. Current policy requires acknowledgment of the operational impact. System B presents the challenge to the required responder and produces evidence of the response. System C owns the eventual account executor. The systems are separate enough that System C cannot safely assume it still has System A's original in-memory context. The challenge therefore needs durable bindings that System C can validate later. A compact challenge model might contain:
 
+> **Illustrative API:** This local `AcknowledgmentChallenge` shape is a teaching model, not the `AsiBackbone.AspNetCore` package type. See the [AsiBackbone 6.0 API Boundary](../getting-started/asibackbone-6-api-boundary.md) before copying package-integration syntax.
+
 ```csharp
 public sealed record AcknowledgmentChallenge(
     string ChallengeId,

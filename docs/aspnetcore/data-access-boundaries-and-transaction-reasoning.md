@@ -312,10 +312,12 @@ But if the purpose of the repository was to hide EF Core or constrain persistenc
 
 Prefer methods that expose the operation the caller needs when the repository is intended to be a real boundary:
 
+> **Illustrative API:** The repository and receipt names in the following examples are local teaching shapes, not `AsiBackbone.*` package signatures. See the [AsiBackbone 6.0 API Boundary](../getting-started/asibackbone-6-api-boundary.md) for the exact current receipt and persistence contracts.
+
 ```csharp
 Task<Account?> FindForDisableAsync(...)
 ValueTask<CapabilityUseResult> TryConsumeAsync(...)
-Task AppendAsync(DecisionReceipt receipt, ...)
+Task AppendAsync(LearningDecisionReceipt receipt, ...)
 ```
 
 Do not create one method per `DbSet` operation simply to avoid naming `DbContext`.
@@ -815,7 +817,7 @@ Prefer explicit code when the operation is meaningful because of the workflow:
 
 ```csharp
 await decisionReceiptStore.AppendAsync(
-    DecisionReceipt.ExecutionStarted(...),
+    LearningDecisionReceipt.ExecutionStarted(...),
     cancellationToken);
 ```
 
@@ -1235,7 +1237,7 @@ Governance decision
 Execution-boundary service
         ↓
 ICapabilityUseStore
-IDecisionReceiptStore
+ILearningDecisionReceiptStore
         ↓
 EF Core implementations
         ↓
@@ -1265,11 +1267,11 @@ public sealed class ExecutionPersistenceCoordinator
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly EfCoreCapabilityUseStore _useStore;
-    private readonly EfCoreDecisionReceiptStore _auditStore;
+    private readonly EfCoreLearningDecisionReceiptStore _auditStore;
 
     public async Task<CapabilityUseResult> TryStartAsync(
         string capabilityId,
-        DecisionReceipt executionStart,
+        LearningDecisionReceipt executionStart,
         CancellationToken cancellationToken)
     {
         await using var transaction =

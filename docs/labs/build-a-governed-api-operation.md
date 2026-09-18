@@ -665,6 +665,7 @@ A generic boolean does not say what was acknowledged or what operation it belong
 Create a small challenge model:
 
 ```csharp
+// Illustrative lab model; not an AsiBackbone package API.
 public sealed record AcknowledgmentChallenge(
     string ChallengeId,
     string ActorId,
