@@ -47,6 +47,7 @@ The names most often used by Learning material are:
 | Durable audit ledger | `AsiBackbone.Core.Audit.IGovernanceAuditLedgerStore` |
 | Actor context | `AsiBackbone.Core.Actors.GovernanceActorContext` |
 | ASP.NET Core endpoint service | `AsiBackbone.AspNetCore.Endpoints.IEndpointGovernanceService` |
+| ASP.NET Core policy marker attribute | `AsiBackbone.AspNetCore.Endpoints.GovernancePolicyAttribute` |
 | Acknowledgment challenge service | `AsiBackbone.AspNetCore.Handshakes.IAcknowledgmentChallengeService` |
 
 These are implementation types. A Learning snippet that defines its own decision, receipt, context, or acknowledgment record is a teaching model unless the section explicitly says otherwise.
@@ -107,6 +108,8 @@ app.MapPost("/exports", HandleExport)
 
 The marker records policy metadata. It does not, by itself, resolve a policy, select constraints, or enforce execution. See the exact [`EndpointGovernanceRouteBuilderExtensions`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.AspNetCore/Endpoints/EndpointGovernanceRouteBuilderExtensions.cs) behavior.
 
+For attribute-based endpoint metadata, the 5.x `RequireGovernancePolicyAttribute` type was renamed to `GovernancePolicyAttribute` in 6.0.
+
 ## Removed Compatibility Surface
 
 The upstream obsolete-member inventory found exactly seven public members whose compatibility window ended at 6.0:
@@ -121,7 +124,7 @@ The upstream obsolete-member inventory found exactly seven public members whose 
 | `RequireGovernancePolicy<TPolicy>(RouteHandlerBuilder)` | `MarkGovernancePolicy<TPolicy>()`, or `MarkGovernancePolicy(typeof(TPolicy))` for a plain marker |
 | `RequireGovernancePolicy<TBuilder>(TBuilder, Type)` | `MarkGovernancePolicy(builder, policyType)` |
 
-The non-obsolete `RequireGovernancePolicyAttribute` remains part of the implementation. Historical 4.x and 5.x migration material may retain old names when it is clearly presented as history; current examples must not present the removed members as callable 6.0 APIs.
+The 5.x `RequireGovernancePolicyAttribute` type was renamed to `GovernancePolicyAttribute` in 6.0. That is a public type rename, not one of the seven obsolete-member removals above. Historical 4.x and 5.x migration material may retain old names when it is clearly presented as history; current examples must not present old names or removed members as 6.0 APIs.
 
 ## Decision Receipt Is Not Execution Proof
 
@@ -136,6 +139,7 @@ Before publishing an API-facing Learning change:
 - label teaching code as illustrative or Learning-owned;
 - label exact framework syntax as AsiBackbone 6.0 API;
 - use finalized 6.0 names and namespaces;
+- use `GovernancePolicyAttribute`, not the 5.x `RequireGovernancePolicyAttribute`, for attribute-based endpoint metadata;
 - do not call removed evaluator constructors or route-builder methods;
 - link implementation source to `release/6.0.0`, not `main` or a 5.x branch;
 - pin any future `AsiBackbone.*` sample package reference to a released 6.x version and commit its lock-file update;

@@ -75,6 +75,7 @@ Examples include:
 | `IAsiBackboneAuditSink` | `IDecisionReceiptSink` |
 | `IAsiBackboneEndpointGovernanceService` | `IEndpointGovernanceService` |
 | `IAsiBackboneAcknowledgmentChallengeService` | `IAcknowledgmentChallengeService` |
+| `RequireGovernancePolicyAttribute` | `GovernancePolicyAttribute` |
 
 This is a representative teaching-oriented subset, not the complete rename inventory. Use the authoritative [6.0 public API naming convention](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/public-api-naming-600.md) for the full list.
 
@@ -111,7 +112,7 @@ AsiBackbone 6.0 removes exactly seven public members whose obsolete compatibilit
 - the five partial `DefaultAsiBackbonePolicyEvaluator<TContext>` constructors are gone; use `DefaultGovernancePolicyEvaluator.CreateBuilder<TContext>()` or the supported full-dependency constructor;
 - the two `RequireGovernancePolicy(...)` route-builder extension methods are gone; use `MarkGovernancePolicy(...)` instead.
 
-The non-obsolete `RequireGovernancePolicyAttribute` remains supported.
+The 5.x `RequireGovernancePolicyAttribute` type was also renamed to `GovernancePolicyAttribute` in 6.0 so the attribute and route-builder paths use the same marker terminology. That type rename is separate from the seven obsolete-member removals.
 
 Do not use this page as the complete implementation migration checklist. The authoritative [Upgrade from 5.x to 6.0](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/upgrade-500-to-600.md) guide contains the exact removed-member inventory, replacement guidance, dependency-injection notes, and complete public type rename table.
 
@@ -162,7 +163,7 @@ Older content is useful when read in version context.
 | --- | --- |
 | `AuditResidue` or **audit residue** in an older package example | Historical 5.x naming for what current Learning and the 6.0 API call a decision receipt. Preserve the old wording when discussing the historical release itself. |
 | `IAsiBackbone*`, `DefaultAsiBackbonePolicyEvaluator`, or other product-prefixed public types | Treat them as 5.x API names and translate them through the 6.0 naming and migration guides before copying code. |
-| `RequireGovernancePolicy(...)` on a route builder | Treat it as historical 5.x syntax. Current 6.0 route metadata uses `MarkGovernancePolicy(...)`. |
+| `RequireGovernancePolicy(...)` on a route builder or `RequireGovernancePolicyAttribute` on an endpoint | Treat them as historical 5.x names. Current 6.0 route metadata uses `MarkGovernancePolicy(...)`, and attribute-based metadata uses `GovernancePolicyAttribute`. |
 | A Learning sample that declares its own context, decision, receipt, acknowledgment, capability, or gateway type | Treat it as a teaching model unless the page explicitly labels the snippet as AsiBackbone 6.0 API. |
 | A historical release note, tag, or archived page | Read it as evidence of what that release taught or implemented at the time, not as the current production API contract. |
 | A conceptual statement about decision-before-execution, acknowledgment, scoped authority, or host-owned execution | Treat the concept as current unless a newer Learning page explicitly revises it. Verify package-specific behavior in AsiBackbone 6.0. |
@@ -192,6 +193,7 @@ If you are moving a code example or internal document from an AsiBackbone 5.x ba
 - [ ] Replace 5.x package type names with the finalized 6.0 names where the snippet uses the real product API.
 - [ ] Replace removed partial evaluator constructors with the builder or full-dependency constructor.
 - [ ] Replace removed route-builder `RequireGovernancePolicy(...)` calls with `MarkGovernancePolicy(...)`.
+- [ ] Replace 5.x `RequireGovernancePolicyAttribute` usage with `GovernancePolicyAttribute`.
 - [ ] Use **decision receipt** in current teaching prose while preserving historical wording in historical release material.
 - [ ] Use **acknowledgment** as the ordinary teaching term and reserve **handshake** for the actual protocol or exact retained type names.
 - [ ] Keep implementation links pinned to `release/6.0.0` when documenting the Learning 1.0 production baseline.
