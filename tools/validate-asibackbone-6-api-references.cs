@@ -7,10 +7,16 @@ using System.Xml.Linq;
 
 return AsiBackboneApiReferenceValidator.Run();
 
-static class AsiBackboneApiReferenceValidator
+static partial class AsiBackboneApiReferenceValidator
 {
     private const string ApiBoundaryRelativePath =
         "docs/getting-started/asibackbone-6-api-boundary.md";
+
+    private static readonly HashSet<string> HistoricalSymbolReferencePaths = new(StringComparer.Ordinal)
+    {
+        ApiBoundaryRelativePath,
+        "docs/getting-started/learning-1-asibackbone-6-compatibility.md"
+    };
 
     private static readonly HashSet<string> ForbiddenCurrentSymbols = new(StringComparer.Ordinal)
     {
@@ -116,7 +122,8 @@ static class AsiBackboneApiReferenceValidator
         "IAsiBackboneSignatureVerificationService",
         "IAsiBackboneSigningService",
         "InMemoryAuditResidueLifecycleStore",
-        "RequireGovernancePolicy"
+        "RequireGovernancePolicy",
+        "RequireGovernancePolicyAttribute"
     };
 
     private static readonly HashSet<string> TextExtensions = new(StringComparer.OrdinalIgnoreCase)
@@ -136,13 +143,15 @@ static class AsiBackboneApiReferenceValidator
         ".yml"
     };
 
-    private static readonly Regex IdentifierRegex = new(
+    [GeneratedRegex(
         @"\b[A-Za-z_][A-Za-z0-9_]*\b",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        RegexOptions.CultureInvariant)]
+    private static partial Regex IdentifierRegex();
 
-    private static readonly Regex StaleImplementationLinkRegex = new(
+    [GeneratedRegex(
         @"https://github\.com/AsiBackbone/AsiBackbone/(?:blob|tree)/(?!release/6\.0\.0(?:/|\b))[^\s)\]'>]+",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+    private static partial Regex StaleImplementationLinkRegex();
 
     public static int Run()
     {
@@ -159,7 +168,7 @@ static class AsiBackboneApiReferenceValidator
         }
 
         var errors = new List<string>();
-        IReadOnlyList<string> textFiles = EnumerateTextFiles(repositoryRoot).ToArray();
+        string[] textFiles = EnumerateTextFiles(repositoryRoot).ToArray();
 
         ValidateCurrentSymbolsAndLinks(repositoryRoot, textFiles, errors);
         int packageReferenceCount = ValidatePackageReferences(repositoryRoot, errors);
@@ -185,43 +194,46 @@ static class AsiBackboneApiReferenceValidator
             : $"{packageReferenceCount} AsiBackbone 6.x package reference(s)";
 
         Console.WriteLine(
-            $"Validated AsiBackbone 6.0 API references across {textFiles.Count} instructional file(s): {packageSummary}.");
+            $"Validated AsiBackbone 6.0 API references across {textFiles.Length} instructional file(s): {packageSummary}.");
         return 0;
     }
 
     private static void ValidateCurrentSymbolsAndLinks(
         string repositoryRoot,
         IEnumerable<string> files,
-        ICollection<string> errors)
+        List<string> errors)
     {
         foreach (string path in files)
         {
             string relativePath = NormalizeRelativePath(repositoryRoot, path);
 
-            if (string.Equals(relativePath, ApiBoundaryRelativePath, StringComparison.Ordinal) ||
-                string.Equals(relativePath, "tools/validate-asibackbone-6-api-references.cs", StringComparison.Ordinal))
+            if (string.Equals(relativePath, "tools/validate-asibackbone-6-api-references.cs", StringComparison.Ordinal))
             {
                 continue;
             }
 
             string text = File.ReadAllText(path);
-            string[] lines = File.ReadAllLines(path);
 
-            for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
+            if (!HistoricalSymbolReferencePaths.Contains(relativePath))
             {
-                string line = lines[lineIndex];
+                string[] lines = File.ReadAllLines(path);
 
-                foreach (Match identifierMatch in IdentifierRegex.Matches(line))
+                for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
                 {
-                    if (ForbiddenCurrentSymbols.Contains(identifierMatch.Value))
+                    string line = lines[lineIndex];
+
+                    foreach (Match identifierMatch in IdentifierRegex().Matches(line))
                     {
-                        errors.Add(
-                            $"{relativePath}:{lineIndex + 1} uses removed or renamed 5.x symbol '{identifierMatch.Value}'.");
+                        if (ForbiddenCurrentSymbols.Contains(identifierMatch.Value))
+                        {
+                            errors.Add(
+                                $"{relativePath}:{lineIndex + 1} uses removed or renamed 5.x symbol '{identifierMatch.Value}'.");
+                        }
                     }
                 }
             }
 
-            foreach (Match linkMatch in StaleImplementationLinkRegex.Matches(text))
+            foreach (Match linkMatch in StaleImplementationLinkRegex().Matches(text))
             {
                 int lineNumber = GetLineNumber(text, linkMatch.Index);
                 errors.Add(
@@ -232,7 +244,7 @@ static class AsiBackboneApiReferenceValidator
 
     private static int ValidatePackageReferences(
         string repositoryRoot,
-        ICollection<string> errors)
+        List<string> errors)
     {
         var centralVersions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var references = new List<PackageReference>();
@@ -318,7 +330,7 @@ static class AsiBackboneApiReferenceValidator
 
     private static void ValidateScopeNotices(
         string repositoryRoot,
-        ICollection<string> errors)
+        List<string> errors)
     {
         string[] noticePaths =
         {
