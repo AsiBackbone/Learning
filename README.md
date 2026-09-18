@@ -83,6 +83,7 @@ Want to understand why this boundary exists or experiment with it?
 | Learn the foundational governed-execution boundary | [Decision Before Execution](docs/tutorials/decision-before-execution.md) |
 | Route from a problem you already recognize | [Find Your Path](docs/getting-started/find-your-path.md) |
 | See the curriculum and prerequisites at a glance | [Learning Path Map](docs/getting-started/learning-path-map.md) |
+| Understand Learning 1.0 / AsiBackbone 6.0 compatibility or interpret 5.x material | [Learning 1.0 and AsiBackbone 6.0 Compatibility Guide](docs/getting-started/learning-1-asibackbone-6-compatibility.md) |
 | Copy exact AsiBackbone 6.0 API syntax | [AsiBackbone 6.0 API Boundary](docs/getting-started/asibackbone-6-api-boundary.md) |
 | Decide whether ASP.NET Core authorization is already enough | [When ASP.NET Core Authorization Is Enough](docs/architecture/when-aspnet-core-authorization-is-enough.md) |
 
