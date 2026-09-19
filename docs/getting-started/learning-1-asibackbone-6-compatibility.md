@@ -1,5 +1,5 @@
 ---
-description: Understand the Learning 1.0 and AsiBackbone 6.0 production baseline, the conceptual and API changes from 5.x, and where exact implementation behavior is authoritative.
+description: Understand the Learning 1.0 and AsiBackbone 6.0 baseline, changes from 5.x, and where authoritative implementation behavior is documented.
 ---
 
 # Learning 1.0 and AsiBackbone 6.0 Compatibility Guide
