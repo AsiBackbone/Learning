@@ -2,6 +2,8 @@
 
 AsiBackbone Learning 1.0.0 is the first production documentation baseline for the AsiBackbone ecosystem. It is the educational companion to the AsiBackbone 6.0.0 implementation release.
 
+The version advances from 0.15.0 to 1.0.0 because the foundational curriculum, public navigation, compatibility boundary, validation gates, and release evidence are now established as a stable documentation contract. Published page URLs are treated as durable; future moves should retain redirects from their previous addresses.
+
 ## Highlights
 
 - Aligns current terminology with the finalized AsiBackbone 6.0 vocabulary, including decision receipts, acknowledgment, capability grants, host-owned execution, and familiar outbox terminology.
@@ -29,6 +31,16 @@ The 6.0 vocabulary and API refinements do not change Learning's central architec
 - the host retains ownership of side effects and execution;
 - decision, acknowledgment, authority, delivery, and execution evidence remain distinct.
 
+## Renamed Pages and Sample
+
+Learning 1.0 adopts the finalized 6.0 terminology while preserving the previously published documentation URLs as redirects:
+
+- `architecture/accountable-systems-infrastructure-and-governed-execution` → `architecture/asibackbone-and-governed-execution`;
+- `tutorials/acknowledgment-and-audit-residue` → `tutorials/decision-receipts-and-acknowledgment`;
+- `labs/acknowledgment-and-audit-residue` → `labs/decision-receipts-and-acknowledgment`.
+
+The companion sample moved from `samples/acknowledgment-and-audit-residue` to `samples/decision-receipts-and-acknowledgment`. The old sample directory retains a pointer README for repository links and historical references.
+
 ## Known Limitations
 
 - Learning is educational documentation, not a package or runtime support line, compliance certification, or security guarantee.
@@ -38,4 +50,4 @@ The 6.0 vocabulary and API refinements do not change Learning's central architec
 
 ## Release Evidence
 
-The GitHub Release includes an SPDX 2.3 inventory of sample source and locked dependencies, these exact release notes, and a SHA-256 evidence manifest. GitHub provenance attestations bind each evidence asset to the release workflow. See the [Stable Release Evidence Runbook](https://github.com/AsiBackbone/Learning/blob/release/1.0.0/RELEASE.md) for scope and verification commands.
+The GitHub Release includes an SPDX 2.3 inventory of sample source and locked dependencies, these exact release notes, and a SHA-256 evidence manifest. GitHub provenance attestations bind each evidence asset to the release workflow. See the [Stable Release Evidence Runbook](https://github.com/AsiBackbone/Learning/blob/main/RELEASE.md) for scope and verification commands.

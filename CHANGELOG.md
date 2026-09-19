@@ -6,6 +6,8 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-19
+
 ### Added
 
 - Learning 1.0 production compatibility, API-boundary, release-readiness, and release-note guidance aligned with AsiBackbone 6.0.
@@ -41,5 +43,6 @@ Learning releases are archival and citation snapshots of educational material. T
 
 - Obsolete dependency-check suppressions for packages not used by Learning.
 
-[Unreleased]: https://github.com/AsiBackbone/Learning/compare/v0.15.0...HEAD
+[Unreleased]: https://github.com/AsiBackbone/Learning/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/AsiBackbone/Learning/compare/v0.15.0...v1.0.0
 [0.15.0]: https://github.com/AsiBackbone/Learning/releases/tag/v0.15.0
