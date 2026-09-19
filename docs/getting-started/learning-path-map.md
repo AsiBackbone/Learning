@@ -4,7 +4,7 @@ description: Visualize the recommended Learning progression, problem-first entry
 
 # Learning Path Map
 
-ASI Backbone Learning is a curriculum, but it is not one mandatory linear course.
+AsiBackbone Learning is a curriculum, but it is not one mandatory linear course.
 
 New readers can build the governed-execution vocabulary through the five foundational topics in order. Experienced readers can enter through [Find Your Path](find-your-path.md), choose the subject area that matches the problem, and return to earlier material only when a missing concept becomes relevant.
 
@@ -31,7 +31,7 @@ flowchart TD
     subgraph FOUNDATION["Recommended foundation for new readers"]
         direction TB
         D --> P["2. Policy Context + Explicit Decision Outcomes"]
-        P --> A["3. Acknowledgment + Audit Residue"]
+        P --> A["3. Decision Receipts + Acknowledgment"]
         A --> C["4. Scoped Capability + Host-Owned Execution"]
         C --> G["5. Governed AI Tool Gateway"]
     end
@@ -62,7 +62,7 @@ flowchart TD
     click FP "https://asibackbone.github.io/Learning/getting-started/find-your-path.html" "Open Find Your Path"
     click D "https://asibackbone.github.io/Learning/tutorials/decision-before-execution.html" "Open Decision Before Execution"
     click P "https://asibackbone.github.io/Learning/tutorials/policy-context-and-explicit-decision-outcomes.html" "Open Policy Context and Explicit Decision Outcomes"
-    click A "https://asibackbone.github.io/Learning/tutorials/acknowledgment-and-audit-residue.html" "Open Acknowledgment and Audit Residue"
+    click A "https://asibackbone.github.io/Learning/tutorials/decision-receipts-and-acknowledgment.html" "Open Decision Receipts and Acknowledgment"
     click C "https://asibackbone.github.io/Learning/tutorials/scoped-capability-and-host-owned-execution.html" "Open Scoped Capability and Host-Owned Execution"
     click G "https://asibackbone.github.io/Learning/tutorials/governed-ai-tool-gateway.html" "Open Governed AI Tool Gateway"
     click ARCH "https://asibackbone.github.io/Learning/architecture/" "Open Architecture"
@@ -93,7 +93,7 @@ For readers who cannot use the diagram, the same foundation is listed below.
 | --- | --- | --- |
 | 1 | [Decision Before Execution](../tutorials/decision-before-execution.md) | Evaluation and protected execution become separate responsibilities |
 | 2 | [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) | Decision inputs, outcomes, reason codes, and policy identity become explicit |
-| 3 | [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) | Acknowledgment becomes distinct and governed-path evidence is preserved |
+| 3 | [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) | Acknowledgment becomes distinct and governed-path evidence is preserved |
 | 4 | [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) | Execution authority becomes narrow while the host retains the final side effect |
 | 5 | [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) | Earlier boundaries are composed around AI-proposed tool execution |
 

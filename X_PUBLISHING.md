@@ -52,7 +52,7 @@ cannot be overridden by repository or workflow input.
 The post text is deterministic:
 
 ```text
-New from ASI Backbone Learning:
+New from AsiBackbone Learning:
 
 {title}
 

@@ -1,6 +1,6 @@
 # Minimal Policy Simulation Harness Sample
 
-This sample is an executable companion for the governance and policy architecture material in ASI Backbone Learning.
+This sample is an executable companion for the governance and policy architecture material in AsiBackbone Learning.
 
 **Learning objective:** Observe how the same proposed intent can produce different structured governance decisions when authoritative policy context or the selected policy version changes, without invoking a protected executor or producing a real-world side effect.
 

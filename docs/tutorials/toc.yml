@@ -7,8 +7,8 @@
 - name: Policy Context and Explicit Decision Outcomes
   href: policy-context-and-explicit-decision-outcomes.md
 
-- name: Acknowledgment and Audit Residue
-  href: acknowledgment-and-audit-residue.md
+- name: Decision Receipts and Acknowledgment
+  href: decision-receipts-and-acknowledgment.md
 
 - name: Scoped Capability and Host-Owned Execution
   href: scoped-capability-and-host-owned-execution.md

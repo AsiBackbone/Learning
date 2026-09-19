@@ -534,7 +534,7 @@ Use `git status` first so you understand which local work will be affected.
 
 - [Scoped Capability and Host-Owned Execution tutorial](../tutorials/scoped-capability-and-host-owned-execution.md) — review the architectural reasoning behind the lab.
 - [Scoped Capability and Host-Owned Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/README.md#scoped-capability-and-host-owned-execution) — return to the executable baseline used by the exercise.
-- [Acknowledgment and Audit Residue lab](acknowledgment-and-audit-residue.md) — revisit acknowledgment, re-evaluation, and evidence before execution authority is issued.
+- [Decision Receipts and Acknowledgment lab](decision-receipts-and-acknowledgment.md) — revisit acknowledgment, re-evaluation, and evidence before execution authority is issued.
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — continue into the end-to-end composition where AI may propose and the host retains execution authority.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — connect this lab's in-memory single-use exercise to durable, atomic, multi-instance replay protection and idempotency boundaries.
 - [Replay Protection and Bounded-Use Authority lab](replay-protection-and-bounded-use.md) — continue from the introductory single-use exercise into a dedicated concurrency race, atomic consume repair, bounded-use contention, and failure-window analysis.

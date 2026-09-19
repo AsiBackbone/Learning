@@ -26,7 +26,7 @@ description: Learn why consequential operations should become explicit proposed 
 >
 > **Observe:** A blocked decision never reaches the executor.
 
-This is the first foundational tutorial in ASI Backbone Learning.
+This is the first foundational tutorial in AsiBackbone Learning.
 
 The pattern is deliberately broader than the `AsiBackbone` package. You can use the same separation in a small application, an API gateway, an administrative workflow, a background process, or an AI-assisted tool system.
 
@@ -567,7 +567,7 @@ It does not prove that:
 
 Operational logging and governance evidence can overlap, but they solve different problems.
 
-Later tutorials explore audit residue and provenance in more detail.
+Later tutorials explore decision receipt and provenance in more detail.
 
 ## Common Failure Modes
 
@@ -700,12 +700,12 @@ Use these references as an implementation map rather than as required dependenci
 | Tutorial concept | Working reference | What to inspect |
 | --- | --- | --- |
 | Explicit governance decision | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) and [`GovernanceDecisionOutcome`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs) | Compare the tutorial's small decision record and outcome enum with the framework's fuller decision model and outcome vocabulary. |
-| Context and constraint evaluation | [`DefaultAsiBackbonePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultAsiBackbonePolicyEvaluator.cs) | Inspect how the working framework evaluates policy and composes governance decisions without turning the evaluator into the host operation itself. |
+| Context and constraint evaluation | [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) | Inspect how the working framework evaluates policy and composes governance decisions without turning the evaluator into the host operation itself. |
 | Decision behavior under tests | [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) | Follow concrete tests that exercise the evaluator and verify decision behavior through the policy pipeline. |
 | Intent through execution | [Intent-to-Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) | Compare the tutorial's Request -> Intent -> Context -> Decision -> Execution flow with the fuller documented lifecycle. |
 | Host-owned execution | [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/host-owned-execution-enforcement.md) | Examine the framework guidance for keeping execution authority with the host after governance evaluation. |
 | Concrete ASP.NET Core host | [`SampleGovernanceController`](https://github.com/AsiBackbone/AsiBackbone/blob/main/samples/PlainAspNetCoreHost/SampleGovernanceController.cs) | See a working host consume governance behavior in an ASP.NET Core application rather than treating the evaluator as the side-effect owner. |
-| ASP.NET Core enforcement layer | [`AsiBackboneEndpointGovernanceMiddleware`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Endpoints/AsiBackboneEndpointGovernanceMiddleware.cs) and [`AsiBackboneEndpointGovernanceTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.AspNetCore.Tests/Endpoints/AsiBackboneEndpointGovernanceTests.cs) | Inspect one concrete request-pipeline enforcement boundary together with the tests that exercise it. |
+| ASP.NET Core enforcement layer | [`EndpointGovernanceMiddleware`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Endpoints/EndpointGovernanceMiddleware.cs) and [`AsiBackboneEndpointGovernanceTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.AspNetCore.Tests/Endpoints/AsiBackboneEndpointGovernanceTests.cs) | Inspect one concrete request-pipeline enforcement boundary together with the tests that exercise it. |
 
 ### Suggested Reading Order
 
@@ -715,7 +715,7 @@ If you are moving from this tutorial into the production-oriented repository, a 
 GovernanceDecision + GovernanceDecisionOutcome
         |
         v
-DefaultAsiBackbonePolicyEvaluator
+DefaultGovernancePolicyEvaluator
         |
         v
 PolicyEvaluatorEndToEndTests
@@ -782,7 +782,7 @@ Host-controlled execution boundary
 Tool invocation
 ```
 
-This leads to a recurring rule throughout ASI Backbone Learning:
+This leads to a recurring rule throughout AsiBackbone Learning:
 
 > **The model may propose. The host retains execution authority.**
 
@@ -848,7 +848,7 @@ and examines how the facts and outcomes of a governance decision can be represen
 - [Foundational Tutorial Index](index.md) — view the complete five-tutorial learning path.
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — continue into explicit policy facts, constraints, and structured outcomes.
 - [Escalation Patterns in Governed Systems](../governance/escalation-patterns-in-governed-systems.md) — follow `EscalationRecommended` into an explicit non-executable routing, evidence, and re-evaluation lifecycle.
-- [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — follow the decision lifecycle into acknowledgment and evidence.
+- [Decision Receipts and Acknowledgment](decision-receipts-and-acknowledgment.md) — follow the decision lifecycle into acknowledgment and evidence.
 - [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see the proposal-versus-execution boundary composed around AI-proposed tool calls.
 - [Threat Modeling as Architecture Reasoning](../security/threat-modeling-as-architecture-reasoning.md) — examine the decision boundary under adversarial assumptions and connect bypass risks to explicit architectural invariants.
 - [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md) — run the framework-neutral companion and observe that blocked decisions never invoke the executor.

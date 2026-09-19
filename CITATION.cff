@@ -2,10 +2,10 @@ cff-version: 1.2.0
 message: >-
   If you use this material, please cite it using the metadata
   from this file.
-title: "ASI Backbone Learning"
+title: "AsiBackbone Learning"
 type: dataset
 abstract: >-
-  ASI Backbone Learning is the educational layer of the ASI Backbone
+  AsiBackbone Learning is the educational layer of the AsiBackbone
   organization: an open, community-oriented, DocFX-published collection of
   tutorials and architectural comparisons covering practical .NET architecture
   for governed execution, secure applications, AI integration, and
@@ -31,7 +31,7 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.21938556"
     description: >-
-      Zenodo concept DOI for ASI Backbone Learning. Always resolves to the
+      Zenodo concept DOI for AsiBackbone Learning. Always resolves to the
       most recent archived version. Cite this when referring to the evolving
       work as a whole.
 repository-code: "https://github.com/AsiBackbone/Learning"
@@ -51,7 +51,7 @@ keywords:
   - lesson
 references:
   - type: software
-    title: "ASI Backbone"
+    title: "AsiBackbone"
     authors:
       - family-names: Cavell
         given-names: "Christopher D."
@@ -66,5 +66,5 @@ references:
         orcid: "https://orcid.org/0009-0002-2113-0245"
     doi: "10.5281/zenodo.20373042"
     repository-code: "https://github.com/AsiBackbone/NetCoreApplicationTemplate"
-version: "0.15.0"
-date-released: "2026-09-11"
+version: "1.0.0"
+date-released: "2026-09-19"

@@ -748,11 +748,11 @@ No privilege should accumulate merely because a sequence of earlier sessions con
 
 ---
 
-## Memory, Audit Residue, and Governance Evidence Serve Different Purposes
+## Memory, Decision Receipt, and Governance Evidence Serve Different Purposes
 
 Memory helps future work remember context.
 
-Audit residue helps reconstruct what happened in a governed path.
+Decision receipt helps reconstruct what happened in a governed path.
 
 Those goals overlap but are not identical.
 
@@ -1230,7 +1230,7 @@ This article describes a host architecture boundary. It does not imply that `Asi
 Existing governance primitives remain useful reference points for preserving the distinction between remembered information and current authority:
 
 - [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — structured current governance outcomes should remain distinct from remembered historical decisions.
-- [`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs) — governance evidence has a different lifecycle and purpose from model-visible memory.
+- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) — governance evidence has a different lifecycle and purpose from model-visible memory.
 - [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — narrow authority should remain an explicit capability concern rather than being reconstructed from memory.
 - [AI Agent Gateway Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/ai-agent-gateway.md) — reinforces the boundary in which the model proposes and the host owns context, policy, and execution.
 
@@ -1279,7 +1279,7 @@ If the answer to the last question is unclear, memory has probably crossed an au
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — construct current authoritative policy context explicitly.
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) — preserve current policy identity and decision lineage without relying on remembered summaries.
 - [Deterministic and Probabilistic Inputs in Policy Evaluation](../governance/deterministic-and-probabilistic-inputs-in-policy-evaluation.md) — classify model-derived or uncertain information separately from authoritative deterministic facts.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — distinguish historical acknowledgment and durable governance evidence from memory.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — distinguish historical acknowledgment and durable governance evidence from memory.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — keep execution authority explicit, bounded, and validated at the execution boundary.
 - [Secret Handling Across Trust Boundaries](../security/secret-handling-across-trust-boundaries.md) — keep credentials and sensitive secret material out of general model-visible memory.
 - [Threat Modeling as Architecture Reasoning](../security/threat-modeling-as-architecture-reasoning.md) — model memory stores, retrieval, poisoning, isolation, and execution boundaries as part of the system threat model.

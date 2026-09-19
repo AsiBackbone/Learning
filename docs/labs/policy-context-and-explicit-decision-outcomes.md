@@ -440,7 +440,7 @@ Discuss:
 - Why is a version or hash useful for later audit interpretation?
 - What additional evidence would a production system need before claiming that a decision is fully reproducible?
 
-This prepares for the next tutorial, where acknowledgment and audit residue become first-class concerns.
+This prepares for the next tutorial, where acknowledgment and decision receipt become first-class concerns.
 
 ### Resetting the Sample
 
@@ -461,12 +461,12 @@ Use `git status` before restoring anything so that you understand which local ch
 - [Policy Context and Explicit Decision Outcomes tutorial](../tutorials/policy-context-and-explicit-decision-outcomes.md) — review the architectural reasoning behind the lab.
 - [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md) — return to the executable baseline used by this exercise.
 - [Decision Before Execution lab](decision-before-execution.md) — practice the earlier boundary between decision and host-owned execution.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — continue from structured outcomes into acknowledgment, lineage, and governance evidence.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — continue from structured outcomes into acknowledgment, lineage, and governance evidence.
 - [Foundational Tutorial Index](../tutorials/index.md) — view the complete foundational learning path.
 - [`GovernanceDecisionOutcome`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs) — compare the teaching vocabulary with the working framework.
 - [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — inspect the fuller decision model and reason metadata.
-- [`IAsiBackboneConstraintEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/IAsiBackboneConstraintEvaluationContext.cs) — compare the explicit teaching snapshot with the framework context surface.
-- [`DefaultAsiBackbonePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultAsiBackbonePolicyEvaluator.cs) — inspect fuller constraint evaluation and decision composition.
+- [`IGovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/IGovernanceEvaluationContext.cs) — compare the explicit teaching snapshot with the framework context surface.
+- [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) — inspect fuller constraint evaluation and decision composition.
 
 ---
 

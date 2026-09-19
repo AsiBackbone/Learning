@@ -8,7 +8,7 @@ description: Practice fail-safe governance when policy, replay, acknowledgment, 
 
 **Difficulty:** Advanced
 
-**Prerequisites:** Complete [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md), [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md), and [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md). Run the [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) before beginning. [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md), [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md), [Centralized Error Handling and Problem Details](../aspnetcore/centralized-error-handling-and-problem-details.md), [Data Access Boundaries and Transaction Reasoning](../aspnetcore/data-access-boundaries-and-transaction-reasoning.md), and [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) provide the deeper failure-model context used throughout the exercise.
+**Prerequisites:** Complete [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md), [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md), and [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md). Run the [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) before beginning. [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md), [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md), [Centralized Error Handling and Problem Details](../aspnetcore/centralized-error-handling-and-problem-details.md), [Data Access Boundaries and Transaction Reasoning](../aspnetcore/data-access-boundaries-and-transaction-reasoning.md), and [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) provide the deeper failure-model context used throughout the exercise.
 
 This lab extends the failure exercise already present in the Governed AI Tool Gateway lab.
 
@@ -65,7 +65,7 @@ Replay/use-state check
    ↓
 Host-owned dry-run executor
    ↓
-Audit residue
+Decision receipt
 ```
 
 The sample already demonstrates a useful rule:
@@ -1236,7 +1236,7 @@ If you added temporary files under the sample directory, remove only the files y
 - [Governed AI Tool Gateway advanced lab](governed-ai-tool-gateway.md) — begin with the broader composed gateway threat model before specializing in failure policy.
 - [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) — use the existing deterministic host-owned execution boundary as the main lab surface.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — preserve `Deferred`, `AcknowledgmentRequired`, and `EscalationRecommended` instead of collapsing failure behavior into a boolean.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — distinguish responsibility evidence from authorization and execution.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — distinguish responsibility evidence from authorization and execution.
 - [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md) — identify which component owns each trust property before choosing degraded behavior.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — reason about replay-store unavailability, atomic consumption, and failure windows.
 - [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md) — distinguish cryptographic verification from current authority and safe execution.

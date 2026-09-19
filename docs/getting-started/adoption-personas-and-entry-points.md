@@ -4,7 +4,7 @@ description: Choose a Learning path based on whether you are a developer, system
 
 # Adoption Personas and Entry Points
 
-ASI Backbone Learning supports several kinds of readers. You do not need to read every topic in sequence before deciding whether the architecture is relevant to your work.
+AsiBackbone Learning supports several kinds of readers. You do not need to read every topic in sequence before deciding whether the architecture is relevant to your work.
 
 Start with the responsibility you own, follow the shortest useful path, and evaluate the boundaries rather than assuming the framework is the answer.
 
@@ -80,7 +80,7 @@ The goal is to determine whether that separation improves your system enough to 
 
 **Start with:**
 
-1. [Accountable Systems Infrastructure and Governed Execution](../architecture/accountable-systems-infrastructure-and-governed-execution.md)
+1. [AsiBackbone and Governed Execution](../architecture/asibackbone-and-governed-execution.md)
 2. [Governance Tool Selection and Composition](../architecture/governance-tool-selection-and-composition.md)
 3. [Policy Engines, Rules Engines, and Distributed Policy Enforcement](../architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md)
 4. [Federated Governance and Independent Authority Coordination](../advanced/federated-governance-and-independent-authority-coordination.md)
@@ -120,7 +120,7 @@ The goal is to determine whether that separation improves your system enough to 
 **Start with:**
 
 1. [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md)
-2. [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+2. [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 3. [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md)
 4. [Governed Execution in Regulated Systems](../advanced/governed-execution-in-regulated-systems.md)
 

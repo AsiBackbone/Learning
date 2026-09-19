@@ -1,11 +1,13 @@
 ---
-description: Browse runnable companion samples that demonstrate ASI Backbone Learning patterns between the problem-first tutorials and hands-on architectural labs.
+description: Browse runnable companion samples that demonstrate AsiBackbone Learning patterns between the problem-first tutorials and hands-on architectural labs.
 _disableBreadcrumb: true
 ---
 
 # Executable Samples
 
-Executable samples are the **runnable demonstration layer** of ASI Backbone Learning.
+Executable samples are the **runnable demonstration layer** of AsiBackbone Learning.
+
+> **Code scope:** These projects compile Learning-owned, framework-neutral teaching models. They do not currently reference `AsiBackbone.*` packages, and similarly named local types are not package API signatures. See the [AsiBackbone 6.0 API Boundary](../getting-started/asibackbone-6-api-boundary.md) for exact current API names, namespaces, and supported construction patterns.
 
 They sit between the problem-first tutorials and the hands-on labs:
 
@@ -29,7 +31,7 @@ All executable sample projects currently under `samples/` are listed below, grou
 | --- | --- | --- |
 | Foundational | [Decision Before Execution](#decision-before-execution) | A blocked decision never reaches the executor. |
 | Foundational | [Policy Context and Explicit Decision Outcomes](#policy-context-and-explicit-decision-outcomes) | Policy consumes explicit facts and returns a structured outcome without performing the side effect. |
-| Foundational | [Acknowledgment and Audit Residue](#acknowledgment-and-audit-residue) | Acknowledgment satisfies a governance requirement; it does not become execution authority. |
+| Foundational | [Decision Receipts and Acknowledgment](#decision-receipts-and-acknowledgment) | Acknowledgment satisfies a governance requirement; it does not become execution authority. |
 | Foundational | [Scoped Capability and Host-Owned Execution](#scoped-capability-and-host-owned-execution) | Narrow authority is validated again at the host-owned execution boundary. |
 | Foundational | [Governed AI Tool Gateway](#governed-ai-tool-gateway) | The model may propose; the host retains execution authority. |
 | Governance and Policy Architecture | [Decision Pipeline Refactoring](#decision-pipeline-refactoring) | Explicit outcomes remain separate from protected execution. |
@@ -88,7 +90,7 @@ dotnet run --project samples/policy-context-and-explicit-decision-outcomes/Sampl
 - [Read the tutorial](../tutorials/policy-context-and-explicit-decision-outcomes.md)
 - [Continue with the learner exercise](../labs/policy-context-and-explicit-decision-outcomes.md)
 
-### Acknowledgment and Audit Residue
+### Decision Receipts and Acknowledgment
 
 **Learning objective:** Observe how a consequential operation can pause for a narrowly bound acknowledgment, validate the response, re-evaluate current policy, and preserve a correlated audit timeline without treating acknowledgment as standing permission.
 
@@ -103,12 +105,12 @@ Decision, acknowledgment, re-evaluation, and execution remain distinguishable ev
 Run from the repository root:
 
 ```bash
-dotnet run --project samples/acknowledgment-and-audit-residue/Sample/AcknowledgmentAndAuditResidue.csproj
+dotnet run --project samples/decision-receipts-and-acknowledgment/Sample/DecisionReceiptsAndAcknowledgment.csproj
 ```
 
-- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/acknowledgment-and-audit-residue/README.md)
-- [Read the tutorial](../tutorials/acknowledgment-and-audit-residue.md)
-- [Continue with the intermediate lab](../labs/acknowledgment-and-audit-residue.md)
+- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-receipts-and-acknowledgment/README.md)
+- [Read the tutorial](../tutorials/decision-receipts-and-acknowledgment.md)
+- [Continue with the intermediate lab](../labs/decision-receipts-and-acknowledgment.md)
 
 ### Scoped Capability and Host-Owned Execution
 
@@ -153,7 +155,7 @@ dotnet run --project samples/governed-ai-tool-gateway/Sample/GovernedAiToolGatew
 - [Trace the governed proposal end to end](../ai-integration/ai-governance-observability-and-end-to-end-decision-tracing.md)
 - [Continue with the advanced lab](../labs/governed-ai-tool-gateway.md)
 
-The same executable includes a deterministic local observability demonstration using `ActivitySource`, trace/span relationships, structured activity events, distinct proposal/correlation identity, policy-version evidence, and the existing audit residue. It prints allowed, denied, and acknowledgment-required traces without requiring a real AI provider or telemetry backend.
+The same executable includes a deterministic local observability demonstration using `ActivitySource`, trace/span relationships, structured activity events, distinct proposal/correlation identity, policy-version evidence, and the existing decision receipt. It prints allowed, denied, and acknowledgment-required traces without requiring a real AI provider or telemetry backend.
 
 ## Governance and Policy Architecture Samples
 

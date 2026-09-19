@@ -8,8 +8,8 @@
     href: index.md#decision-before-execution
   - name: Policy Context and Explicit Decision Outcomes
     href: index.md#policy-context-and-explicit-decision-outcomes
-  - name: Acknowledgment and Audit Residue
-    href: index.md#acknowledgment-and-audit-residue
+  - name: Decision Receipts and Acknowledgment
+    href: index.md#decision-receipts-and-acknowledgment
   - name: Scoped Capability and Host-Owned Execution
     href: index.md#scoped-capability-and-host-owned-execution
   - name: Governed AI Tool Gateway

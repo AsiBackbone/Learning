@@ -349,7 +349,7 @@ Use `git status` before restoring anything so that you understand which local ch
 - [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) - compare your lab behavior with fuller evaluator tests.
 - [Intent-to-Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) - follow the complete documented lifecycle from proposal toward execution.
 - [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/host-owned-execution-enforcement.md) - examine the fuller execution-authority boundary.
-- [`AsiBackboneEndpointGovernanceMiddleware`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Endpoints/AsiBackboneEndpointGovernanceMiddleware.cs) - inspect a concrete ASP.NET Core enforcement layer.
+- [`EndpointGovernanceMiddleware`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Endpoints/EndpointGovernanceMiddleware.cs) - inspect a concrete ASP.NET Core enforcement layer.
 
 ---
 

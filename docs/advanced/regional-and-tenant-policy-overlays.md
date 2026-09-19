@@ -1190,9 +1190,9 @@ then the protected operation should not execute through that path.
 
 ---
 
-## Relationship to the Broader ASI Backbone Concept
+## Relationship to the Broader AsiBackbone Concept
 
-The broader ASI Backbone concept has used regional policy mediation as one architectural illustration: globally useful intent can be constrained by regional rules before consequential local execution.
+The broader AsiBackbone concept has used regional policy mediation as one architectural illustration: globally useful intent can be constrained by regional rules before consequential local execution.
 
 This Learning article does not require an AGI or ASI system.
 

@@ -10,7 +10,7 @@ description: Diagnose a flawed account-disable workflow across trust, authority,
 
 **Pattern classification:** General learning material
 
-**Prerequisites:** Recommended — [Decision Before Execution](../tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md), [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md), [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md), [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md), and [Threat Modeling as Architecture Reasoning](../security/threat-modeling-as-architecture-reasoning.md).
+**Prerequisites:** Recommended — [Decision Before Execution](../tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md), [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md), [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md), [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md), and [Threat Modeling as Architecture Reasoning](../security/threat-modeling-as-architecture-reasoning.md).
 
 This lab is intentionally different from the earlier single-pattern exercises.
 
@@ -1644,7 +1644,7 @@ What evidence survives?
 
 - [Decision Before Execution](../tutorials/decision-before-execution.md) — separate the decision from the side effect.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — rebuild policy context from explicit authoritative facts and preserve meaningful outcomes.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — distinguish acknowledgment from authorization and preserve lifecycle evidence.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — distinguish acknowledgment from authorization and preserve lifecycle evidence.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — keep later execution authority narrow, current, and host-enforced.
 - [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md) — identify where crossing a boundary changes what the host should believe.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — reason about replay state, atomic consumption, concurrency, and execution failure windows.

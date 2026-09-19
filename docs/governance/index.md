@@ -41,7 +41,7 @@ Scoped Authority
    ↓
 Host-Owned Execution
    ↓
-Audit Residue
+Decision Receipt
 ```
 
 The individual stages may be implemented differently across systems.
@@ -62,9 +62,9 @@ Introduces the separation between proposed intent, governance evaluation, and re
 
 Explores explicit policy facts, constraints, reason codes, policy identity, and structured outcomes.
 
-### Acknowledgment and Audit Residue
+### Decision Receipts and Acknowledgment
 
-[Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+[Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 
 Examines workflows that pause for acknowledgment and preserve evidence of the decision path.
 

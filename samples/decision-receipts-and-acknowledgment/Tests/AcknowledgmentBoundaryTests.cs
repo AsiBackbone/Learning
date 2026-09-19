@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace AcknowledgmentAndAuditResidue.Tests;
+namespace DecisionReceiptsAndAcknowledgment.Tests;
 
 public sealed class AcknowledgmentBoundaryTests
 {
@@ -290,24 +290,22 @@ public sealed class AcknowledgmentBoundaryTests
     }
 
     [Fact]
-    public void AuditResidueKeepsLifecycleIdentityExplicit()
+    public void DecisionReceiptKeepsDecisionIdentityExplicit()
     {
-        var residue = new AuditResidue(
-            Sequence: 2,
-            EventId: "test-user-100-event-02",
+        var receipt = new DecisionReceipt(
+            ReceiptId: "test-user-100-decision",
             OccurredUtc: _nowUtc,
             ActorId: "operator-7",
             OperationName: "account.disable",
-            Outcome: "AcknowledgmentAccepted",
-            ReasonCodes: ["account.disable.reason-required", "acknowledgment.accepted"],
+            Outcome: "AcknowledgmentRequired",
+            ReasonCodes: ["account.disable.reason-required"],
             CorrelationId: "test-user-100",
-            PolicyVersion: "3.2",
-            Stage: "acknowledgment-accepted");
+            PolicyVersion: "3.2");
 
-        Assert.Equal("test-user-100", residue.CorrelationId);
-        Assert.Equal("3.2", residue.PolicyVersion);
-        Assert.Equal("acknowledgment-accepted", residue.Stage);
-        Assert.Equal(2, residue.ReasonCodes.Count);
+        Assert.Equal("test-user-100", receipt.CorrelationId);
+        Assert.Equal("3.2", receipt.PolicyVersion);
+        Assert.Equal("AcknowledgmentRequired", receipt.Outcome);
+        Assert.Single(receipt.ReasonCodes);
     }
 
     [Fact]

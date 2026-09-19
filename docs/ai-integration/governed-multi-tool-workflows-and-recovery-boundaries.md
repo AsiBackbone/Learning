@@ -1063,7 +1063,7 @@ what failed operationally
 what remains unattempted
 ```
 
-This distinction matters for both recovery and audit residue.
+This distinction matters for both recovery and decision receipt.
 
 ---
 
@@ -1192,7 +1192,7 @@ Some dependencies support cooperative cancellation before the side effect.
 
 Others may complete despite the host abandoning the request.
 
-Audit residue should record that distinction.
+Correlated lifecycle evidence should record that distinction without rewriting the original decision receipt.
 
 ---
 
@@ -1230,7 +1230,7 @@ Human review changes the decision path only through explicit host-owned rules.
 
 ---
 
-## Correlation and Audit Residue Should Preserve the Step History
+## Correlated Lifecycle Evidence Should Preserve the Step History
 
 A useful audit chain can reconstruct the workflow without pretending that every event had the same outcome.
 
@@ -1677,12 +1677,12 @@ This tutorial focuses on execution and recovery across steps.
 
 This tutorial is framework-neutral.
 
-The working `AsiBackbone` repository provides governance artifacts that can participate in a per-step design, including structured governance decisions, acknowledgment/handshake requests, audit residue, and capability-token grants.
+The working `AsiBackbone` repository provides governance artifacts that can participate in a per-step design, including structured governance decisions, acknowledgment/handshake requests, decision receipt, and capability-token grants.
 
 Useful references include:
 
 - [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs)
-- [`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs)
+- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs)
 - [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs)
 - [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs)
 

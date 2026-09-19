@@ -79,7 +79,7 @@ WorkflowScenario[] scenarios =
         ])
 ];
 
-Console.WriteLine("Acknowledgment and Audit Residue");
+Console.WriteLine("Decision Receipts and Acknowledgment");
 Console.WriteLine(new string('=', 34));
 Console.WriteLine();
 
@@ -102,20 +102,20 @@ foreach (WorkflowScenario scenario in scenarios)
     Console.WriteLine($"Final state: {result.FinalState}");
     Console.WriteLine($"Last decision: {result.LastDecision.Outcome}");
     Console.WriteLine($"Executor invocations: {executor.InvocationCount}");
-    Console.WriteLine("Audit timeline:");
+    Console.WriteLine("Evidence timeline:");
 
-    foreach (AuditResidue residue in result.AuditTrail)
+    foreach (GovernanceLifecycleEvent receipt in result.EvidenceTrail)
     {
         Console.WriteLine(
-            $"  {residue.Sequence,2}. {residue.Stage,-25} " +
-            $"outcome={residue.Outcome,-28} " +
-            $"reasons={FormatReasons(residue.ReasonCodes)}");
+            $"  {receipt.Sequence,2}. {receipt.Stage,-25} " +
+            $"outcome={receipt.Outcome,-28} " +
+            $"reasons={FormatReasons(receipt.ReasonCodes)}");
     }
 
     Console.WriteLine(
         "Correlation preserved: " +
-        result.AuditTrail.All(
-            residue => residue.CorrelationId ==
+        result.EvidenceTrail.All(
+            receipt => receipt.CorrelationId ==
                 scenario.Context.CorrelationId));
     Console.WriteLine();
 }
@@ -135,12 +135,12 @@ static WorkflowResult RunScenario(
     DateTimeOffset nowUtc =
         new(2026, 8, 13, 19, 0, 0, TimeSpan.Zero);
 
-    var audit = new List<AuditResidue>();
+    var evidence = new List<GovernanceLifecycleEvent>();
     DisableAccountPolicyContext context = scenario.Context;
     GovernanceDecision decision = DisableAccountPolicy.Evaluate(context);
 
-    AddDecisionResidue(
-        audit,
+    AddDecisionReceipt(
+        evidence,
         nowUtc,
         context,
         decision,
@@ -152,7 +152,7 @@ static WorkflowResult RunScenario(
         return new WorkflowResult(
             "BlockedByInitialDecision",
             decision,
-            audit);
+            evidence);
     }
 
     AcknowledgmentChallenge challenge =
@@ -162,8 +162,8 @@ static WorkflowResult RunScenario(
             nowUtc);
 
     nowUtc = nowUtc.AddSeconds(1);
-    AddResidue(
-        audit,
+    AddLifecycleEvent(
+        evidence,
         nowUtc,
         context,
         outcome: "ChallengeIssued",
@@ -192,8 +192,8 @@ static WorkflowResult RunScenario(
 
     if (!response.Accepted)
     {
-        AddResidue(
-            audit,
+        AddLifecycleEvent(
+            evidence,
             responseUtc,
             context,
             outcome: "AcknowledgmentRejected",
@@ -204,13 +204,13 @@ static WorkflowResult RunScenario(
         return new WorkflowResult(
             "AcknowledgmentRejected",
             decision,
-            audit);
+            evidence);
     }
 
     if (!validation.IsValid)
     {
-        AddResidue(
-            audit,
+        AddLifecycleEvent(
+            evidence,
             responseUtc,
             context,
             outcome: "AcknowledgmentInvalid",
@@ -221,11 +221,11 @@ static WorkflowResult RunScenario(
         return new WorkflowResult(
             "AcknowledgmentInvalid",
             decision,
-            audit);
+            evidence);
     }
 
-    AddResidue(
-        audit,
+    AddLifecycleEvent(
+        evidence,
         responseUtc,
         context,
         outcome: "AcknowledgmentAccepted",
@@ -248,8 +248,8 @@ static WorkflowResult RunScenario(
     decision = DisableAccountPolicy.Evaluate(context);
     nowUtc = responseUtc.AddSeconds(1);
 
-    AddDecisionResidue(
-        audit,
+    AddDecisionReceipt(
+        evidence,
         nowUtc,
         context,
         decision,
@@ -260,13 +260,13 @@ static WorkflowResult RunScenario(
         return new WorkflowResult(
             "BlockedAfterReevaluation",
             decision,
-            audit);
+            evidence);
     }
 
     executor.Execute(context.Intent);
 
-    AddResidue(
-        audit,
+    AddLifecycleEvent(
+        evidence,
         nowUtc.AddSeconds(1),
         context,
         outcome: "Executed",
@@ -276,7 +276,7 @@ static WorkflowResult RunScenario(
     return new WorkflowResult(
         "Executed",
         decision,
-        audit);
+        evidence);
 }
 
 static DisableAccountPolicyContext CreateContext(
@@ -342,15 +342,28 @@ static AcknowledgmentResponse CreateResponse(
         CorrelationId: challenge.CorrelationId);
 }
 
-static void AddDecisionResidue(
-    List<AuditResidue> audit,
+static void AddDecisionReceipt(
+    List<GovernanceLifecycleEvent> evidence,
     DateTimeOffset occurredUtc,
     DisableAccountPolicyContext context,
     GovernanceDecision decision,
     string stage)
 {
-    AddResidue(
-        audit,
+    var receipt = new DecisionReceipt(
+        ReceiptId: $"{context.CorrelationId}-{stage}",
+        OccurredUtc: occurredUtc,
+        ActorId: context.Actor.ActorId,
+        OperationName: "account.disable",
+        Outcome: decision.Outcome.ToString(),
+        ReasonCodes:
+            decision.Reasons
+                .Select(reason => reason.Code)
+                .ToArray(),
+        CorrelationId: context.CorrelationId,
+        PolicyVersion: context.PolicyVersion);
+
+    AddLifecycleEvent(
+        evidence,
         occurredUtc,
         context,
         outcome: decision.Outcome.ToString(),
@@ -358,22 +371,24 @@ static void AddDecisionResidue(
             decision.Reasons
                 .Select(reason => reason.Code)
                 .ToArray(),
-        stage: stage);
+        stage: stage,
+        decisionReceipt: receipt);
 }
 
-static void AddResidue(
-    List<AuditResidue> audit,
+static void AddLifecycleEvent(
+    List<GovernanceLifecycleEvent> evidence,
     DateTimeOffset occurredUtc,
     DisableAccountPolicyContext context,
     string outcome,
     IReadOnlyList<string> reasonCodes,
     string stage,
-    string? actorId = null)
+    string? actorId = null,
+    DecisionReceipt? decisionReceipt = null)
 {
-    int sequence = audit.Count + 1;
+    int sequence = evidence.Count + 1;
 
-    audit.Add(
-        new AuditResidue(
+    evidence.Add(
+        new GovernanceLifecycleEvent(
             Sequence: sequence,
             EventId:
                 $"{context.CorrelationId}-event-{sequence:00}",
@@ -384,7 +399,8 @@ static void AddResidue(
             ReasonCodes: reasonCodes,
             CorrelationId: context.CorrelationId,
             PolicyVersion: context.PolicyVersion,
-            Stage: stage));
+            Stage: stage,
+            DecisionReceipt: decisionReceipt));
 }
 
 static void VerifyScenario(
@@ -417,22 +433,22 @@ static void VerifyScenario(
             $"but observed {executorInvocations}.");
     }
 
-    string[] stages = [.. result.AuditTrail.Select(residue => residue.Stage)];
+    string[] stages = [.. result.EvidenceTrail.Select(receipt => receipt.Stage)];
 
     if (!stages.SequenceEqual(
             scenario.ExpectedStages,
             StringComparer.Ordinal))
     {
         throw new InvalidOperationException(
-            $"Scenario '{scenario.Name}' produced an unexpected audit timeline.");
+            $"Scenario '{scenario.Name}' produced an unexpected evidence timeline.");
     }
 
-    if (result.AuditTrail.Any(
-            residue => residue.CorrelationId !=
+    if (result.EvidenceTrail.Any(
+            receipt => receipt.CorrelationId !=
                 scenario.Context.CorrelationId))
     {
         throw new InvalidOperationException(
-            $"Scenario '{scenario.Name}' lost correlation across its audit timeline.");
+            $"Scenario '{scenario.Name}' lost correlation across its evidence timeline.");
     }
 }
 
@@ -457,7 +473,7 @@ public sealed record WorkflowScenario(
 public sealed record WorkflowResult(
     string FinalState,
     GovernanceDecision LastDecision,
-    IReadOnlyList<AuditResidue> AuditTrail);
+    IReadOnlyList<GovernanceLifecycleEvent> EvidenceTrail);
 
 public enum ResponseMode
 {
@@ -635,7 +651,7 @@ public sealed class AcknowledgmentValidator
     }
 }
 
-public sealed record AuditResidue(
+public sealed record GovernanceLifecycleEvent(
     int Sequence,
     string EventId,
     DateTimeOffset OccurredUtc,
@@ -645,7 +661,18 @@ public sealed record AuditResidue(
     IReadOnlyList<string> ReasonCodes,
     string CorrelationId,
     string PolicyVersion,
-    string Stage);
+    string Stage,
+    DecisionReceipt? DecisionReceipt);
+
+public sealed record DecisionReceipt(
+    string ReceiptId,
+    DateTimeOffset OccurredUtc,
+    string ActorId,
+    string OperationName,
+    string Outcome,
+    IReadOnlyList<string> ReasonCodes,
+    string CorrelationId,
+    string PolicyVersion);
 
 public sealed class RecordingExecutor
 {

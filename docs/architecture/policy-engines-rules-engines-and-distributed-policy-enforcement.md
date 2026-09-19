@@ -19,7 +19,7 @@ feed: true
 
 > **Industry anchors:** Technologies commonly encountered in these spaces include Drools for rule evaluation and OPA/Rego, Cedar, or XACML-based engines for policy evaluation. They are examples for orientation and searchability, not definitions of the categories.
 
-> **Standalone-reader note:** In this article, **Learning** means the ASI Backbone Learning repository and tutorial series. Its recurring governance pipeline is a responsibility model for `Intent -> Authoritative Context -> Policy / Constraints -> Decision -> Acknowledgment or Escalation when required -> Scoped Authority when needed -> Host-Owned Execution -> Audit Residue`. Those responsibilities may be implemented in one application or distributed across several components.
+> **Standalone-reader note:** In this article, **Learning** means the AsiBackbone Learning repository and tutorial series. Its recurring governance pipeline is a responsibility model for `Intent -> Authoritative Context -> Policy / Constraints -> Decision -> Acknowledgment or Escalation when required -> Scoped Authority when needed -> Host-Owned Execution -> Decision Receipt`. Those responsibilities may be implemented in one application or distributed across several components.
 
 ## Executive Summary
 
@@ -43,7 +43,7 @@ These are composable responsibilities, not maturity levels. A remote PDP is not 
 | Approach | Primary responsibility | Natural strength | Not automatically provided |
 | --- | --- | --- | --- |
 | Rules engine | Evaluate a body of domain rules against facts | Centralized, declarative business logic, decision tables, chaining, rule reuse | A distributed policy lifecycle, authoritative context, execution authority, or enforcement topology |
-| Policy engine / PDP | Evaluate externalized authorization or governance policy | Consistent policy evaluation, policy-as-code, versioned policy, reusable decisions across heterogeneous callers | Trustworthy input construction, acknowledgment, escalation workflow, capability issuance, execution, or complete audit residue |
+| Policy engine / PDP | Evaluate externalized authorization or governance policy | Consistent policy evaluation, policy-as-code, versioned policy, reusable decisions across heterogeneous callers | Trustworthy input construction, acknowledgment, escalation workflow, capability issuance, execution, or complete decision receipt |
 | Distributed policy enforcement | Apply policy decisions at one or more PEPs | Enforcement close to the protected resource or side effect | A single universal consistency, freshness, partition, or degraded-mode strategy |
 | Learning governance pipeline | Coordinate consequential-action lifecycle boundaries | Explicit context, outcomes, acknowledgment/escalation, scoped authority, host-owned execution, provenance | A requirement that every application use a separate framework or remote policy service |
 
@@ -74,7 +74,7 @@ Intent
   -> acknowledgment / escalation when required
   -> scoped continuation authority when needed
   -> PEP / host-owned execution
-  -> audit residue
+  -> decision receipt
 ```
 
 ### One Policy Decision, Many Possible Placements
@@ -829,7 +829,7 @@ Scoped Authority when needed
    ↓
 Host-Owned Execution
    ↓
-Audit Residue
+Decision Receipt
 ```
 
 A policy engine can occupy the evaluation step:
@@ -971,7 +971,7 @@ A policy engine returning `Allow` should not obscure which host:
 
 This is the same reason the Learning material preserves **host-owned execution**.
 
-### Audit Residue
+### Decision Receipt
 
 A policy engine may emit decision logs.
 
@@ -1646,7 +1646,7 @@ Which PEP enforced the final result?
 
 ## 18. Relationship to the Learning Governance Pipeline
 
-As defined near the beginning of this article, the ASI Backbone Learning governance pipeline should be read as a responsibility model, not as a requirement that every responsibility be a different product or service.
+As defined near the beginning of this article, the AsiBackbone Learning governance pipeline should be read as a responsibility model, not as a requirement that every responsibility be a different product or service.
 
 One implementation may look like:
 

@@ -29,7 +29,7 @@ It is:
 | Cloud/resource governance | Resource configuration and platform compliance | Resource inventory, policy assignment, remediation, platform controls | Application-specific acknowledgment or execution provenance |
 | Policy/rules engines | Structured decision evaluation | Reusable policy logic, language-neutral decisions, policy-as-code | Owning side effects, human workflow, durable runtime accountability by default |
 | Agent/tool governance | What automated agents may propose, delegate, or invoke | Tool registration, agent identity, delegation rules, sandboxing, agent operations | Universal application authorization or business-process evidence |
-| Governed execution | Consequential application intent before side effects | Explicit decisions, acknowledgment, scoped continuation authority, audit residue, host-owned execution | Cloud configuration, network policy, model hosting, or generic rules evaluation by itself |
+| Governed execution | Consequential application intent before side effects | Explicit decisions, acknowledgment, scoped continuation authority, decision receipt, host-owned execution | Cloud configuration, network policy, model hosting, or generic rules evaluation by itself |
 
 These families frequently compose.
 

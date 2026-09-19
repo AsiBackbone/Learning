@@ -10,7 +10,7 @@ description: Learn how narrow, short-lived capabilities preserve host control be
 
 **Difficulty:** Intermediate  
 
-**Prerequisites:** [Decision Before Execution](decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md), and [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md)
+**Prerequisites:** [Decision Before Execution](decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md), and [Decision Receipts and Acknowledgment](decision-receipts-and-acknowledgment.md)
 
 **Glossary:** [Scoped capability](../architecture/glossary.md#scoped-capability), [capability token](../architecture/glossary.md#capability-token), [execution authority](../architecture/glossary.md#execution-authority), [host-owned execution](../architecture/glossary.md#host-owned-execution), and [trust boundary](../architecture/glossary.md#trust-boundary).
 
@@ -26,13 +26,13 @@ description: Learn how narrow, short-lived capabilities preserve host control be
 >
 > **Observe:** A blocked decision cannot mint execution authority, and expired or stale authority never reaches the executor.
 
-This is the fourth foundational tutorial in ASI Backbone Learning.
+This is the fourth foundational tutorial in AsiBackbone Learning.
 
 It builds on:
 
 1. [Decision Before Execution](decision-before-execution.md)
 2. [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md)
-3. [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md)
+3. [Decision Receipts and Acknowledgment](decision-receipts-and-acknowledgment.md)
 
 The earlier tutorials established that a consequential action should be proposed, evaluated, and—when necessary—acknowledged before execution.
 
@@ -59,7 +59,7 @@ Capability validation
    ↓
 Host-owned execution
    ↓
-Audit residue
+Decision receipt
 ```
 
 The central principle is:
@@ -1448,7 +1448,7 @@ Execution gateway validates capability
    ↓
 Host invokes tool
    ↓
-Audit residue
+Decision receipt
 ```
 
 Example:
@@ -1563,7 +1563,7 @@ Execution-boundary validation
    ↓
 Host invokes tool
    ↓
-Audit residue
+Decision receipt
 ```
 
 The fifth tutorial is therefore not a new architectural primitive.
@@ -1575,7 +1575,7 @@ It is the first full composition of the primitives established so far.
 - [Foundational Tutorial Index](index.md) — view the complete five-tutorial governed-execution learning path.
 - [Do You Need a Capability Token, or Are Roles and Claims Enough?](../articles/2026/roles-claims-or-capability-token-dotnet.md) — use a scenario-driven selection guide before introducing capability infrastructure where roles, claims, or immediate host authorization may already be enough.
 - [Decision Before Execution](decision-before-execution.md) — revisit the foundational boundary between a proposed operation, a governance decision, and the host-owned side effect.
-- [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — review the responsibility and evidence boundaries that may precede issuance of execution authority.
+- [Decision Receipts and Acknowledgment](decision-receipts-and-acknowledgment.md) — review the responsibility and evidence boundaries that may precede issuance of execution authority.
 - [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) — revisit the policy facts, outcome semantics, and policy identity that justify a scoped capability.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — go deeper on durable replay state, atomic consumption, distributed races, idempotency, and execution failure windows.
 - [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](../advanced/governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md) — explore the experimental delegation rule that derived authority must not silently become broader than its source authority.

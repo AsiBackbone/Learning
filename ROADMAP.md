@@ -26,7 +26,7 @@ automation, and community intake surfaces.
 
 1. [Decision Before Execution](docs/tutorials/decision-before-execution.md)
 2. [Policy Context and Explicit Decision Outcomes](docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
-3. [Acknowledgment and Audit Residue](docs/tutorials/acknowledgment-and-audit-residue.md)
+3. [Decision Receipts and Acknowledgment](docs/tutorials/decision-receipts-and-acknowledgment.md)
 4. [Scoped Capability and Host-Owned Execution](docs/tutorials/scoped-capability-and-host-owned-execution.md)
 5. [Governed AI Tool Gateway](docs/tutorials/governed-ai-tool-gateway.md)
 
@@ -47,7 +47,7 @@ Scoped authority
    ↓
 Host-owned execution
    ↓
-Audit residue
+Decision receipt
 ```
 
 The repository therefore enters a **post-foundation maintenance mode** rather than
@@ -110,7 +110,7 @@ area solely for breadth:
 
 The Learning repository should become:
 
-* A clear educational entry point into the ASI Backbone organization.
+* A clear educational entry point into the AsiBackbone organization.
 * A practical learning resource rather than a product manual.
 * A bridge between architectural reasoning and working .NET implementations.
 * A source of intentionally small executable examples.
@@ -252,7 +252,7 @@ They do not replace host-side policy, validation, authorization, or execution co
 
 ### Canonical Does Not Mean Universal
 
-A canonical pattern represents an approach aligned with one or more current ASI Backbone organization implementations.
+A canonical pattern represents an approach aligned with one or more current AsiBackbone organization implementations.
 
 It does not mean that the approach is universally correct.
 
@@ -447,12 +447,12 @@ Escalate
 * [x] Pair with learner exercise.
 * [x] Strengthen links to working implementation references.
 
-### Tutorial 3 — Acknowledgment and Audit Residue
+### Tutorial 3 — Decision Receipts and Acknowledgment
 
 * [x] Publish foundational tutorial.
 * [x] Explain acknowledgment as a governance boundary.
 * [x] Preserve distinction between acknowledgment and authorization.
-* [x] Explain decision lineage and audit residue.
+* [x] Explain decision lineage and decision receipt.
 * [x] Address reason codes, correlation, and policy identity.
 * [x] Distinguish operational logging from governance evidence.
 * [x] Pair with executable companion sample.
@@ -482,7 +482,7 @@ Escalate
 * [x] Include scoped authority.
 * [x] Preserve host-owned execution.
 * [x] Address tool allowlists and argument validation.
-* [x] Discuss audit residue and failure handling.
+* [x] Discuss decision receipt and failure handling.
 * [x] Pair with executable companion sample. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 * [x] Add end-to-end lab. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 * [x] Expand threat-model exercises. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
@@ -525,7 +525,7 @@ They should not attempt to reproduce the full `AsiBackbone` or `NetCoreApplicati
 
 * [x] Decision Before Execution sample.
 * [x] Policy Context and Explicit Decision Outcomes sample.
-* [x] Acknowledgment and Audit Residue sample.
+* [x] Decision Receipts and Acknowledgment sample.
 * [x] Scoped Capability and Host-Owned Execution sample. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [x] Governed AI Tool Gateway sample. ([#4](https://github.com/AsiBackbone/Learning/issues/4))
 
@@ -629,7 +629,7 @@ Potential initial labs:
 ### Intermediate Labs
 
 * [x] Add acknowledgment to a consequential workflow.
-* [x] Preserve an audit receipt.
+* [x] Preserve an decision receipt.
 * [x] Introduce capability-scoped execution. ([#3](https://github.com/AsiBackbone/Learning/issues/3))
 * [x] Build a governed API operation. ([#54](https://github.com/AsiBackbone/Learning/issues/54))
 * [x] Refactor scattered governance logic into a decision pipeline. ([#221](https://github.com/AsiBackbone/Learning/issues/221))
@@ -1299,7 +1299,7 @@ Useful signals include:
 * Questions converted into improved explanations.
 * Architectural discussions converted into tutorials or labs when they expose a real gap.
 * Alternative patterns contributed and reviewed.
-* Patterns reused outside ASI Backbone repositories.
+* Patterns reused outside AsiBackbone repositories.
 * Community Issues and Discussions.
 * External pull requests.
 * Contributors who begin with documentation or samples and later participate elsewhere in the organization.
@@ -1323,7 +1323,7 @@ The Learning repository is not intended to become:
 * A certification program.
 * A security guarantee.
 * A production robotics controller.
-* A repository that attempts to prove the broader theoretical ASI Backbone or Eden Hypothesis framework.
+* A repository that attempts to prove the broader theoretical AsiBackbone or Eden Hypothesis framework.
 
 Its purpose is narrower:
 
@@ -1333,12 +1333,12 @@ Its purpose is narrower:
 
 ## Long-Term Direction
 
-Over time, Learning may become the primary educational entry point into the ASI Backbone organization.
+Over time, Learning may become the primary educational entry point into the AsiBackbone organization.
 
 A mature learning ecosystem could look like:
 
 ```text
-                    ASI Backbone Organization
+                    AsiBackbone Organization
                              |
               +--------------+--------------+
               |                             |

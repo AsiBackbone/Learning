@@ -1,14 +1,16 @@
 ---
-description: Start ASI Backbone Learning with core governed-execution concepts, the recommended learning path, practical examples, labs, and pattern-evaluation guidance.
+description: Start AsiBackbone Learning with core governed-execution concepts, the recommended learning path, practical examples, labs, and pattern-evaluation guidance.
 ---
 
 # Getting Started
 
-Welcome to **ASI Backbone Learning**.
+Welcome to **AsiBackbone Learning**.
 
 This repository teaches governance and controlled-execution architecture through small explanations, runnable examples, invariant tests, and hands-on labs. You do not need to adopt the `AsiBackbone` package or any specific framework to use the material.
 
 > **Read it. Run it. Question it. Improve it.**
+
+> **Production baseline:** Learning 1.0 is aligned with AsiBackbone 6.0. If you are reading material that references the AsiBackbone 5.x API, use the [Learning 1.0 and AsiBackbone 6.0 Compatibility Guide](learning-1-asibackbone-6-compatibility.md) before copying package syntax.
 
 ## Start Here
 
@@ -20,6 +22,8 @@ Choose the shortest path that matches how you want to learn:
 | Solve a specific architecture problem | [**Find Your Path**](find-your-path.md) |
 | See the complete curriculum visually | [**Learning Path Map**](learning-path-map.md) |
 | Learn by running code | [**Executable Samples**](../samples/index.md) |
+| Understand version alignment or translate older 5.x material | [**Learning 1.0 and AsiBackbone 6.0 Compatibility Guide**](learning-1-asibackbone-6-compatibility.md) |
+| Copy exact AsiBackbone 6.0 API syntax | [**AsiBackbone 6.0 API Boundary**](asibackbone-6-api-boundary.md) |
 | Practice by changing or challenging the design | [**Hands-On Labs**](../labs/index.md) |
 | Compare a simpler alternative | [**When ASP.NET Core Authorization Is Enough**](../architecture/when-aspnet-core-authorization-is-enough.md) |
 
@@ -74,7 +78,7 @@ The foundation is deliberately progressive. Each topic adds one boundary to the 
 |---|---|---|---|
 | 1 | [**Decision Before Execution**](../tutorials/decision-before-execution.md) | Denied decision → no execution | [Lab](../labs/decision-before-execution.md) |
 | 2 | [**Policy Context and Explicit Decision Outcomes**](../tutorials/policy-context-and-explicit-decision-outcomes.md) | Decisions are explicit, not boolean-only | [Lab](../labs/policy-context-and-explicit-decision-outcomes.md) |
-| 3 | [**Acknowledgment and Audit Residue**](../tutorials/acknowledgment-and-audit-residue.md) | Acknowledgment does not grant execution authority | [Lab](../labs/acknowledgment-and-audit-residue.md) |
+| 3 | [**Decision Receipts and Acknowledgment**](../tutorials/decision-receipts-and-acknowledgment.md) | Acknowledgment does not grant execution authority | [Lab](../labs/decision-receipts-and-acknowledgment.md) |
 | 4 | [**Scoped Capability and Host-Owned Execution**](../tutorials/scoped-capability-and-host-owned-execution.md) | Expired or stale authority blocks execution | [Lab](../labs/scoped-capability-and-host-owned-execution.md) |
 | 5 | [**Governed AI Tool Gateway**](../tutorials/governed-ai-tool-gateway.md) | Unknown or unauthorized AI tool proposal → no execution | [Lab](../labs/governed-ai-tool-gateway.md) |
 
@@ -105,6 +109,8 @@ Tutorials begin with the problem, show the common or naive implementation, expos
 The [`samples/`](../samples/index.md) area contains intentionally small .NET teaching implementations. They favor deterministic local behavior, explicit execution boundaries, focused domain examples, and simulated side effects where appropriate.
 
 They are teaching artifacts rather than production frameworks.
+
+Their local types are not package API signatures. Use the [AsiBackbone 6.0 API Boundary](asibackbone-6-api-boundary.md) when you need exact current namespaces, evaluator construction, endpoint markers, or migration guidance.
 
 ### Tests
 
@@ -139,7 +145,7 @@ Use the smallest architecture that preserves the boundaries you actually need. I
 
 ## Working Repository References
 
-ASI Backbone Learning is the educational layer of the organization. The working repositories provide fuller implementation examples:
+AsiBackbone Learning is the educational layer of the organization. The working repositories provide fuller implementation examples:
 
 - [`AsiBackbone/AsiBackbone`](https://github.com/AsiBackbone/AsiBackbone) — a .NET governance and policy-control framework covering policy evaluation, structured decisions, acknowledgment workflows, audit/provenance, capability-scoped authority, host-owned execution, and AI/application governance.
 - [`AsiBackbone/NetCoreApplicationTemplate`](https://github.com/AsiBackbone/NetCoreApplicationTemplate) — an enterprise-oriented ASP.NET Core reference implementation demonstrating middleware organization, structured logging, security defaults, error handling, rate limiting, authentication-ready architecture, data access, and Architecture Decision Records.
@@ -158,7 +164,7 @@ For a concrete comparison, see [**When ASP.NET Core Authorization Is Enough**](.
 
 ## Scope and Boundaries
 
-ASI Backbone Learning is an educational and architectural resource. It is **not** a compliance certification, legal standard, security guarantee, AI model, AGI/ASI implementation, robotics controller, or substitute for application-specific security review.
+AsiBackbone Learning is an educational and architectural resource. It is **not** a compliance certification, legal standard, security guarantee, AI model, AGI/ASI implementation, robotics controller, or substitute for application-specific security review.
 
 Production systems remain responsible for their own authentication, authorization, infrastructure, persistence, safety controls, regulatory requirements, threat modeling, and operational execution.
 

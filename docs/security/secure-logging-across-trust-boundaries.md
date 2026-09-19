@@ -8,7 +8,7 @@ description: Treat logging as an outbound trust boundary by minimizing data befo
 
 **Difficulty:** Intermediate
 
-**Prerequisites:** [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md) and [Structured Logging Without Sensitive-Data Sprawl](../aspnetcore/structured-logging-without-sensitive-data-sprawl.md). [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) is useful when comparing operational telemetry with governance evidence.
+**Prerequisites:** [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md) and [Structured Logging Without Sensitive-Data Sprawl](../aspnetcore/structured-logging-without-sensitive-data-sprawl.md). [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) is useful when comparing operational telemetry with governance evidence.
 
 **Learning objective:** Treat logging as a chain of trust-boundary decisions rather than only an `ILogger` or observability concern. Decide what may leave application memory, minimize and bound event data before emission, validate externally supplied identifiers, review provider/export/storage/access/retention assumptions, preserve tenant separation, define degraded behavior, and distinguish operational logs from evidence-oriented governance records.
 
@@ -1193,7 +1193,7 @@ A useful comparison is:
 | Schema | Diagnostic event schema | Purpose-built decision/lifecycle schema |
 | Sensitive-data rule | Minimize | Minimize; evidence is not a data-dumping exception |
 
-See [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) for the evidence-oriented lifecycle.
+See [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) for the evidence-oriented lifecycle.
 
 The two paths can share a correlation identifier:
 
@@ -1206,7 +1206,7 @@ ElapsedMilliseconds = 12
       ↓
 Troubleshooting
 
-Governance residue
+Decision receipt
 Outcome = denied
 ReasonCodes = [resource.protected]
 PolicyVersion = 4.1
@@ -1556,7 +1556,7 @@ The organization repositories provide fuller specimens where the same boundaries
 | Minimized structured request logging and correlation | [`RequestLoggingExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/RequestLoggingExtensions.cs) | Request/trace enrichment, excluded paths, status-based levels, and explicit warnings against unreviewed bodies, cookies, authorization headers, tokens, identity payloads, password/form fields, and query strings. |
 | Provider levels, local file behavior, and bounded retention | [`appsettings.json`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/appsettings.json) | Logging configuration, correlation/trace properties, file rolling, retention, size limits, and request-logging options. Treat concrete settings as one implementation choice rather than universal security defaults. |
 | Remote tracing/metrics export boundary | [`OpenTelemetryServiceExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/OpenTelemetryServiceExtensions.cs) | Separate instrumentation and optional OTLP export surfaces that make the remote telemetry boundary visible. |
-| Governance evidence versus ordinary telemetry | [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) | Distinct decision, acknowledgment, execution, persistence, and operational-logging responsibilities. |
+| Governance evidence versus ordinary telemetry | [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) | Distinct decision, acknowledgment, execution, persistence, and operational-logging responsibilities. |
 | Audit and telemetry metadata hygiene | [Safe Audit and Telemetry Data Guidance](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/safe-audit-telemetry-data.md) | Allowlisted metadata, bounded codes, prompt/body/secret avoidance, provider emission review, retention, access control, and host-owned data-safety responsibility. |
 | Tamper-evidence boundaries | [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md) | Why signing, verification, key custody, and tamper evidence establish narrower properties than confidentiality, authorization, or safe collection. |
 
@@ -1654,7 +1654,7 @@ Before moving on, you should be able to answer:
 - [Security](index.md) — return to the Security learning-area overview.
 - [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md) — apply the broader rule that a boundary should change what the system is willing to trust and pass onward.
 - [Structured Logging Without Sensitive-Data Sprawl](../aspnetcore/structured-logging-without-sensitive-data-sprawl.md) — study application-level event design, `ILogger`, stable event identity, correlation, scopes, exception boundaries, log levels, cardinality, and observability roles.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — compare ordinary operational telemetry with evidence-oriented governance records.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — compare ordinary operational telemetry with evidence-oriented governance records.
 - [Centralized Error Handling and Problem Details](../aspnetcore/centralized-error-handling-and-problem-details.md) — separate public error disclosure from internal diagnostics.
 - [Signing, Verification, Key Custody, and Tamper Evidence](signing-verification-key-custody-and-tamper-evidence.md) — distinguish cryptographic evidence properties from safe collection and confidentiality.
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — apply data and execution boundaries to AI-proposed operations.

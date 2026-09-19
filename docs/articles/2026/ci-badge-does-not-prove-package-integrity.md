@@ -13,7 +13,7 @@ feed: true
 
 **Difficulty:** Intermediate
 
-**Prerequisites:** Basic familiarity with .NET builds, NuGet packages, and CI terminology. No ASI Backbone knowledge is required.
+**Prerequisites:** Basic familiarity with .NET builds, NuGet packages, and CI terminology. No AsiBackbone knowledge is required.
 
 A repository looks healthy: build passing, tests passing, dependency updates automated, release published.
 

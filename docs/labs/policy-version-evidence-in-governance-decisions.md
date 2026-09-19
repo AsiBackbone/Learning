@@ -245,7 +245,7 @@ PolicyId = account-disable
 PolicyVersion = 2.0
 ```
 
-Also preserve the sample's correlation identifier so that later audit residue can connect the decision to the same governed workflow.
+Also preserve the sample's correlation identifier so that later decision receipt can connect the decision to the same governed workflow.
 
 At this point, the record should be able to answer:
 
@@ -469,14 +469,14 @@ This distinction matters when policy can change faster than the capability lifet
 
 ---
 
-## Part 6 — Correlate Policy Evidence with Audit Residue
+## Part 6 — Correlate Policy Evidence with Decision Receipt
 
 Create a small audit record for the changed-policy execution attempt.
 
 One possible shape is:
 
 ```csharp
-public sealed record PolicyEvidenceResidue(
+public sealed record PolicyEvidenceReceipt(
     string EventId,
     string CorrelationId,
     string DecisionId,
@@ -604,7 +604,7 @@ It is easy to react to audit requirements by copying everything into every decis
 
 Do not do that by default.
 
-Review your final `DecisionRecord` and `PolicyEvidenceResidue` models.
+Review your final `DecisionRecord` and `PolicyEvidenceReceipt` models.
 
 For each field, ask whether it is required for:
 
@@ -656,7 +656,7 @@ Run the modified sample and confirm all of the following:
 - Acknowledgment remains bound to the decision and policy evidence that produced the challenge.
 - Policy changes after acknowledgment do not turn acknowledgment into a policy override.
 - Capability authority remains connected to the decision evidence that justified issuance.
-- Audit residue can distinguish decision-time policy from current execution-time policy.
+- Decision receipt can distinguish decision-time policy from current execution-time policy.
 - A fingerprint, if added, is described as a digest of a chosen representation rather than as cryptographic proof of authorship or tamper evidence.
 - Decision records avoid unnecessary secrets and unrelated personal data.
 
@@ -781,8 +781,8 @@ Use `git status` first so you understand which local work will be affected.
 - [Policy Versioning and Decision Provenance tutorial](../governance/policy-versioning-and-decision-provenance.md) — review the conceptual model this lab puts into practice, including stable policy identity, drift, freshness, fingerprints, and evidence boundaries.
 - [Policy Context and Explicit Decision Outcomes tutorial](../tutorials/policy-context-and-explicit-decision-outcomes.md) — review explicit decision inputs, outputs, reason codes, and policy identity.
 - [Policy Context and Explicit Decision Outcomes sample](https://github.com/AsiBackbone/Learning/blob/main/samples/policy-context-and-explicit-decision-outcomes/README.md) — use the intentionally small executable baseline for this lab.
-- [Acknowledgment and Audit Residue tutorial](../tutorials/acknowledgment-and-audit-residue.md) — review acknowledgment binding, re-evaluation, correlation, and durable governance evidence.
-- [Acknowledgment and Audit Residue lab](acknowledgment-and-audit-residue.md) — compare the broader lifecycle exercise, including policy-identity drift after acknowledgment.
+- [Decision Receipts and Acknowledgment tutorial](../tutorials/decision-receipts-and-acknowledgment.md) — review acknowledgment binding, re-evaluation, correlation, and durable governance evidence.
+- [Decision Receipts and Acknowledgment lab](decision-receipts-and-acknowledgment.md) — compare the broader lifecycle exercise, including policy-identity drift after acknowledgment.
 - [Scoped Capability and Host-Owned Execution tutorial](../tutorials/scoped-capability-and-host-owned-execution.md) — continue into short-lived, narrowly bound execution authority and execution-boundary validation.
 - [Scoped Capability and Host-Owned Execution lab](scoped-capability-and-host-owned-execution.md) — practice stale authority, resource freshness, expiration, and replay boundaries.
 - [AsiBackbone/AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) — inspect the fuller governance implementation after working through the teaching model.

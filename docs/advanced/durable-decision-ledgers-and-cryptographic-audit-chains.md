@@ -1,10 +1,10 @@
 ---
-description: Learn how governance receipts form verifiable, append-oriented evidence chains through canonicalization, links, signatures, checkpoints, and key lifecycle.
+description: Learn how decision receipts form verifiable, append-oriented evidence chains through canonicalization, links, signatures, checkpoints, and key lifecycle.
 ---
 
 # Durable Decision Ledgers and Cryptographic Audit Chains
 
-**Learning objective:** Understand how governance receipts can be preserved as a durable, append-oriented evidence chain whose integrity claims remain explicit across canonicalization, ordering, hash linkage, optional signatures, checkpoints, key rotation, retention, archival, migration, restore, and corruption handling.
+**Learning objective:** Understand how decision receipts can be preserved as a durable, append-oriented evidence chain whose integrity claims remain explicit across canonicalization, ordering, hash linkage, optional signatures, checkpoints, key rotation, retention, archival, migration, restore, and corruption handling.
 
 **Pattern classification:** General learning material
 
@@ -30,7 +30,7 @@ The central lesson is:
 
 This treatment assumes:
 
-- A governance workflow already produces purpose-built receipts or residue for consequential decision events.
+- A governance workflow already produces purpose-built receipts for consequential decision events.
 - The host can identify which evidence must survive process restarts and operational-log retention.
 - A ledger can define a stable ordering within an explicit ledger or partition identity.
 - Cryptographic algorithms and key providers are selected through an application-specific security process rather than invented inside the ledger code.
@@ -38,7 +38,7 @@ This treatment assumes:
 
 This treatment does **not** assume:
 
-- A governance receipt is an event-sourced domain event.
+- A decision receipt is an event-sourced domain event.
 - A durable store is append-only merely because application code exposes only `Append`.
 - A hash proves who created a record.
 - A signature proves that a decision was correct or remains authorized.
@@ -71,7 +71,7 @@ Remove one of those assumptions and the claim may narrow.
 
 The teaching threat model considers accidental corruption, privileged local modification/deletion, insertion/reordering, tail truncation/rollback, whole-chain replacement, split-view/equivocation, signing-key lifecycle problems, and migration/restore mistakes. It assumes standard cryptographic primitives are implemented by established libraries/providers rather than broken by the ledger itself.
 
-It does **not** attempt to solve Byzantine consensus among mutually distrustful writers, prove the truthfulness of data before it enters the ledger, protect an already-compromised endpoint that fabricates governance receipts before canonicalization, or define a universal legal evidentiary standard. Those require different system boundaries.
+It does **not** attempt to solve Byzantine consensus among mutually distrustful writers, prove the truthfulness of data before it enters the ledger, protect an already-compromised endpoint that fabricates decision receipts before canonicalization, or define a universal legal evidentiary standard. Those require different system boundaries.
 
 ---
 
@@ -80,7 +80,7 @@ It does **not** attempt to solve Byzantine consensus among mutually distrustful 
 A simple append lifecycle is:
 
 ```text
-Governance receipt N
+Decision receipt N
       ↓
 Canonical representation
       ↓
@@ -147,7 +147,7 @@ A system can contain several historical artifacts at the same time.
 | Artifact | Primary job | What it is not automatically |
 | --- | --- | --- |
 | Operational log | Troubleshooting, observability, diagnostics | Durable governance evidence |
-| Governance receipt | Explain one decision or lifecycle transition | Ordered ledger |
+| Decision receipt | Explain one decision or lifecycle transition | Ordered ledger |
 | Decision ledger | Preserve ordered governance evidence across time | Domain-state source |
 | Event-sourced domain event | Reconstruct accepted domain state | Complete governance decision record |
 | Execution authority | Permit a narrowly bound side effect when currently valid | Historical evidence |
@@ -157,7 +157,7 @@ The boundaries remain useful even if several artifacts share one physical databa
 ```text
 Operational log
         !=
-Governance receipt
+Decision receipt
         !=
 Decision ledger
         !=
@@ -166,9 +166,9 @@ Event-sourced domain state
 Execution authority
 ```
 
-### Governance receipt versus operational log
+### Decision receipt versus operational log
 
-A governance receipt may need to answer which intent was evaluated, which policy version participated, which outcome/reason codes resulted, whether acknowledgment was required, and which execution state followed.
+A decision receipt may need to answer which intent was evaluated, which policy version participated, which outcome/reason codes resulted, whether acknowledgment was required, and which execution state followed.
 
 An operational log may instead answer which dependency timed out, how long the request took, and which exception path executed.
 
@@ -267,7 +267,7 @@ A canonicalization contract should define at least:
 A safer lifecycle is:
 
 ```text
-Typed governance receipt
+Typed decision receipt
         ↓
 Versioned canonical representation
         ↓
@@ -1436,7 +1436,7 @@ If they are implicit, "immutable audit ledger" is probably stronger language tha
 - [Advanced](index.md) — return to the Advanced learning-area overview.
 - [Event Sourcing, Audit Trails, and Governance Decision Provenance](../architecture/event-sourcing-audit-trails-and-governance-decision-provenance.md) — distinguish domain state, operational logs, audit records, and governance provenance before adding a chain.
 - [Signing, Verification, Key Custody, and Tamper Evidence](../security/signing-verification-key-custody-and-tamper-evidence.md) — study the cryptographic primitives and wording boundaries that this lifecycle composes.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — identify the decision, acknowledgment, and execution residue that may require durable preservation.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — identify the decision receipt and correlated acknowledgment or execution evidence that may require durable preservation.
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) — preserve the policy identity needed to interpret historical decisions.
 - [Secure Logging Across Trust Boundaries](../security/secure-logging-across-trust-boundaries.md) — keep operational telemetry, governance evidence, data minimization, retention, and evidence-failure semantics distinct.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — preserve the boundary between historical evidence and current execution authority.

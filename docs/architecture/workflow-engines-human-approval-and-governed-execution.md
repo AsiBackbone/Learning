@@ -13,7 +13,7 @@ feed: true
 
 **Difficulty:** Intermediate
 
-**Prerequisites:** Recommended — [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md). [Human-in-the-Loop Governance Workflows](../governance/human-in-the-loop-governance-workflows.md) is useful follow-on reading for a deeper review lifecycle.
+**Prerequisites:** Recommended — [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md). [Human-in-the-Loop Governance Workflows](../governance/human-in-the-loop-governance-workflows.md) is useful follow-on reading for a deeper review lifecycle.
 
 > **Terminology note:** This comparison uses `workflow engine`, `human approval`, `governance decision`, `scoped authority`, and `host-owned execution` as architectural terms. Products differ widely. A workflow product may include authorization, rules, approvals, policy evaluation, audit history, or task assignment. The comparison is about responsibilities and trust boundaries rather than product categories or vendor features.
 
@@ -976,7 +976,7 @@ A workflow engine can persist an acknowledgment task without making acknowledgme
 Show warning -> wait for actor acknowledgment -> continue
 ```
 
-The record should remain bound to the actor, exact condition, relevant intent, and applicable decision context. Afterward, the host may still need current policy evaluation or narrow continuation authority. See [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md).
+The record should remain bound to the actor, exact condition, relevant intent, and applicable decision context. Afterward, the host may still need current policy evaluation or narrow continuation authority. See [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md).
 
 ---
 
@@ -1179,7 +1179,7 @@ Do not add a layer merely because the diagram looks more sophisticated with it.
 ## Related Learning Material
 
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md)
 - [Human-in-the-Loop Governance Workflows](../governance/human-in-the-loop-governance-workflows.md)

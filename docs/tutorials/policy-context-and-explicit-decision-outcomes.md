@@ -26,7 +26,7 @@ description: Learn to make governance inputs explicit with policy-context snapsh
 >
 > **Observe:** Policy evaluation consumes an explicit context snapshot and returns a structured outcome without performing the governed side effect.
 
-This is the second foundational tutorial in ASI Backbone Learning.
+This is the second foundational tutorial in AsiBackbone Learning.
 
 It builds on [Decision Before Execution](decision-before-execution.md), which established the first boundary:
 
@@ -841,7 +841,7 @@ Policy identity
 Decision evidence
 ```
 
-Later tutorials will expand this into acknowledgment and audit residue.
+Later tutorials will expand this into acknowledgment and decision receipt.
 
 ## Keep Sensitive Data Out of Reason Messages
 
@@ -1036,7 +1036,7 @@ Context must be available before governed execution.
 
 Not every context field belongs in durable audit storage.
 
-Decision context and audit residue are related but different concepts.
+Decision context and decision receipt are related but different concepts.
 
 The next tutorial will examine that boundary more closely.
 
@@ -1076,13 +1076,13 @@ The Learning example intentionally compresses the architecture so the policy bou
 
 | Tutorial concept | Working implementation | What to inspect |
 | --- | --- | --- |
-| Framework-neutral policy context contract | [`IAsiBackboneConstraintEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/IAsiBackboneConstraintEvaluationContext.cs) | The minimum context surface shared by evaluators and constraints. |
-| Concrete context snapshot | [`AsiBackboneConstraintEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/AsiBackboneConstraintEvaluationContext.cs) | Correlation ID, policy version/hash, and normalized host-provided metadata. |
+| Framework-neutral policy context contract | [`IGovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/IGovernanceEvaluationContext.cs) | The minimum context surface shared by evaluators and constraints. |
+| Concrete context snapshot | [`GovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/GovernanceEvaluationContext.cs) | Correlation ID, policy version/hash, and normalized host-provided metadata. |
 | Explicit outcome vocabulary | [`GovernanceDecisionOutcome`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs) | The framework's allowed, warning, denied, deferred, acknowledgment-required, and escalation-recommended states. |
 | Structured decision result | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | Outcome, stable reason codes, correlation and trace identifiers, policy identity, and `CanProceed`. |
-| Constraint composition | [`DefaultAsiBackbonePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultAsiBackbonePolicyEvaluator.cs) | How constraint results are accumulated and composed into a governance decision. |
-| Domain- or host-specific final decision rules | [`IAsiBackboneDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IAsiBackboneDecisionPolicy.cs) | The post-composition boundary that can introduce deferred, acknowledgment-required, or escalation-recommended outcomes. |
-| Transport mapping | [`AsiBackboneHttpResultMappingExtensions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Results/AsiBackboneHttpResultMappingExtensions.cs) | How a governance decision is translated into HTTP without moving transport concerns into the Core decision model. |
+| Constraint composition | [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) | How constraint results are accumulated and composed into a governance decision. |
+| Domain- or host-specific final decision rules | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | The post-composition boundary that can introduce deferred, acknowledgment-required, or escalation-recommended outcomes. |
+| Transport mapping | [`GovernanceHttpResultMappingExtensions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Results/GovernanceHttpResultMappingExtensions.cs) | How a governance decision is translated into HTTP without moving transport concerns into the Core decision model. |
 | End-to-end policy behavior | [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) | Executable examples of evaluator behavior and decision composition. |
 
 The framework currently distinguishes these outcomes:
@@ -1102,12 +1102,12 @@ The Learning example uses the same vocabulary so the conceptual model maps clean
 
 For a code-first inspection, follow these references in order:
 
-1. [`IAsiBackboneConstraintEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/IAsiBackboneConstraintEvaluationContext.cs) — begin with the context contract.
-2. [`AsiBackboneConstraintEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/AsiBackboneConstraintEvaluationContext.cs) — inspect the default concrete context snapshot.
-3. [`DefaultAsiBackbonePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultAsiBackbonePolicyEvaluator.cs) — follow constraint evaluation and composition.
-4. [`IAsiBackboneDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IAsiBackboneDecisionPolicy.cs) — see where broader host or domain policy can refine the composed result.
+1. [`IGovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/IGovernanceEvaluationContext.cs) — begin with the context contract.
+2. [`GovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/GovernanceEvaluationContext.cs) — inspect the default concrete context snapshot.
+3. [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) — follow constraint evaluation and composition.
+4. [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) — see where broader host or domain policy can refine the composed result.
 5. [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — inspect the final structured decision contract.
-6. [`AsiBackboneHttpResultMappingExtensions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Results/AsiBackboneHttpResultMappingExtensions.cs) — observe transport mapping after the governance decision exists.
+6. [`GovernanceHttpResultMappingExtensions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Results/GovernanceHttpResultMappingExtensions.cs) — observe transport mapping after the governance decision exists.
 
 For architectural explanation rather than source code, see:
 
@@ -1225,7 +1225,7 @@ Before moving on, you should be able to:
 
 ## Next
 
-The next foundational topic is **Acknowledgment and Audit Residue**.
+The next foundational topic is **Decision Receipts and Acknowledgment**.
 
 That tutorial expands the lifecycle after a decision:
 
@@ -1236,7 +1236,7 @@ Acknowledgment when required
    ↓
 Host action
    ↓
-Audit residue
+Decision receipt
 ```
 
 It will examine how a consequential operation can pause for explicit acknowledgment and how structured evidence can preserve what happened without confusing governance evidence with ordinary application logging.
@@ -1249,7 +1249,7 @@ It will examine how a consequential operation can pause for explicit acknowledgm
 - [Risk-Based Decisions in Governed Systems](../governance/risk-based-decisions-in-governed-systems.md) — extend explicit context and structured outcomes with reviewable risk factors, versioned risk-to-outcome mapping, freshness, provenance, and threshold tests.
 - [Escalation Patterns in Governed Systems](../governance/escalation-patterns-in-governed-systems.md) — continue from the `EscalationRecommended` outcome into routing, additional evidence, current-context re-evaluation, and a new decision.
 - [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md) — compare this richer decision model with built-in ASP.NET Core policies, requirements, handlers, and resource-based authorization, including cases where the simpler authorization model is the better choice.
-- [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) — continue from explicit decision outcomes into acknowledgment, re-evaluation, correlation, and governance evidence.
+- [Decision Receipts and Acknowledgment](decision-receipts-and-acknowledgment.md) — continue from explicit decision outcomes into acknowledgment, re-evaluation, correlation, and governance evidence.
 - [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) — follow allowed or acknowledged decisions into narrowly scoped execution authority.
 - [Governed AI Tool Gateway](governed-ai-tool-gateway.md) — see authoritative host context and explicit decision outcomes applied to AI-proposed tool actions.
 - [Threat Modeling as Architecture Reasoning](../security/threat-modeling-as-architecture-reasoning.md) — use source-of-authority questions to identify caller-controlled context, trust changes, bypass paths, and unprotected assumptions.

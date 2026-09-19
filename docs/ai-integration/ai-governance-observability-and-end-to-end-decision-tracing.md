@@ -10,13 +10,13 @@ description: Trace AI proposals through validation, governance, acknowledgment, 
 
 **Difficulty:** Advanced
 
-**Prerequisites:** [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md), [Typed AI Proposed Intent and Schema-Validation Boundaries](typed-ai-proposed-intent-and-schema-validation-boundaries.md), [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md), [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md), and familiarity with [Structured Logging Without Sensitive-Data Sprawl](../aspnetcore/structured-logging-without-sensitive-data-sprawl.md).
+**Prerequisites:** [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md), [Typed AI Proposed Intent and Schema-Validation Boundaries](typed-ai-proposed-intent-and-schema-validation-boundaries.md), [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md), [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md), and familiarity with [Structured Logging Without Sensitive-Data Sprawl](../aspnetcore/structured-logging-without-sensitive-data-sprawl.md).
 
 ## Pattern Card
 
 > **Problem:** A governed AI system may preserve the execution boundary correctly while still be difficult to diagnose. After a model proposes an operation, developers and operators need to reconstruct what happened without treating telemetry as permission.
 >
-> **Pattern:** Carry stable proposal and correlation identifiers through host-owned validation, context construction, governance, acknowledgment, scoped authority, execution, and evidence. Use trace/span relationships, structured events, stable reason codes, and separate audit residue to make the path inspectable.
+> **Pattern:** Carry stable proposal and correlation identifiers through host-owned validation, context construction, governance, acknowledgment, scoped authority, execution, and evidence. Use trace/span relationships, structured events, stable reason codes, and separate decision receipt to make the path inspectable.
 >
 > **Use when:** AI-proposed tool execution, agent workflows, human acknowledgment, or scoped-capability execution need enough evidence to reconstruct decisions and verify important architectural invariants.
 >
@@ -53,7 +53,7 @@ Execution-boundary validation
     ↓
 Host-owned executor
     ↓
-Audit residue
+Decision receipt
 ```
 
 Observability adds a parallel evidence path:
@@ -63,7 +63,7 @@ Governed workflow
       │
       ├── trace/span relationships
       ├── structured operational events
-      └── audit residue / receipt
+      └── decision receipt
 ```
 
 The evidence path should let a learner inspect a statement such as:
@@ -99,7 +99,7 @@ A production trace often contains several identifiers. They are related, but the
 | **Reason code** | Stable machine-readable explanation for a governance outcome. | Decision evidence lifecycle. |
 | **Acknowledgment identity** | Binds a response to a particular acknowledgment requirement. | Acknowledgment lifecycle. |
 | **Capability ID** | Identifies narrow follow-on execution authority. | Capability lifetime. |
-| **Audit receipt / residue ID** | Identifies retained governance evidence. | Evidence-retention period. |
+| **Decision receipt ID** | Identifies the retained policy-decision record. | Evidence-retention period. |
 
 A useful mental model is:
 
@@ -134,7 +134,7 @@ ai.governance.workflow
 │   ├── event: capability-consumption
 │   ├── executor.invoke
 │   └── event: execution
-└── correlated audit residue
+└── correlated decision receipt
 ```
 
 For an acknowledgment-required path, the same logical workflow may contain two gateway passes:
@@ -614,7 +614,7 @@ The observability tests verify the architectural outcomes rather than a particul
 
 ### 1. One Identifier for Everything
 
-The proposal ID, workflow correlation ID, trace ID, and audit receipt are treated as interchangeable.
+The proposal ID, workflow correlation ID, trace ID, and decision receipt are treated as interchangeable.
 
 That becomes fragile when retries, asynchronous work, or delayed acknowledgment appear.
 
@@ -695,7 +695,7 @@ After completing this tutorial and running the sample, you should be able to:
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — the foundational end-to-end host-owned execution path.
 - [Typed AI Proposed Intent and Schema-Validation Boundaries](typed-ai-proposed-intent-and-schema-validation-boundaries.md) — the model-output acceptance boundary.
 - [Governed Multi-Tool Workflows and Recovery Boundaries](governed-multi-tool-workflows-and-recovery-boundaries.md) — extends the tracing problem into multiple governed steps, partial failure, replanning, and recovery.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — deeper treatment of responsibility and evidence stages.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — deeper treatment of responsibility and evidence stages.
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) — policy identity, drift, provenance, and freshness.
 - [Structured Logging Without Sensitive-Data Sprawl](../aspnetcore/structured-logging-without-sensitive-data-sprawl.md) — operational event design and data minimization.
 - [Secure Logging Across Trust Boundaries](../security/secure-logging-across-trust-boundaries.md) — provider, collector, storage, access, retention, and tenant boundaries.

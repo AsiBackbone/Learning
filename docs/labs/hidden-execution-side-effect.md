@@ -507,7 +507,7 @@ Performs consequential operation
 
 Operational logging and metrics are also technically side effects, but they are not the same thing as executing the governed business operation. They should still be designed deliberately, especially when they can leak sensitive data or trigger downstream automation.
 
-Audit residue is another distinct concern. Recording that a decision occurred should not silently become the requested external operation itself.
+Decision receipt is another distinct concern. Recording that a decision occurred should not silently become the requested external operation itself.
 
 The invariant in this beginner lab is intentionally narrower and easier to observe:
 

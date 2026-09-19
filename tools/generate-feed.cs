@@ -190,7 +190,7 @@ static class FeedGenerator
                     StringComparison.Ordinal) ||
                 !string.Equals(
                     channelImage.SelectSingleNode("title")?.InnerText,
-                    "ASI Backbone Learning",
+                    "AsiBackbone Learning",
                     StringComparison.Ordinal) ||
                 !string.Equals(
                     channelImage.SelectSingleNode("link")?.InnerText,
@@ -536,11 +536,11 @@ static class FeedGenerator
 
         writer.WriteStartElement("channel");
 
-        writer.WriteElementString("title", "ASI Backbone Learning");
+        writer.WriteElementString("title", "AsiBackbone Learning");
         writer.WriteElementString("link", SiteRoot.AbsoluteUri);
         writer.WriteElementString(
             "description",
-            "Long-form technical articles from Accountable Systems Infrastructure (ASI) Backbone Learning on " +
+            "Long-form technical articles from AsiBackbone Learning on " +
             "governed .NET decision flow and execution, secure application architecture, AI integration, and policy-" +
             "driven systems.");
         writer.WriteElementString("language", "en-us");
@@ -550,7 +550,7 @@ static class FeedGenerator
 
         writer.WriteStartElement("image");
         writer.WriteElementString("url", FeedImageUri.AbsoluteUri);
-        writer.WriteElementString("title", "ASI Backbone Learning");
+        writer.WriteElementString("title", "AsiBackbone Learning");
         writer.WriteElementString("link", SiteRoot.AbsoluteUri);
         writer.WriteElementString("width", "144");
         writer.WriteElementString("height", "144");

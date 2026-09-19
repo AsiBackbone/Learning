@@ -41,7 +41,7 @@ Intermediate
 - .NET 10 SDK
 - [Decision Before Execution](../../docs/tutorials/decision-before-execution.md)
 - [Policy Context and Explicit Decision Outcomes](../../docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
-- [Acknowledgment and Audit Residue](../../docs/tutorials/acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment](../../docs/tutorials/decision-receipts-and-acknowledgment.md)
 
 ## Run the Sample
 
@@ -234,13 +234,13 @@ Useful experiments include:
 4. Change the audience to another gateway and decide whether cross-gateway reuse should be allowed.
 5. Add `NotBeforeUtc` and test the exact lower time boundary.
 6. Add a single-use store and demonstrate first-use success followed by replay rejection.
-7. Record capability issuance and validation as distinct audit-residue events.
+7. Record capability issuance and validation as distinct decision-receipt events.
 
 ## Related Material
 
 - [Scoped Capability and Host-Owned Execution tutorial](../../docs/tutorials/scoped-capability-and-host-owned-execution.md)
 - [Scoped Capability and Host-Owned Execution intermediate lab](../../docs/labs/scoped-capability-and-host-owned-execution.md)
-- [Acknowledgment and Audit Residue sample](../acknowledgment-and-audit-residue/README.md)
+- [Decision Receipts and Acknowledgment sample](../decision-receipts-and-acknowledgment/README.md)
 - [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) - compare the teaching capability with the working framework's provider-neutral grant metadata.
 - [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) - inspect fuller execution-context validation.
 - [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) - review the working seam for bounded-use and replay-state enforcement.

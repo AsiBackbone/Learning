@@ -19,7 +19,7 @@ feed: true
 
 > **Industry anchors:** .NET teams often encounter MediatR, Wolverine, message buses, mediator pipelines, and separate read/write models while implementing command/query separation. These are orientation points for searchability, not definitions of CQRS and not evidence that a governance boundary exists. A request/handler library can support CQRS-style organization without providing authorization, policy provenance, approval, or scoped continuation authority by itself.
 
-> **Standalone-reader note:** In this article, **Learning** means the ASI Backbone Learning repository and tutorial series. Its governed-execution model separates proposed intent, authoritative context, policy decision, optional acknowledgment or escalation, scoped authority when needed, host-owned execution, and audit residue. Those responsibilities may live in one application or be split across components.
+> **Standalone-reader note:** In this article, **Learning** means the AsiBackbone Learning repository and tutorial series. Its governed-execution model separates proposed intent, authoritative context, policy decision, optional acknowledgment or escalation, scoped authority when needed, host-owned execution, and decision receipt. Those responsibilities may live in one application or be split across components.
 
 ## Executive Summary
 

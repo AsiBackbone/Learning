@@ -94,7 +94,7 @@ Escalation can route to a human reviewer, a specialized policy service, or an ex
 
 Use the canonical material for the downstream boundary that actually applies:
 
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) for acknowledgment semantics.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) for acknowledgment semantics.
 - [Human-in-the-Loop Governance Workflows](human-in-the-loop-governance-workflows.md) for reviewer approval, rejection, and bounded override behavior.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) for execution authority and host-owned side effects.
 
@@ -1474,7 +1474,7 @@ That timeline is more informative than one mutable row called `approval_status`.
 
 ---
 
-## Audit Residue
+## Decision Receipt
 
 Useful lifecycle events can include:
 
@@ -2033,9 +2033,9 @@ The `AsiBackbone/AsiBackbone` repository already exposes the structured outcome 
 | --- | --- | --- |
 | Escalation outcome vocabulary | [`GovernanceDecisionOutcome`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs) | The framework outcome that includes `EscalationRecommended`. |
 | Structured decision | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | Outcome, reason codes, correlation/trace identifiers, and policy identity that a host can preserve before routing. |
-| Post-composition decision policy | [`IAsiBackboneDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IAsiBackboneDecisionPolicy.cs) | The host/domain boundary where broader policy can refine a composed result. |
+| Post-composition decision policy | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | The host/domain boundary where broader policy can refine a composed result. |
 | Escalation example | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/custom-decision-policy-examples.md) | A gateway-readiness example that can return escalation without performing the protected action. |
-| Audit evidence | [`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs) | Structured evidence that can preserve decision outcome, reasons, policy identity, and correlation. |
+| Audit evidence | [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) | Structured evidence that can preserve decision outcome, reasons, policy identity, and correlation. |
 | Host execution boundary | [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/host-owned-execution-enforcement.md) | Why a governance result still requires explicit host enforcement before side effects. |
 | High-consequence scenario | [High-Risk Administrative Action Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/high-risk-administrative-action.md) | A scenario where escalation-recommended outcomes remain non-executable and host-controlled. |
 
@@ -2112,7 +2112,7 @@ If several answers are unclear, the system may have an escalation label, but it 
 - [Risk-Based Decisions in Governed Systems](risk-based-decisions-in-governed-systems.md) — map high consequence or uncertainty into escalation without turning risk itself into authority.
 - [Policy Versioning and Decision Provenance](policy-versioning-and-decision-provenance.md) — preserve initial and later policy identities across a multi-stage decision path.
 - [Practical Policy Testing and Decision-Table Strategies](practical-policy-testing-and-decision-table-strategies.md) — make routing, timeout, depth, degraded behavior, and execution invariants regression-testable.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — distinguish escalation from acknowledgment and preserve correlated lifecycle evidence.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — distinguish escalation from acknowledgment and preserve correlated lifecycle evidence.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — keep later executable authority narrow even after an escalation resolves favorably.
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — apply escalation to AI-proposed actions without giving the model routing or execution authority.
 - [Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md) — align escalation routing with regional, tenant, and policy-authority boundaries.

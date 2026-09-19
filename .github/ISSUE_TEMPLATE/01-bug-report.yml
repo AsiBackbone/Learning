@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for helping improve ASI Backbone Learning.
+        Thank you for helping improve AsiBackbone Learning.
 
         Use this form for concrete defects in documentation, tutorials, samples,
         labs, DocFX output, workflows, links, or repository configuration.

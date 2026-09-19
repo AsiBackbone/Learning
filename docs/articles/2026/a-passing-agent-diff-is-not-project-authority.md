@@ -30,7 +30,7 @@ That distinction matters because a fluent patch can make several different claim
 
 Each claim needs different evidence, and the last two may require decisions or observations that do not exist in a pull-request environment.
 
-This article examines one bounded episode in the [Learning repository](https://github.com/AsiBackbone/Learning), the education and documentation repository for **Accountable Systems Infrastructure (ASI) Backbone**. It describes one maintainer, one repository, and two pull requests in September 2026. It does not claim that every AsiBackbone repository or every AI-assisted project follows the same process.
+This article examines one bounded episode in the [Learning repository](https://github.com/AsiBackbone/Learning), the education and documentation repository for **AsiBackbone**. It describes one maintainer, one repository, and two pull requests in September 2026. It does not claim that every AsiBackbone repository or every AI-assisted project follows the same process.
 
 The episode has a recursive quality. AsiBackbone teaches that a proposed operation should not become an executed operation merely because the proposal is well formed. The development process benefited from the same separation of concerns. That is an explanatory analogy, not a claim that GitHub workflows formally implement or validate the AsiBackbone architecture.
 

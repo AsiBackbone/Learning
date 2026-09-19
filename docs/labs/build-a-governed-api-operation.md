@@ -10,7 +10,7 @@ description: Extend an ASP.NET Core API into governed execution with explicit in
 
 **Pattern classification:** Canonical Pattern
 
-**Prerequisites:** Complete [Decision Before Execution](../tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md), and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md). Read [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md) before starting so that the authorization/governance boundary is explicit.
+**Prerequisites:** Complete [Decision Before Execution](../tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md), and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md). Read [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md) before starting so that the authorization/governance boundary is explicit.
 
 This lab bridges the foundational governance sequence into an ASP.NET Core API operation.
 
@@ -51,7 +51,7 @@ Scoped authority
    ↓
 Host-owned execution
    ↓
-Audit residue
+Decision receipt
 ```
 
 The primary invariant for the lab is:
@@ -247,7 +247,7 @@ GovernedApiLab/
 │   ├── DisableAccountPolicy.cs
 │   ├── AcknowledgmentChallenge.cs
 │   ├── ExecutionCapability.cs
-│   └── GovernanceResidue.cs
+│   └── DecisionReceipt.cs
 ├── Accounts/
 │   ├── Account.cs
 │   ├── IAccountRepository.cs
@@ -665,6 +665,7 @@ A generic boolean does not say what was acknowledged or what operation it belong
 Create a small challenge model:
 
 ```csharp
+// Illustrative lab model; not an AsiBackbone package API.
 public sealed record AcknowledgmentChallenge(
     string ChallengeId,
     string ActorId,
@@ -943,7 +944,7 @@ The acknowledgment is not the account service.
 
 ## Part 11 — Record Decision and Execution as Different Evidence
 
-Create a small residue model or recording sink for the exercise.
+Create a small receipt model or recording sink for the exercise.
 
 You need to distinguish at least:
 
@@ -959,7 +960,7 @@ execution-blocked
 A small event shape might include:
 
 ```csharp
-public sealed record GovernanceResidue(
+public sealed record DecisionReceipt(
     string EventId,
     string CorrelationId,
     string ActorId,
@@ -1006,9 +1007,9 @@ Add a test in which the recording account service throws after incrementing its 
 The test should confirm:
 
 ```text
-Decision residue outcome = Allowed
+Decision receipt outcome = Allowed
 Account service calls = 1
-Execution residue outcome = Failed
+Execution receipt outcome = Failed
 ```
 
 If your application has centralized exception handling, the HTTP result may become a safe `500` Problem Details response.
@@ -1160,7 +1161,7 @@ Governance decision
           ↓
      Host-owned account service
           ↓
-     Execution residue
+     Execution receipt
 ```
 
 Answer these questions:
@@ -1256,12 +1257,12 @@ A useful architecture makes the intermediate boundaries observable and testable 
 
 - [Decision Before Execution](../tutorials/decision-before-execution.md) — revisit the boundary between proposed intent, governance decision, and side effect.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — review authoritative decision-time facts, explicit outcomes, and reason codes.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — review bound acknowledgment, re-evaluation, correlation, and separate decision/execution evidence.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — review bound acknowledgment, re-evaluation, correlation, and separate decision/execution evidence.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — review narrow authority and execution-boundary validation.
 - [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md) — compare the governed flow with the simpler authorization-only architecture and the hybrid pattern.
 - [Centralized Error Handling and Problem Details](../aspnetcore/centralized-error-handling-and-problem-details.md) — optionally reuse the repository's safe host-side response convention for expected governance mapping and unexpected failures.
 - [ASP.NET Core learning area](../aspnetcore/index.md) — connect the exercise to middleware, configuration, logging, and error-handling architecture.
-- [AsiBackbone/AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) — inspect fuller governance decision, audit-residue, capability, and host-integration concepts after completing the teaching exercise.
+- [AsiBackbone/AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) — inspect fuller governance decision, decision-receipt, capability, and host-integration concepts after completing the teaching exercise.
 - [AsiBackbone/NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) — compare the disposable lab with a broader ASP.NET Core reference architecture.
 
 ---

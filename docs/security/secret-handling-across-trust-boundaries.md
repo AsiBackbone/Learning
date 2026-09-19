@@ -1985,7 +1985,7 @@ For each credential or secret, answer:
 12. **Can a short-lived token replace a long-lived distributed secret?**
 13. **Can workload identity remove the need to distribute the secret at all?**
 14. **Can command-line, URL, environment, debugging, or process inspection reveal it?**
-15. **Can it enter logs, traces, metrics, exceptions, audit residue, or public errors?**
+15. **Can it enter logs, traces, metrics, exceptions, decision receipt, or public errors?**
 16. **Can it enter an AI prompt, conversation, tool argument, evaluation set, or provider trace?**
 17. **Which CI jobs can access it?**
 18. **Does a validation job receive publication or deployment authority unnecessarily?**

@@ -158,11 +158,11 @@ Useful experiments include:
 - [Policy Context and Explicit Decision Outcomes tutorial](../../docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
 - [Policy Context and Explicit Decision Outcomes learner exercise](../../docs/labs/policy-context-and-explicit-decision-outcomes.md)
 - [Decision Before Execution sample](../decision-before-execution/README.md)
-- [Acknowledgment and Audit Residue](../../docs/tutorials/acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment](../../docs/tutorials/decision-receipts-and-acknowledgment.md)
 - [`GovernanceDecisionOutcome`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs) - compare the teaching outcome vocabulary with the working framework.
 - [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) - inspect the fuller decision model, reason metadata, correlation, and policy identity.
-- [`IAsiBackboneConstraintEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/IAsiBackboneConstraintEvaluationContext.cs) - compare the sample snapshot with the framework's constraint-evaluation context surface.
-- [`DefaultAsiBackbonePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultAsiBackbonePolicyEvaluator.cs) - inspect fuller constraint composition and decision evaluation.
+- [`IGovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/IGovernanceEvaluationContext.cs) - compare the sample snapshot with the framework's constraint-evaluation context surface.
+- [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) - inspect fuller constraint composition and decision evaluation.
 
 ## License
 

@@ -59,26 +59,26 @@ public static class GovernanceObservabilityInstrumentation
         return activity;
     }
 
-    public static void RecordAuditEvent(AuditResidue residue)
+    public static void RecordAuditEvent(DecisionReceipt receipt)
     {
         var tags = new ActivityTagsCollection
         {
-            { CorrelationIdTagName, residue.CorrelationId },
-            { "governance.stage", residue.Stage },
-            { "governance.outcome", residue.Outcome },
-            { "governance.reason_code", residue.ReasonCode }
+            { CorrelationIdTagName, receipt.CorrelationId },
+            { "governance.stage", receipt.Stage },
+            { "governance.outcome", receipt.Outcome },
+            { "governance.reason_code", receipt.ReasonCode }
         };
 
-        if (!string.IsNullOrWhiteSpace(residue.PolicyVersion))
+        if (!string.IsNullOrWhiteSpace(receipt.PolicyVersion))
         {
             tags.Add(
                 "governance.policy.version",
-                residue.PolicyVersion);
+                receipt.PolicyVersion);
         }
 
         Activity.Current?.AddEvent(
             new ActivityEvent(
-                $"governance.{residue.Stage}",
+                $"governance.{receipt.Stage}",
                 tags: tags));
     }
 }
@@ -233,7 +233,7 @@ public sealed record GovernanceObservabilityRun(
     GatewayResult Result,
     int ExecutorInvocationCount,
     IReadOnlyList<GovernanceObservedActivity> Activities,
-    IReadOnlyList<AuditResidue> AuditEntries);
+    IReadOnlyList<DecisionReceipt> AuditEntries);
 
 public static class GovernanceObservabilityRunner
 {
@@ -319,7 +319,7 @@ public static class GovernanceObservabilityRunner
                 host.Handler.InvocationCount);
         }
 
-        AuditResidue[] auditEntries = [.. host.AuditSink.Entries
+        DecisionReceipt[] auditEntries = [.. host.AuditSink.Entries
             .Where(entry => string.Equals(
                 entry.CorrelationId,
                 correlationId,
@@ -431,12 +431,12 @@ public static class GovernanceObservabilityDemo
 
         Console.WriteLine("Audit evidence:");
 
-        foreach (AuditResidue residue in run.AuditEntries)
+        foreach (DecisionReceipt receipt in run.AuditEntries)
         {
             Console.WriteLine(
-                $"- {residue.Stage}: {residue.Outcome} " +
-                $"({residue.ReasonCode}) " +
-                $"policy={residue.PolicyVersion ?? "-"}");
+                $"- {receipt.Stage}: {receipt.Outcome} " +
+                $"({receipt.ReasonCode}) " +
+                $"policy={receipt.PolicyVersion ?? "-"}");
         }
 
         Console.WriteLine();

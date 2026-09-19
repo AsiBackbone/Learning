@@ -87,7 +87,7 @@ Use the diagrams as orientation, then follow the corresponding lessons for reaso
 - [Getting Started](../getting-started/index.md)
 - [Decision Before Execution](../tutorials/decision-before-execution.md)
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md)
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md)
 - [Trust Boundaries and Least Privilege](../security/trust-boundaries-and-least-privilege.md)

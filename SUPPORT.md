@@ -10,7 +10,7 @@ Use [GitHub Discussions](https://github.com/orgs/AsiBackbone/discussions) for:
 - Help understanding or applying a tutorial or sample.
 - Ideas for new learning material that are not yet focused work items.
 - Comparing canonical, alternative, or experimental patterns.
-- Broader questions that span multiple ASI Backbone repositories.
+- Broader questions that span multiple AsiBackbone repositories.
 
 Use [GitHub Issues](https://github.com/AsiBackbone/Learning/issues) for:
 

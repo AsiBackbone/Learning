@@ -12,11 +12,11 @@ description: Learn how acknowledgment can cross process and system boundaries wi
 
 **Difficulty:** Advanced
 
-**Required prerequisites:** [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md).
+**Required prerequisites:** [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md).
 
 **Recommended background:** [Human-in-the-Loop Governance Workflows](../governance/human-in-the-loop-governance-workflows.md), [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md), [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md), and [Cross-System Capability Exchange and Delegated Authority](cross-system-capability-exchange-and-delegated-authority.md).
 
-**Glossary:** [Acknowledgment](../architecture/glossary.md#acknowledgment), [audit residue](../architecture/glossary.md#audit-residue), [decision provenance](../architecture/glossary.md#decision-provenance), [scoped capability](../architecture/glossary.md#scoped-capability), [execution authority](../architecture/glossary.md#execution-authority), and [trust boundary](../architecture/glossary.md#trust-boundary).
+**Glossary:** [Acknowledgment](../architecture/glossary.md#acknowledgment), [decision receipt](../architecture/glossary.md#decision-receipt), [decision provenance](../architecture/glossary.md#decision-provenance), [scoped capability](../architecture/glossary.md#scoped-capability), [execution authority](../architecture/glossary.md#execution-authority), and [trust boundary](../architecture/glossary.md#trust-boundary).
 
 > **Framework-neutral scope:** This article teaches lifecycle, trust, replay, recovery, and authority boundaries. It does not define a messaging protocol, workflow product, identity federation scheme, signature format, durable-store technology, or exactly-once execution mechanism.
 
@@ -149,6 +149,8 @@ accounts.bulk-suspend
 ```
 
 System A evaluates a tenant administrator's request to suspend a bounded set of fictional accounts. Current policy requires acknowledgment of the operational impact. System B presents the challenge to the required responder and produces evidence of the response. System C owns the eventual account executor. The systems are separate enough that System C cannot safely assume it still has System A's original in-memory context. The challenge therefore needs durable bindings that System C can validate later. A compact challenge model might contain:
+
+> **Illustrative API:** This local `AcknowledgmentChallenge` shape is a teaching model, not the `AsiBackbone.AspNetCore` package type. See the [AsiBackbone 6.0 API Boundary](../getting-started/asibackbone-6-api-boundary.md) before copying package-integration syntax.
 
 ```csharp
 public sealed record AcknowledgmentChallenge(
@@ -991,7 +993,7 @@ Distributed continuation is not a maturity upgrade. It is justified only when th
 
 Continue with:
 
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) for the foundational acknowledgment lifecycle.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) for the foundational acknowledgment lifecycle.
 - [Human-in-the-Loop Governance Workflows](../governance/human-in-the-loop-governance-workflows.md) when an independent reviewer disposition, rather than acknowledgment, is the requirement.
 - [Human Acknowledgment Workflow](../case-studies/human-acknowledgment-workflow.md) for the detailed single-system persistence, race, evidence, and changed-state case study.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) for narrow continuation authority and executor ownership.

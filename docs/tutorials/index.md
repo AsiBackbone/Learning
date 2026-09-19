@@ -4,9 +4,11 @@ description: Browse problem-first tutorials that expose failure modes, introduce
 
 # Tutorials
 
-ASI Backbone Learning tutorials are **problem-first**. They begin with an architectural problem, expose a failure mode or limitation, introduce a pattern, and connect the teaching example to runnable evidence and fuller implementations.
+AsiBackbone Learning tutorials are **problem-first**. They begin with an architectural problem, expose a failure mode or limitation, introduce a pattern, and connect the teaching example to runnable evidence and fuller implementations.
 
 The goal is understanding—not framework adoption.
+
+> **Code scope:** Tutorial snippets and companion projects are Learning-owned teaching models unless a section is explicitly labeled **AsiBackbone 6.0 API**. For exact current namespaces and syntax, use the [AsiBackbone 6.0 API Boundary](../getting-started/asibackbone-6-api-boundary.md).
 
 ## Learning Path at a Glance
 
@@ -14,7 +16,7 @@ The goal is understanding—not framework adoption.
 | --- | --- | --- | --- |
 | 1 | [Decision Before Execution](decision-before-execution.md) | Beginner | Evaluation is separated from protected execution |
 | 2 | [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md) | Beginner | Decision facts and outcomes become explicit |
-| 3 | [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md) | Intermediate | Acknowledgment and decision evidence remain distinct from authority |
+| 3 | [Decision Receipts and Acknowledgment](decision-receipts-and-acknowledgment.md) | Intermediate | Decision receipts, acknowledgment, and later lifecycle evidence remain distinct from authority |
 | 4 | [Scoped Capability and Host-Owned Execution](scoped-capability-and-host-owned-execution.md) | Intermediate | Execution authority becomes narrow, temporary, and host-validated |
 | 5 | [Governed AI Tool Gateway](governed-ai-tool-gateway.md) | Intermediate | AI proposal is composed with host-owned context, policy, authority, and execution |
 
@@ -67,7 +69,7 @@ Represent the facts used by policy explicitly and return outcomes that describe 
 
 **Core ideas:** actor/resource/operation/environment context, context snapshots, stable reason codes, policy identity, determinism, and decision composition.
 
-### 3. [Acknowledgment and Audit Residue](acknowledgment-and-audit-residue.md)
+### 3. [Decision Receipts and Acknowledgment](decision-receipts-and-acknowledgment.md)
 
 Pause a consequential operation for explicit acknowledgment, resume through a governed boundary, and preserve structured evidence of the decision path.
 
@@ -98,7 +100,7 @@ Execution-boundary validation
    ↓
 Host-owned tool execution
    ↓
-Audit residue
+Decision receipt
 ```
 
 > **The model may propose. The host retains execution authority.**

@@ -12,7 +12,7 @@ description: Use a constraint-conditioned decision model to reason about how act
 
 **Prerequisites:** [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) and [Constraint Composition and Policy Precedence](../governance/constraint-composition-and-policy-precedence.md)
 
-A recurring ASI Backbone teaching idea is that open intent should not become arbitrary action.
+A recurring AsiBackbone teaching idea is that open intent should not become arbitrary action.
 
 In software architecture terms:
 
@@ -111,7 +111,7 @@ The point is that the decision vocabulary should be explicit and bounded. A poli
 | `ΛS(x, τ)` | Conceptual measure of how strongly the current state and structure narrow the proposal |
 | Residual openness | Ability to defer, revise, acknowledge, escalate, or re-evaluate |
 | Collapse boundary | Point where proposal becomes an explicit decision, not where a side effect automatically occurs |
-| Residue | Structured evidence describing the decision path |
+| Receipt | Structured evidence describing the decision path |
 
 ## Toy model: time-window change
 
@@ -181,7 +181,7 @@ The architectural value is the structure-conditioned reasoning pattern.
 
 ## Continue learning
 
-- [Accountable Systems Infrastructure and Governed Execution](accountable-systems-infrastructure-and-governed-execution.md)
+- [AsiBackbone and Governed Execution](asibackbone-and-governed-execution.md)
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
 - [Constraint Composition and Policy Precedence](../governance/constraint-composition-and-policy-precedence.md)
 - [Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md)

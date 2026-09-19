@@ -8,7 +8,7 @@ description: Learn how to place EF Core behind clear boundaries, choose transact
 
 **Difficulty:** Intermediate
 
-**Prerequisites:** Basic familiarity with ASP.NET Core dependency injection and EF Core. [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md), [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md), and [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) provide useful governance context.
+**Prerequisites:** Basic familiarity with ASP.NET Core dependency injection and EF Core. [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md), [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md), and [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) provide useful governance context.
 
 **Learning objective:** Decide where EF Core belongs in an application, distinguish persistence abstractions from unnecessary wrappers, choose transaction boundaries deliberately, use interceptors only where their lifecycle fits the concern, test relational behavior with an appropriate provider, and preserve the boundary between a local database transaction and an external side effect.
 
@@ -18,7 +18,7 @@ description: Learn how to place EF Core behind clear boundaries, choose transact
 >
 > **Pattern:** Keep persistence at an application/infrastructure boundary. Use `DbContext` directly when it already expresses the required unit of work; introduce a repository or store interface when it creates a meaningful domain, testing, provider, or ownership boundary. Use the smallest transaction that makes related **local** state atomic, and model remote effects with separate idempotency, messaging, or recovery semantics.
 >
-> **Use when:** An ASP.NET Core application must persist governance decisions, audit residue, capability-use state, workflow state, or other durable data and the correctness of those writes matters to later execution.
+> **Use when:** An ASP.NET Core application must persist governance decisions, decision receipt, capability-use state, workflow state, or other durable data and the correctness of those writes matters to later execution.
 >
 > **Prefer something simpler when:** The application has trivial persistence, one request-scoped `DbContext`, one `SaveChangesAsync` call, and no requirement to abstract the store or coordinate several local writes. Do not add repositories, explicit transactions, or interceptors merely to match a pattern catalog.
 >
@@ -49,7 +49,7 @@ Capability
    ↓
 Execution
    ↓
-Audit residue
+Decision receipt
 ```
 
 But process memory has obvious limits.
@@ -312,10 +312,12 @@ But if the purpose of the repository was to hide EF Core or constrain persistenc
 
 Prefer methods that expose the operation the caller needs when the repository is intended to be a real boundary:
 
+> **Illustrative API:** The repository and receipt names in the following examples are local teaching shapes, not `AsiBackbone.*` package signatures. See the [AsiBackbone 6.0 API Boundary](../getting-started/asibackbone-6-api-boundary.md) for the exact current receipt and persistence contracts.
+
 ```csharp
 Task<Account?> FindForDisableAsync(...)
 ValueTask<CapabilityUseResult> TryConsumeAsync(...)
-Task AppendAsync(AuditResidue residue, ...)
+Task AppendAsync(LearningDecisionReceipt receipt, ...)
 ```
 
 Do not create one method per `DbSet` operation simply to avoid naming `DbContext`.
@@ -350,10 +352,10 @@ Example:
 
 ```csharp
 CapabilityUseRecord use = ...;
-ExecutionResidueRecord residue = ...;
+ExecutionReceiptRecord receipt = ...;
 
 _dbContext.CapabilityUses.Add(use);
-_dbContext.ExecutionResidues.Add(residue);
+_dbContext.ExecutionReceipts.Add(receipt);
 
 await _dbContext.SaveChangesAsync(
     cancellationToken);
@@ -399,8 +401,8 @@ try
     dbContext.Operations.Add(operation);
     await dbContext.SaveChangesAsync(cancellationToken);
 
-    dbContext.ExecutionResidues.Add(
-        CreateResidue(operation.Id));
+    dbContext.ExecutionReceipts.Add(
+        CreateReceipt(operation.Id));
 
     await dbContext.SaveChangesAsync(cancellationToken);
 
@@ -441,7 +443,7 @@ For one-time capability consumption:
 
 For local audit pairing:
 
-> **If capability consumption is committed, the execution-start residue must also be committed.**
+> **If capability consumption is committed, the execution-start receipt must also be committed.**
 
 For an account update plus local outbox message:
 
@@ -525,7 +527,7 @@ Suppose the same application database owns both:
 
 ```text
 Capability-use state
-Execution-start residue
+Execution-start receipt
 ```
 
 The host may require:
@@ -533,7 +535,7 @@ The host may require:
 ```text
 Consume capability
         +
-Write execution-start residue
+Write execution-start receipt
         ↓
 Commit together
 ```
@@ -547,7 +549,7 @@ Begin transaction
         ↓
 Claim permitted capability use
         ↓
-Write execution-start residue
+Write execution-start receipt
         ↓
 Commit
 ```
@@ -575,7 +577,7 @@ Begin database transaction
         ↓
 Consume capability
         ↓
-Write execution-start residue
+Write execution-start receipt
         ↓
 Call external service
         ↓
@@ -613,7 +615,7 @@ Consider:
 ```text
 Capability marked consumed
         ↓
-Execution-start residue written
+Execution-start receipt written
         ↓
 Database transaction commits
         ↓
@@ -814,8 +816,8 @@ Trying to infer them from modified entities can turn the interceptor into hidden
 Prefer explicit code when the operation is meaningful because of the workflow:
 
 ```csharp
-await auditResidueStore.AppendAsync(
-    AuditResidue.ExecutionStarted(...),
+await decisionReceiptStore.AppendAsync(
+    LearningDecisionReceipt.ExecutionStarted(...),
     cancellationToken);
 ```
 
@@ -839,7 +841,7 @@ Prefer explicit application behavior
 
 ---
 
-## Generic Database Auditing Is Not Governance Audit Residue
+## Generic Database Auditing Is Not Decision Receipt
 
 A database audit record may say:
 
@@ -853,7 +855,7 @@ New: true
 
 That can be useful.
 
-Governance audit residue may say:
+Governance decision receipt may say:
 
 ```text
 DecisionId: dec-42
@@ -870,7 +872,7 @@ Database auditing asks:
 
 > What persisted data changed?
 
-Governance residue asks:
+Decision receipt asks:
 
 > What happened in the governed decision and execution lifecycle?
 
@@ -1165,14 +1167,14 @@ Begin local unit of work
         ↓
 Claim capability use
         ↓
-Write execution-start residue
+Write execution-start receipt
         ↓
 Force second write to fail
         ↓
 Rollback
         ↓
 Capability use absent
-Execution residue absent
+Execution receipt absent
 ```
 
 Another useful test:
@@ -1235,7 +1237,7 @@ Governance decision
 Execution-boundary service
         ↓
 ICapabilityUseStore
-IAuditResidueStore
+ILearningDecisionReceiptStore
         ↓
 EF Core implementations
         ↓
@@ -1256,7 +1258,7 @@ That is the boundary this tutorial is trying to preserve.
 
 ---
 
-## Example: Local Transaction Around Capability Consumption and Residue
+## Example: Local Transaction Around Capability Consumption and Receipt
 
 A coordinator can make the intended local transaction explicit:
 
@@ -1265,11 +1267,11 @@ public sealed class ExecutionPersistenceCoordinator
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly EfCoreCapabilityUseStore _useStore;
-    private readonly EfCoreAuditResidueStore _auditStore;
+    private readonly EfCoreLearningDecisionReceiptStore _auditStore;
 
     public async Task<CapabilityUseResult> TryStartAsync(
         string capabilityId,
-        AuditResidue executionStart,
+        LearningDecisionReceipt executionStart,
         CancellationToken cancellationToken)
     {
         await using var transaction =
@@ -1492,7 +1494,7 @@ The `AsiBackbone` repository provides the governance-side abstractions that make
 Relevant references include:
 
 - [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — carries policy identity and structured outcomes without owning persistence.
-- [`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs) — provider-neutral governance evidence that can be persisted by a host-selected durable store.
+- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) — provider-neutral governance evidence that can be persisted by a host-selected durable store.
 - [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — carries scoped authority metadata while leaving storage and execution ownership to the host.
 
 The architectural bridge is:
@@ -1543,7 +1545,7 @@ Before calling a persistence design complete, ask:
 9. Are transaction boundaries short-lived?
 10. Is one-time or bounded-use capability state enforced atomically under concurrency?
 11. Are database constraints/concurrency mechanisms part of the guarantee rather than only application-level checks?
-12. Are governance audit residue and generic database-change auditing modeled separately?
+12. Are governance decision receipt and generic database-change auditing modeled separately?
 13. Does an interceptor contain hidden workflow/business logic?
 14. Is interceptor ordering deliberate when several save concerns interact?
 15. What happens when the database is unavailable?
@@ -1585,8 +1587,8 @@ The purpose is narrower:
 ## Related Content
 
 - [Centralized Error Handling and Problem Details](centralized-error-handling-and-problem-details.md) — keep expected persistence outcomes distinct from unexpected application failures and map safe public errors at the host boundary.
-- [Build a Governed API Operation lab](../labs/build-a-governed-api-operation.md) — assemble authorization, governance, scoped authority, host-owned execution, and audit residue inside an ASP.NET Core operation.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — review why governance evidence may need durable storage beyond ordinary logs.
+- [Build a Governed API Operation lab](../labs/build-a-governed-api-operation.md) — assemble authorization, governance, scoped authority, host-owned execution, and decision receipt inside an ASP.NET Core operation.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — review why governance evidence may need durable storage beyond ordinary logs.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — review the execution-boundary authority that durable use state may need to protect.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — examine atomic capability consumption, durable replay state, idempotency, outbox/inbox reasoning, and exactly-once boundaries in more depth.
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) — preserve the policy evidence that produced a durable decision without rewriting historical identity later.

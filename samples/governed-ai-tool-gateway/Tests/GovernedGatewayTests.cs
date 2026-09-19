@@ -91,7 +91,7 @@ public sealed class GovernedGatewayTests
             result.DecisionOutcome);
         Assert.Equal(0, host.Handler.InvocationCount);
 
-        AuditResidue contextEntry = Assert.Single(
+        DecisionReceipt contextEntry = Assert.Single(
             host.AuditSink.Entries,
             entry => entry.Stage == "context");
 
@@ -419,7 +419,7 @@ public sealed class GovernedGatewayTests
 
         Assert.Equal(GatewayStatus.WouldExecute, result.Status);
 
-        AuditResidue[] entries = [.. host.AuditSink.Entries.Where(entry => entry.CorrelationId == proposalId)];
+        DecisionReceipt[] entries = [.. host.AuditSink.Entries.Where(entry => entry.CorrelationId == proposalId)];
 
         Assert.NotEmpty(entries);
         Assert.All(

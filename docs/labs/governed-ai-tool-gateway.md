@@ -10,7 +10,7 @@ description: Practice governing AI-proposed tool actions while preserving host-o
 
 **Prerequisites:** Complete the [Governed AI Tool Gateway tutorial](../tutorials/governed-ai-tool-gateway.md), run the [Governed AI Tool Gateway sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md), and be comfortable with the first four foundational patterns.
 
-This is the capstone lab for the foundational ASI Backbone Learning path.
+This is the capstone lab for the foundational AsiBackbone Learning path.
 
 The baseline sample uses a simulated proposal generator and a dry-run `notification.send` handler.
 
@@ -51,7 +51,7 @@ Single-use consumption
    ↓
 Host-owned dry-run handler
    ↓
-Audit residue
+Decision receipt
 ```
 
 Important baseline invariants include:
@@ -781,7 +781,7 @@ A useful comparison might be:
 | Scoped capability | Usually unnecessary | Useful for consequential action |
 | Replay state | Usually unnecessary | Potentially important |
 | External credential | None | Host-owned |
-| Audit residue | Lightweight | Potentially important |
+| Decision receipt | Lightweight | Potentially important |
 
 The objective is to avoid turning governance into ceremony detached from consequence.
 
@@ -949,7 +949,7 @@ git restore samples/governed-ai-tool-gateway
 - [Scoped Capability and Host-Owned Execution lab](scoped-capability-and-host-owned-execution.md) — revisit capability binding, expiration, stale authority, and replay concepts in isolation.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — distinguish capability replay protection from request idempotency, external retry semantics, and exactly-once execution claims.
 - [Safe Degraded Mode and Fail-Safe Governance](safe-degraded-mode-and-fail-safe-governance.md) — continue from the gateway's single fail-open exercise into explicit policy, replay, verification, acknowledgment, evidence, and executor failure behavior.
-- [Acknowledgment and Audit Residue lab](acknowledgment-and-audit-residue.md) — revisit responsibility and evidence boundaries before they are composed into AI tool execution.
+- [Decision Receipts and Acknowledgment lab](decision-receipts-and-acknowledgment.md) — revisit responsibility and evidence boundaries before they are composed into AI tool execution.
 - [AI Agent Gateway Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/ai-agent-gateway.md) — compare the teaching gateway with the working framework's scenario documentation.
 - [Human Approval Before AI Tool Execution](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/human-approval-before-ai-tool-execution.md) — compare acknowledgment handling with the implementation-oriented guidance.
 - [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) — examine production-oriented proof, replay, time, binding, and failure considerations.

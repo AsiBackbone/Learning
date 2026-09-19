@@ -44,7 +44,7 @@ Execution-boundary validation
    ↓
 Host-owned dry-run handler
    ↓
-Audit residue
+Decision receipt
 ```
 
 The sample deliberately keeps the proposer and executor separate.
@@ -389,7 +389,7 @@ Policy version where recorded
 Acknowledgment challenge identity
 Capability identity
 Executor invocation
-Audit residue
+Decision receipt
 ```
 
 The sample deliberately preserves this distinction:
@@ -492,7 +492,7 @@ Compare the small teaching implementation with the fuller working `AsiBackbone` 
 - [AI Agent Gateway Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/ai-agent-gateway.md)
 - [Human Approval Before AI Tool Execution](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/human-approval-before-ai-tool-execution.md)
 - [GovernanceDecision](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs)
-- [AuditResidue](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs)
+- [DecisionReceipt](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs)
 - [CapabilityTokenGrant](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs)
 - [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md)
 - [`AsiBackbone.OpenTelemetry` README](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/README.md)

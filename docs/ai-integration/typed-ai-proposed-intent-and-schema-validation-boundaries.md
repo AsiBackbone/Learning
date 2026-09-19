@@ -1780,7 +1780,7 @@ Execution-boundary validation
    ↓
 Host-owned execution
    ↓
-Audit residue
+Decision receipt
 ```
 
 This tutorial zooms into the first transition:

@@ -259,7 +259,7 @@ For governed systems, important assets often include:
 - Secrets and credentials.
 - Signing keys.
 - Replay/use state.
-- Audit residue and decision provenance.
+- Decision receipt and decision provenance.
 - Trusted identity or tenant mappings.
 - Service availability.
 - Build and release integrity.
@@ -272,7 +272,7 @@ For each asset, write the security objective in plain language.
 | Execution authority | Authority must remain bound to the actor, operation, resource, audience, time, and use count required by the decision. |
 | Policy configuration | A caller or model must not be able to choose the policy version that governs its own request. |
 | External API credential | The credential must remain host-owned and should not enter prompts, client payloads, logs, or unrelated components. |
-| Audit residue | Records should be useful for reconstruction without exposing secrets or unnecessary sensitive payloads. |
+| Decision receipt | Records should be useful for reconstruction without exposing secrets or unnecessary sensitive payloads. |
 | Service capacity | One actor should not be able to exhaust shared execution resources without bounded controls. |
 
 The objective is more useful than a generic label such as "protect the database."
@@ -1806,7 +1806,7 @@ It does not constitute:
 - A penetration test.
 - A vulnerability assessment.
 - A compliance assessment.
-- A production threat model for any ASI Backbone organization repository.
+- A production threat model for any AsiBackbone organization repository.
 - A guarantee that the listed mitigations are sufficient for a particular application.
 
 Threat modeling identifies and structures reasoning.

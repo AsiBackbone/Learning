@@ -6,7 +6,7 @@ _disableBreadcrumb: true
 _disableToc: true
 ---
 
-# ASI Backbone Learning
+# AsiBackbone Learning
 
 <div class="home-hero">
   <p class="home-kicker">Practical .NET architecture for accountable systems</p>
@@ -19,7 +19,7 @@ _disableToc: true
   <p class="home-principle">A proposed action should become a governed decision before it becomes real-world execution.</p>
 </div>
 
-ASI Backbone Learning explains architectural ideas, demonstrates them with focused examples, examines their tradeoffs, and connects the lessons to fuller working implementations. **ASI** means **Accountable Systems Infrastructure**.
+AsiBackbone Learning explains architectural ideas, demonstrates them with focused examples, examines their tradeoffs, and connects the lessons to fuller working implementations. `AsiBackbone` is the product name; no acronym expansion is required to follow the material.
 
 > **Read it. Run it. Question it. Improve it.**
 
@@ -59,10 +59,10 @@ The material uses a recurring separation of responsibilities:
   <li>Context</li>
   <li>Constraints</li>
   <li>Decision</li>
+  <li>Decision receipt</li>
   <li>Acknowledgment <span>when required</span></li>
   <li>Scoped authority</li>
   <li>Host-owned execution</li>
-  <li>Audit residue</li>
 </ol>
 
 ## Choose a learning path
@@ -153,7 +153,7 @@ The goal is to make the reasoning visible—not to prove that one framework or a
 
 ## Recently added
 
-This is a living project under active development. Recent publications include:
+Learning 1.0 is the production documentation baseline aligned with AsiBackbone 6.0, and it remains a living project under evidence-driven maintenance. Recent publications include:
 
 - [A Passing Agent Diff Is Not Project Authority](articles/2026/a-passing-agent-diff-is-not-project-authority.md)
 - [Why an AI Tool Call Is Only a Proposal](articles/2026/why-ai-tool-call-is-only-a-proposal.md)
@@ -164,9 +164,9 @@ This is a living project under active development. Recent publications include:
 
   <p>Canonical patterns document what the working repositories currently do; alternative patterns create room for comparison, criticism, and improvement. Canonical does not mean universal.</p>
 
-  <p>ASI Backbone Learning is an educational architecture resource—not a compliance certification, legal standard, security guarantee, AI model, AGI or ASI implementation, robotics controller, replacement for application-specific security review, or requirement to use the AsiBackbone package. Examples are teaching artifacts; production systems remain responsible for their own security, infrastructure, persistence, regulatory requirements, safety controls, and execution.</p>
+  <p>AsiBackbone Learning is an educational architecture resource—not a compliance certification, legal standard, security guarantee, AI model, AGI or ASI implementation, robotics controller, replacement for application-specific security review, or requirement to use the AsiBackbone package. Examples are teaching artifacts; production systems remain responsible for their own security, infrastructure, persistence, regulatory requirements, safety controls, and execution.</p>
 
-  <p>ASI Backbone Learning is not affiliated with the Artificial Superintelligence Alliance.</p>
+  <p>AsiBackbone Learning is not affiliated with the Artificial Superintelligence Alliance.</p>
 </details>
 
 ---

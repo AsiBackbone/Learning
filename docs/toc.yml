@@ -5,6 +5,8 @@
   items:
   - name: Getting Started
     href: getting-started/index.md
+  - name: Learning 1.0 / AsiBackbone 6.0
+    href: getting-started/learning-1-asibackbone-6-compatibility.md
   - name: Articles
     href: articles/index.md
   - name: Tutorials

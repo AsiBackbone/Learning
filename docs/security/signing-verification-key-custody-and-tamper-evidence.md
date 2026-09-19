@@ -8,7 +8,7 @@ description: Learn how signatures, verification, key custody, rotation, fingerpr
 
 **Difficulty:** Advanced
 
-**Prerequisites:** [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), and [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md). Familiarity with [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) is helpful.
+**Prerequisites:** [Trust Boundaries and Least Privilege](trust-boundaries-and-least-privilege.md), [Replay Protection and Bounded-Use Authority](replay-protection-and-bounded-use.md), and [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md). Familiarity with [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) is helpful.
 
 **Learning objective:** Distinguish content fingerprints from digital signatures, separate signing from verification and authorization, place signing and verification at explicit trust boundaries, reason about key ownership and rotation, and explain what signed or tamper-evident evidence can and cannot prove.
 
@@ -1576,9 +1576,9 @@ Cryptographic authenticity and replay state are complementary controls.
 
 ---
 
-## Audit Residue as Signed Evidence
+## Decision Receipt as Signed Evidence
 
-Audit residue can preserve:
+Decision receipt can preserve:
 
 ```text
 What decision occurred?
@@ -2222,7 +2222,7 @@ The Learning boundary remains:
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) — distinguish policy identity and fingerprints from authenticity and tamper-evidence claims.
 - [Durable Decision Ledgers and Cryptographic Audit Chains](../advanced/durable-decision-ledgers-and-cryptographic-audit-chains.md) — continue from hash/signature primitives into ordered append semantics, protected checkpoints, tail-truncation detection, key lifecycle, archival, migration, restore, and corrupted-chain handling.
 - [Software Supply-Chain Integrity for .NET Repositories](software-supply-chain-integrity-for-dotnet-repositories.md) — apply provenance, checksum, signing, and verification distinctions to build and release artifacts without treating any one mechanism as proof of artifact safety.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) — connect signatures to durable governance evidence without treating acknowledgment as an execution override.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — connect signatures to durable governance evidence without treating acknowledgment as an execution override.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — apply verification as one execution-boundary check around narrow authority.
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — preserve the rule that AI may propose while host-owned code retains verification, policy, and execution authority.
 

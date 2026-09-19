@@ -4,6 +4,12 @@
   href: learning-path-map.md
 - name: Find Your Path
   href: find-your-path.md
+- name: Learning 1.0 / AsiBackbone 6.0 Compatibility
+  href: learning-1-asibackbone-6-compatibility.md
+- name: Learning 1.0.0 Release Readiness
+  href: learning-1-release-readiness.md
+- name: AsiBackbone 6.0 API Boundary
+  href: asibackbone-6-api-boundary.md
 - name: Adoption Personas and Entry Points
   href: adoption-personas-and-entry-points.md
 - name: Learning Model

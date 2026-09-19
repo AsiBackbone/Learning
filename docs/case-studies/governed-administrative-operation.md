@@ -10,7 +10,7 @@ description: Follow an account-disable request through authorization, trusted co
 
 **Difficulty:** Intermediate
 
-**Prerequisites:** Recommended — [Decision Before Execution](../tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md). [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) is useful for the paused branch.
+**Prerequisites:** Recommended — [Decision Before Execution](../tutorials/decision-before-execution.md), [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md), and [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md). [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) is useful for the paused branch.
 
 **Estimated study time:** 30–45 minutes for the full case. The five-minute path below is enough to understand the composition before deciding whether the deeper implementation and operational sections are useful.
 
@@ -488,7 +488,7 @@ Allowed now?
   └── yes → issue scoped execution authority
 ```
 
-That prevents acknowledgment from becoming a policy bypass. [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) covers challenge binding and evidence in detail.
+That prevents acknowledgment from becoming a policy bypass. [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) covers challenge binding and evidence in detail.
 
 ---
 
@@ -663,6 +663,8 @@ One correlation identifier connects the lifecycle, but different records answer 
 ### Correlation Schema
 
 Use one explicit linkage envelope across the three core evidence types—decision, grant, and execution:
+
+> **Illustrative API:** The receipt records below are case-study models, not `AsiBackbone.*` package signatures. Compare the exact 6.0 receipt surface in the [AsiBackbone 6.0 API Boundary](../getting-started/asibackbone-6-api-boundary.md).
 
 ```csharp
 public sealed record EvidenceCorrelation(
@@ -1190,7 +1192,7 @@ For the individual boundaries behind this composition:
 
 - [Decision Before Execution](../tutorials/decision-before-execution.md) explains the foundational zero-execution invariant.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) develops authoritative context and richer outcomes.
-- [Acknowledgment and Audit Residue](../tutorials/acknowledgment-and-audit-residue.md) covers bound interruption and evidence.
+- [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) covers bound interruption and evidence.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) covers narrow continuation authority and execution-boundary validation.
 - [Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md) covers policy identity, drift, and historical evidence.
 
