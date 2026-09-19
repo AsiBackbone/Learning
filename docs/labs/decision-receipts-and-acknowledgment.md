@@ -6,7 +6,7 @@ description: Practice acknowledgment as a narrowly bound governance event, re-ev
 
 **Learning objective:** Practice treating acknowledgment as a narrowly bound governance event rather than permission, preserving re-evaluation after acknowledgment, and maintaining a correlated audit timeline that distinguishes decisions, acknowledgments, and execution outcomes.
 
-**Difficulty:** Intermediate  
+**Difficulty:** Intermediate\
 
 **Prerequisites:** Complete the [Decision Receipts and Acknowledgment tutorial](../tutorials/decision-receipts-and-acknowledgment.md) and run the [Decision Receipts and Acknowledgment sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-receipts-and-acknowledgment/README.md).
 

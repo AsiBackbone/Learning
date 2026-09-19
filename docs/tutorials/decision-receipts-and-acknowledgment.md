@@ -8,7 +8,7 @@ description: Learn how operations pause for bound acknowledgment, re-evaluate cu
 
 **Pattern classification:** Canonical Pattern
 
-**Difficulty:** Intermediate  
+**Difficulty:** Intermediate\
 
 **Prerequisites:** [Decision Before Execution](decision-before-execution.md) and [Policy Context and Explicit Decision Outcomes](policy-context-and-explicit-decision-outcomes.md)
 

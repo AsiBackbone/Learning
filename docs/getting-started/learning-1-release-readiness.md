@@ -4,13 +4,13 @@ description: Review the dated validation evidence, compatibility boundary, known
 
 # Learning 1.0.0 Release Readiness
 
-**Review date:** 2026-09-19  
-**Review outcome:** Approved as a release candidate, subject to the final pull-request checks, merge to protected `main`, and tag-bound publication checks described below.  
-**Learning content baseline reviewed:** [`9f26c55b2adce2476c2b92c3e3bc9679cb1bf334`](https://github.com/AsiBackbone/Learning/commit/9f26c55b2adce2476c2b92c3e3bc9679cb1bf334) on `release/1.0.0`
+**Review date:** 2026-09-19\
+**Review outcome:** Approved as a release candidate, subject to the final pull-request checks, merge to protected `main`, and tag-bound publication checks described below.\
+**Learning content baseline reviewed:** [`2aa3f8bb487809bc2bcd0fc83baffc4c4256c62a`](https://github.com/AsiBackbone/Learning/commit/2aa3f8bb487809bc2bcd0fc83baffc4c4256c62a) on `release/1.0.0`
 
 **Aligned implementation baseline:** AsiBackbone `6.0.0`, using the authoritative [`release/6.0.0`](https://github.com/AsiBackbone/AsiBackbone/tree/release/6.0.0) source and [5.x-to-6.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/upgrade-500-to-600.md)
 
-This record captures the final pre-release review of Learning 1.0.0. Follow-up changes after the reviewed content baseline update release metadata, add permanent redirect stubs, replace release-branch links with durable default-branch links, and correct this record. The pull request containing those changes must pass the required documentation, link, sample, formatting, security, and workflow checks; the resulting merge commit, rather than the baseline commit alone, becomes the release candidate.
+This record captures the final pre-release review of Learning 1.0.0. Follow-up changes after the reviewed content baseline update release metadata, add permanent redirect stubs, replace release-branch links with durable default-branch or commit-permalink links, and correct this record. The pull request containing those changes must pass the required documentation, link, sample, formatting, security, and workflow checks; the resulting merge commit, rather than the baseline commit alone, becomes the release candidate.
 
 ## Compatibility Statement
 
@@ -25,7 +25,7 @@ Learning owns educational definitions, progressive explanations, tutorials, labs
 | [#339 — Align canonical terminology](https://github.com/AsiBackbone/Learning/issues/339) | Implementation complete; administrative closure is deferred until the release work reaches the default branch. | [PR #343](https://github.com/AsiBackbone/Learning/pull/343), the [canonical glossary](../architecture/glossary.md), and progressive terminology across current content. |
 | [#340 — Update API references and examples](https://github.com/AsiBackbone/Learning/issues/340) | Implementation complete; administrative closure is deferred until the release work reaches the default branch. | [PR #344](https://github.com/AsiBackbone/Learning/pull/344), the [AsiBackbone 6.0 API Boundary](asibackbone-6-api-boundary.md), and the repository API-reference validator. |
 | [#341 — Publish compatibility and migration guidance](https://github.com/AsiBackbone/Learning/issues/341) | Implementation complete; administrative closure is deferred until the release work reaches the default branch. | [PR #345](https://github.com/AsiBackbone/Learning/pull/345), [PR #346](https://github.com/AsiBackbone/Learning/pull/346), and the [Learning 1.0 / AsiBackbone 6.0 Compatibility Guide](learning-1-asibackbone-6-compatibility.md). |
-| [#342 — Complete the release-readiness review](https://github.com/AsiBackbone/Learning/issues/342) | This dated record and the [Learning 1.0.0 release notes](https://github.com/AsiBackbone/Learning/blob/main/RELEASE-NOTES-1.0.0.md) complete the pre-release review deliverables. | Local validation listed below plus current security and workflow evidence. |
+| [#342 — Complete the release-readiness review](https://github.com/AsiBackbone/Learning/issues/342) | This dated record and the [Learning 1.0.0 release notes](https://github.com/AsiBackbone/Learning/blob/2aa3f8bb487809bc2bcd0fc83baffc4c4256c62a/RELEASE-NOTES-1.0.0.md) complete the pre-release review deliverables. | Local validation listed below plus current security and workflow evidence. |
 
 The three implementation issues remain open because their closing pull requests were merged into `release/1.0.0`, not the default branch. No implementation work from those issues is deferred. Administrative closure is intentionally left to the merge or explicit issue-closing step that places the completed work on `main`.
 
@@ -90,7 +90,7 @@ Publication-time generation, attestation, upload, anonymous-download verificatio
 - [x] Current security, workflow-analysis, dependency-analysis, and supply-chain checks are green on the `main` history incorporated into the release branch.
 - [ ] The release-readiness pull request passes Documentation Validation, Link Validation, Sample Validation, and required branch checks.
 - [ ] The approved release candidate is merged to protected `main`.
-- [ ] `v1.0.0` is created from the approved `main` commit and the GitHub Release uses the reviewed [release notes](https://github.com/AsiBackbone/Learning/blob/main/RELEASE-NOTES-1.0.0.md).
+- [ ] `v1.0.0` is created from the approved `main` commit and the GitHub Release uses the reviewed [release notes](https://github.com/AsiBackbone/Learning/blob/2aa3f8bb487809bc2bcd0fc83baffc4c4256c62a/RELEASE-NOTES-1.0.0.md).
 - [ ] The release-triggered evidence workflow publishes, attests, and verifies all three durable assets.
 
 The unchecked items are publication controls, not known documentation defects. Do not publish Learning 1.0.0 until they are complete.
