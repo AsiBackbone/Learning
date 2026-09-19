@@ -184,9 +184,9 @@ Issues are best used for concrete repository work; Learning Discussions are bett
 
 ## Project Status
 
-**Active development — foundational tutorial, sample, test, and lab path established.**
+**Learning 1.0 is the production documentation baseline aligned with AsiBackbone 6.0.**
 
-Current development is focused on stronger implementation references, deeper labs, ASP.NET Core architecture, security and trust architecture, governance material, architecture comparisons, and improved discoverability. See [ROADMAP.md](ROADMAP.md) for the maintained direction.
+The foundational tutorial, sample, test, and lab path is established. Current work focuses on maintenance, evidence-driven refinement, implementation alignment, and carefully selected additions. See the [Learning 1.0.0 Release Readiness record](docs/getting-started/learning-1-release-readiness.md) for the dated production review and [ROADMAP.md](ROADMAP.md) for the maintained direction.
 
 ## Citing a Release
 

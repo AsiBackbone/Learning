@@ -153,7 +153,7 @@ The goal is to make the reasoning visible—not to prove that one framework or a
 
 ## Recently added
 
-This is a living project under active development. Recent publications include:
+Learning 1.0 is the production documentation baseline aligned with AsiBackbone 6.0, and it remains a living project under evidence-driven maintenance. Recent publications include:
 
 - [A Passing Agent Diff Is Not Project Authority](articles/2026/a-passing-agent-diff-is-not-project-authority.md)
 - [Why an AI Tool Call Is Only a Proposal](articles/2026/why-ai-tool-call-is-only-a-proposal.md)

@@ -8,6 +8,7 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ### Added
 
+- Learning 1.0 production compatibility, API-boundary, release-readiness, and release-note guidance aligned with AsiBackbone 6.0.
 - Optional post-deployment X publication with source-frontmatter selection,
   durable receipt/checkpoint state, canonical-URL reconciliation, protected
   OAuth credentials, deterministic dry runs, and offline contract validation.
@@ -16,6 +17,7 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ### Changed
 
+- Aligned current terminology, navigation, tutorials, diagrams, and sample guidance with the finalized AsiBackbone 6.0 vocabulary and public API surface.
 - Aligned all sample tests on `Microsoft.Testing.Platform` and `xunit.v3`, matching the shared AsiBackbone repository posture.
 
 ## [0.15.0] - 2026-09-11
