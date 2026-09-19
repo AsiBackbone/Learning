@@ -8,7 +8,7 @@ description: Review the dated validation evidence, compatibility boundary, known
 **Review outcome:** Approved as a release candidate, subject to the final pull-request checks, merge to protected `main`, and tag-bound publication checks described below.\
 **Learning content baseline reviewed:** [`2aa3f8bb487809bc2bcd0fc83baffc4c4256c62a`](https://github.com/AsiBackbone/Learning/commit/2aa3f8bb487809bc2bcd0fc83baffc4c4256c62a) on `release/1.0.0`
 
-**Aligned implementation baseline:** AsiBackbone `6.0.0`, using the authoritative [`release/6.0.0`](https://github.com/AsiBackbone/AsiBackbone/tree/release/6.0.0) source and [5.x-to-6.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/upgrade-500-to-600.md)
+**Aligned implementation baseline:** AsiBackbone `6.0.0`, using the authoritative [`main`](https://github.com/AsiBackbone/AsiBackbone/tree/main) source and [5.x-to-6.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-500-to-600.md)
 
 This record captures the final pre-release review of Learning 1.0.0. Follow-up changes after the reviewed content baseline update release metadata, add permanent redirect stubs, replace release-branch links with durable default-branch or commit-permalink links, and correct this record. The pull request containing those changes must pass the required documentation, link, sample, formatting, security, and workflow checks; the resulting merge commit, rather than the baseline commit alone, becomes the release candidate.
 
@@ -33,7 +33,7 @@ The three implementation issues remain open because their closing pull requests 
 
 - The [canonical glossary](../architecture/glossary.md) introduces context, constraints, decisions, decision receipts, acknowledgment, capability grants, outbox delivery, signing, and advanced controls progressively.
 - Current package-facing guidance uses the finalized 6.0 names and distinguishes historical 5.x names from current syntax.
-- The API-reference validator rejects removed 5.x APIs and implementation links that do not target `release/6.0.0`, except in the two explicitly historical migration/reference pages.
+- The API-reference validator rejects removed 5.x APIs and implementation links that do not target `main`, except in the two explicitly historical migration/reference pages.
 - Learning-owned samples are framework-neutral teaching models. Their indexes and README files identify that boundary and direct readers to the exact 6.0 API guide.
 - Previously published pages renamed for 6.0 terminology retain redirect stubs, and the renamed sample retains a pointer at its former repository path.
 - Getting Started, the root README, and primary navigation identify Learning 1.0 as the production documentation baseline aligned with AsiBackbone 6.0.

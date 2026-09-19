@@ -19,7 +19,7 @@ The version advances from 0.15.0 to 1.0.0 because the foundational curriculum, p
 
 Learning 1.0 documents and teaches the AsiBackbone 6.0 production surface. Earlier Learning releases remain historical educational records and may reference APIs or terminology that were valid in earlier AsiBackbone release lines.
 
-Use the [Learning 1.0 and AsiBackbone 6.0 Compatibility Guide](https://asibackbone.github.io/Learning/getting-started/learning-1-asibackbone-6-compatibility.html) to translate older material. Use the [AsiBackbone 6.0 API Boundary](https://asibackbone.github.io/Learning/getting-started/asibackbone-6-api-boundary.html) for current high-frequency names and examples. The AsiBackbone [5.x-to-6.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/upgrade-500-to-600.md) remains authoritative for complete implementation migration details.
+Use the [Learning 1.0 and AsiBackbone 6.0 Compatibility Guide](https://asibackbone.github.io/Learning/getting-started/learning-1-asibackbone-6-compatibility.html) to translate older material. Use the [AsiBackbone 6.0 API Boundary](https://asibackbone.github.io/Learning/getting-started/asibackbone-6-api-boundary.html) for current high-frequency names and examples. The AsiBackbone [5.x-to-6.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-500-to-600.md) remains authoritative for complete implementation migration details.
 
 ## Stable Architectural Boundaries
 

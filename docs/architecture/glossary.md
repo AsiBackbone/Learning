@@ -257,7 +257,7 @@ An allowlist blocks unknown or unapproved tool names from reaching handlers. Mem
 
 ## Current AsiBackbone Implementation Correspondence
 
-The Learning glossary is architectural first. The current [`AsiBackbone/AsiBackbone` implementation glossary](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/glossary.md) provides the implementation-side vocabulary and API cross-references.
+The Learning glossary is architectural first. The current [`AsiBackbone/AsiBackbone` implementation glossary](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/glossary.md) provides the implementation-side vocabulary and API cross-references.
 
 The most direct correspondences are:
 

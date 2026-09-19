@@ -6,7 +6,7 @@ description: Understand the Learning 1.0 and AsiBackbone 6.0 baseline, changes f
 
 > **Production baseline:** Learning 1.0 documents and teaches the AsiBackbone 6.0 production surface. Earlier Learning releases remain historical educational records and may reference APIs or terminology that were valid in earlier AsiBackbone release lines.
 
-Learning 1.0 is the educational companion to AsiBackbone 6.0. That alignment means current Learning terminology, API-facing examples, and implementation links are interpreted against the `release/6.0.0` product baseline.
+Learning 1.0 is the educational companion to AsiBackbone 6.0. That alignment means current Learning terminology, API-facing examples, and implementation links are interpreted against the `main` product baseline.
 
 It does **not** mean that Learning depends on the AsiBackbone packages. Most Learning samples remain framework-neutral teaching models, and the architecture lessons are intended to remain useful even when you implement them without AsiBackbone.
 
@@ -25,7 +25,7 @@ The ownership rule is intentionally simple:
 
 > **Learning teaches the architecture. AsiBackbone defines the released API and runtime truth.**
 
-The implementation repository documents the same boundary in its [Documentation Ownership](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/documentation-ownership.md) guidance.
+The implementation repository documents the same boundary in its [Documentation Ownership](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/documentation-ownership.md) guidance.
 
 ## What Changed Conceptually
 
@@ -77,7 +77,7 @@ Examples include:
 | `IAsiBackboneAcknowledgmentChallengeService` | `IAcknowledgmentChallengeService` |
 | `RequireGovernancePolicyAttribute` | `GovernancePolicyAttribute` |
 
-This is a representative teaching-oriented subset, not the complete rename inventory. Use the authoritative [6.0 public API naming convention](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/public-api-naming-600.md) for the full list.
+This is a representative teaching-oriented subset, not the complete rename inventory. Use the authoritative [6.0 public API naming convention](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/public-api-naming-600.md) for the full list.
 
 ### Learning can stay simpler than the product surface
 
@@ -114,7 +114,7 @@ AsiBackbone 6.0 removes exactly seven public members whose obsolete compatibilit
 
 The 5.x `RequireGovernancePolicyAttribute` type was also renamed to `GovernancePolicyAttribute` in 6.0 so the attribute and route-builder paths use the same marker terminology. That type rename is separate from the seven obsolete-member removals.
 
-Do not use this page as the complete implementation migration checklist. The authoritative [Upgrade from 5.x to 6.0](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/upgrade-500-to-600.md) guide contains the exact removed-member inventory, replacement guidance, dependency-injection notes, and complete public type rename table.
+Do not use this page as the complete implementation migration checklist. The authoritative [Upgrade from 5.x to 6.0](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-500-to-600.md) guide contains the exact removed-member inventory, replacement guidance, dependency-injection notes, and complete public type rename table.
 
 ## What Did Not Change
 
@@ -176,11 +176,11 @@ Use these sources in order, depending on the question:
 
 1. [Learning Architecture Glossary](../architecture/glossary.md) — canonical Learning definitions and teaching vocabulary.
 2. [AsiBackbone 6.0 API Boundary](asibackbone-6-api-boundary.md) — the high-frequency 6.0 package names and examples that Learning readers are most likely to copy.
-3. [Upgrade from 5.x to 6.0](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/upgrade-500-to-600.md) — authoritative breaking-change and migration guidance.
-4. [6.0 Public API Naming Convention](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/public-api-naming-600.md) — complete public type rename inventory and retained-name decisions.
-5. [AsiBackbone API Terminology Map](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/terminology-map.md) — mapping from Learning concepts to concrete product APIs.
-6. [AsiBackbone API Glossary](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/glossary.md) — implementation-specific meanings, invariants, and host responsibilities.
-7. [Documentation Ownership](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/documentation-ownership.md) — the source-of-truth boundary between the two repositories.
+3. [Upgrade from 5.x to 6.0](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-500-to-600.md) — authoritative breaking-change and migration guidance.
+4. [6.0 Public API Naming Convention](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/public-api-naming-600.md) — complete public type rename inventory and retained-name decisions.
+5. [AsiBackbone API Terminology Map](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/terminology-map.md) — mapping from Learning concepts to concrete product APIs.
+6. [AsiBackbone API Glossary](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/glossary.md) — implementation-specific meanings, invariants, and host responsibilities.
+7. [Documentation Ownership](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/documentation-ownership.md) — the source-of-truth boundary between the two repositories.
 
 When those sources overlap, exact API/runtime behavior belongs to `AsiBackbone/AsiBackbone`; architecture teaching and canonical Learning terminology belong to `AsiBackbone/Learning`.
 
@@ -196,7 +196,7 @@ If you are moving a code example or internal document from an AsiBackbone 5.x ba
 - [ ] Replace 5.x `RequireGovernancePolicyAttribute` usage with `GovernancePolicyAttribute`.
 - [ ] Use **decision receipt** in current teaching prose while preserving historical wording in historical release material.
 - [ ] Use **acknowledgment** as the ordinary teaching term and reserve **handshake** for the actual protocol or exact retained type names.
-- [ ] Keep implementation links pinned to `release/6.0.0` when documenting the Learning 1.0 production baseline.
+- [ ] Keep implementation links pinned to `main` when documenting the Learning 1.0 production baseline.
 - [ ] Verify exact behavior in the implementation repository instead of copying a second runtime contract into Learning.
 
 ## Continue

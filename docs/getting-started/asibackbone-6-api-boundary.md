@@ -7,11 +7,11 @@ description: Distinguish Learning teaching models from the finalized AsiBackbone
 AsiBackbone Learning teaches architecture with two different kinds of code:
 
 1. **Learning-owned teaching models** are small, framework-neutral types compiled from this repository. They make an architectural boundary easy to observe, but they are not package API signatures.
-2. **AsiBackbone 6.0 API examples** use the finalized public names and namespaces from the implementation repository's `release/6.0.0` branch.
+2. **AsiBackbone 6.0 API examples** use the finalized public names and namespaces from the implementation repository's `main` branch.
 
 Keep that distinction visible when copying an example. A local teaching type named for a concept may be intentionally smaller than the similarly named framework type.
 
-> **API status:** Unless a section is labeled **AsiBackbone 6.0 API**, code in Learning is illustrative or belongs to a Learning sample. Follow the linked implementation source or the [5.x to 6.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/upgrade-500-to-600.md) for exact package syntax.
+> **API status:** Unless a section is labeled **AsiBackbone 6.0 API**, code in Learning is illustrative or belongs to a Learning sample. Follow the linked implementation source or the [5.x to 6.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-500-to-600.md) for exact package syntax.
 
 ## Executable Sample Package Policy
 
@@ -27,7 +27,7 @@ If a future sample adds an `AsiBackbone.*` package reference, it must pin a rele
 
 ## Finalized Core Names
 
-The complete review covers 232 public type entries across ten managed packages. The authoritative inventory is the [6.0 public API naming convention](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/public-api-naming-600.md).
+The complete review covers 232 public type entries across ten managed packages. The authoritative inventory is the [6.0 public API naming convention](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/public-api-naming-600.md).
 
 The names most often used by Learning material are:
 
@@ -88,7 +88,7 @@ var evaluator = new DefaultGovernancePolicyEvaluator<MyPolicyContext>(
 
 For dependency injection, prefer a factory that resolves the host's configured constraints, contributors, decision policy, `IOptions<GovernancePolicyOptions>.Value`, and logger before calling the builder. Registering only the concrete evaluator type requires the container to resolve all five constructor dependencies.
 
-Inspect the exact implementation in [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs), its [`CreateBuilder` factory](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.Factory.cs), and [`GovernancePolicyEvaluatorBuilder`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Evaluation/GovernancePolicyEvaluatorBuilder.cs).
+Inspect the exact implementation in [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs), its [`CreateBuilder` factory](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.Factory.cs), and [`GovernancePolicyEvaluatorBuilder`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/GovernancePolicyEvaluatorBuilder.cs).
 
 ## Mark Endpoint Policy Metadata
 
@@ -106,7 +106,7 @@ app.MapPost("/exports", HandleExport)
     .MarkGovernancePolicy(typeof(ExportPolicyMarker));
 ```
 
-The marker records policy metadata. It does not, by itself, resolve a policy, select constraints, or enforce execution. See the exact [`EndpointGovernanceRouteBuilderExtensions`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.AspNetCore/Endpoints/EndpointGovernanceRouteBuilderExtensions.cs) behavior.
+The marker records policy metadata. It does not, by itself, resolve a policy, select constraints, or enforce execution. See the exact [`EndpointGovernanceRouteBuilderExtensions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Endpoints/EndpointGovernanceRouteBuilderExtensions.cs) behavior.
 
 For attribute-based endpoint metadata, the 5.x `RequireGovernancePolicyAttribute` type was renamed to `GovernancePolicyAttribute` in 6.0.
 
@@ -130,7 +130,7 @@ The 5.x `RequireGovernancePolicyAttribute` type was renamed to `GovernancePolicy
 
 `DecisionReceipt` records the policy decision outcome and reasons. Later acknowledgment, capability, gateway, emission, and execution lifecycle evidence can correlate with it, but the decision receipt does not prove that the host executed the protected operation.
 
-Learning samples may use smaller local receipt or lifecycle records to make that distinction visible. Compare them with the exact 6.0 [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) and [`DecisionReceiptLifecycleEvent`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceiptLifecycleEvent.cs) source before adopting a package integration.
+Learning samples may use smaller local receipt or lifecycle records to make that distinction visible. Compare them with the exact 6.0 [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) and [`DecisionReceiptLifecycleEvent`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceiptLifecycleEvent.cs) source before adopting a package integration.
 
 ## Review Checklist
 
@@ -141,7 +141,7 @@ Before publishing an API-facing Learning change:
 - use finalized 6.0 names and namespaces;
 - use `GovernancePolicyAttribute`, not the 5.x `RequireGovernancePolicyAttribute`, for attribute-based endpoint metadata;
 - do not call removed evaluator constructors or route-builder methods;
-- link implementation source to `release/6.0.0`, not `main` or a 5.x branch;
+- link implementation source to `main`, not `main` or a 5.x branch;
 - pin any future `AsiBackbone.*` sample package reference to a released 6.x version and commit its lock-file update;
 - preserve old names only in clearly historical migration or release material.
 

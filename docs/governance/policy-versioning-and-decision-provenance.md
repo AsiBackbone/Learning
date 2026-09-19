@@ -1385,7 +1385,7 @@ The current `AsiBackbone` implementation provides several useful working referen
 
 ### GovernanceDecision
 
-[`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) carries optional `PolicyVersion` and `PolicyHash` values on the decision itself.
+[`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) carries optional `PolicyVersion` and `PolicyHash` values on the decision itself.
 
 That demonstrates the important boundary that policy evidence can travel with the result rather than remaining only in transient evaluation context.
 
@@ -1393,17 +1393,17 @@ The current type does not define a dedicated `PolicyId` property. A host that ne
 
 ### DecisionReceipt
 
-[`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) carries optional policy version/hash evidence and preserves those values when receipt is created from a `GovernanceDecision`.
+[`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) carries optional policy version/hash evidence and preserves those values when receipt is created from a `GovernanceDecision`.
 
 That is an example of policy evidence propagating into later governance evidence.
 
 ### CapabilityTokenGrant
 
-[`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) can carry optional `PolicyVersion` and `PolicyHash` bindings into short-lived execution authority.
+[`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) can carry optional `PolicyVersion` and `PolicyHash` bindings into short-lived execution authority.
 
 ### CapabilityGrantValidationOptions
 
-[`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) allows an execution boundary to state expected policy version/hash values during capability validation.
+[`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) allows an execution boundary to state expected policy version/hash values during capability validation.
 
 These references show concrete implementation seams.
 

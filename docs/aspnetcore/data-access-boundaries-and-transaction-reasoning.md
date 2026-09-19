@@ -1493,9 +1493,9 @@ The `AsiBackbone` repository provides the governance-side abstractions that make
 
 Relevant references include:
 
-- [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — carries policy identity and structured outcomes without owning persistence.
-- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) — provider-neutral governance evidence that can be persisted by a host-selected durable store.
-- [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — carries scoped authority metadata while leaving storage and execution ownership to the host.
+- [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — carries policy identity and structured outcomes without owning persistence.
+- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) — provider-neutral governance evidence that can be persisted by a host-selected durable store.
+- [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — carries scoped authority metadata while leaving storage and execution ownership to the host.
 
 The architectural bridge is:
 

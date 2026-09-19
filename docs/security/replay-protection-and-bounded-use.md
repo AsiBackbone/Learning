@@ -1214,8 +1214,8 @@ A host-owned gateway can make the state transition explicit:
 > `IllustrativeCapabilityCheckResult`, and `CheckAsync` are teaching-only names used
 > here to keep the replay-protection discussion independent of the released package API.
 > For the current `AsiBackbone` capability-grant validation surface, see
-> [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/capability-grant-hardening.md)
-> and the [4.0 to 5.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/upgrade-400-to-500.md).
+> [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md)
+> and the [4.0 to 5.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-400-to-500.md).
 
 ```csharp
 public sealed class ProtectedOperationGateway(
@@ -1382,12 +1382,12 @@ The current `AsiBackbone/AsiBackbone` repository contains a fuller capability-us
 
 | Learning concept | Working reference | What to inspect |
 | --- | --- | --- |
-| Provider-neutral bounded-use state | [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) | `TryConsumeAsync` combines checking and consumption; Core explicitly leaves durable state, distributed locking, cache consistency, database schema, and replay-window guarantees to the host/provider. |
-| Teaching/local in-memory provider | [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Storage.InMemory/CapabilityTokens/InMemoryCapabilityGrantUseStore.cs) | Thread-safe in-process use counts and stopped/cancelled state, with explicit documentation that the provider is non-durable, non-distributed, and not production replay protection. |
-| Execution validation pipeline | [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) | Proof checks, metadata/binding checks, then optional use-store consumption; missing or unavailable replay state maps to an explicit non-success validation outcome instead of silent execution. |
-| Use-check configuration | [`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) | `RequireUseCheck`, `MaxUseCount`, validation time, scope, policy, binding, and proof options. |
-| Broader capability guidance | [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/capability-grant-hardening.md) | Proof, issuer/audience/scope, replay/use limits, cancellation/revocation, time windows, and the host-owned security boundary. |
-| Executable use-store behavior | [`InMemoryCapabilityGrantUseStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/tests/AsiBackbone.Core.Tests/CapabilityTokens/InMemoryCapabilityGrantUseStoreTests.cs) | In-process accepted use, use-limit, stopped/cancelled, and local concurrency behavior. |
+| Provider-neutral bounded-use state | [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) | `TryConsumeAsync` combines checking and consumption; Core explicitly leaves durable state, distributed locking, cache consistency, database schema, and replay-window guarantees to the host/provider. |
+| Teaching/local in-memory provider | [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Storage.InMemory/CapabilityTokens/InMemoryCapabilityGrantUseStore.cs) | Thread-safe in-process use counts and stopped/cancelled state, with explicit documentation that the provider is non-durable, non-distributed, and not production replay protection. |
+| Execution validation pipeline | [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidator.cs) | Proof checks, metadata/binding checks, then optional use-store consumption; missing or unavailable replay state maps to an explicit non-success validation outcome instead of silent execution. |
+| Use-check configuration | [`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) | `RequireUseCheck`, `MaxUseCount`, validation time, scope, policy, binding, and proof options. |
+| Broader capability guidance | [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) | Proof, issuer/audience/scope, replay/use limits, cancellation/revocation, time windows, and the host-owned security boundary. |
+| Executable use-store behavior | [`InMemoryCapabilityGrantUseStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityTokens/InMemoryCapabilityGrantUseStoreTests.cs) | In-process accepted use, use-limit, stopped/cancelled, and local concurrency behavior. |
 
 The implementation repository is a specimen, not a universal storage prescription.
 

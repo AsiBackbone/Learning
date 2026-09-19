@@ -651,11 +651,11 @@ Use `git status` first so you understand which local work will be affected.
 - [Policy Context and Explicit Decision Outcomes lab](policy-context-and-explicit-decision-outcomes.md) — revisit explicit decision inputs, reason codes, and precedence.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — continue from acknowledged governance requirements into narrow execution authority.
 - [Foundational Tutorial Index](../tutorials/index.md) — view the complete foundational learning path.
-- [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) — compare the teaching challenge with the fuller framework handshake request.
-- [`LiabilityHandshakeAcknowledgment`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeAcknowledgment.cs) — inspect the working accepted/rejected acknowledgment model.
-- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) — compare the lab's small evidence model with the framework's richer decision receipt.
-- [`Dynamic Liability Handshake`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/dynamic-liability-handshake.md) — review the fuller handshake lifecycle.
-- [`Durable Audit Outbox Persistence`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/durable-audit-outbox-persistence.md) — study production-oriented durability and delivery concerns after completing the in-memory exercise.
+- [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) — compare the teaching challenge with the fuller framework handshake request.
+- [`LiabilityHandshakeAcknowledgment`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeAcknowledgment.cs) — inspect the working accepted/rejected acknowledgment model.
+- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) — compare the lab's small evidence model with the framework's richer decision receipt.
+- [`Dynamic Liability Handshake`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/dynamic-liability-handshake.md) — review the fuller handshake lifecycle.
+- [`Durable Audit Outbox Persistence`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/durable-audit-outbox-persistence.md) — study production-oriented durability and delivery concerns after completing the in-memory exercise.
 
 ---
 

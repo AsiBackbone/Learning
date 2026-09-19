@@ -99,10 +99,10 @@ Useful experiments include:
 - [Decision Before Execution tutorial](../../docs/tutorials/decision-before-execution.md)
 - [Decision Before Execution beginner lab](../../docs/labs/decision-before-execution.md)
 - [Policy Context and Explicit Decision Outcomes](../../docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
-- [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) - compare the teaching decision model with the fuller framework decision type.
-- [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) - inspect fuller policy and constraint evaluation.
-- [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/host-owned-execution-enforcement.md) - follow the production-oriented execution-boundary guidance.
-- [Plain ASP.NET Core Host](https://github.com/AsiBackbone/AsiBackbone/tree/release/6.0.0/samples/PlainAspNetCoreHost) - inspect a concrete host integration.
+- [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) - compare the teaching decision model with the fuller framework decision type.
+- [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) - inspect fuller policy and constraint evaluation.
+- [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/host-owned-execution-enforcement.md) - follow the production-oriented execution-boundary guidance.
+- [Plain ASP.NET Core Host](https://github.com/AsiBackbone/AsiBackbone/tree/main/samples/PlainAspNetCoreHost) - inspect a concrete host integration.
 
 ## License
 

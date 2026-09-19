@@ -1242,7 +1242,7 @@ The current `AsiBackbone` repository provides useful specimens for several piece
 
 ### Custom Decision Policy Examples
 
-[Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/custom-decision-policy-examples.md) includes a regional overlay example that preserves an existing block and applies additional local restrictions or acknowledgment requirements.
+[Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/custom-decision-policy-examples.md) includes a regional overlay example that preserves an existing block and applies additional local restrictions or acknowledgment requirements.
 
 That example demonstrates one **narrowing-overlay** model.
 
@@ -1250,7 +1250,7 @@ It should not be read as a complete universal global/region/tenant hierarchy.
 
 ### Policy Evaluator Pipeline
 
-[Policy Evaluator Pipeline](https://github.com/AsiBackbone/AsiBackbone/blob/release/6.0.0/docs/articles/policy-evaluator-pipeline.md) shows the distinction between constraint evaluation, base composition, an optional decision policy, and host-owned execution.
+[Policy Evaluator Pipeline](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/policy-evaluator-pipeline.md) shows the distinction between constraint evaluation, base composition, an optional decision policy, and host-owned execution.
 
 Those seams can participate in a host-defined overlay architecture, but the host still needs to define the authority relationship among independently versioned policy layers.
 
