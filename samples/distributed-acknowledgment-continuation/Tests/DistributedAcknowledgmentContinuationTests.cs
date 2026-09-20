@@ -475,29 +475,38 @@ public sealed class DistributedAcknowledgmentContinuationTests
         CancellationToken cancellationToken =
             TestContext.Current.CancellationToken;
 
-        using var ready = new CountdownEvent(2);
-        using var start = new ManualResetEventSlim(false);
+        var allReady =
+            new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
+        var start =
+            new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
+        int readyCount = 0;
 
         Task<GatewayResult>[] tasks =
-            [.. Enumerable.Range(0, 2)
-                .Select(_ => Task.Run(async () =>
-                {
-                    ready.Signal();
-                    start.Wait(cancellationToken);
+            [RunAttemptAsync(), RunAttemptAsync()];
 
-                    return await gateway.ExecuteAsync(
-                        request,
-                        evidence,
-                        cancellationToken);
-                }, cancellationToken))];
-
-        Assert.True(
-            ready.Wait(
-                TimeSpan.FromSeconds(5),
-                cancellationToken));
-        start.Set();
+        await allReady.Task.WaitAsync(
+            TimeSpan.FromSeconds(5),
+            cancellationToken);
+        start.TrySetResult(true);
 
         GatewayResult[] results = await Task.WhenAll(tasks);
+
+        async Task<GatewayResult> RunAttemptAsync()
+        {
+            if (Interlocked.Increment(ref readyCount) == 2)
+            {
+                allReady.TrySetResult(true);
+            }
+
+            await start.Task.WaitAsync(cancellationToken);
+
+            return await gateway.ExecuteAsync(
+                request,
+                evidence,
+                cancellationToken);
+        }
 
         Assert.Single(results, result => result.Executed);
         Assert.Single(
