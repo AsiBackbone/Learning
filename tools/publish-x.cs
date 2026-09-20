@@ -631,6 +631,8 @@ sealed class XPublisher(IXClient client, IPublisherStateStore store, IXPostCompo
 
 sealed class XApiClient(HttpClient httpClient, XCredentials credentials) : IXClient
 {
+    private static readonly TimeSpan MaximumRetryDelay = TimeSpan.FromSeconds(30);
+
     private static readonly Uri ApiRoot = new("https://api.x.com/2/");
 
     public async Task<IReadOnlyList<XPost>> GetRecentPostsAsync(CancellationToken cancellationToken)
@@ -777,12 +779,29 @@ sealed class XApiClient(HttpClient httpClient, XCredentials credentials) : IXCli
         throw new InvalidOperationException("X request exhausted its retry limit.");
     }
 
-    private static TimeSpan GetRetryDelay(HttpResponseMessage response, int attempt)
+    internal static TimeSpan GetRetryDelay(
+        HttpResponseMessage response,
+        int attempt,
+        DateTimeOffset? currentTime = null)
     {
-        TimeSpan? retryAfter = response.Headers.RetryAfter?.Delta;
-        return retryAfter is not null && retryAfter <= TimeSpan.FromSeconds(30)
-            ? retryAfter.Value
-            : TimeSpan.FromSeconds(attempt);
+        RetryConditionHeaderValue? retryCondition = response.Headers.RetryAfter;
+        TimeSpan? retryAfter = retryCondition?.Delta;
+
+        if (retryAfter is null && retryCondition?.Date is DateTimeOffset retryDate)
+        {
+            retryAfter = retryDate - (currentTime ?? DateTimeOffset.UtcNow);
+        }
+
+        if (retryAfter is null)
+        {
+            return TimeSpan.FromSeconds(attempt);
+        }
+
+        return retryAfter.Value <= TimeSpan.Zero
+            ? TimeSpan.Zero
+            : retryAfter.Value >= MaximumRetryDelay
+                ? MaximumRetryDelay
+                : retryAfter.Value;
     }
 
     private static Uri BuildUri(Uri uri, IReadOnlyDictionary<string, string> query)
@@ -943,6 +962,7 @@ static class XPublisherSelfTest
             TestInvalidMetadata();
             TestComposition();
             TestResponseClassification();
+            TestRetryDelays();
             await TestApiResponsesAsync();
             await TestReceiptsAndReconciliationAsync();
             await TestAmbiguousDeliveryAsync();
@@ -1044,6 +1064,34 @@ static class XPublisherSelfTest
         Assert(XApiClient.Classify(HttpStatusCode.Forbidden) == XResponseDisposition.AuthenticationFailure, "403 classification failed.");
         Assert(XApiClient.Classify(HttpStatusCode.TooManyRequests) == XResponseDisposition.Retryable, "429 classification failed.");
         Assert(XApiClient.Classify(HttpStatusCode.BadGateway) == XResponseDisposition.Retryable, "5xx classification failed.");
+    }
+
+    private static void TestRetryDelays()
+    {
+        DateTimeOffset currentTime = new(2026, 9, 20, 12, 0, 0, TimeSpan.Zero);
+
+        using var deltaResponse = Response(HttpStatusCode.TooManyRequests, "{}");
+        deltaResponse.Headers.RetryAfter = new RetryConditionHeaderValue(TimeSpan.FromSeconds(45));
+        Assert(
+            XApiClient.GetRetryDelay(deltaResponse, attempt: 1, currentTime) == TimeSpan.FromSeconds(30),
+            "long Retry-After deltas should be clamped to the maximum delay.");
+
+        using var dateResponse = Response(HttpStatusCode.TooManyRequests, "{}");
+        dateResponse.Headers.RetryAfter = new RetryConditionHeaderValue(currentTime.AddSeconds(20));
+        Assert(
+            XApiClient.GetRetryDelay(dateResponse, attempt: 1, currentTime) == TimeSpan.FromSeconds(20),
+            "Retry-After dates should delay until the requested time.");
+
+        using var expiredDateResponse = Response(HttpStatusCode.TooManyRequests, "{}");
+        expiredDateResponse.Headers.RetryAfter = new RetryConditionHeaderValue(currentTime.AddSeconds(-1));
+        Assert(
+            XApiClient.GetRetryDelay(expiredDateResponse, attempt: 1, currentTime) == TimeSpan.Zero,
+            "expired Retry-After dates should allow an immediate retry.");
+
+        using var fallbackResponse = Response(HttpStatusCode.BadGateway, "{}");
+        Assert(
+            XApiClient.GetRetryDelay(fallbackResponse, attempt: 2, currentTime) == TimeSpan.FromSeconds(2),
+            "responses without Retry-After should use the attempt-based fallback.");
     }
 
     private static async Task TestApiResponsesAsync()
