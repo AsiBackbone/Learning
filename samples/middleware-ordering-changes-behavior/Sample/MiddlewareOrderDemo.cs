@@ -79,6 +79,7 @@ public static class MiddlewareOrderDemo
             catch (InvalidOperationException exception)
             {
                 observe("exception-boundary:handled");
+                observe($"exception-boundary:exception:{exception.GetType().Name}");
 
                 context.Response.StatusCode =
                     StatusCodes.Status500InternalServerError;
@@ -87,7 +88,7 @@ public static class MiddlewareOrderDemo
                     "text/plain";
 
                 await context.Response.WriteAsync(
-                    $"Handled by demo exception boundary: {exception.Message}");
+                    "Handled by demo exception boundary.");
             }
             finally
             {
