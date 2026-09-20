@@ -295,6 +295,11 @@ dotnet_style_prefer_conditional_expression_over_return = false:suggestion
 # teaches substitution boundaries rather than concrete implementation details.
 dotnet_diagnostic.CA1859.severity = none
 
+[samples/**/Sample/*.cs]
+# Runnable tutorials intentionally keep their domain types in the global
+# namespace so each example can be read without namespace ceremony.
+dotnet_diagnostic.CA1050.severity = none
+
 [samples/middleware-ordering-changes-behavior/Sample/Program.cs]
 # This focused middleware-ordering example keeps logging calls inline so the
 # execution sequence remains visible without unrelated source-generated code.
@@ -309,6 +314,10 @@ generated_code = true
 [**/bin/**/*.cs]
 generated_code = true
 
-[samples/**/Tests/**/*.cs]
+[samples/**/Tests/*.cs]
 # Sample tests use scenario-style underscores just like top-level test projects.
+dotnet_diagnostic.CA1707.severity = none
+
+[samples/**/Tests/**/*.cs]
+# Apply the same test-name convention to tests organized in subdirectories.
 dotnet_diagnostic.CA1707.severity = none
