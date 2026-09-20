@@ -121,7 +121,7 @@ public sealed class CrossSystemGateway(
             UnauthorizedAccessException => "executor.authorization",
             ArgumentException => "executor.contract",
             InvalidOperationException => "executor.state",
-            System.IO.IOException => "executor.io",
+            IOException => "executor.io",
             _ => "executor.unexpected"
         };
     }
