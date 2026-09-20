@@ -75,7 +75,7 @@ public sealed class MiddlewareOrderTests
         Assert.Equal(StatusCodes.Status500InternalServerError, context.Response.StatusCode);
         Assert.Equal("text/plain", context.Response.ContentType);
         Assert.Equal(
-            "Handled by demo exception boundary: Demonstration failure.",
+            "Handled by demo exception boundary.",
             body);
     }
 

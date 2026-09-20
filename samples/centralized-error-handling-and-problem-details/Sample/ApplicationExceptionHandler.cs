@@ -18,6 +18,8 @@ public sealed class ApplicationExceptionHandler(
         ArgumentNullException.ThrowIfNull(httpContext);
         ArgumentNullException.ThrowIfNull(exception);
 
+        cancellationToken.ThrowIfCancellationRequested();
+
         if (httpContext.Response.HasStarted)
         {
             return false;
@@ -50,6 +52,8 @@ public sealed class ApplicationExceptionHandler(
         problemDetails.Extensions["traceId"] = traceId;
 
         httpContext.Response.StatusCode = problem.StatusCode;
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         return await problemDetailsService.TryWriteAsync(
             new ProblemDetailsContext

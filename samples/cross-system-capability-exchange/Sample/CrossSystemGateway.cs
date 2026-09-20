@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace CrossSystemCapabilityExchange;
 
 public sealed class CrossSystemGateway(
@@ -6,6 +8,9 @@ public sealed class CrossSystemGateway(
     IExportExecutor executor,
     string executionDestination)
 {
+    private static readonly ActivitySource _activitySource =
+        new("CrossSystemCapabilityExchange.Gateway");
+
     private long _decisionSequence;
 
     public async Task<GatewayResult> ExecuteAsync(
@@ -82,10 +87,20 @@ public sealed class CrossSystemGateway(
         {
             throw;
         }
-        catch (Exception)
+        catch (Exception exception)
         {
+            string failureCategory = ClassifyExecutionFailure(exception);
+
+            RecordExecutionFailure(
+                exception,
+                failureCategory,
+                recipientDecisionId,
+                executionId,
+                artifact.Capability.CapabilityId,
+                context.CorrelationId);
+
             // Do not propagate executor exception details across the recipient
-            // boundary. Internal telemetry may capture the exception separately;
+            // boundary. Internal telemetry captures categorized failure details;
             // the gateway returns only the stable failure category here.
             return GatewayResult.ExecutionFailed(
                 recipientDecisionId,
@@ -96,5 +111,48 @@ public sealed class CrossSystemGateway(
         return GatewayResult.ExecutedSuccessfully(
             recipientDecisionId,
             executionId);
+    }
+
+    private static string ClassifyExecutionFailure(Exception exception)
+    {
+        return exception switch
+        {
+            TimeoutException => "executor.timeout",
+            UnauthorizedAccessException => "executor.authorization",
+            ArgumentException => "executor.contract",
+            InvalidOperationException => "executor.state",
+            IOException => "executor.io",
+            _ => "executor.unexpected"
+        };
+    }
+
+    private static void RecordExecutionFailure(
+        Exception exception,
+        string failureCategory,
+        string recipientDecisionId,
+        string executionId,
+        string capabilityId,
+        string correlationId)
+    {
+        using Activity? activity =
+            _activitySource.StartActivity(
+                "cross-system.execution.failure",
+                ActivityKind.Internal);
+
+        activity?.SetTag("error.type", exception.GetType().FullName);
+        activity?.SetTag("error.category", failureCategory);
+        activity?.SetTag("gateway.recipient_decision_id", recipientDecisionId);
+        activity?.SetTag("gateway.execution_id", executionId);
+        activity?.SetTag("gateway.capability_id", capabilityId);
+        activity?.SetTag("gateway.correlation_id", correlationId);
+
+        Trace.TraceError(
+            "CrossSystemGateway execution failed. Category={0}; ExceptionType={1}; RecipientDecisionId={2}; ExecutionId={3}; CapabilityId={4}; CorrelationId={5}",
+            failureCategory,
+            exception.GetType().Name,
+            recipientDecisionId,
+            executionId,
+            capabilityId,
+            correlationId);
     }
 }
