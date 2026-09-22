@@ -141,6 +141,8 @@ public interface ICapabilityUseStore
 
 public sealed class AtomicInMemoryCapabilityUseStore : ICapabilityUseStore
 {
+    // This process-lifetime teaching store intentionally retains capability state.
+    // A production store should safely evict expired entries and dispose each gate.
     private readonly ConcurrentDictionary<string, UseState> _states =
         new(StringComparer.Ordinal);
 
@@ -201,7 +203,7 @@ public sealed class AtomicInMemoryCapabilityUseStore : ICapabilityUseStore
     public int GetObservedUseCount(string capabilityId)
     {
         return _states.TryGetValue(capabilityId, out UseState? state)
-            ? state.UseCount
+            ? Volatile.Read(ref state.UseCount)
             : 0;
     }
 
@@ -211,7 +213,7 @@ public sealed class AtomicInMemoryCapabilityUseStore : ICapabilityUseStore
 
         public SemaphoreSlim Gate { get; } = new(1, 1);
 
-        public int UseCount { get; set; }
+        public int UseCount;
     }
 }
 

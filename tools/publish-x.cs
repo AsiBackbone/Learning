@@ -742,6 +742,12 @@ sealed class XApiClient(HttpClient httpClient, XCredentials credentials) : IXCli
             {
                 throw new InvalidOperationException("X read request exhausted its timeout retries.", exception);
             }
+            catch (HttpRequestException exception) when (method == HttpMethod.Post)
+            {
+                throw new AmbiguousDeliveryException(
+                    "X request failed after it may have been sent.",
+                    exception);
+            }
             catch (HttpRequestException) when (attempt < maximumAttempts)
             {
                 await Task.Delay(TimeSpan.FromSeconds(attempt), cancellationToken);
@@ -756,6 +762,14 @@ sealed class XApiClient(HttpClient httpClient, XCredentials credentials) : IXCli
             }
 
             _ = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            if (method == HttpMethod.Post && (int)response.StatusCode >= 500)
+            {
+                int ambiguousStatusCode = (int)response.StatusCode;
+                response.Dispose();
+                throw new AmbiguousDeliveryException(
+                    $"X returned HTTP {ambiguousStatusCode} after the request may have been accepted.");
+            }
 
             if (disposition == XResponseDisposition.Retryable && attempt < maximumAttempts)
             {
@@ -798,7 +812,7 @@ sealed class XApiClient(HttpClient httpClient, XCredentials credentials) : IXCli
         }
 
         return retryAfter.Value <= TimeSpan.Zero
-            ? TimeSpan.Zero
+            ? TimeSpan.FromSeconds(attempt)
             : retryAfter.Value >= MaximumRetryDelay
                 ? MaximumRetryDelay
                 : retryAfter.Value;
@@ -821,14 +835,19 @@ static class OAuth1Signer
         HttpMethod method,
         Uri uri,
         IReadOnlyDictionary<string, string> query,
-        XCredentials credentials)
+        XCredentials credentials,
+        DateTimeOffset? currentTime = null,
+        string? nonce = null)
     {
         var oauth = new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["oauth_consumer_key"] = credentials.ApiKey,
-            ["oauth_nonce"] = Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLowerInvariant(),
+            ["oauth_nonce"] = nonce ??
+                Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLowerInvariant(),
             ["oauth_signature_method"] = "HMAC-SHA1",
-            ["oauth_timestamp"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture),
+            ["oauth_timestamp"] = (currentTime ?? DateTimeOffset.UtcNow)
+                .ToUnixTimeSeconds()
+                .ToString(CultureInfo.InvariantCulture),
             ["oauth_token"] = credentials.AccessToken,
             ["oauth_version"] = "1.0"
         };
@@ -843,8 +862,8 @@ static class OAuth1Signer
         string signatureBase = $"{method.Method.ToUpperInvariant()}&{Encode(baseUri)}&{Encode(normalized)}";
         string signingKey = $"{Encode(credentials.ApiKeySecret)}&{Encode(credentials.AccessTokenSecret)}";
 
-        using var hmac = new HMACSHA1(Encoding.ASCII.GetBytes(signingKey));
-        string signature = Convert.ToBase64String(hmac.ComputeHash(Encoding.ASCII.GetBytes(signatureBase)));
+        using var hmac = new HMACSHA1(Encoding.UTF8.GetBytes(signingKey));
+        string signature = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(signatureBase)));
         oauth["oauth_signature"] = signature;
 
         return string.Join(
@@ -963,6 +982,7 @@ static class XPublisherSelfTest
             TestComposition();
             TestResponseClassification();
             TestRetryDelays();
+            TestOAuthSignature();
             await TestApiResponsesAsync();
             await TestReceiptsAndReconciliationAsync();
             await TestAmbiguousDeliveryAsync();
@@ -1085,13 +1105,45 @@ static class XPublisherSelfTest
         using var expiredDateResponse = Response(HttpStatusCode.TooManyRequests, "{}");
         expiredDateResponse.Headers.RetryAfter = new RetryConditionHeaderValue(currentTime.AddSeconds(-1));
         Assert(
-            XApiClient.GetRetryDelay(expiredDateResponse, attempt: 1, currentTime) == TimeSpan.Zero,
-            "expired Retry-After dates should allow an immediate retry.");
+            XApiClient.GetRetryDelay(expiredDateResponse, attempt: 1, currentTime) == TimeSpan.FromSeconds(1),
+            "expired Retry-After dates should use the attempt-based fallback.");
+
+        using var zeroDeltaResponse = Response(HttpStatusCode.TooManyRequests, "{}");
+        zeroDeltaResponse.Headers.RetryAfter = new RetryConditionHeaderValue(TimeSpan.Zero);
+        Assert(
+            XApiClient.GetRetryDelay(zeroDeltaResponse, attempt: 2, currentTime) == TimeSpan.FromSeconds(2),
+            "non-positive Retry-After deltas should use the attempt-based fallback.");
 
         using var fallbackResponse = Response(HttpStatusCode.BadGateway, "{}");
         Assert(
             XApiClient.GetRetryDelay(fallbackResponse, attempt: 2, currentTime) == TimeSpan.FromSeconds(2),
             "responses without Retry-After should use the attempt-based fallback.");
+    }
+
+    private static void TestOAuthSignature()
+    {
+        DateTimeOffset currentTime = new(2026, 9, 20, 12, 0, 0, TimeSpan.Zero);
+        XCredentials credentials = new("key", "sécret", "token", "töken-secret", "1234");
+        string authorization = OAuth1Signer.CreateAuthorizationParameter(
+            HttpMethod.Post,
+            new Uri("https://api.x.com/2/tweets"),
+            new Dictionary<string, string>(),
+            credentials,
+            currentTime,
+            nonce: "fixed-nonce");
+
+        const string expectedAuthorization =
+            "oauth_consumer_key=\"key\", " +
+            "oauth_nonce=\"fixed-nonce\", " +
+            "oauth_signature=\"FcjdoFnRX21Z523PnUwLIXp%2Bvbo%3D\", " +
+            "oauth_signature_method=\"HMAC-SHA1\", " +
+            "oauth_timestamp=\"1789905600\", " +
+            "oauth_token=\"token\", " +
+            "oauth_version=\"1.0\"";
+
+        Assert(
+            string.Equals(authorization, expectedAuthorization, StringComparison.Ordinal),
+            "OAuth authorization should match the deterministic UTF-8 signature vector.");
     }
 
     private static async Task TestApiResponsesAsync()
@@ -1119,11 +1171,7 @@ static class XPublisherSelfTest
                 () => client.CreatePostAsync("Synthetic post", CancellationToken.None));
         }
 
-        foreach (HttpStatusCode status in new[]
-                 {
-                     HttpStatusCode.TooManyRequests,
-                     HttpStatusCode.BadGateway
-                 })
+        foreach (HttpStatusCode status in new[] { HttpStatusCode.TooManyRequests })
         {
             HttpResponseMessage[] responses =
             [
@@ -1136,6 +1184,18 @@ static class XPublisherSelfTest
             await AssertThrowsAsync<InvalidOperationException>(
                 () => client.CreatePostAsync("Synthetic post", CancellationToken.None));
         }
+
+        using var serverErrorHttpClient = new HttpClient(new SequenceHttpMessageHandler(
+            Response(HttpStatusCode.BadGateway, "{}")));
+        var serverErrorClient = new XApiClient(serverErrorHttpClient, credentials);
+        await AssertThrowsAsync<AmbiguousDeliveryException>(
+            () => serverErrorClient.CreatePostAsync("Synthetic post", CancellationToken.None));
+
+        using var networkFailureHttpClient = new HttpClient(new SequenceHttpMessageHandler(
+            new HttpRequestException("Synthetic connection reset.")));
+        var networkFailureClient = new XApiClient(networkFailureHttpClient, credentials);
+        await AssertThrowsAsync<AmbiguousDeliveryException>(
+            () => networkFailureClient.CreatePostAsync("Synthetic post", CancellationToken.None));
 
         using var timeoutHttpClient = new HttpClient(new SequenceHttpMessageHandler(
             new TaskCanceledException("Synthetic timeout.")));

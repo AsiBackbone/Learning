@@ -8,3 +8,24 @@ docs/_site/
 
 # Visual Studio
 .vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# JetBrains IDEs
+.idea/
+*.sln.iml
+
+# Test and coverage output
+TestResults/
+coverage/
+coverage.*
+*.coverage
+*.coveragexml
+
+# Repository-local build and package artifacts
+artifacts/
+packages/
+*.nupkg
+*.snupkg
