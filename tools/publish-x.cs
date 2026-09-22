@@ -836,12 +836,14 @@ static class OAuth1Signer
         Uri uri,
         IReadOnlyDictionary<string, string> query,
         XCredentials credentials,
-        DateTimeOffset? currentTime = null)
+        DateTimeOffset? currentTime = null,
+        string? nonce = null)
     {
         var oauth = new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["oauth_consumer_key"] = credentials.ApiKey,
-            ["oauth_nonce"] = Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLowerInvariant(),
+            ["oauth_nonce"] = nonce ??
+                Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLowerInvariant(),
             ["oauth_signature_method"] = "HMAC-SHA1",
             ["oauth_timestamp"] = (currentTime ?? DateTimeOffset.UtcNow)
                 .ToUnixTimeSeconds()
@@ -980,7 +982,7 @@ static class XPublisherSelfTest
             TestComposition();
             TestResponseClassification();
             TestRetryDelays();
-            TestOAuthTimestamp();
+            TestOAuthSignature();
             await TestApiResponsesAsync();
             await TestReceiptsAndReconciliationAsync();
             await TestAmbiguousDeliveryAsync();
@@ -1118,7 +1120,7 @@ static class XPublisherSelfTest
             "responses without Retry-After should use the attempt-based fallback.");
     }
 
-    private static void TestOAuthTimestamp()
+    private static void TestOAuthSignature()
     {
         DateTimeOffset currentTime = new(2026, 9, 20, 12, 0, 0, TimeSpan.Zero);
         XCredentials credentials = new("key", "sécret", "token", "töken-secret", "1234");
@@ -1127,13 +1129,21 @@ static class XPublisherSelfTest
             new Uri("https://api.x.com/2/tweets"),
             new Dictionary<string, string>(),
             credentials,
-            currentTime);
+            currentTime,
+            nonce: "fixed-nonce");
+
+        const string expectedAuthorization =
+            "oauth_consumer_key=\"key\", " +
+            "oauth_nonce=\"fixed-nonce\", " +
+            "oauth_signature=\"FcjdoFnRX21Z523PnUwLIXp%2Bvbo%3D\", " +
+            "oauth_signature_method=\"HMAC-SHA1\", " +
+            "oauth_timestamp=\"1789905600\", " +
+            "oauth_token=\"token\", " +
+            "oauth_version=\"1.0\"";
 
         Assert(
-            authorization.Contains(
-                $"oauth_timestamp=\"{currentTime.ToUnixTimeSeconds()}\"",
-                StringComparison.Ordinal),
-            "OAuth timestamps should use the injected current time.");
+            string.Equals(authorization, expectedAuthorization, StringComparison.Ordinal),
+            "OAuth authorization should match the deterministic UTF-8 signature vector.");
     }
 
     private static async Task TestApiResponsesAsync()
