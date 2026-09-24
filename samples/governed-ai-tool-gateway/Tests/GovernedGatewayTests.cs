@@ -216,6 +216,82 @@ public sealed class GovernedGatewayTests
     }
 
     [Fact]
+    public async Task AcknowledgmentCannotCrossTenantBoundary()
+    {
+        SampleHost host = SampleComposition.Create();
+        AiToolProposal proposal = CreateProposal(
+            proposalId: "proposal-cross-tenant-ack",
+            recipient: "partner@example.net",
+            template: "case-update");
+
+        GatewayResult first = await host.Gateway.ExecuteAsync(
+            proposal,
+            CreateActor(),
+            _nowUtc,
+            acknowledgmentResponse: null,
+            CancellationToken.None);
+
+        AcknowledgmentChallenge challenge =
+            Assert.IsType<AcknowledgmentChallenge>(
+                first.AcknowledgmentChallenge);
+
+        GatewayResult result = await host.Gateway.ExecuteAsync(
+            proposal,
+            new HostActor("operator-7", "tenant-b"),
+            _nowUtc.AddSeconds(5),
+            new AcknowledgmentResponse(
+                challenge.ChallengeId,
+                "operator-7",
+                Accepted: true,
+                RespondedUtc: _nowUtc.AddSeconds(5)),
+            CancellationToken.None);
+
+        Assert.Equal(GatewayStatus.Rejected, result.Status);
+        Assert.Equal("acknowledgment.tenant-mismatch", result.ReasonCode);
+        Assert.Equal(0, host.Handler.InvocationCount);
+    }
+
+    [Fact]
+    public async Task AcknowledgmentCannotCrossWorkflowCorrelationBoundary()
+    {
+        SampleHost host = SampleComposition.Create();
+        AiToolProposal proposal = CreateProposal(
+            proposalId: "proposal-cross-correlation-ack",
+            recipient: "partner@example.net",
+            template: "case-update");
+
+        GatewayResult first = await host.Gateway.ExecuteAsync(
+            proposal,
+            CreateActor(),
+            _nowUtc,
+            acknowledgmentResponse: null,
+            CancellationToken.None,
+            hostCorrelationId: "workflow-correlation-a");
+
+        AcknowledgmentChallenge challenge =
+            Assert.IsType<AcknowledgmentChallenge>(
+                first.AcknowledgmentChallenge);
+
+        GatewayResult result = await host.Gateway.ExecuteAsync(
+            proposal,
+            CreateActor(),
+            _nowUtc.AddSeconds(5),
+            new AcknowledgmentResponse(
+                challenge.ChallengeId,
+                "operator-7",
+                Accepted: true,
+                RespondedUtc: _nowUtc.AddSeconds(5)),
+            CancellationToken.None,
+            hostCorrelationId: "workflow-correlation-b");
+
+        Assert.Equal(GatewayStatus.Rejected, result.Status);
+        Assert.Equal(
+            "acknowledgment.correlation-mismatch",
+            result.ReasonCode);
+        Assert.Equal(0, host.Handler.InvocationCount);
+    }
+
+    [Fact]
     public async Task ExpiredIssuedAcknowledgmentIsRejectedAcrossGatewayCalls()
     {
         SampleHost host = SampleComposition.Create();
@@ -276,6 +352,68 @@ public sealed class GovernedGatewayTests
             "acknowledgment.challenge-unknown",
             result.ReasonCode);
         Assert.Equal(0, host.Handler.InvocationCount);
+    }
+
+    [Fact]
+    public void ChallengeStorePrunesExpiredAndConsumedTerminalState()
+    {
+        var store = new InMemoryAcknowledgmentChallengeStore();
+        AiToolPolicyContext context = HostPolicyContextFactory.Create(
+            CreateProposal(
+                proposalId: "proposal-cleanup",
+                recipient: "partner@example.net",
+                template: "case-update"),
+            Assert.IsType<ToolDescriptor>(
+                SampleComposition.Create().ToolRegistry.Find(
+                    "notification.send")),
+            CreateActor());
+        GovernanceDecision decision = NotificationPolicy.Evaluate(context);
+        AcknowledgmentChallenge expiredChallenge =
+            AcknowledgmentService.CreateChallenge(
+                context,
+                decision,
+                _nowUtc);
+
+        store.Issue(expiredChallenge, _nowUtc);
+
+        AcknowledgmentChallengeLookup expired = store.Find(
+            expiredChallenge.ChallengeId,
+            expiredChallenge.ExpiresUtc);
+        AcknowledgmentChallengeLookup expiredAfterRetention = store.Find(
+            expiredChallenge.ChallengeId,
+            expiredChallenge.ExpiresUtc.AddMinutes(5));
+
+        Assert.Equal(
+            AcknowledgmentChallengeLookupStatus.Expired,
+            expired.Status);
+        Assert.Equal(
+            AcknowledgmentChallengeLookupStatus.Unknown,
+            expiredAfterRetention.Status);
+
+        AcknowledgmentChallenge consumedChallenge =
+            AcknowledgmentService.CreateChallenge(
+                context,
+                decision,
+                _nowUtc.AddMinutes(10));
+
+        store.Issue(consumedChallenge, _nowUtc.AddMinutes(10));
+        Assert.True(store.TryConsume(
+            consumedChallenge.ChallengeId,
+            _nowUtc.AddMinutes(10).AddSeconds(1)));
+
+        AcknowledgmentChallengeLookup consumed = store.Find(
+            consumedChallenge.ChallengeId,
+            _nowUtc.AddMinutes(10).AddSeconds(1));
+        AcknowledgmentChallengeLookup consumedAfterRetention = store.Find(
+            consumedChallenge.ChallengeId,
+            _nowUtc.AddMinutes(15).AddSeconds(1));
+
+        Assert.Equal(
+            AcknowledgmentChallengeLookupStatus.Consumed,
+            consumed.Status);
+        Assert.Equal(
+            AcknowledgmentChallengeLookupStatus.Unknown,
+            consumedAfterRetention.Status);
     }
 
     [Fact]
