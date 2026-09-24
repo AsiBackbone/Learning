@@ -235,14 +235,17 @@ AcknowledgmentRequired
 
 The host creates a challenge bound to:
 
+- A cryptographically unpredictable challenge identifier.
 - Actor.
 - Operation.
 - Recipient.
 - Reason code.
-- Time window.
+- Issuance time and five-minute expiry.
 
-If the actor accepts the challenge, the host records the acknowledgment identity in policy context and **re-evaluates** the decision.
+The teaching host persists the exact issued challenge in an in-memory challenge store. A response must present an identifier that the host actually issued, and validation compares the response with that stored challenge and the current host-built actor, operation, recipient, issuance time, and expiry. Unknown identifiers, expired challenges, and already-consumed challenges are rejected.
 
+If the actor accepts the challenge, the host atomically marks that challenge consumed before recording the acknowledgment identity in policy context and **re-evaluates** the decision.
+ 
 The sequence is:
 
 ```text
@@ -261,7 +264,9 @@ Allowed or blocked
 
 The acknowledgment does not directly invoke the tool.
 
-A response from the wrong actor is rejected.
+A response from the wrong actor is rejected. Changing the bound recipient also invalidates the response, and replaying an accepted challenge is rejected because the challenge is already consumed.
+
+The in-memory challenge store is intentionally local teaching state. A production host with multiple instances must use durable or distributed challenge state with atomic consume semantics so every instance validates the same issued challenge lifecycle and cannot accept the same challenge twice.
 
 ## Scoped Capability Preserves Narrow Authority
 
@@ -423,12 +428,15 @@ The focused test project verifies that:
 6. An unclassified destination is deferred.
 7. Rejected acknowledgment does not become execution authority.
 8. An acknowledgment from the wrong actor is rejected.
-9. Changing the recipient after acknowledgment requires a new recipient-bound acknowledgment.
-10. Valid external acknowledgment causes re-evaluation before execution authority is issued.
-11. Changing the recipient after approval invalidates the capability.
-12. An expired capability is rejected at the execution boundary.
-13. Replaying the same capability identity cannot invoke the handler twice.
-14. A successful flow preserves one correlation identifier across evidence stages.
+9. An issued challenge submitted at or after its five-minute expiry is rejected.
+10. A correctly formatted but never-issued challenge identifier is rejected.
+11. Changing the recipient after acknowledgment requires a new recipient-bound acknowledgment.
+12. Valid external acknowledgment causes re-evaluation before execution authority is issued.
+13. Replaying an already-consumed acknowledgment challenge is rejected.
+14. Changing the recipient after approval invalidates the capability.
+15. An expired capability is rejected at the execution boundary.
+16. Replaying the same capability identity cannot invoke the handler twice.
+17. A successful flow preserves one correlation identifier across evidence stages.
 
 These tests make the sample's architectural contract executable.
 
@@ -470,6 +478,7 @@ This teaching sample does not claim to provide production implementations of:
 - Model sandboxing.
 - Prompt-injection prevention.
 - Cryptographic capability proof.
+- Durable or distributed acknowledgment challenge storage.
 - Durable replay storage.
 - Distributed atomic consumption.
 - Capability revocation.

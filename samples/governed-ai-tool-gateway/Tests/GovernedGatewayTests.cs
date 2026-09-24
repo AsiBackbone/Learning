@@ -216,6 +216,69 @@ public sealed class GovernedGatewayTests
     }
 
     [Fact]
+    public async Task ExpiredIssuedAcknowledgmentIsRejectedAcrossGatewayCalls()
+    {
+        SampleHost host = SampleComposition.Create();
+        AiToolProposal proposal = CreateProposal(
+            proposalId: "proposal-expired-ack",
+            recipient: "partner@example.net",
+            template: "case-update");
+
+        GatewayResult first = await host.Gateway.ExecuteAsync(
+            proposal,
+            CreateActor(),
+            _nowUtc,
+            acknowledgmentResponse: null,
+            CancellationToken.None);
+
+        AcknowledgmentChallenge challenge =
+            Assert.IsType<AcknowledgmentChallenge>(
+                first.AcknowledgmentChallenge);
+
+        GatewayResult result = await host.Gateway.ExecuteAsync(
+            proposal,
+            CreateActor(),
+            _nowUtc.AddMinutes(5),
+            new AcknowledgmentResponse(
+                challenge.ChallengeId,
+                "operator-7",
+                Accepted: true,
+                RespondedUtc: _nowUtc.AddMinutes(5)),
+            CancellationToken.None);
+
+        Assert.Equal(GatewayStatus.Rejected, result.Status);
+        Assert.Equal("acknowledgment.expired", result.ReasonCode);
+        Assert.Equal(0, host.Handler.InvocationCount);
+    }
+
+    [Fact]
+    public async Task NeverIssuedChallengeIdentifierIsRejected()
+    {
+        SampleHost host = SampleComposition.Create();
+        AiToolProposal proposal = CreateProposal(
+            proposalId: "proposal-never-issued-ack",
+            recipient: "partner@example.net",
+            template: "case-update");
+
+        GatewayResult result = await host.Gateway.ExecuteAsync(
+            proposal,
+            CreateActor(),
+            _nowUtc,
+            new AcknowledgmentResponse(
+                new string('a', 64),
+                "operator-7",
+                Accepted: true,
+                RespondedUtc: _nowUtc),
+            CancellationToken.None);
+
+        Assert.Equal(GatewayStatus.Rejected, result.Status);
+        Assert.Equal(
+            "acknowledgment.challenge-unknown",
+            result.ReasonCode);
+        Assert.Equal(0, host.Handler.InvocationCount);
+    }
+
+    [Fact]
     public async Task ValidExternalAcknowledgmentReevaluatesAndWouldExecute()
     {
         SampleHost host = SampleComposition.Create();
@@ -296,8 +359,59 @@ public sealed class GovernedGatewayTests
             CancellationToken.None);
 
         Assert.Equal(GatewayStatus.Rejected, result.Status);
-        Assert.Equal("acknowledgment.challenge-mismatch", result.ReasonCode);
+        Assert.Equal("acknowledgment.resource-mismatch", result.ReasonCode);
         Assert.Equal(0, host.Handler.InvocationCount);
+    }
+
+    [Fact]
+    public async Task ConsumedAcknowledgmentCannotBeReplayed()
+    {
+        SampleHost host = SampleComposition.Create();
+        AiToolProposal proposal = CreateProposal(
+            proposalId: "proposal-replayed-ack",
+            recipient: "partner@example.net",
+            template: "case-update");
+
+        GatewayResult first = await host.Gateway.ExecuteAsync(
+            proposal,
+            CreateActor(),
+            _nowUtc,
+            acknowledgmentResponse: null,
+            CancellationToken.None);
+
+        AcknowledgmentChallenge challenge =
+            Assert.IsType<AcknowledgmentChallenge>(
+                first.AcknowledgmentChallenge);
+
+        var response = new AcknowledgmentResponse(
+            challenge.ChallengeId,
+            "operator-7",
+            Accepted: true,
+            RespondedUtc: _nowUtc.AddSeconds(5));
+
+        GatewayResult accepted = await host.Gateway.ExecuteAsync(
+            proposal,
+            CreateActor(),
+            _nowUtc.AddSeconds(5),
+            response,
+            CancellationToken.None);
+
+        GatewayResult replayed = await host.Gateway.ExecuteAsync(
+            proposal,
+            CreateActor(),
+            _nowUtc.AddSeconds(10),
+            response with
+            {
+                RespondedUtc = _nowUtc.AddSeconds(10)
+            },
+            CancellationToken.None);
+
+        Assert.Equal(GatewayStatus.WouldExecute, accepted.Status);
+        Assert.Equal(GatewayStatus.Rejected, replayed.Status);
+        Assert.Equal(
+            "acknowledgment.challenge-consumed",
+            replayed.ReasonCode);
+        Assert.Equal(1, host.Handler.InvocationCount);
     }
 
     [Fact]

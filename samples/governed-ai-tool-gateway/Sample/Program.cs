@@ -168,6 +168,8 @@ public static class SampleComposition
         var contextFactory = new HostPolicyContextFactory();
         var policy = new NotificationPolicy();
         var acknowledgmentService = new AcknowledgmentService();
+        var acknowledgmentChallengeStore =
+            new InMemoryAcknowledgmentChallengeStore();
         var capabilityIssuer = new ExecutionCapabilityIssuer();
         var capabilityValidator = new ExecutionCapabilityValidator();
         var useStore = new InMemoryCapabilityUseStore();
@@ -177,6 +179,7 @@ public static class SampleComposition
 
         var gateway = new GovernedAiToolGateway(
             toolRegistry,
+            acknowledgmentChallengeStore,
             useStore,
             handler,
             auditSink);
@@ -187,6 +190,7 @@ public static class SampleComposition
             ContextFactory: contextFactory,
             Policy: policy,
             AcknowledgmentService: acknowledgmentService,
+            AcknowledgmentChallengeStore: acknowledgmentChallengeStore,
             CapabilityIssuer: capabilityIssuer,
             CapabilityValidator: capabilityValidator,
             CapabilityUseStore: useStore,
@@ -201,6 +205,7 @@ public sealed record SampleHost(
     HostPolicyContextFactory ContextFactory,
     NotificationPolicy Policy,
     AcknowledgmentService AcknowledgmentService,
+    InMemoryAcknowledgmentChallengeStore AcknowledgmentChallengeStore,
     ExecutionCapabilityIssuer CapabilityIssuer,
     ExecutionCapabilityValidator CapabilityValidator,
     InMemoryCapabilityUseStore CapabilityUseStore,
@@ -452,6 +457,75 @@ public sealed record AcknowledgmentResponse(
     bool Accepted,
     DateTimeOffset RespondedUtc);
 
+public enum AcknowledgmentChallengeLookupStatus
+{
+    Unknown,
+    Issued,
+    Consumed
+}
+
+public sealed record AcknowledgmentChallengeLookup(
+    AcknowledgmentChallengeLookupStatus Status,
+    AcknowledgmentChallenge? Challenge);
+
+public sealed class InMemoryAcknowledgmentChallengeStore
+{
+    private readonly object _sync = new();
+    private readonly Dictionary<string, AcknowledgmentChallenge> _issued =
+        new(StringComparer.Ordinal);
+    private readonly HashSet<string> _consumed =
+        new(StringComparer.Ordinal);
+
+    public void Issue(AcknowledgmentChallenge challenge)
+    {
+        lock (_sync)
+        {
+            if (!_issued.TryAdd(challenge.ChallengeId, challenge))
+            {
+                throw new InvalidOperationException(
+                    "The acknowledgment challenge identifier was already issued.");
+            }
+        }
+    }
+
+    public AcknowledgmentChallengeLookup Find(string challengeId)
+    {
+        lock (_sync)
+        {
+            if (_issued.TryGetValue(
+                    challengeId,
+                    out AcknowledgmentChallenge? challenge))
+            {
+                return new(
+                    AcknowledgmentChallengeLookupStatus.Issued,
+                    challenge);
+            }
+
+            return _consumed.Contains(challengeId)
+                ? new(
+                    AcknowledgmentChallengeLookupStatus.Consumed,
+                    null)
+                : new(
+                    AcknowledgmentChallengeLookupStatus.Unknown,
+                    null);
+        }
+    }
+
+    public bool TryConsume(string challengeId)
+    {
+        lock (_sync)
+        {
+            if (!_issued.Remove(challengeId))
+            {
+                return false;
+            }
+
+            _consumed.Add(challengeId);
+            return true;
+        }
+    }
+}
+
 public sealed record AcknowledgmentValidationResult(
     bool Accepted,
     string ReasonCode,
@@ -482,7 +556,9 @@ public sealed class AcknowledgmentService
             ? throw new InvalidOperationException(
                 "Acknowledgment challenges may only satisfy an acknowledgment-required decision.")
             : new AcknowledgmentChallenge(
-            ChallengeId: $"{context.CorrelationId}-ack-{context.OperationName}-{context.Recipient}",
+            ChallengeId: Convert.ToHexString(
+                    System.Security.Cryptography.RandomNumberGenerator.GetBytes(32))
+                .ToLowerInvariant(),
             ActorId: context.ActorId,
             OperationName: context.OperationName,
             Recipient: context.Recipient,
@@ -496,6 +572,7 @@ public sealed class AcknowledgmentService
     public static AcknowledgmentValidationResult Validate(
         AcknowledgmentChallenge challenge,
         AcknowledgmentResponse response,
+        AiToolPolicyContext context,
         DateTimeOffset nowUtc)
     {
         if (!string.Equals(
@@ -510,21 +587,48 @@ public sealed class AcknowledgmentService
         if (!string.Equals(
                 challenge.ActorId,
                 response.ActorId,
+                StringComparison.Ordinal) ||
+            !string.Equals(
+                challenge.ActorId,
+                context.ActorId,
                 StringComparison.Ordinal))
         {
             return AcknowledgmentValidationResult.Failure(
                 "acknowledgment.actor-mismatch");
         }
 
-        return response.RespondedUtc < challenge.IssuedUtc ||
-            nowUtc >= challenge.ExpiresUtc
+        if (!string.Equals(
+                challenge.OperationName,
+                context.OperationName,
+                StringComparison.Ordinal))
+        {
+            return AcknowledgmentValidationResult.Failure(
+                "acknowledgment.operation-mismatch");
+        }
+
+        if (!string.Equals(
+                challenge.Recipient,
+                context.Recipient,
+                StringComparison.Ordinal))
+        {
+            return AcknowledgmentValidationResult.Failure(
+                "acknowledgment.resource-mismatch");
+        }
+
+        bool outsideIssuedWindow =
+            response.RespondedUtc < challenge.IssuedUtc ||
+            response.RespondedUtc >= challenge.ExpiresUtc ||
+            nowUtc < challenge.IssuedUtc ||
+            nowUtc >= challenge.ExpiresUtc;
+
+        return outsideIssuedWindow
             ? AcknowledgmentValidationResult.Failure(
                 "acknowledgment.expired")
             : !response.Accepted
             ? AcknowledgmentValidationResult.Failure(
                 "acknowledgment.rejected")
             : AcknowledgmentValidationResult.Success(
-            $"{challenge.ChallengeId}-accepted");
+                $"{challenge.ChallengeId}-accepted");
     }
 }
 
@@ -851,6 +955,7 @@ public sealed record GatewayResult(
 
 public sealed class GovernedAiToolGateway(
     ToolRegistry toolRegistry,
+    InMemoryAcknowledgmentChallengeStore acknowledgmentChallengeStore,
     InMemoryCapabilityUseStore capabilityUseStore,
     RecordingNotificationHandler handler,
     InMemoryAuditSink auditSink)
@@ -942,14 +1047,18 @@ public sealed class GovernedAiToolGateway(
         if (decision.Outcome ==
             GovernanceDecisionOutcome.AcknowledgmentRequired)
         {
-            AcknowledgmentChallenge challenge =
-                AcknowledgmentService.CreateChallenge(
-                    context,
-                    decision,
-                    nowUtc);
+            AcknowledgmentChallenge challenge;
 
             if (acknowledgmentResponse is null)
             {
+                challenge =
+                    AcknowledgmentService.CreateChallenge(
+                        context,
+                        decision,
+                        nowUtc);
+
+                acknowledgmentChallengeStore.Issue(challenge);
+
                 auditSink.Write(
                     context.CorrelationId,
                     "acknowledgment",
@@ -962,25 +1071,73 @@ public sealed class GovernedAiToolGateway(
                     challenge);
             }
 
+            AcknowledgmentChallengeLookup lookup =
+                acknowledgmentChallengeStore.Find(
+                    acknowledgmentResponse.ChallengeId);
+
+            if (lookup.Status !=
+                    AcknowledgmentChallengeLookupStatus.Issued ||
+                lookup.Challenge is null)
+            {
+                string reasonCode =
+                    lookup.Status ==
+                    AcknowledgmentChallengeLookupStatus.Consumed
+                        ? "acknowledgment.challenge-consumed"
+                        : "acknowledgment.challenge-unknown";
+
+                auditSink.Write(
+                    context.CorrelationId,
+                    "acknowledgment",
+                    "rejected",
+                    reasonCode);
+
+                return GatewayResult.Rejected(
+                    context.CorrelationId,
+                    reasonCode);
+            }
+
+            challenge = lookup.Challenge;
+
             AcknowledgmentValidationResult acknowledgment =
                 AcknowledgmentService.Validate(
                     challenge,
                     acknowledgmentResponse,
+                    context,
                     nowUtc);
-
-            auditSink.Write(
-                context.CorrelationId,
-                "acknowledgment",
-                acknowledgment.Accepted ? "accepted" : "rejected",
-                acknowledgment.ReasonCode);
 
             if (!acknowledgment.Accepted ||
                 acknowledgment.AcknowledgmentId is null)
             {
+                auditSink.Write(
+                    context.CorrelationId,
+                    "acknowledgment",
+                    "rejected",
+                    acknowledgment.ReasonCode);
+
                 return GatewayResult.Rejected(
                     context.CorrelationId,
                     acknowledgment.ReasonCode);
             }
+
+            if (!acknowledgmentChallengeStore.TryConsume(
+                    challenge.ChallengeId))
+            {
+                auditSink.Write(
+                    context.CorrelationId,
+                    "acknowledgment",
+                    "rejected",
+                    "acknowledgment.challenge-consumed");
+
+                return GatewayResult.Rejected(
+                    context.CorrelationId,
+                    "acknowledgment.challenge-consumed");
+            }
+
+            auditSink.Write(
+                context.CorrelationId,
+                "acknowledgment",
+                "accepted",
+                acknowledgment.ReasonCode);
 
             context = context with
             {
