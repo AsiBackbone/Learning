@@ -89,6 +89,7 @@ static partial class AsiBackboneApiReferenceValidator
         "BackboneResult",
         "CapabilityTokenGrant",
         "CapabilityTokens",
+        "CreateExecutionBoundary",
         "DefaultAsiBackboneAcknowledgmentChallengeService",
         "DefaultAsiBackboneDlpFailurePolicyResolver",
         "DefaultAsiBackboneEndpointGovernanceService",
@@ -233,7 +234,7 @@ static partial class AsiBackboneApiReferenceValidator
                         if (ForbiddenCurrentSymbols.Contains(identifierMatch.Value))
                         {
                             errors.Add(
-                                $"{relativePath}:{lineIndex + 1} uses a removed or renamed pre-7.0 symbol '{identifierMatch.Value}'.");
+                                $"{relativePath}:{lineIndex + 1} uses a retired, removed, or renamed implementation symbol '{identifierMatch.Value}'.");
                         }
                     }
                 }
