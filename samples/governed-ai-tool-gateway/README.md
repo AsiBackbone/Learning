@@ -235,13 +235,18 @@ AcknowledgmentRequired
 
 The host creates a challenge bound to:
 
+- A cryptographically unpredictable challenge identifier.
 - Actor.
+- Tenant.
+- Workflow correlation/proposal identity.
 - Operation.
 - Recipient.
 - Reason code.
-- Time window.
+- Issuance time and five-minute expiry.
 
-If the actor accepts the challenge, the host records the acknowledgment identity in policy context and **re-evaluates** the decision.
+The teaching host persists the exact issued challenge in an in-memory challenge store. A response must present an identifier that the host actually issued, and validation compares the response with that stored challenge and the current host-built actor, tenant, workflow correlation, operation, recipient, issuance time, and expiry. Unknown identifiers, future-dated response timestamps, expired challenges, and already-consumed challenges are rejected.
+
+If the actor accepts the challenge, the host atomically marks that challenge consumed before recording the acknowledgment identity in policy context and **re-evaluates** the decision.
 
 The sequence is:
 
@@ -261,7 +266,9 @@ Allowed or blocked
 
 The acknowledgment does not directly invoke the tool.
 
-A response from the wrong actor is rejected.
+A response from the wrong actor is rejected. Changing the bound recipient also invalidates the response, and replaying an accepted challenge is rejected because the challenge is already consumed.
+
+The in-memory challenge store is intentionally local teaching state. It removes expired issued challenges and retains consumed or expired identifiers only for a short replay-detection window; a later replay still fails as unknown after that tombstone is removed. A production host with multiple instances must use durable or distributed challenge state with atomic consume semantics, an explicit retention policy, and bounded cleanup so every instance validates the same issued challenge lifecycle and cannot accept the same challenge twice.
 
 ## Scoped Capability Preserves Narrow Authority
 
@@ -423,12 +430,19 @@ The focused test project verifies that:
 6. An unclassified destination is deferred.
 7. Rejected acknowledgment does not become execution authority.
 8. An acknowledgment from the wrong actor is rejected.
-9. Changing the recipient after acknowledgment requires a new recipient-bound acknowledgment.
-10. Valid external acknowledgment causes re-evaluation before execution authority is issued.
-11. Changing the recipient after approval invalidates the capability.
-12. An expired capability is rejected at the execution boundary.
-13. Replaying the same capability identity cannot invoke the handler twice.
-14. A successful flow preserves one correlation identifier across evidence stages.
+9. A challenge cannot cross tenant boundaries even when the actor identifier is the same.
+10. A challenge cannot cross workflow correlation boundaries.
+11. An issued challenge submitted at or after its five-minute expiry is rejected.
+12. A response timestamp later than the host's current time is rejected.
+13. A correctly formatted but never-issued challenge identifier is rejected.
+14. Expired and consumed state is pruned after a bounded replay-detection window.
+15. Changing the recipient after acknowledgment requires a new recipient-bound acknowledgment.
+16. Valid external acknowledgment causes re-evaluation before execution authority is issued.
+17. Replaying an already-consumed acknowledgment challenge is rejected.
+18. Changing the recipient after approval invalidates the capability.
+19. An expired capability is rejected at the execution boundary.
+20. Replaying the same capability identity cannot invoke the handler twice.
+21. A successful flow preserves one correlation identifier across evidence stages.
 
 These tests make the sample's architectural contract executable.
 
@@ -470,6 +484,7 @@ This teaching sample does not claim to provide production implementations of:
 - Model sandboxing.
 - Prompt-injection prevention.
 - Cryptographic capability proof.
+- Durable or distributed acknowledgment challenge storage.
 - Durable replay storage.
 - Distributed atomic consumption.
 - Capability revocation.
@@ -493,7 +508,7 @@ Compare the small teaching implementation with the fuller working `AsiBackbone` 
 - [Human Approval Before AI Tool Execution](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/human-approval-before-ai-tool-execution.md)
 - [GovernanceDecision](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs)
 - [DecisionReceipt](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs)
-- [CapabilityTokenGrant](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs)
+- [CapabilityTokenGrant](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs)
 - [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md)
 - [`AsiBackbone.OpenTelemetry` README](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/README.md)
 - [`OpenTelemetryGovernanceInstrumentation`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/OpenTelemetryGovernanceInstrumentation.cs)

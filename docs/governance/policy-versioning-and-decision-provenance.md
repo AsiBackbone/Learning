@@ -1399,11 +1399,11 @@ That is an example of policy evidence propagating into later governance evidence
 
 ### CapabilityTokenGrant
 
-[`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) can carry optional `PolicyVersion` and `PolicyHash` bindings into short-lived execution authority.
+[`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) can carry optional `PolicyVersion` and `PolicyHash` bindings into short-lived execution authority.
 
 ### CapabilityGrantValidationOptions
 
-[`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) allows an execution boundary to state expected policy version/hash values during capability validation.
+[`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) allows an execution boundary to state expected policy version/hash values during capability validation.
 
 These references show concrete implementation seams.
 
