@@ -693,6 +693,12 @@ public sealed class AcknowledgmentService
             nowUtc < challenge.IssuedUtc ||
             nowUtc >= challenge.ExpiresUtc;
 
+        if (response.RespondedUtc > nowUtc)
+        {
+            return AcknowledgmentValidationResult.Failure(
+                "acknowledgment.response-in-future");
+        }
+
         return outsideIssuedWindow
             ? AcknowledgmentValidationResult.Failure(
                 "acknowledgment.expired")

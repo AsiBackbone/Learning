@@ -149,7 +149,7 @@ static partial class AsiBackboneApiReferenceValidator
     private static partial Regex IdentifierRegex();
 
     [GeneratedRegex(
-        @"https://github\.com/AsiBackbone/AsiBackbone/(?:blob|tree)/(?!main(?:/|\b))[^\s)\]'>]+",
+        @"https://github\.com/AsiBackbone/AsiBackbone/(?:blob|tree)/(?!(?:main|v6\.0\.0)(?:/|\b))[^\s)\]'>]+",
         RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
     private static partial Regex StaleImplementationLinkRegex();
 
@@ -237,7 +237,7 @@ static partial class AsiBackboneApiReferenceValidator
             {
                 int lineNumber = GetLineNumber(text, linkMatch.Index);
                 errors.Add(
-                    $"{relativePath}:{lineNumber} links implementation source outside main: {linkMatch.Value}");
+                    $"{relativePath}:{lineNumber} links implementation source outside main or the supported v6.0.0 tag: {linkMatch.Value}");
             }
         }
     }

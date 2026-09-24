@@ -328,6 +328,44 @@ public sealed class GovernedGatewayTests
     }
 
     [Fact]
+    public async Task FutureDatedAcknowledgmentResponseIsRejected()
+    {
+        SampleHost host = SampleComposition.Create();
+        AiToolProposal proposal = CreateProposal(
+            proposalId: "proposal-future-dated-ack",
+            recipient: "partner@example.net",
+            template: "case-update");
+
+        GatewayResult first = await host.Gateway.ExecuteAsync(
+            proposal,
+            CreateActor(),
+            _nowUtc,
+            acknowledgmentResponse: null,
+            CancellationToken.None);
+
+        AcknowledgmentChallenge challenge =
+            Assert.IsType<AcknowledgmentChallenge>(
+                first.AcknowledgmentChallenge);
+
+        GatewayResult result = await host.Gateway.ExecuteAsync(
+            proposal,
+            CreateActor(),
+            _nowUtc.AddSeconds(5),
+            new AcknowledgmentResponse(
+                challenge.ChallengeId,
+                "operator-7",
+                Accepted: true,
+                RespondedUtc: _nowUtc.AddMinutes(1)),
+            CancellationToken.None);
+
+        Assert.Equal(GatewayStatus.Rejected, result.Status);
+        Assert.Equal(
+            "acknowledgment.response-in-future",
+            result.ReasonCode);
+        Assert.Equal(0, host.Handler.InvocationCount);
+    }
+
+    [Fact]
     public async Task NeverIssuedChallengeIdentifierIsRejected()
     {
         SampleHost host = SampleComposition.Create();

@@ -244,7 +244,7 @@ The host creates a challenge bound to:
 - Reason code.
 - Issuance time and five-minute expiry.
 
-The teaching host persists the exact issued challenge in an in-memory challenge store. A response must present an identifier that the host actually issued, and validation compares the response with that stored challenge and the current host-built actor, tenant, workflow correlation, operation, recipient, issuance time, and expiry. Unknown identifiers, expired challenges, and already-consumed challenges are rejected.
+The teaching host persists the exact issued challenge in an in-memory challenge store. A response must present an identifier that the host actually issued, and validation compares the response with that stored challenge and the current host-built actor, tenant, workflow correlation, operation, recipient, issuance time, and expiry. Unknown identifiers, future-dated response timestamps, expired challenges, and already-consumed challenges are rejected.
 
 If the actor accepts the challenge, the host atomically marks that challenge consumed before recording the acknowledgment identity in policy context and **re-evaluates** the decision.
 
@@ -433,15 +433,16 @@ The focused test project verifies that:
 9. A challenge cannot cross tenant boundaries even when the actor identifier is the same.
 10. A challenge cannot cross workflow correlation boundaries.
 11. An issued challenge submitted at or after its five-minute expiry is rejected.
-12. A correctly formatted but never-issued challenge identifier is rejected.
-13. Expired and consumed state is pruned after a bounded replay-detection window.
-14. Changing the recipient after acknowledgment requires a new recipient-bound acknowledgment.
-15. Valid external acknowledgment causes re-evaluation before execution authority is issued.
-16. Replaying an already-consumed acknowledgment challenge is rejected.
-17. Changing the recipient after approval invalidates the capability.
-18. An expired capability is rejected at the execution boundary.
-19. Replaying the same capability identity cannot invoke the handler twice.
-20. A successful flow preserves one correlation identifier across evidence stages.
+12. A response timestamp later than the host's current time is rejected.
+13. A correctly formatted but never-issued challenge identifier is rejected.
+14. Expired and consumed state is pruned after a bounded replay-detection window.
+15. Changing the recipient after acknowledgment requires a new recipient-bound acknowledgment.
+16. Valid external acknowledgment causes re-evaluation before execution authority is issued.
+17. Replaying an already-consumed acknowledgment challenge is rejected.
+18. Changing the recipient after approval invalidates the capability.
+19. An expired capability is rejected at the execution boundary.
+20. Replaying the same capability identity cannot invoke the handler twice.
+21. A successful flow preserves one correlation identifier across evidence stages.
 
 These tests make the sample's architectural contract executable.
 
@@ -507,7 +508,7 @@ Compare the small teaching implementation with the fuller working `AsiBackbone` 
 - [Human Approval Before AI Tool Execution](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/human-approval-before-ai-tool-execution.md)
 - [GovernanceDecision](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs)
 - [DecisionReceipt](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs)
-- [CapabilityTokenGrant](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs)
+- [CapabilityTokenGrant](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs)
 - [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md)
 - [`AsiBackbone.OpenTelemetry` README](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/README.md)
 - [`OpenTelemetryGovernanceInstrumentation`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/OpenTelemetryGovernanceInstrumentation.cs)
