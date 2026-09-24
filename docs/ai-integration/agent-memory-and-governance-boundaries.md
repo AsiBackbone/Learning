@@ -1231,7 +1231,7 @@ Existing governance primitives remain useful reference points for preserving the
 
 - [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — structured current governance outcomes should remain distinct from remembered historical decisions.
 - [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) — governance evidence has a different lifecycle and purpose from model-visible memory.
-- [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — narrow authority should remain an explicit capability concern rather than being reconstructed from memory.
+- [`CapabilityGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrant.cs) — narrow authority should remain an explicit capability concern rather than being reconstructed from memory.
 - [AI Agent Gateway Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/ai-agent-gateway.md) — reinforces the boundary in which the model proposes and the host owns context, policy, and execution.
 
 The host remains responsible for the memory store, retention model, source validation, isolation strategy, retrieval policy, and any product-specific user controls.

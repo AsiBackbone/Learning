@@ -81,11 +81,14 @@ static partial class AsiBackboneApiReferenceValidator
         "AsiBackboneTestHarnessPolicyEvaluator",
         "AsiBackboneTestHarnessServiceCollectionExtensions",
         "AsiBackboneTestSigningService",
+        "AuditResidueLifecycleEventTests",
         "AuditResidue",
         "AuditResidueBuilder",
         "AuditResidueLifecycleEvent",
         "AuditResidueLifecycleStage",
         "BackboneResult",
+        "CapabilityTokenGrant",
+        "CapabilityTokens",
         "DefaultAsiBackboneAcknowledgmentChallengeService",
         "DefaultAsiBackboneDlpFailurePolicyResolver",
         "DefaultAsiBackboneEndpointGovernanceService",
@@ -93,6 +96,7 @@ static partial class AsiBackboneApiReferenceValidator
         "EfCoreAuditResidueLifecycleStore",
         "HttpContextAsiBackboneActorContextResolver",
         "HttpContextAsiBackboneRequestCorrelationResolver",
+        "Handshakes",
         "IAsiBackboneAcknowledgmentChallengeService",
         "IAsiBackboneActorContext",
         "IAsiBackboneAuditLedgerStore",
@@ -122,6 +126,8 @@ static partial class AsiBackboneApiReferenceValidator
         "IAsiBackboneSignatureVerificationService",
         "IAsiBackboneSigningService",
         "InMemoryAuditResidueLifecycleStore",
+        "LiabilityHandshakeAcknowledgment",
+        "LiabilityHandshakeRequest",
         "RequireGovernancePolicy",
         "RequireGovernancePolicyAttribute"
     };
@@ -176,7 +182,7 @@ static partial class AsiBackboneApiReferenceValidator
 
         if (errors.Count > 0)
         {
-            Console.Error.WriteLine("AsiBackbone 6.0 API-reference validation failed:");
+            Console.Error.WriteLine("AsiBackbone API-reference validation failed:");
 
             foreach (string error in errors)
             {
@@ -194,7 +200,7 @@ static partial class AsiBackboneApiReferenceValidator
             : $"{packageReferenceCount} AsiBackbone 6.x package reference(s)";
 
         Console.WriteLine(
-            $"Validated AsiBackbone 6.0 API references across {textFiles.Length} instructional file(s): {packageSummary}.");
+            $"Validated current AsiBackbone references and the historical 6.0 API boundary across {textFiles.Length} instructional file(s): {packageSummary}.");
         return 0;
     }
 
@@ -227,7 +233,7 @@ static partial class AsiBackboneApiReferenceValidator
                         if (ForbiddenCurrentSymbols.Contains(identifierMatch.Value))
                         {
                             errors.Add(
-                                $"{relativePath}:{lineIndex + 1} uses removed or renamed 5.x symbol '{identifierMatch.Value}'.");
+                                $"{relativePath}:{lineIndex + 1} uses a removed or renamed pre-7.0 symbol '{identifierMatch.Value}'.");
                         }
                     }
                 }

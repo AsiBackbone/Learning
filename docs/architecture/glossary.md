@@ -257,7 +257,7 @@ An allowlist blocks unknown or unapproved tool names from reaching handlers. Mem
 
 ## Current AsiBackbone Implementation Correspondence
 
-The Learning glossary is architectural first. The current [`AsiBackbone/AsiBackbone` implementation glossary](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/glossary.md) provides the implementation-side vocabulary and API cross-references.
+The Learning glossary is architectural first. The current [`AsiBackbone/AsiBackbone` implementation glossary](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/glossary.md) provides the implementation-side vocabulary and API cross-references. The correspondences below use the 7.0 public CLR names; intentionally stable signed, telemetry, and protocol strings may retain their 6.x values.
 
 The most direct correspondences are:
 
@@ -273,11 +273,11 @@ The most direct correspondences are:
 | Defer | `GovernanceDecisionOutcome.Deferred` |
 | Require acknowledgment | `GovernanceDecisionOutcome.AcknowledgmentRequired` |
 | Escalate | `GovernanceDecisionOutcome.EscalationRecommended` |
-| Acknowledgment | `LiabilityHandshakeAcknowledgment`; ASP.NET Core challenge support also exposes acknowledgment challenge types and services. |
+| Acknowledgment | `AcknowledgmentResponse`; ASP.NET Core challenge support also exposes acknowledgment challenge types and services. |
 | Decision receipt | `DecisionReceipt`; durable ledger support includes `AuditLedgerRecord` and `IGovernanceAuditLedgerStore`. |
 | Policy version | `GovernanceDecision.PolicyVersion` |
 | Policy fingerprint | `GovernanceDecision.PolicyHash` |
-| Scoped capability / capability token | `CapabilityTokenGrant`, `CapabilityGrantValidator` |
+| Scoped capability / capability token | `CapabilityGrant`, `CapabilityGrantValidator` |
 | Operational gateway | Implemented as a host-owned architecture pattern rather than one universal gateway base type. |
 
 The current implementation also defines `GovernanceDecisionOutcome.Warning`, which permits continuation while retaining warning reasons. Foundational Learning tutorials may omit `Warning` when a smaller outcome set keeps the teaching example focused; that simplification should not be read as a claim that the implementation enum has only five members.

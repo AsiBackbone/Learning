@@ -712,9 +712,9 @@ Use `git status` first so you understand which local work will be affected.
 - [Scoped Capability and Host-Owned Execution lab](scoped-capability-and-host-owned-execution.md) — revisit the broader capability boundary and its introductory single-use exercise.
 - [Data Access Boundaries and Transaction Reasoning](../aspnetcore/data-access-boundaries-and-transaction-reasoning.md) — bridge `TryConsumeAsync` semantics into durable transaction and persistence design.
 - [Governed AI Tool Gateway](../tutorials/governed-ai-tool-gateway.md) — see bounded authority inside a larger AI-assisted execution boundary.
-- [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/CapabilityTokens/ICapabilityGrantUseStore.cs) — compare the lab contract with the working framework seam.
-- [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Storage.InMemory/CapabilityTokens/InMemoryCapabilityGrantUseStore.cs) — inspect the working local reference provider and its limitations.
-- [`InMemoryCapabilityGrantUseStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/tests/AsiBackbone.Core.Tests/CapabilityTokens/InMemoryCapabilityGrantUseStoreTests.cs) — compare local concurrency invariant coverage.
+- [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityGrants/ICapabilityGrantUseStore.cs) — compare the lab contract with the working framework seam.
+- [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Storage.InMemory/CapabilityGrants/InMemoryCapabilityGrantUseStore.cs) — inspect the working local reference provider and its limitations.
+- [`InMemoryCapabilityGrantUseStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityGrants/InMemoryCapabilityGrantUseStoreTests.cs) — compare local concurrency invariant coverage.
 
 ---
 

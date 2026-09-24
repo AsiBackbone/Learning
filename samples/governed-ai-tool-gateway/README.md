@@ -508,7 +508,7 @@ Compare the small teaching implementation with the fuller working `AsiBackbone` 
 - [Human Approval Before AI Tool Execution](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/human-approval-before-ai-tool-execution.md)
 - [GovernanceDecision](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs)
 - [DecisionReceipt](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs)
-- [CapabilityTokenGrant](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs)
+- [CapabilityGrant](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrant.cs)
 - [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md)
 - [`AsiBackbone.OpenTelemetry` README](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/README.md)
 - [`OpenTelemetryGovernanceInstrumentation`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/OpenTelemetryGovernanceInstrumentation.cs)

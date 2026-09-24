@@ -249,8 +249,8 @@ Useful experiments include:
 - [Decision Receipts and Acknowledgment intermediate lab](../../docs/labs/decision-receipts-and-acknowledgment.md)
 - [Policy Context and Explicit Decision Outcomes sample](../policy-context-and-explicit-decision-outcomes/README.md)
 - [Scoped Capability and Host-Owned Execution](../../docs/tutorials/scoped-capability-and-host-owned-execution.md)
-- [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) - compare the teaching challenge with the fuller working handshake request.
-- [`LiabilityHandshakeAcknowledgment`](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeAcknowledgment.cs) - inspect the working acknowledgment model.
+- [`AcknowledgmentRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Acknowledgments/AcknowledgmentRequest.cs) - compare the teaching challenge with the fuller working handshake request.
+- [`AcknowledgmentResponse`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Acknowledgments/AcknowledgmentResponse.cs) - inspect the working acknowledgment model.
 - [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) - compare the small teaching receipt with the framework's decision-outcome record.
 - [`DecisionReceiptLifecycleEvent`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceiptLifecycleEvent.cs) - compare the sample's correlated lifecycle events with the framework's acknowledgment, capability, gateway, and emission stages.
 - [`Dynamic Liability Handshake`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/dynamic-liability-handshake.md) - review the fuller handshake lifecycle.

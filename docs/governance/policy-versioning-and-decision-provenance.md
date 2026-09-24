@@ -1397,13 +1397,13 @@ The current type does not define a dedicated `PolicyId` property. A host that ne
 
 That is an example of policy evidence propagating into later governance evidence.
 
-### CapabilityTokenGrant
+### CapabilityGrant
 
-[`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) can carry optional `PolicyVersion` and `PolicyHash` bindings into short-lived execution authority.
+[`CapabilityGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrant.cs) can carry optional `PolicyVersion` and `PolicyHash` bindings into short-lived execution authority.
 
 ### CapabilityGrantValidationOptions
 
-[`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityGrantValidationOptions.cs) allows an execution boundary to state expected policy version/hash values during capability validation.
+[`CapabilityGrantValidationOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrantValidationOptions.cs) allows an execution boundary to state expected policy version/hash values during capability validation.
 
 These references show concrete implementation seams.
 

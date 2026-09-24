@@ -1578,8 +1578,8 @@ Useful references include:
 - [`Human Approval Before AI Tool Execution`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/human-approval-before-ai-tool-execution.md) — focuses on acknowledgment before an AI-proposed consequential action proceeds.
 - [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — structured decision outcomes and reason data.
 - [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) — structured governance evidence.
-- [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs) — framework-neutral acknowledgment/handshake request.
-- [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs) — short-lived, provider-neutral capability metadata for governed follow-on execution.
+- [`AcknowledgmentRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Acknowledgments/AcknowledgmentRequest.cs) — framework-neutral acknowledgment/handshake request.
+- [`CapabilityGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrant.cs) — short-lived, provider-neutral capability metadata for governed follow-on execution.
 - [`Capability Grant Hardening`](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) — execution-boundary validation, proof handling, bindings, failure behavior, and bounded-use guidance.
 
 The working project makes the responsibility boundary explicit:
