@@ -10,7 +10,7 @@ This repository teaches governance and controlled-execution architecture through
 
 > **Read it. Run it. Question it. Improve it.**
 
-> **Production baseline:** Learning 1.0 is aligned with AsiBackbone 6.0. If you are reading material that references the AsiBackbone 5.x API, use the [Learning 1.0 and AsiBackbone 6.0 Compatibility Guide](learning-1-asibackbone-6-compatibility.md) before copying package syntax.
+> **Version boundary:** Learning 1.0 remains the historical AsiBackbone 6.0 baseline. Use the [AsiBackbone 7.0 Compatibility and API Boundary](asibackbone-7-api-boundary.md) for current implementation syntax; use the [Learning 1.0 and AsiBackbone 6.0 Compatibility Guide](learning-1-asibackbone-6-compatibility.md) for the versioned 6.0 record.
 
 ## Start Here
 
@@ -22,8 +22,8 @@ Choose the shortest path that matches how you want to learn:
 | Solve a specific architecture problem | [**Find Your Path**](find-your-path.md) |
 | See the complete curriculum visually | [**Learning Path Map**](learning-path-map.md) |
 | Learn by running code | [**Executable Samples**](../samples/index.md) |
-| Understand version alignment or translate older 5.x material | [**Learning 1.0 and AsiBackbone 6.0 Compatibility Guide**](learning-1-asibackbone-6-compatibility.md) |
-| Copy exact AsiBackbone 6.0 API syntax | [**AsiBackbone 6.0 API Boundary**](asibackbone-6-api-boundary.md) |
+| Copy or prepare current AsiBackbone 7.0 API syntax | [**AsiBackbone 7.0 Compatibility and API Boundary**](asibackbone-7-api-boundary.md) |
+| Maintain the historical Learning 1.0 / 6.0 contract or translate older 5.x material | [**Learning 1.0 and AsiBackbone 6.0 Compatibility Guide**](learning-1-asibackbone-6-compatibility.md) |
 | Practice by changing or challenging the design | [**Hands-On Labs**](../labs/index.md) |
 | Compare a simpler alternative | [**When ASP.NET Core Authorization Is Enough**](../architecture/when-aspnet-core-authorization-is-enough.md) |
 
@@ -110,7 +110,7 @@ The [`samples/`](../samples/index.md) area contains intentionally small .NET tea
 
 They are teaching artifacts rather than production frameworks.
 
-Their local types are not package API signatures. Use the [AsiBackbone 6.0 API Boundary](asibackbone-6-api-boundary.md) when you need exact current namespaces, evaluator construction, endpoint markers, or migration guidance.
+Their local types are not package API signatures. Use the [AsiBackbone 7.0 Compatibility and API Boundary](asibackbone-7-api-boundary.md) when you need exact current namespaces, supported construction paths, security changes, or migration guidance.
 
 ### Tests
 

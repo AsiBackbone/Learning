@@ -9,12 +9,16 @@ return AsiBackboneApiReferenceValidator.Run();
 
 static partial class AsiBackboneApiReferenceValidator
 {
-    private const string ApiBoundaryRelativePath =
-        "docs/getting-started/asibackbone-6-api-boundary.md";
+    private const string CurrentApiBoundaryRelativePath =
+        "docs/getting-started/asibackbone-7-api-boundary.md";
 
-    private static readonly HashSet<string> HistoricalSymbolReferencePaths = new(StringComparer.Ordinal)
+    private const string ValidatorRelativePath =
+        "tools/validate-asibackbone-api-references.cs";
+
+    private static readonly HashSet<string> VersionTransitionReferencePaths = new(StringComparer.Ordinal)
     {
-        ApiBoundaryRelativePath,
+        CurrentApiBoundaryRelativePath,
+        "docs/getting-started/asibackbone-6-api-boundary.md",
         "docs/getting-started/learning-1-asibackbone-6-compatibility.md"
     };
 
@@ -160,6 +164,16 @@ static partial class AsiBackboneApiReferenceValidator
         RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
     private static partial Regex StaleImplementationLinkRegex();
 
+    [GeneratedRegex(
+        @"https://github\.com/AsiBackbone/AsiBackbone/(?:blob|tree)/(?<ref>[^/\s)\]'>]+)/[^\s)\]'>]+",
+        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+    private static partial Regex ImplementationLinkRegex();
+
+    [GeneratedRegex(
+        @"^asibackbone_(?<key>ref|status):\s*(?<value>\S+)\s*$",
+        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Multiline)]
+    private static partial Regex VersionMetadataRegex();
+
     public static int Run()
     {
         string repositoryRoot;
@@ -178,6 +192,7 @@ static partial class AsiBackboneApiReferenceValidator
         string[] textFiles = EnumerateTextFiles(repositoryRoot).ToArray();
 
         ValidateCurrentSymbolsAndLinks(repositoryRoot, textFiles, errors);
+        ValidateVersionedCompatibilityPages(repositoryRoot, errors);
         int packageReferenceCount = ValidatePackageReferences(repositoryRoot, errors);
         ValidateScopeNotices(repositoryRoot, errors);
 
@@ -192,16 +207,16 @@ static partial class AsiBackboneApiReferenceValidator
 
             Console.Error.WriteLine();
             Console.Error.WriteLine(
-                $"Use '{ApiBoundaryRelativePath}' for the current names, supported construction paths, and historical-removal inventory.");
+                $"Use '{CurrentApiBoundaryRelativePath}' for current names and supported construction paths.");
             return 1;
         }
 
         string packageSummary = packageReferenceCount == 0
             ? "no AsiBackbone package references (framework-neutral sample policy)"
-            : $"{packageReferenceCount} AsiBackbone 6.x package reference(s)";
+            : $"{packageReferenceCount} AsiBackbone 7.x package reference(s)";
 
         Console.WriteLine(
-            $"Validated current AsiBackbone references and the historical 6.0 API boundary across {textFiles.Length} instructional file(s): {packageSummary}.");
+            $"Validated current AsiBackbone 7.0 references and immutable historical compatibility pages across {textFiles.Length} instructional file(s): {packageSummary}.");
         return 0;
     }
 
@@ -214,14 +229,14 @@ static partial class AsiBackboneApiReferenceValidator
         {
             string relativePath = NormalizeRelativePath(repositoryRoot, path);
 
-            if (string.Equals(relativePath, "tools/validate-asibackbone-6-api-references.cs", StringComparison.Ordinal))
+            if (string.Equals(relativePath, ValidatorRelativePath, StringComparison.Ordinal))
             {
                 continue;
             }
 
             string text = File.ReadAllText(path);
 
-            if (!HistoricalSymbolReferencePaths.Contains(relativePath))
+            if (!VersionTransitionReferencePaths.Contains(relativePath))
             {
                 string[] lines = File.ReadAllLines(path);
 
@@ -245,6 +260,86 @@ static partial class AsiBackboneApiReferenceValidator
                 int lineNumber = GetLineNumber(text, linkMatch.Index);
                 errors.Add(
                     $"{relativePath}:{lineNumber} links implementation source outside main or the supported v6.0.0 tag: {linkMatch.Value}");
+            }
+        }
+    }
+
+    private static void ValidateVersionedCompatibilityPages(
+        string repositoryRoot,
+        List<string> errors)
+    {
+        string gettingStarted = Path.Combine(repositoryRoot, "docs", "getting-started");
+
+        foreach (string path in Directory.EnumerateFiles(gettingStarted, "*.md", SearchOption.TopDirectoryOnly))
+        {
+            string relativePath = NormalizeRelativePath(repositoryRoot, path);
+            string fileName = Path.GetFileName(path);
+
+            if (!fileName.Contains("asibackbone-", StringComparison.OrdinalIgnoreCase) ||
+                (!fileName.Contains("api-boundary", StringComparison.OrdinalIgnoreCase) &&
+                 !fileName.Contains("compatibility", StringComparison.OrdinalIgnoreCase)))
+            {
+                continue;
+            }
+
+            string text = File.ReadAllText(path);
+            Dictionary<string, string> metadata = VersionMetadataRegex()
+                .Matches(text)
+                .ToDictionary(
+                    match => match.Groups["key"].Value.ToLowerInvariant(),
+                    match => match.Groups["value"].Value,
+                    StringComparer.Ordinal);
+
+            if (!metadata.TryGetValue("ref", out string? expectedRef) ||
+                !metadata.TryGetValue("status", out string? status))
+            {
+                errors.Add($"{relativePath} must declare asibackbone_ref and asibackbone_status metadata.");
+                continue;
+            }
+
+            if (status.Equals("historical", StringComparison.OrdinalIgnoreCase) &&
+                expectedRef.Equals("main", StringComparison.OrdinalIgnoreCase))
+            {
+                errors.Add($"{relativePath} is historical and must use an immutable implementation ref, not main.");
+            }
+
+            bool isCurrentBoundary = relativePath.Equals(
+                CurrentApiBoundaryRelativePath,
+                StringComparison.Ordinal);
+
+            if (status.Equals("current", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!isCurrentBoundary)
+                {
+                    errors.Add(
+                        $"{relativePath} cannot declare itself current; only '{CurrentApiBoundaryRelativePath}' may use the moving implementation boundary.");
+                }
+
+                if (!expectedRef.Equals("main", StringComparison.OrdinalIgnoreCase))
+                {
+                    errors.Add($"{relativePath} is current and must declare asibackbone_ref: main.");
+                }
+            }
+            else if (!status.Equals("historical", StringComparison.OrdinalIgnoreCase))
+            {
+                errors.Add($"{relativePath} has unsupported asibackbone_status '{status}'. Use current or historical.");
+            }
+
+            if (!isCurrentBoundary && expectedRef.Equals("main", StringComparison.OrdinalIgnoreCase))
+            {
+                errors.Add(
+                    $"{relativePath} is a versioned compatibility page and must pin an immutable implementation ref instead of main.");
+            }
+
+            foreach (Match linkMatch in ImplementationLinkRegex().Matches(text))
+            {
+                string actualRef = linkMatch.Groups["ref"].Value;
+
+                if (!actualRef.Equals(expectedRef, StringComparison.OrdinalIgnoreCase))
+                {
+                    errors.Add(
+                        $"{relativePath}:{GetLineNumber(text, linkMatch.Index)} uses implementation ref '{actualRef}' instead of declared ref '{expectedRef}'.");
+                }
             }
         }
     }
@@ -325,10 +420,10 @@ static partial class AsiBackboneApiReferenceValidator
 
             string normalizedVersion = version.Trim().TrimStart('[', '(');
 
-            if (!normalizedVersion.StartsWith("6.", StringComparison.Ordinal))
+            if (!normalizedVersion.StartsWith("7.", StringComparison.Ordinal))
             {
                 errors.Add(
-                    $"{reference.RelativePath} references {reference.PackageId} {version}; Learning package-integration samples must use 6.x.");
+                    $"{reference.RelativePath} references {reference.PackageId} {version}; current Learning package-integration samples must use 7.x.");
             }
         }
 
@@ -361,10 +456,10 @@ static partial class AsiBackboneApiReferenceValidator
             string text = File.ReadAllText(path);
 
             if (!text.Contains("Learning-owned", StringComparison.Ordinal) ||
-                !text.Contains("asibackbone-6-api-boundary.md", StringComparison.OrdinalIgnoreCase))
+                !text.Contains("asibackbone-7-api-boundary.md", StringComparison.OrdinalIgnoreCase))
             {
                 errors.Add(
-                    $"{relativePath} must distinguish Learning-owned code from the AsiBackbone 6.0 API and link the API boundary guide.");
+                    $"{relativePath} must distinguish Learning-owned code from the AsiBackbone 7.0 API and link the current API boundary guide.");
             }
         }
     }

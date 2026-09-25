@@ -1,12 +1,14 @@
 ---
 description: Understand the Learning 1.0 and AsiBackbone 6.0 baseline, changes from 5.x, and where authoritative implementation behavior is documented.
+asibackbone_ref: v6.0.0
+asibackbone_status: historical
 ---
 
 # Learning 1.0 and AsiBackbone 6.0 Compatibility Guide
 
-> **Production baseline:** Learning 1.0 documents and teaches the AsiBackbone 6.0 production surface. Earlier Learning releases remain historical educational records and may reference APIs or terminology that were valid in earlier AsiBackbone release lines.
+> **Historical baseline:** Learning 1.0 documents and teaches the AsiBackbone 6.0 production surface. Use the [AsiBackbone 7.0 API Boundary](asibackbone-7-api-boundary.md) for current package syntax.
 
-Learning 1.0 is the educational companion to AsiBackbone 6.0. That alignment means current Learning terminology, API-facing examples, and implementation links are interpreted against the `main` product baseline.
+Learning 1.0 is the educational companion to AsiBackbone 6.0. Its API-facing examples and implementation links are interpreted against the immutable `v6.0.0` product baseline.
 
 It does **not** mean that Learning depends on the AsiBackbone packages. Most Learning samples remain framework-neutral teaching models, and the architecture lessons are intended to remain useful even when you implement them without AsiBackbone.
 
@@ -16,8 +18,8 @@ This guide explains the version relationship and the educational impact of the 6
 
 | Material | How to interpret it |
 | --- | --- |
-| **Learning 1.0** | Current production architecture education aligned with AsiBackbone 6.0 terminology and public API concepts. |
-| **AsiBackbone 6.0** | Authoritative implementation baseline for package IDs, namespaces, public types, members, defaults, runtime behavior, compatibility, and migration details. |
+| **Learning 1.0** | Versioned architecture education aligned with AsiBackbone 6.0 terminology and public API concepts. |
+| **AsiBackbone 6.0** | Historical implementation baseline for package IDs, namespaces, public types, members, defaults, runtime behavior, compatibility, and migration details. |
 | **Earlier Learning releases** | Historical educational records. Their architecture explanations may still be useful, but API-facing examples can reflect the AsiBackbone release line current when they were published. |
 | **AsiBackbone 5.x material** | Historical implementation guidance. Translate package API syntax through the 5.x-to-6.0 migration guidance before using it in current code. |
 
@@ -25,7 +27,7 @@ The ownership rule is intentionally simple:
 
 > **Learning teaches the architecture. AsiBackbone defines the released API and runtime truth.**
 
-The implementation repository documents the same boundary in its [Documentation Ownership](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/documentation-ownership.md) guidance.
+The implementation repository documents the same boundary in its [Documentation Ownership](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/docs/articles/documentation-ownership.md) guidance.
 
 ## What Changed Conceptually
 
@@ -33,7 +35,7 @@ The 6.0 transition refines terminology without changing the central governed-exe
 
 ### Decision receipt replaces audit residue in current teaching
 
-Learning 1.0 uses **decision receipt** for the structured record of a policy decision, its outcome, and its reasons. The 6.0 product API likewise renamed the `AuditResidue` family to the `DecisionReceipt` family.
+Within the Learning 1.0 baseline, **decision receipt** is the structured record of a policy decision, its outcome, and its reasons. The 6.0 product API likewise renamed the `AuditResidue` family to the `DecisionReceipt` family.
 
 A decision receipt is intentionally narrower than a claim of execution proof:
 
@@ -58,7 +60,7 @@ The retained word `Liability` in exact Core type names does not claim legal prot
 
 ### Product type names are more domain-focused
 
-AsiBackbone 6.0 removes redundant product-name prefixes from many public types and uses domain qualifiers where they communicate architectural role. Current Learning prose therefore emphasizes familiar concepts such as **context**, **constraint**, **decision**, **evaluator**, **receipt**, and **actor**, while exact API examples use the finalized 6.0 names.
+AsiBackbone 6.0 removes redundant product-name prefixes from many public types and uses domain qualifiers where they communicate architectural role. Learning 1.0 prose therefore emphasizes familiar concepts such as **context**, **constraint**, **decision**, **evaluator**, **receipt**, and **actor**, while its exact API examples use the finalized 6.0 names.
 
 Examples include:
 
@@ -77,7 +79,7 @@ Examples include:
 | `IAsiBackboneAcknowledgmentChallengeService` | `IAcknowledgmentChallengeService` |
 | `RequireGovernancePolicyAttribute` | `GovernancePolicyAttribute` |
 
-This is a representative teaching-oriented subset, not the complete rename inventory. Use the authoritative [6.0 public API naming convention](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/public-api-naming-600.md) for the full list.
+This is a representative teaching-oriented subset, not the complete rename inventory. Use the authoritative [6.0 public API naming convention](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/docs/articles/public-api-naming-600.md) for the full list.
 
 ### Learning can stay simpler than the product surface
 
@@ -101,9 +103,9 @@ Two categories matter most when translating 5.x package examples.
 
 ### Use the finalized 6.0 public names
 
-Current package-facing snippets should use the 6.0 names and namespaces. The [AsiBackbone 6.0 API Boundary](asibackbone-6-api-boundary.md) lists the high-frequency types used by Learning and shows supported evaluator construction and endpoint metadata examples.
+Package-facing snippets within the Learning 1.0 baseline use the 6.0 names and namespaces. The [AsiBackbone 6.0 API Boundary](asibackbone-6-api-boundary.md) lists the high-frequency types used by that release and shows supported evaluator construction and endpoint metadata examples.
 
-Learning-owned sample types remain local teaching models unless a section is explicitly labeled **AsiBackbone 6.0 API**.
+Learning-owned sample types remain local teaching models unless a section is explicitly labeled **AsiBackbone 6.0 API**. New package-facing material should instead follow the [7.0 boundary](asibackbone-7-api-boundary.md).
 
 ### Removed 5.x compatibility members are no longer callable
 
@@ -114,7 +116,7 @@ AsiBackbone 6.0 removes exactly seven public members whose obsolete compatibilit
 
 The 5.x `RequireGovernancePolicyAttribute` type was also renamed to `GovernancePolicyAttribute` in 6.0 so the attribute and route-builder paths use the same marker terminology. That type rename is separate from the seven obsolete-member removals.
 
-Do not use this page as the complete implementation migration checklist. The authoritative [Upgrade from 5.x to 6.0](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-500-to-600.md) guide contains the exact removed-member inventory, replacement guidance, dependency-injection notes, and complete public type rename table.
+Do not use this page as the complete implementation migration checklist. The authoritative [Upgrade from 5.x to 6.0](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/docs/articles/upgrade-500-to-600.md) guide contains the exact removed-member inventory, replacement guidance, dependency-injection notes, and complete public type rename table.
 
 ## What Did Not Change
 
@@ -176,11 +178,11 @@ Use these sources in order, depending on the question:
 
 1. [Learning Architecture Glossary](../architecture/glossary.md) — canonical Learning definitions and teaching vocabulary.
 2. [AsiBackbone 6.0 API Boundary](asibackbone-6-api-boundary.md) — the high-frequency 6.0 package names and examples that Learning readers are most likely to copy.
-3. [Upgrade from 5.x to 6.0](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-500-to-600.md) — authoritative breaking-change and migration guidance.
-4. [6.0 Public API Naming Convention](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/public-api-naming-600.md) — complete public type rename inventory and retained-name decisions.
-5. [AsiBackbone API Terminology Map](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/terminology-map.md) — mapping from Learning concepts to concrete product APIs.
-6. [AsiBackbone API Glossary](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/glossary.md) — implementation-specific meanings, invariants, and host responsibilities.
-7. [Documentation Ownership](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/documentation-ownership.md) — the source-of-truth boundary between the two repositories.
+3. [Upgrade from 5.x to 6.0](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/docs/articles/upgrade-500-to-600.md) — authoritative breaking-change and migration guidance.
+4. [6.0 Public API Naming Convention](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/docs/articles/public-api-naming-600.md) — complete public type rename inventory and retained-name decisions.
+5. [AsiBackbone API Terminology Map](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/docs/articles/terminology-map.md) — mapping from Learning concepts to concrete product APIs.
+6. [AsiBackbone API Glossary](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/docs/articles/glossary.md) — implementation-specific meanings, invariants, and host responsibilities.
+7. [Documentation Ownership](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/docs/articles/documentation-ownership.md) — the source-of-truth boundary between the two repositories.
 
 When those sources overlap, exact API/runtime behavior belongs to `AsiBackbone/AsiBackbone`; architecture teaching and canonical Learning terminology belong to `AsiBackbone/Learning`.
 
@@ -196,11 +198,11 @@ If you are moving a code example or internal document from an AsiBackbone 5.x ba
 - [ ] Replace 5.x `RequireGovernancePolicyAttribute` usage with `GovernancePolicyAttribute`.
 - [ ] Use **decision receipt** in current teaching prose while preserving historical wording in historical release material.
 - [ ] Use **acknowledgment** as the ordinary teaching term and reserve **handshake** for the actual protocol or exact retained type names.
-- [ ] Keep implementation links pinned to `main` when documenting the Learning 1.0 production baseline.
+- [ ] Keep historical implementation links pinned to `v6.0.0`; never use the moving `main` branch for this versioned baseline.
 - [ ] Verify exact behavior in the implementation repository instead of copying a second runtime contract into Learning.
 
 ## Continue
 
 If you are learning the architecture rather than migrating package code, continue with [Decision Before Execution](../tutorials/decision-before-execution.md).
 
-If you are copying AsiBackbone package syntax, continue with the [AsiBackbone 6.0 API Boundary](asibackbone-6-api-boundary.md), then use the implementation repository for exact API and runtime details.
+If you are maintaining an AsiBackbone 6.0 integration, continue with the [historical AsiBackbone 6.0 API Boundary](asibackbone-6-api-boundary.md). For current syntax, use the [AsiBackbone 7.0 API Boundary](asibackbone-7-api-boundary.md).
