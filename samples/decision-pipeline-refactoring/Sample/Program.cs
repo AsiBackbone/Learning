@@ -237,12 +237,19 @@ public sealed class AccountDisablePolicy
             return GovernanceDecision.Defer("account.disable.investigation-pending");
         }
 
-        return context.Account.RequiresManualReview
-            ? GovernanceDecision.Escalate("account.disable.manual-review-required")
-            : !context.AcknowledgmentSatisfied
-            ? GovernanceDecision.RequireAcknowledgment(
-                "account.disable.acknowledgment-required")
-            : GovernanceDecision.Allow();
+        if (context.Account.RequiresManualReview)
+        {
+            return GovernanceDecision.Escalate(
+                "account.disable.manual-review-required");
+        }
+
+        if (!context.AcknowledgmentSatisfied)
+        {
+            return GovernanceDecision.RequireAcknowledgment(
+                "account.disable.acknowledgment-required");
+        }
+
+        return GovernanceDecision.Allow();
     }
 }
 

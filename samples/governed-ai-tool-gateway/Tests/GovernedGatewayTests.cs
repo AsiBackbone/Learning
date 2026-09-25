@@ -328,6 +328,40 @@ public sealed class GovernedGatewayTests
     }
 
     [Fact]
+    public void ExpirationTakesPrecedenceOverRejectedAcknowledgmentResponse()
+    {
+        SampleHost host = SampleComposition.Create();
+        ToolDescriptor descriptor =
+            Assert.IsType<ToolDescriptor>(
+                host.ToolRegistry.Find("notification.send"));
+        AiToolPolicyContext context = HostPolicyContextFactory.Create(
+            CreateProposal(recipient: "partner@example.net"),
+            descriptor,
+            CreateActor());
+        GovernanceDecision decision = NotificationPolicy.Evaluate(context);
+        AcknowledgmentChallenge challenge =
+            AcknowledgmentService.CreateChallenge(
+                context,
+                decision,
+                _nowUtc);
+        var response = new AcknowledgmentResponse(
+            challenge.ChallengeId,
+            challenge.ActorId,
+            Accepted: false,
+            RespondedUtc: challenge.ExpiresUtc);
+
+        AcknowledgmentValidationResult result =
+            AcknowledgmentService.Validate(
+                challenge,
+                response,
+                context,
+                challenge.ExpiresUtc);
+
+        Assert.False(result.Accepted);
+        Assert.Equal("acknowledgment.expired", result.ReasonCode);
+    }
+
+    [Fact]
     public async Task FutureDatedAcknowledgmentResponseIsRejected()
     {
         SampleHost host = SampleComposition.Create();
@@ -660,6 +694,45 @@ public sealed class GovernedGatewayTests
 
         Assert.False(validation.IsValid);
         Assert.Equal("capability.expired", validation.ReasonCode);
+    }
+
+    [Fact]
+    public void AcknowledgmentMismatchTakesPrecedenceOverUseLimitFailure()
+    {
+        SampleHost host = SampleComposition.Create();
+        ToolDescriptor descriptor =
+            Assert.IsType<ToolDescriptor>(
+                host.ToolRegistry.Find("notification.send"));
+        AiToolPolicyContext context = HostPolicyContextFactory.Create(
+            CreateProposal(recipient: "partner@example.net"),
+            descriptor,
+            CreateActor()) with
+        {
+            SatisfiedAcknowledgmentId = "ack-expected"
+        };
+        GovernanceDecision decision = NotificationPolicy.Evaluate(context);
+        ExecutionCapability capability =
+            ExecutionCapabilityIssuer.Issue(
+                context,
+                decision,
+                descriptor,
+                _nowUtc) with
+            {
+                AcknowledgmentId = "ack-other",
+                MaximumUses = 2
+            };
+
+        CapabilityValidationResult validation =
+            ExecutionCapabilityValidator.Validate(
+                capability,
+                context,
+                descriptor,
+                _nowUtc.AddSeconds(10));
+
+        Assert.False(validation.IsValid);
+        Assert.Equal(
+            "capability.acknowledgment-mismatch",
+            validation.ReasonCode);
     }
 
     [Fact]

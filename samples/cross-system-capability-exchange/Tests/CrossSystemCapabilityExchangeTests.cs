@@ -359,6 +359,28 @@ public sealed class CrossSystemCapabilityExchangeTests
     }
 
     [Fact]
+    public async Task RevocationTakesPrecedenceOverRecipientPolicyDenial()
+    {
+        var executor = new RecordingExportExecutor();
+        var revocationStore = new InMemoryRevocationStore();
+        revocationStore.Revoke("cap-a-784");
+
+        CrossSystemGateway gateway =
+            SampleScenarios.CreateGateway(
+                executor,
+                revocationStore: revocationStore);
+
+        GatewayResult result = await gateway.ExecuteAsync(
+            SampleScenarios.CreateArtifact(),
+            SampleScenarios.CreateContext(localPolicyAllows: false),
+            CancellationToken.None);
+
+        Assert.False(result.Executed);
+        Assert.Equal("capability.revoked", result.InternalReasonCode);
+        Assert.Equal(0, executor.InvocationCount);
+    }
+
+    [Fact]
     public async Task ReplayStoreUnavailableFailsClosed()
     {
         var executor = new RecordingExportExecutor();

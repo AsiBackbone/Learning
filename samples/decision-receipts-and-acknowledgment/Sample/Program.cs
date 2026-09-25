@@ -580,16 +580,22 @@ public sealed class DisableAccountPolicy
                 "The actor and account belong to different tenants.");
         }
 
-        return context.Account.IsProtected
-            ? GovernanceDecision.Escalate(
+        if (context.Account.IsProtected)
+        {
+            return GovernanceDecision.Escalate(
                 "account.disable.protected-account",
-                "Protected accounts require escalation.")
-            : string.IsNullOrWhiteSpace(context.Intent.Reason) &&
-            !context.RequiredAcknowledgmentSatisfied
-            ? GovernanceDecision.RequireAcknowledgment(
+                "Protected accounts require escalation.");
+        }
+
+        if (string.IsNullOrWhiteSpace(context.Intent.Reason) &&
+            !context.RequiredAcknowledgmentSatisfied)
+        {
+            return GovernanceDecision.RequireAcknowledgment(
                 "account.disable.reason-required",
-                "The missing administrative reason requires explicit acknowledgment.")
-            : GovernanceDecision.Allow();
+                "The missing administrative reason requires explicit acknowledgment.");
+        }
+
+        return GovernanceDecision.Allow();
     }
 }
 
@@ -645,9 +651,17 @@ public sealed class AcknowledgmentValidator
             return new(false, "acknowledgment.code-mismatch");
         }
 
-        return challenge.CorrelationId != response.CorrelationId
-            ? new(false, "acknowledgment.correlation-mismatch")
-            : nowUtc > challenge.ExpiresUtc ? new(false, "acknowledgment.expired") : new(true, "acknowledgment.accepted");
+        if (challenge.CorrelationId != response.CorrelationId)
+        {
+            return new(false, "acknowledgment.correlation-mismatch");
+        }
+
+        if (nowUtc > challenge.ExpiresUtc)
+        {
+            return new(false, "acknowledgment.expired");
+        }
+
+        return new(true, "acknowledgment.accepted");
     }
 }
 

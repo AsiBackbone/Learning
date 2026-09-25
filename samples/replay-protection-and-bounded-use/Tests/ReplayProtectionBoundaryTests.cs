@@ -191,6 +191,24 @@ public sealed class ReplayProtectionBoundaryTests
     }
 
     [Fact]
+    public void NotYetValidTakesPrecedenceForMalformedLifetimeWindow()
+    {
+        ExecutionCapability capability = CreateCapability() with
+        {
+            IssuedUtc = _issuedUtc.AddMinutes(10),
+            ExpiresUtc = _issuedUtc
+        };
+
+        CapabilityValidationResult result =
+            ExecutionCapabilityValidator.Validate(
+                capability,
+                CreateRequest(nowUtc: _issuedUtc.AddMinutes(1)));
+
+        Assert.False(result.IsValid);
+        Assert.Equal("capability.not-yet-valid", result.ReasonCode);
+    }
+
+    [Fact]
     public async Task MismatchedCapabilityIsRejectedBeforeConsumption()
     {
         var store = new AtomicInMemoryCapabilityUseStore();

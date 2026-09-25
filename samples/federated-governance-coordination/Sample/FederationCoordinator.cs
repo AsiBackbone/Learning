@@ -151,24 +151,30 @@ public sealed class FederationCoordinator
                 required);
         }
 
-        return anyAllowed &&
+        if (anyAllowed &&
             anyDenied &&
             contract.DisagreementDisposition ==
-                DisagreementDisposition.RouteToEscalation
-            ? Decision(
+                DisagreementDisposition.RouteToEscalation)
+        {
+            return Decision(
                 authoritySet,
                 contract,
                 FederatedOutcome.EscalationRecommended,
                 "federation.disagreement-escalation-recommended",
-                required)
-            : anyDenied
-            ? Decision(
+                required);
+        }
+
+        if (anyDenied)
+        {
+            return Decision(
                 authoritySet,
                 contract,
                 FederatedOutcome.Denied,
                 "federation.required-authority-denied",
-                required)
-            : Decision(
+                required);
+        }
+
+        return Decision(
             authoritySet,
             contract,
             FederatedOutcome.Allowed,

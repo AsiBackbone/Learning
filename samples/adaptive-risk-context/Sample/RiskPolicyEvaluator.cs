@@ -165,26 +165,32 @@ public sealed class RiskPolicyEvaluator
                 nowUtc);
         }
 
-        return observation.FraudProbability >= policy.EscalationThreshold
-            ? Decision(
+        if (observation.FraudProbability >= policy.EscalationThreshold)
+        {
+            return Decision(
                 decisionId,
                 DecisionOutcome.EscalationRecommended,
                 "risk.probability-escalated",
                 context,
                 riskInput,
                 policy,
-                nowUtc)
-            : context.IncidentPosture == IncidentPosture.Elevated &&
-            context.Amount >= 100_000m
-            ? Decision(
+                nowUtc);
+        }
+
+        if (context.IncidentPosture == IncidentPosture.Elevated &&
+            context.Amount >= 100_000m)
+        {
+            return Decision(
                 decisionId,
                 DecisionOutcome.EscalationRecommended,
                 "risk.incident-posture-escalated",
                 context,
                 riskInput,
                 policy,
-                nowUtc)
-            : Decision(
+                nowUtc);
+        }
+
+        return Decision(
             decisionId,
             DecisionOutcome.Allowed,
             "risk.acceptable",

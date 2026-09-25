@@ -153,13 +153,19 @@ public sealed class CrossSystemCapabilityValidator(
                 "lifetime.expired");
         }
 
-        return revocationStore.IsRevoked(capability.CapabilityId)
-            ? CapabilityValidationResult.Reject(
-                "capability.revoked")
-            : !context.LocalPolicyAllows
-            ? CapabilityValidationResult.Reject(
-                "recipient-policy.denied")
-            : CapabilityValidationResult.Accept();
+        if (revocationStore.IsRevoked(capability.CapabilityId))
+        {
+            return CapabilityValidationResult.Reject(
+                "capability.revoked");
+        }
+
+        if (!context.LocalPolicyAllows)
+        {
+            return CapabilityValidationResult.Reject(
+                "recipient-policy.denied");
+        }
+
+        return CapabilityValidationResult.Accept();
     }
 
     private static CapabilityValidationResult ValidateDelegationChain(

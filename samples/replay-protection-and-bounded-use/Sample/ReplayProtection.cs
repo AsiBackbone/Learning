@@ -80,13 +80,19 @@ public sealed class ExecutionCapabilityValidator
                 "capability.audience-mismatch");
         }
 
-        return request.NowUtc < capability.IssuedUtc
-            ? CapabilityValidationResult.Invalid(
-                "capability.not-yet-valid")
-            : request.NowUtc >= capability.ExpiresUtc
-            ? CapabilityValidationResult.Invalid(
-                "capability.expired")
-            : CapabilityValidationResult.Valid();
+        if (request.NowUtc < capability.IssuedUtc)
+        {
+            return CapabilityValidationResult.Invalid(
+                "capability.not-yet-valid");
+        }
+
+        if (request.NowUtc >= capability.ExpiresUtc)
+        {
+            return CapabilityValidationResult.Invalid(
+                "capability.expired");
+        }
+
+        return CapabilityValidationResult.Valid();
     }
 }
 

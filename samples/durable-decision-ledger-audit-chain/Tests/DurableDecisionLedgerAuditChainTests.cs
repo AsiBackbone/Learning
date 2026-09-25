@@ -227,6 +227,23 @@ public sealed class DurableDecisionLedgerAuditChainTests
         Assert.Equal(1L, result.FailureSequence);
     }
 
+    [Fact]
+    public void CanonicalizationFailureTakesPrecedenceOverHashFailure()
+    {
+        LedgerRecord record = CreateRecord(FirstCore()) with
+        {
+            CanonicalizationVersion = "canonical-json/v2",
+            HashAlgorithm = "SHA-512"
+        };
+
+        LedgerVerificationResult result =
+            LedgerVerifier.Verify([record], record.LedgerId);
+
+        Assert.Equal(
+            LedgerIntegrityStatus.CanonicalizationUnavailable,
+            result.IntegrityStatus);
+    }
+
     [Theory]
     [InlineData("blank-operation")]
     [InlineData("unpaired-resource")]

@@ -9,19 +9,25 @@ public sealed class SimulatedAcknowledgmentEvidenceVerifier(
     public EvidenceVerificationResult Verify(
         AcknowledgmentEvidence evidence)
     {
-        return forcedStatus == EvidenceVerificationStatus.Unavailable
-            ? new EvidenceVerificationResult(
+        if (forcedStatus == EvidenceVerificationStatus.Unavailable)
+        {
+            return new EvidenceVerificationResult(
                 EvidenceVerificationStatus.Unavailable,
-                "evidence.verification-unavailable")
-            : forcedStatus == EvidenceVerificationStatus.Untrusted ||
+                "evidence.verification-unavailable");
+        }
+
+        if (forcedStatus == EvidenceVerificationStatus.Untrusted ||
             !string.Equals(
                 evidence.EvidenceIssuer,
                 trustedEvidenceIssuer,
-                StringComparison.Ordinal)
-            ? new EvidenceVerificationResult(
+                StringComparison.Ordinal))
+        {
+            return new EvidenceVerificationResult(
                 EvidenceVerificationStatus.Untrusted,
-                "evidence.untrusted")
-            : new EvidenceVerificationResult(
+                "evidence.untrusted");
+        }
+
+        return new EvidenceVerificationResult(
             EvidenceVerificationStatus.Trusted,
             "evidence.trusted");
     }

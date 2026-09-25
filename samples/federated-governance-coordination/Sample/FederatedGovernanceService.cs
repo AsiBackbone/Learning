@@ -12,22 +12,29 @@ public sealed class FederatedGovernanceService(
         AuthoritySetDescriptor authoritySet =
             AuthoritySetResolver.Resolve(request.Resource);
 
-        return authoritySet.Mode == CoordinationMode.LocalOnly
-            ? new FederatedDecision(
+        if (authoritySet.Mode == CoordinationMode.LocalOnly)
+        {
+            FederatedOutcome outcome = request.LocalPolicyAllows
+                ? FederatedOutcome.Allowed
+                : FederatedOutcome.Denied;
+            string reasonCode = request.LocalPolicyAllows
+                ? "local.allowed"
+                : "local.denied";
+
+            return new FederatedDecision(
                 DecisionId: $"local-{authoritySet.AuthoritySetId}",
-                Outcome: request.LocalPolicyAllows
-                    ? FederatedOutcome.Allowed
-                    : FederatedOutcome.Denied,
-                ReasonCode: request.LocalPolicyAllows
-                    ? "local.allowed"
-                    : "local.denied",
+                Outcome: outcome,
+                ReasonCode: reasonCode,
                 AuthoritySetId: authoritySet.AuthoritySetId,
                 AuthoritySetVersion: authoritySet.AuthoritySetVersion,
                 ContractId: contract.ContractId,
                 ContractVersion: contract.ContractVersion,
-                Evidence: [])
-            : !request.CoordinatorAvailable
-            ? new FederatedDecision(
+                Evidence: []);
+        }
+
+        if (!request.CoordinatorAvailable)
+        {
+            return new FederatedDecision(
                 DecisionId: $"fed-{authoritySet.AuthoritySetId}-unavailable",
                 Outcome: FederatedOutcome.Deferred,
                 ReasonCode: "federation.coordinator-unavailable",
@@ -35,8 +42,10 @@ public sealed class FederatedGovernanceService(
                 AuthoritySetVersion: authoritySet.AuthoritySetVersion,
                 ContractId: contract.ContractId,
                 ContractVersion: contract.ContractVersion,
-                Evidence: [])
-            : FederationCoordinator.Compose(
+                Evidence: []);
+        }
+
+        return FederationCoordinator.Compose(
             authoritySet,
             contract,
             contributions);

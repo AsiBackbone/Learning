@@ -8,6 +8,7 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ### Changed
 
+- Replaced chained conditional-return expressions in ordering-sensitive sample policies and validators with explicit guard clauses, preserving first-failure reason-code precedence and adding focused regression coverage (#358).
 - Added a current AsiBackbone 7.0 compatibility and API boundary, separated it from the historical Learning 1.0 / AsiBackbone 6.0 contract, pinned historical implementation links to `v6.0.0`, and strengthened validation so versioned compatibility pages declare and honor their implementation ref (#355).
 - Aligned current implementation correspondence tables, source links, test links, and sample references with the AsiBackbone 7.0 acknowledgment, decision-receipt, and capability-grant public surface while preserving Learning-owned teaching terminology and architectural boundaries (#354).
 
