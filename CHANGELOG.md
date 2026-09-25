@@ -6,6 +6,10 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+### Changed
+
+- Aligned current implementation correspondence tables, source links, test links, and sample references with the AsiBackbone 7.0 acknowledgment, decision-receipt, and capability-grant public surface while preserving Learning-owned teaching terminology and architectural boundaries (#354).
+
 ### Fixed
 
 - Corrected the Governed AI Tool Gateway acknowledgment lifecycle so responses are validated against the exact issued challenge instead of a freshly recreated one. Challenge identifiers now use cryptographically unpredictable nonces; bind actor, tenant, workflow correlation, operation, and recipient; and are retained and atomically consumed in bounded host-owned state. Unknown, future-dated, expired, cross-context, resource-mismatched, and replayed challenges fail closed. The sample documentation now calls out the production requirement for durable or distributed challenge state across multiple instances (#356).

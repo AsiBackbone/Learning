@@ -1677,14 +1677,14 @@ This tutorial focuses on execution and recovery across steps.
 
 This tutorial is framework-neutral.
 
-The working `AsiBackbone` repository provides governance artifacts that can participate in a per-step design, including structured governance decisions, acknowledgment/handshake requests, decision receipt, and capability-token grants.
+The working `AsiBackbone` repository provides governance artifacts that can participate in a per-step design, including structured governance decisions, acknowledgment requests, decision receipts, and capability grants.
 
 Useful references include:
 
 - [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs)
 - [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs)
-- [`LiabilityHandshakeRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/Handshakes/LiabilityHandshakeRequest.cs)
-- [`CapabilityTokenGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/v6.0.0/src/AsiBackbone.Core/CapabilityTokens/CapabilityTokenGrant.cs)
+- [`AcknowledgmentRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Acknowledgments/AcknowledgmentRequest.cs)
+- [`CapabilityGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrant.cs)
 
 Those abstractions do not make `AsiBackbone` a model runtime or workflow engine.
 
