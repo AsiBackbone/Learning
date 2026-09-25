@@ -682,7 +682,7 @@ With the AsiBackbone repository checked out next to Learning, run the determinis
 dotnet run --file tools/validate-organization-links.cs -- --source-repository ../AsiBackbone --self-test
 ```
 
-The self-test includes one valid source link and one deliberately nonexistent path; it passes only when the nonexistent path is rejected. To run the live checker locally, install the pinned Lychee version used by the action, provide a GitHub token through the `GITHUB_TOKEN` environment variable, and run:
+The self-test includes a valid source link, a deliberately nonexistent path, and a slash-containing ref such as `release/7.0`; it passes only when the missing path is rejected and the ref/path boundary resolves correctly for fetched branches and tags. To run the live checker locally, install the pinned Lychee version used by the action, provide a GitHub token through the `GITHUB_TOKEN` environment variable, and run:
 
 ```bash
 lychee './**/*.md'

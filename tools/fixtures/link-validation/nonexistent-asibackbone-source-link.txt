@@ -2,3 +2,4 @@ Regression fixture for organization-owned GitHub source-link validation.
 
 [Existing source file](https://github.com/AsiBackbone/AsiBackbone/blob/main/README.md)
 [Nonexistent source file](https://github.com/AsiBackbone/AsiBackbone/blob/main/this-path-must-not-exist/issue-357.md)
+[Slash-containing ref](https://github.com/AsiBackbone/AsiBackbone/blob/release/7.0/README.md)

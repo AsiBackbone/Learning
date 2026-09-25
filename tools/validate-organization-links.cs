@@ -13,7 +13,7 @@ static partial class OrganizationLinkValidator
         "tools/fixtures/link-validation/nonexistent-asibackbone-source-link.txt";
 
     [GeneratedRegex(
-        @"https://github\.com/AsiBackbone/AsiBackbone/(?<kind>blob|tree)/(?<ref>[^/\s)\]>'?#]+)/(?<path>[^\s)\]>'?#]+)",
+        @"https://github\.com/AsiBackbone/AsiBackbone/(?<kind>blob|tree)/(?<suffix>[^\s)\]>'?#]+)",
         RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
     private static partial Regex OrganizationLinkRegex();
 
@@ -48,7 +48,16 @@ static partial class OrganizationLinkValidator
             return 2;
         }
 
-        if (selfTest && !RunSelfTest(repositoryRoot, sourceRepositoryPath))
+        IReadOnlyList<GitReference> gitReferences = ReadGitReferences(sourceRepositoryPath);
+
+        if (gitReferences.Count == 0)
+        {
+            Console.Error.WriteLine(
+                $"No branches or tags were found in the AsiBackbone source repository at '{sourceRepositoryPath}'.");
+            return 2;
+        }
+
+        if (selfTest && !RunSelfTest(repositoryRoot, sourceRepositoryPath, gitReferences))
         {
             return 1;
         }
@@ -56,7 +65,7 @@ static partial class OrganizationLinkValidator
         IReadOnlyList<LinkReference> links = EnumerateMarkdownFiles(repositoryRoot)
             .SelectMany(path => ExtractLinks(repositoryRoot, path))
             .ToArray();
-        IReadOnlyList<string> errors = ValidateLinks(sourceRepositoryPath, links);
+        IReadOnlyList<string> errors = ValidateLinks(sourceRepositoryPath, gitReferences, links);
 
         if (errors.Count > 0)
         {
@@ -75,7 +84,10 @@ static partial class OrganizationLinkValidator
         return 0;
     }
 
-    private static bool RunSelfTest(string repositoryRoot, string sourceRepositoryPath)
+    private static bool RunSelfTest(
+        string repositoryRoot,
+        string sourceRepositoryPath,
+        IReadOnlyList<GitReference> gitReferences)
     {
         string fixturePath = Path.Combine(
             repositoryRoot,
@@ -88,15 +100,40 @@ static partial class OrganizationLinkValidator
         }
 
         IReadOnlyList<LinkReference> fixtureLinks = ExtractLinks(repositoryRoot, fixturePath).ToArray();
-        IReadOnlyList<string> fixtureErrors = ValidateLinks(sourceRepositoryPath, fixtureLinks);
+        LinkReference slashRefLink = fixtureLinks.Single(link =>
+            link.Url.Contains("release/7.0", StringComparison.Ordinal));
+        var shorterRef = new GitReference("release", "refs/heads/release", 0);
+        var slashBranch = new GitReference("release/7.0", "refs/heads/release/7.0", 0);
+        var slashTag = new GitReference("release/7.0", "refs/tags/release/7.0", 2);
+        ResolvedLink? resolvedSlashBranch = ResolveLink(
+            slashRefLink,
+            new[] { shorterRef, slashBranch });
+        ResolvedLink? resolvedSlashTag = ResolveLink(slashRefLink, new[] { slashTag });
+        IReadOnlyList<LinkReference> repositoryFixtureLinks = fixtureLinks
+            .Where(link => !ReferenceEquals(link, slashRefLink))
+            .ToArray();
+        IReadOnlyList<string> fixtureErrors = ValidateLinks(
+            sourceRepositoryPath,
+            gitReferences,
+            repositoryFixtureLinks);
         const string missingPath = "this-path-must-not-exist/issue-357.md";
 
-        if (fixtureLinks.Count != 2 ||
+        if (fixtureLinks.Count != 3 ||
             fixtureErrors.Count != 1 ||
-            !fixtureErrors[0].Contains(missingPath, StringComparison.Ordinal))
+            !fixtureErrors[0].Contains(missingPath, StringComparison.Ordinal) ||
+            resolvedSlashBranch is null ||
+            !resolvedSlashBranch.GitReference.FullName.Equals(
+                "refs/heads/release/7.0",
+                StringComparison.Ordinal) ||
+            !resolvedSlashBranch.TargetPath.Equals("README.md", StringComparison.Ordinal) ||
+            resolvedSlashTag is null ||
+            !resolvedSlashTag.GitReference.FullName.Equals(
+                "refs/tags/release/7.0",
+                StringComparison.Ordinal) ||
+            !resolvedSlashTag.TargetPath.Equals("README.md", StringComparison.Ordinal))
         {
             Console.Error.WriteLine(
-                "Organization-link regression failed: the fixture must contain one valid link and reject exactly one nonexistent source path.");
+                "Organization-link regression failed: the fixture must reject one nonexistent path and resolve a slash-containing ref against fetched refs.");
 
             foreach (string error in fixtureErrors)
             {
@@ -106,12 +143,14 @@ static partial class OrganizationLinkValidator
             return false;
         }
 
-        Console.WriteLine("Organization-link regression passed: a nonexistent GitHub source path fails validation.");
+        Console.WriteLine(
+            "Organization-link regression passed: a nonexistent path fails and slash-containing branch and tag refs resolve correctly.");
         return true;
     }
 
     private static IReadOnlyList<string> ValidateLinks(
         string sourceRepositoryPath,
+        IReadOnlyList<GitReference> gitReferences,
         IReadOnlyList<LinkReference> links)
     {
         var errors = new List<string>();
@@ -119,14 +158,18 @@ static partial class OrganizationLinkValidator
 
         foreach (LinkReference link in links)
         {
-            if (link.GitRef.StartsWith("-", StringComparison.Ordinal) ||
-                link.TargetPath.StartsWith("-", StringComparison.Ordinal))
+            ResolvedLink? resolvedLink = ResolveLink(link, gitReferences);
+
+            if (resolvedLink is null)
             {
-                errors.Add($"{link.Location} contains an invalid ref or target path: {link.Url}");
+                errors.Add(
+                    $"{link.Location} does not match a fetched AsiBackbone branch or tag: {link.Url}");
                 continue;
             }
 
-            string objectSpec = $"{link.GitRef}:{link.TargetPath}";
+            string objectSpec = resolvedLink.TargetPath.Length == 0
+                ? $"{resolvedLink.GitReference.FullName}^{{tree}}"
+                : $"{resolvedLink.GitReference.FullName}:{resolvedLink.TargetPath}";
 
             if (!objectTypes.TryGetValue(objectSpec, out GitObjectResult? result))
             {
@@ -137,7 +180,7 @@ static partial class OrganizationLinkValidator
             if (!result.Exists)
             {
                 errors.Add(
-                    $"{link.Location} targets missing AsiBackbone object '{objectSpec}': {link.Url}");
+                    $"{link.Location} targets missing AsiBackbone object '{resolvedLink.GitReference.Name}/{resolvedLink.TargetPath}': {link.Url}");
                 continue;
             }
 
@@ -153,6 +196,37 @@ static partial class OrganizationLinkValidator
         }
 
         return errors;
+    }
+
+    private static ResolvedLink? ResolveLink(
+        LinkReference link,
+        IReadOnlyList<GitReference> gitReferences)
+    {
+        GitReference? gitReference = gitReferences
+            .Where(candidate =>
+                link.RefAndPath.Equals(candidate.Name, StringComparison.Ordinal) ||
+                link.RefAndPath.StartsWith(candidate.Name + "/", StringComparison.Ordinal))
+            .OrderByDescending(candidate => candidate.Name.Length)
+            .ThenBy(candidate => candidate.Priority)
+            .FirstOrDefault();
+
+        if (gitReference is null)
+        {
+            return null;
+        }
+
+        string targetPath = link.RefAndPath.Equals(gitReference.Name, StringComparison.Ordinal)
+            ? string.Empty
+            : link.RefAndPath[(gitReference.Name.Length + 1)..].Trim('/');
+
+        if ((targetPath.Length == 0 &&
+             !link.Kind.Equals("tree", StringComparison.OrdinalIgnoreCase)) ||
+            targetPath.StartsWith("-", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        return new ResolvedLink(gitReference, targetPath);
     }
 
     private static GitObjectResult ReadGitObjectType(string sourceRepositoryPath, string objectSpec)
@@ -181,6 +255,74 @@ static partial class OrganizationLinkValidator
             : new GitObjectResult(false, string.Empty);
     }
 
+    private static IReadOnlyList<GitReference> ReadGitReferences(string sourceRepositoryPath)
+    {
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "git",
+            WorkingDirectory = sourceRepositoryPath,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false
+        };
+
+        startInfo.ArgumentList.Add("for-each-ref");
+        startInfo.ArgumentList.Add("--format=%(refname)");
+        startInfo.ArgumentList.Add("refs/heads");
+        startInfo.ArgumentList.Add("refs/remotes/origin");
+        startInfo.ArgumentList.Add("refs/tags");
+
+        using Process process = Process.Start(startInfo)
+            ?? throw new InvalidOperationException("Could not start git for ref discovery.");
+        string output = process.StandardOutput.ReadToEnd();
+        string error = process.StandardError.ReadToEnd();
+        process.WaitForExit();
+
+        if (process.ExitCode != 0)
+        {
+            throw new InvalidOperationException(
+                $"Could not enumerate fetched AsiBackbone refs: {error.Trim()}");
+        }
+
+        return output
+            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(ParseGitReference)
+            .Where(reference => reference is not null)
+            .Cast<GitReference>()
+            .GroupBy(reference => reference.Name, StringComparer.Ordinal)
+            .Select(group => group
+                .OrderBy(reference => reference.Priority)
+                .First())
+            .OrderByDescending(reference => reference.Name.Length)
+            .ThenBy(reference => reference.Priority)
+            .ToArray();
+    }
+
+    private static GitReference? ParseGitReference(string fullName)
+    {
+        const string headPrefix = "refs/heads/";
+        const string remotePrefix = "refs/remotes/origin/";
+        const string tagPrefix = "refs/tags/";
+
+        if (fullName.StartsWith(headPrefix, StringComparison.Ordinal))
+        {
+            return new GitReference(fullName[headPrefix.Length..], fullName, 0);
+        }
+
+        if (fullName.StartsWith(remotePrefix, StringComparison.Ordinal))
+        {
+            string name = fullName[remotePrefix.Length..];
+
+            return name.Equals("HEAD", StringComparison.Ordinal)
+                ? null
+                : new GitReference(name, fullName, 1);
+        }
+
+        return fullName.StartsWith(tagPrefix, StringComparison.Ordinal)
+            ? new GitReference(fullName[tagPrefix.Length..], fullName, 2)
+            : null;
+    }
+
     private static IEnumerable<LinkReference> ExtractLinks(string repositoryRoot, string path)
     {
         string text = File.ReadAllText(path);
@@ -188,22 +330,21 @@ static partial class OrganizationLinkValidator
 
         foreach (Match match in OrganizationLinkRegex().Matches(text))
         {
-            string targetPath;
+            string refAndPath;
 
             try
             {
-                targetPath = Uri.UnescapeDataString(match.Groups["path"].Value).Trim('/');
+                refAndPath = Uri.UnescapeDataString(match.Groups["suffix"].Value).Trim('/');
             }
             catch (UriFormatException)
             {
-                targetPath = match.Groups["path"].Value.Trim('/');
+                refAndPath = match.Groups["suffix"].Value.Trim('/');
             }
 
             yield return new LinkReference(
                 match.Value,
                 match.Groups["kind"].Value,
-                match.Groups["ref"].Value,
-                targetPath,
+                refAndPath,
                 $"{relativePath}:{GetLineNumber(text, match.Index)}");
         }
     }
@@ -301,9 +442,17 @@ static partial class OrganizationLinkValidator
     private sealed record LinkReference(
         string Url,
         string Kind,
-        string GitRef,
-        string TargetPath,
+        string RefAndPath,
         string Location);
+
+    private sealed record ResolvedLink(
+        GitReference GitReference,
+        string TargetPath);
+
+    private sealed record GitReference(
+        string Name,
+        string FullName,
+        int Priority);
 
     private sealed record GitObjectResult(bool Exists, string ObjectType);
 }
