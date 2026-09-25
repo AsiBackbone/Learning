@@ -206,14 +206,20 @@ public sealed class ExecutionFreshnessEvaluator
                 return Reevaluate("risk.scoring-method-drift");
             }
 
-            return !string.Equals(
+            if (!string.Equals(
                     authority.CalibrationVersion,
                     observation.CalibrationVersion,
-                    StringComparison.Ordinal)
-                ? Reevaluate("risk.calibration-drift")
-                : authority.ModelHealth != observation.ModelHealth
-                ? Reevaluate("risk.model-health-drift")
-                : Reevaluate("risk.observation-drift");
+                    StringComparison.Ordinal))
+            {
+                return Reevaluate("risk.calibration-drift");
+            }
+
+            if (authority.ModelHealth != observation.ModelHealth)
+            {
+                return Reevaluate("risk.model-health-drift");
+            }
+
+            return Reevaluate("risk.observation-drift");
         }
 
         // Staleness applies only after identity/integrity and policy-acceptance

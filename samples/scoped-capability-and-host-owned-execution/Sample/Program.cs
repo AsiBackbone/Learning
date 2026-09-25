@@ -382,19 +382,25 @@ public sealed class ExecutionCapabilityValidator
                 "capability.expired");
         }
 
-        return !string.Equals(
+        if (!string.Equals(
                 capability.AcknowledgmentId,
                 request.AcknowledgmentId,
-                StringComparison.Ordinal)
-            ? CapabilityValidationResult.Invalid(
-                "capability.acknowledgment-mismatch")
-            : !string.Equals(
+                StringComparison.Ordinal))
+        {
+            return CapabilityValidationResult.Invalid(
+                "capability.acknowledgment-mismatch");
+        }
+
+        if (!string.Equals(
                 capability.IntendedUse,
                 request.IntendedUse,
-                StringComparison.Ordinal)
-            ? CapabilityValidationResult.Invalid(
-                "capability.intended-use-mismatch")
-            : CapabilityValidationResult.Valid();
+                StringComparison.Ordinal))
+        {
+            return CapabilityValidationResult.Invalid(
+                "capability.intended-use-mismatch");
+        }
+
+        return CapabilityValidationResult.Valid();
     }
 }
 

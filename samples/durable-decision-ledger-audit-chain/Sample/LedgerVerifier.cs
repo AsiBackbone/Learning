@@ -165,11 +165,23 @@ public static class LedgerVerifier
             return LedgerIntegrityStatus.UnsupportedRecordSchemaVersion;
         }
 
-        return !string.Equals(record.CanonicalizationVersion, LedgerFormat.CanonicalizationVersion, StringComparison.Ordinal)
-            ? LedgerIntegrityStatus.CanonicalizationUnavailable
-            : !string.Equals(record.HashAlgorithm, LedgerFormat.HashAlgorithm, StringComparison.Ordinal)
-            ? LedgerIntegrityStatus.UnsupportedHashAlgorithm
-            : null;
+        if (!string.Equals(
+                record.CanonicalizationVersion,
+                LedgerFormat.CanonicalizationVersion,
+                StringComparison.Ordinal))
+        {
+            return LedgerIntegrityStatus.CanonicalizationUnavailable;
+        }
+
+        if (!string.Equals(
+                record.HashAlgorithm,
+                LedgerFormat.HashAlgorithm,
+                StringComparison.Ordinal))
+        {
+            return LedgerIntegrityStatus.UnsupportedHashAlgorithm;
+        }
+
+        return null;
     }
 
     private static LedgerCompletenessStatus EvaluateCheckpoint(
@@ -213,14 +225,20 @@ public static class LedgerVerifier
             return verifiedThroughSequence is null ? LedgerCompletenessStatus.NotEvaluated : LedgerCompletenessStatus.VerifiedPastCheckpoint;
         }
 
-        return checkpoint.SequenceNumber > observedHeadSequence
-            ? LedgerCompletenessStatus.MissingCheckpointedTail
-            : !string.Equals(
+        if (checkpoint.SequenceNumber > observedHeadSequence)
+        {
+            return LedgerCompletenessStatus.MissingCheckpointedTail;
+        }
+
+        if (!string.Equals(
                 checkpointObservedFingerprint,
                 checkpoint.HeadFingerprint,
-                StringComparison.Ordinal)
-            ? LedgerCompletenessStatus.CheckpointMismatch
-            : checkpoint.SequenceNumber == observedHeadSequence
+                StringComparison.Ordinal))
+        {
+            return LedgerCompletenessStatus.CheckpointMismatch;
+        }
+
+        return checkpoint.SequenceNumber == observedHeadSequence
             ? LedgerCompletenessStatus.MatchesCheckpoint
             : LedgerCompletenessStatus.VerifiedPastCheckpoint;
     }

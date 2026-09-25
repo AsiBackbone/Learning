@@ -309,18 +309,24 @@ public sealed class RecipientDirectory
 {
     public static DestinationClassification Classify(string recipient)
     {
-        return recipient.EndsWith(
+        if (recipient.EndsWith(
                 "@example.internal",
-                StringComparison.OrdinalIgnoreCase)
-            ? DestinationClassification.Internal
-            : recipient.EndsWith(
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return DestinationClassification.Internal;
+        }
+
+        if (recipient.EndsWith(
                 "@example.net",
                 StringComparison.OrdinalIgnoreCase) ||
             recipient.EndsWith(
                 "@blocked.example",
-                StringComparison.OrdinalIgnoreCase)
-            ? DestinationClassification.External
-            : DestinationClassification.Unknown;
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return DestinationClassification.External;
+        }
+
+        return DestinationClassification.Unknown;
     }
 }
 
@@ -425,19 +431,25 @@ public sealed class NotificationPolicy
                 "The host blocks this destination domain.");
         }
 
-        return context.DestinationClassification ==
-            DestinationClassification.Unknown
-            ? GovernanceDecision.Defer(
+        if (context.DestinationClassification ==
+            DestinationClassification.Unknown)
+        {
+            return GovernanceDecision.Defer(
                 "notification.destination-unknown",
-                "The host cannot classify the destination.")
-            : context.DestinationClassification ==
+                "The host cannot classify the destination.");
+        }
+
+        if (context.DestinationClassification ==
                 DestinationClassification.External &&
             string.IsNullOrWhiteSpace(
-                context.SatisfiedAcknowledgmentId)
-            ? GovernanceDecision.RequireAcknowledgment(
+                context.SatisfiedAcknowledgmentId))
+        {
+            return GovernanceDecision.RequireAcknowledgment(
                 "notification.external-acknowledgment-required",
-                "External notifications require acknowledgment.")
-            : GovernanceDecision.Allow();
+                "External notifications require acknowledgment.");
+        }
+
+        return GovernanceDecision.Allow();
     }
 }
 
@@ -699,14 +711,20 @@ public sealed class AcknowledgmentService
                 "acknowledgment.response-in-future");
         }
 
-        return outsideIssuedWindow
-            ? AcknowledgmentValidationResult.Failure(
-                "acknowledgment.expired")
-            : !response.Accepted
-            ? AcknowledgmentValidationResult.Failure(
-                "acknowledgment.rejected")
-            : AcknowledgmentValidationResult.Success(
-                $"{challenge.ChallengeId}-accepted");
+        if (outsideIssuedWindow)
+        {
+            return AcknowledgmentValidationResult.Failure(
+                "acknowledgment.expired");
+        }
+
+        if (!response.Accepted)
+        {
+            return AcknowledgmentValidationResult.Failure(
+                "acknowledgment.rejected");
+        }
+
+        return AcknowledgmentValidationResult.Success(
+            $"{challenge.ChallengeId}-accepted");
     }
 }
 
@@ -849,16 +867,22 @@ public sealed class ExecutionCapabilityValidator
                 "capability.expired");
         }
 
-        return !string.Equals(
+        if (!string.Equals(
                 capability.AcknowledgmentId,
                 context.SatisfiedAcknowledgmentId,
-                StringComparison.Ordinal)
-            ? CapabilityValidationResult.Invalid(
-                "capability.acknowledgment-mismatch")
-            : capability.MaximumUses != 1
-            ? CapabilityValidationResult.Invalid(
-                "capability.use-limit-invalid")
-            : CapabilityValidationResult.Valid();
+                StringComparison.Ordinal))
+        {
+            return CapabilityValidationResult.Invalid(
+                "capability.acknowledgment-mismatch");
+        }
+
+        if (capability.MaximumUses != 1)
+        {
+            return CapabilityValidationResult.Invalid(
+                "capability.use-limit-invalid");
+        }
+
+        return CapabilityValidationResult.Valid();
     }
 }
 

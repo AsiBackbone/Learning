@@ -337,15 +337,20 @@ public sealed class DisableAccountPolicy
                 "Protected accounts require escalation.");
         }
 
-        return context.Environment.MaintenanceHoldActive
-            ? GovernanceDecision.Defer(
+        if (context.Environment.MaintenanceHoldActive)
+        {
+            return GovernanceDecision.Defer(
                 "account.disable.maintenance-hold",
-                "Account changes are temporarily deferred.")
-            : string.IsNullOrWhiteSpace(
-                context.Intent.Reason)
-            ? GovernanceDecision.RequireAcknowledgment(
+                "Account changes are temporarily deferred.");
+        }
+
+        if (string.IsNullOrWhiteSpace(context.Intent.Reason))
+        {
+            return GovernanceDecision.RequireAcknowledgment(
                 "account.disable.reason-required",
-                "A reason must be supplied and acknowledged.")
-            : GovernanceDecision.Allow();
+                "A reason must be supplied and acknowledged.");
+        }
+
+        return GovernanceDecision.Allow();
     }
 }
