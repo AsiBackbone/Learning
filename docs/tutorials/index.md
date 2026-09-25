@@ -8,7 +8,7 @@ AsiBackbone Learning tutorials are **problem-first**. They begin with an archite
 
 The goal is understanding—not framework adoption.
 
-> **Code scope:** Tutorial snippets and companion projects are Learning-owned teaching models unless a section is explicitly labeled **AsiBackbone 6.0 API**. For exact current namespaces and syntax, use the [AsiBackbone 6.0 API Boundary](../getting-started/asibackbone-6-api-boundary.md).
+> **Code scope:** Tutorial snippets and companion projects are Learning-owned teaching models unless a section is explicitly labeled **AsiBackbone 7.0 API**. For exact current namespaces and syntax, use the [AsiBackbone 7.0 Compatibility and API Boundary](../getting-started/asibackbone-7-api-boundary.md).
 
 ## Learning Path at a Glance
 

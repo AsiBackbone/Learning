@@ -20,7 +20,7 @@ on:
       - 'tools/generate-sitemap.cs'
       - 'tools/prepare-indexnow.cs'
       - 'tools/publish-x.cs'
-      - 'tools/validate-asibackbone-6-api-references.cs'
+      - 'tools/validate-asibackbone-api-references.cs'
       - 'tools/validate-doc-metadata.cs'
       - 'tools/validate-docfx-template-baseline.cs'
       - '.config/dotnet-tools.json'
@@ -64,8 +64,8 @@ jobs:
       - name: Validate DocFX template baseline
         run: dotnet run --file tools/validate-docfx-template-baseline.cs
 
-      - name: Validate AsiBackbone 6.0 API references
-        run: dotnet run --file tools/validate-asibackbone-6-api-references.cs
+      - name: Validate AsiBackbone API references
+        run: dotnet run --file tools/validate-asibackbone-api-references.cs
 
       - name: Restore .NET tools
         run: dotnet tool restore

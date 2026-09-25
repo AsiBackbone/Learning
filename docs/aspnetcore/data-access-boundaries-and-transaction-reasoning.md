@@ -312,7 +312,7 @@ But if the purpose of the repository was to hide EF Core or constrain persistenc
 
 Prefer methods that expose the operation the caller needs when the repository is intended to be a real boundary:
 
-> **Illustrative API:** The repository and receipt names in the following examples are local teaching shapes, not `AsiBackbone.*` package signatures. See the [AsiBackbone 6.0 API Boundary](../getting-started/asibackbone-6-api-boundary.md) for the exact current receipt and persistence contracts.
+> **Illustrative API:** The repository and receipt names in the following examples are local teaching shapes, not `AsiBackbone.*` package signatures. See the [AsiBackbone 7.0 Compatibility and API Boundary](../getting-started/asibackbone-7-api-boundary.md) for the exact current receipt and persistence contracts.
 
 ```csharp
 Task<Account?> FindForDisableAsync(...)
