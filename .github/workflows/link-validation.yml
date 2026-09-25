@@ -13,6 +13,8 @@ on:
     paths:
       - '**/*.md'
       - 'lychee.toml'
+      - 'tools/fixtures/link-validation/**'
+      - 'tools/validate-organization-links.cs'
       - '.github/workflows/link-validation.yml'
 
   # Periodically detect external link rot even when documentation
@@ -41,6 +43,25 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Checkout AsiBackbone link targets
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: AsiBackbone/AsiBackbone
+          path: .link-targets/AsiBackbone
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Validate organization-owned source links
+        run: >-
+          dotnet run --file tools/validate-organization-links.cs --
+          --source-repository .link-targets/AsiBackbone
+          --self-test
+
       # Documentation links to this repository are written as absolute
       # github.com URLs so they work on GitHub, on the published DocFX site, and
       # in a local clone. Checking them live would validate main rather than the
@@ -56,6 +77,16 @@ jobs:
             --remap "^https://github\.com/AsiBackbone/Learning/blob/main file://${{ github.workspace }}"
             --remap "^https://github\.com/AsiBackbone/Learning/tree/main file://${{ github.workspace }}"
             './**/*.md'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # The pinned action exports this input as GITHUB_TOKEN, which Lychee
+          # uses for authenticated GitHub requests and a higher rate limit.
+          token: ${{ github.token }}
           fail: true
           jobSummary: true
+
+      - name: Explain persistent GitHub throttling
+        if: failure()
+        shell: bash
+        run: |
+          if [[ -f lychee/out.md ]] && grep -Eqi '(^|[^0-9])429([^0-9]|$)|too many requests' lychee/out.md; then
+            echo "::error::GitHub still returned HTTP 429 after authenticated retries. Treat this as a retryable validation failure; rerun the job and verify token permissions rather than accepting 429 as success."
+          fi

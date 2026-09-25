@@ -1,15 +1,16 @@
 verbose = "info"
 no_progress = true
 
-max_retries = 2
+max_retries = 4
 timeout = 20
-retry_wait_time = 2
+retry_wait_time = 5
 
 max_concurrency = 8
 host_concurrency = 2
 
-# Treat rate limiting as inconclusive rather than a broken link.
-accept = ["200..=399", "429"]
+# A response must resolve successfully after retries. In particular, HTTP 429
+# remains a retryable failure instead of being mistaken for a valid target.
+accept = ["200..=399"]
 
 # Do not attempt to validate localhost/private addresses used in
 # local-development documentation.
@@ -24,10 +25,14 @@ include_mail = false
 # are parsed from the response body.
 include_fragments = "anchor-only"
 
+# The workflow fetches organization-owned source trees here for deterministic
+# Git object validation; Lychee should inspect only Learning's tracked content.
+exclude_path = ["(^|/)\\.link-targets/"]
+
 # Exclusions suppress link rot rather than reporting it, so each one needs a
 # reason that is specific to the URL and not merely "this is sometimes slow".
-# Transient slowness is already handled by max_retries, retry_wait_time, and by
-# accepting 429 above.
+# Transient slowness and throttling are handled by bounded retries. A persistent
+# 429 remains visible so maintainers can retry the job or inspect authentication.
 exclude = [
   # Private vulnerability reporting is intentionally conditional and may
   # return 404 to automated or unauthenticated link checkers.
