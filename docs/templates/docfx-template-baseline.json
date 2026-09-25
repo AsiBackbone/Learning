@@ -1,6 +1,6 @@
 {
   "template": "modern",
-  "docfxVersion": "2.78.5",
-  "upstreamRelease": "v2.78.5",
+  "docfxVersion": "2.81.0",
+  "upstreamRelease": "v2.81.0",
   "localOverride": "docs/templates/layout/_master.tmpl"
 }
