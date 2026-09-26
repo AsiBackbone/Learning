@@ -431,31 +431,31 @@ public async Task Protected_account_is_not_disabled_through_the_registered_handl
 
 The assertion that carries the weight is `Assert.Empty(store.DisabledAccountIds)`. A returned `Pending` result proves the handler *reported* the right outcome; zero calls to the store proves the protected effect did not occur. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) develops that distinction fully. A second test worth writing changes the account's version between evaluation and execution and asserts a `Conflict` with no effect.
 
-If some checks remain in the pipeline, add a fail-closed coverage test so a forgotten declaration breaks the build rather than the audit. This sketch finds every **dispatched** command type — every `T` with a registered `ICommandHandler<T>`:
+If some checks remain in the pipeline, add a fail-closed coverage test so a forgotten declaration breaks the build rather than the audit. Enumerate the registrations the production composition root actually makes — not the types that happen to exist in an assembly:
 
 ```csharp
 [Fact]
-public void Every_dispatched_command_declares_a_policy()
+public void Every_registered_command_handler_has_a_policy()
 {
-    var commandTypes = typeof(DisableAccount).Assembly
-        .GetTypes()
-        .SelectMany(t => t.GetInterfaces())
-        .Where(i => i.IsGenericType &&
-                    i.GetGenericTypeDefinition() == typeof(ICommandHandler<>))
-        .Select(i => i.GetGenericArguments()[0])
-        .Where(command => !command.IsGenericParameter)   // skip open decorators
-        .Distinct();
+    var services = new ServiceCollection().AddApplication();   // the production registrations
 
-    var undeclared = commandTypes
-        .Where(t => !PolicyRegistry.HasPolicyFor(t))
-        .Select(t => t.Name)
+    var undeclared = services
+        .Select(descriptor => descriptor.ServiceType)
+        .Where(service => service.IsConstructedGenericType &&
+                          service.GetGenericTypeDefinition() == typeof(ICommandHandler<>))
+        .Select(service => service.GetGenericArguments()[0])
+        .Distinct()
+        .Where(command => !PolicyRegistry.HasPolicyFor(command))
+        .Select(command => command.Name)
         .ToList();
 
     Assert.Empty(undeclared);
 }
 ```
 
-It will not see a command type that has no handler yet. If commands are defined separately from handlers, enumerate a command marker or registry instead. The same rule can also be enforced earlier, with an architecture-test library or a Roslyn analyzer, when the codebase is large enough to justify one.
+Because it reads the same `IServiceCollection` the application builds, this covers handlers registered from other assemblies, through factories, or by assembly scanning, and ignores handler classes that exist but are never registered. Decorating a registration with Scrutor keeps its service type, so decorated handlers are still counted.
+
+Be clear about what it does not prove. It covers only commands dispatched **through the container**. An open-generic handler registration (`ICommandHandler<>` mapped to a generic implementation) has no concrete command type to check and needs its own rule. Handlers constructed outside the container — Failure 5 — are invisible to it by definition; that gap is what the permit on the executor exists to close. When the codebase is large enough, the same rule can also be enforced earlier with an architecture-test library or a Roslyn analyzer.
 
 Neither test is sophisticated. Both exist to fail during a future refactor — which is the only moment they matter.
 
