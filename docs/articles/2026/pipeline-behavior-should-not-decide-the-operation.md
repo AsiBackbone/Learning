@@ -2,6 +2,7 @@
 description: Why a MediatR pipeline behavior or .NET decorator is a strong home for uniform mechanics but a weak sole owner of resource-dependent authorization decisions.
 title: Your Pipeline Behavior Can Watch the Operation. It Should Not Decide It.
 author: Christopher D. Cavell
+published: "2026-09-26"
 summary: A generic, operation-agnostic pipeline behavior wraps a call that has already been chosen; it sees the request rather than the resource, cannot express operation-specific outcomes without an operation-specific contract, and can be bypassed by registration order or a second entry path.
 feed: true
 ---
