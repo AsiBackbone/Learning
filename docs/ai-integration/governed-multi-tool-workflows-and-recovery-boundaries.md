@@ -1372,8 +1372,8 @@ foreach (ProposedWorkflowStep step in workflow.Steps)
 > `IllustrativeCapabilityCheckResult`, and `CheckAsync` are teaching-only names used
 > here to keep the execution-boundary concept distinct from the released package API.
 > For the current `AsiBackbone` capability-grant validation surface, see
-> [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md)
-> and the [4.0 to 5.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-400-to-500.md).
+> [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/capability-grant-hardening.md)
+> and the [4.0 to 5.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/upgrade-400-to-500.md).
 
 This sketch intentionally leaves out acknowledgment, escalation, retries, durable persistence, and distributed coordination details.
 
@@ -1681,10 +1681,10 @@ The working `AsiBackbone` repository provides governance artifacts that can part
 
 Useful references include:
 
-- [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs)
-- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs)
-- [`AcknowledgmentRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Acknowledgments/AcknowledgmentRequest.cs)
-- [`CapabilityGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrant.cs)
+- [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs)
+- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs)
+- [`AcknowledgmentRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Acknowledgments/AcknowledgmentRequest.cs)
+- [`CapabilityGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrant.cs)
 
 Those abstractions do not make `AsiBackbone` a model runtime or workflow engine.
 

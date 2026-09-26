@@ -153,7 +153,7 @@ The goal is to make the reasoning visible—not to prove that one framework or a
 
 ## Recently added
 
-Learning 1.0 is the historical documentation baseline aligned with AsiBackbone 6.0. Current package-facing guidance follows the [prepared AsiBackbone 7.0 compatibility and API boundary](getting-started/asibackbone-7-api-boundary.md), while the framework-neutral architecture material remains under evidence-driven maintenance. Recent publications include:
+Learning 1.1 is the current documentation baseline aligned with released AsiBackbone 7.0.0. The [current compatibility and API boundary](getting-started/asibackbone-7-api-boundary.md) pins implementation references to the immutable release tag; Learning 1.0 / AsiBackbone 6.0 remains available as historical guidance. Recent publications include:
 
 - [A Passing Agent Diff Is Not Project Authority](articles/2026/a-passing-agent-diff-is-not-project-authority.md)
 - [Why an AI Tool Call Is Only a Proposal](articles/2026/why-ai-tool-call-is-only-a-proposal.md)

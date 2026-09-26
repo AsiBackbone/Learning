@@ -1567,11 +1567,11 @@ This tutorial is framework-neutral, but the `AsiBackbone/AsiBackbone` repository
 
 | Learning concept | Working implementation reference | What to inspect |
 | --- | --- | --- |
-| Host/domain decision policy | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | The post-composition boundary where host policy can refine a decision without executing the protected action. |
-| Risk-aware policy example | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/custom-decision-policy-examples.md) | The regional overlay example reads host-provided `risk` metadata and can require acknowledgment while preserving host-owned execution. |
-| High-risk workflow | [High-Risk Administrative Action Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/high-risk-administrative-action.md) | A concrete scenario where actor, target, risk, policy metadata, acknowledgment, decision receipt, and host execution remain separate responsibilities. |
-| Structured decision result | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | The outcome and reason structure consumed by the host. |
-| Policy evaluation | [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) | Constraint evaluation, base composition, and the optional decision-policy boundary. |
+| Host/domain decision policy | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | The post-composition boundary where host policy can refine a decision without executing the protected action. |
+| Risk-aware policy example | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/custom-decision-policy-examples.md) | The regional overlay example reads host-provided `risk` metadata and can require acknowledgment while preserving host-owned execution. |
+| High-risk workflow | [High-Risk Administrative Action Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/scenarios/high-risk-administrative-action.md) | A concrete scenario where actor, target, risk, policy metadata, acknowledgment, decision receipt, and host execution remain separate responsibilities. |
+| Structured decision result | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | The outcome and reason structure consumed by the host. |
+| Policy evaluation | [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) | Constraint evaluation, base composition, and the optional decision-policy boundary. |
 
 The implementation repository does not require every host to adopt the qualitative model used in this tutorial.
 

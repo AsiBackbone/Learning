@@ -322,8 +322,8 @@ A compact teaching shape might separate the original command from the later exec
 > `IllustrativeCapabilityCheckResult`, and `CheckAsync` are teaching-only names used
 > here to show the architectural boundary without reproducing the released package API.
 > For the current `AsiBackbone` capability-grant validation surface, see
-> [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md)
-> and the [4.0 to 5.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-400-to-500.md).
+> [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/capability-grant-hardening.md)
+> and the [4.0 to 5.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/upgrade-400-to-500.md).
 
 ```csharp
 public sealed record ExecuteDeployment(

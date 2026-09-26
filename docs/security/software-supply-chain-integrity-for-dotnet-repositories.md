@@ -2083,10 +2083,10 @@ Pinned DocFX tool manifest
 ### AsiBackbone
 
 - [AsiBackbone repository](https://github.com/AsiBackbone/AsiBackbone)
-- [AsiBackbone workflow directory](https://github.com/AsiBackbone/AsiBackbone/tree/main/.github/workflows)
-- [Directory.Build.props](https://github.com/AsiBackbone/AsiBackbone/blob/main/Directory.Build.props)
-- [Directory.Packages.props](https://github.com/AsiBackbone/AsiBackbone/blob/main/Directory.Packages.props)
-- [Dependabot configuration](https://github.com/AsiBackbone/AsiBackbone/blob/main/.github/dependabot.yml)
+- [AsiBackbone workflow directory](https://github.com/AsiBackbone/AsiBackbone/tree/v7.0.0/.github/workflows)
+- [Directory.Build.props](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/Directory.Build.props)
+- [Directory.Packages.props](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/Directory.Packages.props)
+- [Dependabot configuration](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/.github/dependabot.yml)
 
 Inspect it for:
 

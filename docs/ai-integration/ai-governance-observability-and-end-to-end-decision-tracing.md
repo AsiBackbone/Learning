@@ -569,9 +569,9 @@ The working `AsiBackbone` repository contains an `AsiBackbone.OpenTelemetry` pac
 
 Useful implementation references include:
 
-- [`AsiBackbone.OpenTelemetry` README](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/README.md)
-- [`OpenTelemetryGovernanceInstrumentation`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/OpenTelemetryGovernanceInstrumentation.cs)
-- [`OpenTelemetryGovernanceAttributes`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.OpenTelemetry/OpenTelemetryGovernanceAttributes.cs)
+- [`AsiBackbone.OpenTelemetry` README](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.OpenTelemetry/README.md)
+- [`OpenTelemetryGovernanceInstrumentation`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.OpenTelemetry/OpenTelemetryGovernanceInstrumentation.cs)
+- [`OpenTelemetryGovernanceAttributes`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.OpenTelemetry/OpenTelemetryGovernanceAttributes.cs)
 
 The working package exposes activity events/tags, metrics, stable governance attributes, trace/span identifiers, decision metadata, lifecycle information, and emission outcomes.
 

@@ -1389,12 +1389,12 @@ This lab is framework-neutral.
 
 | Learning concern | Reference | What to inspect |
 | --- | --- | --- |
-| Policy evaluation | [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) | A concrete evaluation pipeline that returns governance decisions without performing host side effects. |
-| Structured decisions | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | Outcome, reasons, correlation, and policy identity that can participate in comparison evidence. |
-| Host-specific decision policy | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | A boundary where candidate host/domain decision behavior can be evaluated separately from execution. |
-| Policy pipeline explanation | [Policy Evaluator Pipeline](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/policy-evaluator-pipeline.md) | Evaluation and composition boundaries useful when designing replayable policy inputs. |
-| Decision-policy examples | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/custom-decision-policy-examples.md) | Examples of host policy variations that could be compared in a simulation corpus. |
-| Host-owned execution | [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/host-owned-execution-enforcement.md) | Why evaluating an allowed result does not require or imply performing the protected action. |
+| Policy evaluation | [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) | A concrete evaluation pipeline that returns governance decisions without performing host side effects. |
+| Structured decisions | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | Outcome, reasons, correlation, and policy identity that can participate in comparison evidence. |
+| Host-specific decision policy | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | A boundary where candidate host/domain decision behavior can be evaluated separately from execution. |
+| Policy pipeline explanation | [Policy Evaluator Pipeline](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/policy-evaluator-pipeline.md) | Evaluation and composition boundaries useful when designing replayable policy inputs. |
+| Decision-policy examples | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/custom-decision-policy-examples.md) | Examples of host policy variations that could be compared in a simulation corpus. |
+| Host-owned execution | [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/host-owned-execution-enforcement.md) | Why evaluating an allowed result does not require or imply performing the protected action. |
 
 Learning does not require a particular simulation service, policy-management product, event store, data warehouse, or deployment controller.
 

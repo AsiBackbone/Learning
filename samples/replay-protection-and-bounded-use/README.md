@@ -395,10 +395,10 @@ The sample stays framework-neutral so the atomic state transition remains easy t
 
 | Teaching sample | Working reference | What to inspect |
 | --- | --- | --- |
-| `ICapabilityUseStore` | [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityGrants/ICapabilityGrantUseStore.cs) | Provider-neutral `TryConsumeAsync` semantics and the boundary between Core behavior and host-owned durable state. |
-| `AtomicInMemoryCapabilityUseStore` | [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Storage.InMemory/CapabilityGrants/InMemoryCapabilityGrantUseStore.cs) | Thread-safe local use counts and explicit non-durable/non-distributed limitations. |
-| Concurrent invariant tests | [`InMemoryCapabilityGrantUseStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/CapabilityGrants/InMemoryCapabilityGrantUseStoreTests.cs) | Accepted use, use limits, stop/cancel state, and local concurrency behavior. |
-| `ProtectedOperationGateway` | [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrantValidator.cs) | Static/proof validation composed with optional stateful use checking before host-owned execution. |
+| `ICapabilityUseStore` | [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/CapabilityGrants/ICapabilityGrantUseStore.cs) | Provider-neutral `TryConsumeAsync` semantics and the boundary between Core behavior and host-owned durable state. |
+| `AtomicInMemoryCapabilityUseStore` | [`InMemoryCapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Storage.InMemory/CapabilityGrants/InMemoryCapabilityGrantUseStore.cs) | Thread-safe local use counts and explicit non-durable/non-distributed limitations. |
+| Concurrent invariant tests | [`InMemoryCapabilityGrantUseStoreTests`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/tests/AsiBackbone.Core.Tests/CapabilityGrants/InMemoryCapabilityGrantUseStoreTests.cs) | Accepted use, use limits, stop/cancel state, and local concurrency behavior. |
+| `ProtectedOperationGateway` | [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrantValidator.cs) | Static/proof validation composed with optional stateful use checking before host-owned execution. |
 
 The framework implementation remains a specimen. Durable replay guarantees are still defined by the host and selected provider.
 
@@ -422,7 +422,7 @@ Continue with the [Replay Protection and Bounded-Use Authority lab](../../docs/l
 - [Scoped Capability and Host-Owned Execution sample](../scoped-capability-and-host-owned-execution/README.md)
 - [Data Access Boundaries and Transaction Reasoning](../../docs/aspnetcore/data-access-boundaries-and-transaction-reasoning.md)
 - [Governed AI Tool Gateway](../../docs/tutorials/governed-ai-tool-gateway.md)
-- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md)
+- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/capability-grant-hardening.md)
 
 ## License
 

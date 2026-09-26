@@ -1229,12 +1229,12 @@ The `AsiBackbone/AsiBackbone` repository provides a fuller implementation of the
 
 | Learning concept | Working implementation reference | What to inspect |
 | --- | --- | --- |
-| Core policy vocabulary | [Core Domain Language](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/core-domain-language.md) | Context, constraints, active policy structure, decisions, and host boundary |
-| Constraint evaluation and base composition | [Policy Evaluator Pipeline](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/policy-evaluator-pipeline.md) | Deny/warning/allow composition, empty-policy behavior, short-circuiting, exception posture, and reason handling |
-| Post-composition policy | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/custom-decision-policy-examples.md) | Warning preservation, regional overlays, acknowledgment, escalation, and host-owned execution |
-| Concrete evaluator | [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) | Source-level evaluation and composition behavior |
-| Decision-policy contract | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | Boundary between base composition and host/domain decision transformation |
-| End-to-end behavior | [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) | Executable policy-evaluator invariants |
+| Core policy vocabulary | [Core Domain Language](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/core-domain-language.md) | Context, constraints, active policy structure, decisions, and host boundary |
+| Constraint evaluation and base composition | [Policy Evaluator Pipeline](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/policy-evaluator-pipeline.md) | Deny/warning/allow composition, empty-policy behavior, short-circuiting, exception posture, and reason handling |
+| Post-composition policy | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/custom-decision-policy-examples.md) | Warning preservation, regional overlays, acknowledgment, escalation, and host-owned execution |
+| Concrete evaluator | [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) | Source-level evaluation and composition behavior |
+| Decision-policy contract | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | Boundary between base composition and host/domain decision transformation |
+| End-to-end behavior | [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) | Executable policy-evaluator invariants |
 
 The Learning article remains framework-neutral on purpose.
 
