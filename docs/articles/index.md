@@ -41,8 +41,6 @@ The Learning site is the canonical publication host. Cross-posted copies should 
 
 **Christopher D. Cavell** · **September 26, 2026**
 
-## Articles and Tutorials Serve Different Jobs
-
 A generic, operation-agnostic pipeline behavior wraps a call that has already been chosen; it sees the request rather than the resource, cannot express operation-specific outcomes without an operation-specific contract, and can be bypassed by registration order or a second entry path.
 
 Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/pipeline-behavior-should-not-decide-the-operation.html`
@@ -111,6 +109,8 @@ Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/ci-badge-do
 Authorization can succeed while resource-state or workflow rules still block execution; resolve that decision before protected side effects begin.
 
 Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/authorization-check-runs-too-late.html`
+
+## Articles and Tutorials Serve Different Jobs
 
 | Tutorial | Article |
 | --- | --- |
