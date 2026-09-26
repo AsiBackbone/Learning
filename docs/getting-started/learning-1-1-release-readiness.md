@@ -39,7 +39,7 @@ The following local gates are required on the release-preparation branch:
 
 All local gates passed on 2026-09-26. The API validator covered 362 instructional files, organization-link validation resolved 280 AsiBackbone source links against fetched Git objects, DocFX built 119 conceptual pages with zero warnings or errors, and all 312 sample tests passed with zero failures or skips.
 
-The pull request must also pass hosted documentation, link, sample, CodeQL, dependency, workflow-security, and supply-chain checks before merge.
+[PR #368](https://github.com/AsiBackbone/Learning/pull/368) passes hosted documentation, link, sample, release-evidence, CodeQL, dependency, workflow-security, and supply-chain checks.
 
 ## Release Evidence and Publication Boundary
 
@@ -64,7 +64,7 @@ Those assets and their provenance cannot exist before publication. Tag identity,
 - [x] AsiBackbone `v7.0.0` is published and its API, migration, persistence, and security guidance has been reviewed.
 - [x] Current implementation links are pinned to `v7.0.0`; Learning 1.0 / AsiBackbone 6.0 records remain historical.
 - [x] Learning 1.1 release notes, changelog, citation metadata, and current-release messaging describe the complete scope.
-- [ ] Required pull-request checks pass on the final release-preparation commit.
+- [x] Required pull-request checks pass on the final release-preparation commit in [PR #368](https://github.com/AsiBackbone/Learning/pull/368).
 - [ ] The approved release candidate is merged to protected `main`.
 - [ ] `v1.1.0` and its GitHub Release are created from the approved merge commit using the reviewed release notes.
 - [ ] The release-triggered evidence workflow publishes, attests, and verifies all durable assets.
