@@ -66,5 +66,5 @@ references:
         orcid: "https://orcid.org/0009-0002-2113-0245"
     doi: "10.5281/zenodo.20373042"
     repository-code: "https://github.com/AsiBackbone/NetCoreApplicationTemplate"
-version: "1.0.0"
-date-released: "2026-09-19"
+version: "1.1.0"
+date-released: "2026-09-26"

@@ -96,9 +96,9 @@ Use the diagrams as orientation, then follow the corresponding lessons for reaso
 
 The Learning diagrams are intentionally framework-neutral. The current AsiBackbone implementation repository contains fuller implementation-facing references:
 
-- [Core Governance Flow Diagrams](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/core-governance-flow-diagrams.md)
-- [Core Policy Evaluator Pipeline](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/policy-evaluator-pipeline.md)
-- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md)
+- [Core Governance Flow Diagrams](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/core-governance-flow-diagrams.md)
+- [Core Policy Evaluator Pipeline](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/policy-evaluator-pipeline.md)
+- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/capability-grant-hardening.md)
 
 Those implementation references may use concrete package types and validation profiles. This Learning page keeps the architectural lesson independent of any one API surface.
 

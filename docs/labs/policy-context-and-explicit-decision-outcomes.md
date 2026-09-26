@@ -463,10 +463,10 @@ Use `git status` before restoring anything so that you understand which local ch
 - [Decision Before Execution lab](decision-before-execution.md) — practice the earlier boundary between decision and host-owned execution.
 - [Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md) — continue from structured outcomes into acknowledgment, lineage, and governance evidence.
 - [Foundational Tutorial Index](../tutorials/index.md) — view the complete foundational learning path.
-- [`GovernanceDecisionOutcome`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs) — compare the teaching vocabulary with the working framework.
-- [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — inspect the fuller decision model and reason metadata.
-- [`IGovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/IGovernanceEvaluationContext.cs) — compare the explicit teaching snapshot with the framework context surface.
-- [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) — inspect fuller constraint evaluation and decision composition.
+- [`GovernanceDecisionOutcome`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs) — compare the teaching vocabulary with the working framework.
+- [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — inspect the fuller decision model and reason metadata.
+- [`IGovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Constraints/IGovernanceEvaluationContext.cs) — compare the explicit teaching snapshot with the framework context surface.
+- [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) — inspect fuller constraint evaluation and decision composition.
 
 ---
 

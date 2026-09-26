@@ -574,9 +574,9 @@ Then answer:
 - [Decision Before Execution sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md) — compare the corrected sample flow with the flawed starter code in this exercise.
 - [Decision Before Execution lab](decision-before-execution.md) — practice deliberately breaking and repairing the host execution guard.
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — continue into richer context and non-boolean outcomes.
-- [Intent-to-Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) — inspect the fuller lifecycle from proposal through execution.
-- [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/host-owned-execution-enforcement.md) — compare the teaching boundary with the fuller implementation guidance.
-- [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) — inspect tests that make policy/execution behavior observable in the implementation repository.
+- [Intent-to-Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/intent-to-execution-pattern.md) — inspect the fuller lifecycle from proposal through execution.
+- [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/host-owned-execution-enforcement.md) — compare the teaching boundary with the fuller implementation guidance.
+- [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) — inspect tests that make policy/execution behavior observable in the implementation repository.
 
 ---
 

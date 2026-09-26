@@ -2031,13 +2031,13 @@ The `AsiBackbone/AsiBackbone` repository already exposes the structured outcome 
 
 | Learning concept | Working implementation reference | What to inspect |
 | --- | --- | --- |
-| Escalation outcome vocabulary | [`GovernanceDecisionOutcome`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs) | The framework outcome that includes `EscalationRecommended`. |
-| Structured decision | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | Outcome, reason codes, correlation/trace identifiers, and policy identity that a host can preserve before routing. |
-| Post-composition decision policy | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | The host/domain boundary where broader policy can refine a composed result. |
-| Escalation example | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/custom-decision-policy-examples.md) | A gateway-readiness example that can return escalation without performing the protected action. |
-| Audit evidence | [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) | Structured evidence that can preserve decision outcome, reasons, policy identity, and correlation. |
-| Host execution boundary | [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/host-owned-execution-enforcement.md) | Why a governance result still requires explicit host enforcement before side effects. |
-| High-consequence scenario | [High-Risk Administrative Action Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/high-risk-administrative-action.md) | A scenario where escalation-recommended outcomes remain non-executable and host-controlled. |
+| Escalation outcome vocabulary | [`GovernanceDecisionOutcome`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs) | The framework outcome that includes `EscalationRecommended`. |
+| Structured decision | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | Outcome, reason codes, correlation/trace identifiers, and policy identity that a host can preserve before routing. |
+| Post-composition decision policy | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | The host/domain boundary where broader policy can refine a composed result. |
+| Escalation example | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/custom-decision-policy-examples.md) | A gateway-readiness example that can return escalation without performing the protected action. |
+| Audit evidence | [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) | Structured evidence that can preserve decision outcome, reasons, policy identity, and correlation. |
+| Host execution boundary | [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/host-owned-execution-enforcement.md) | Why a governance result still requires explicit host enforcement before side effects. |
+| High-consequence scenario | [High-Risk Administrative Action Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/scenarios/high-risk-administrative-action.md) | A scenario where escalation-recommended outcomes remain non-executable and host-controlled. |
 
 A host may implement escalation persistence and routing using:
 

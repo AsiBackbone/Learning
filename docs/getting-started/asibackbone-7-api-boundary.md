@@ -1,12 +1,12 @@
 ---
 description: Use the current AsiBackbone 7.0 names and understand the security, serialization, and persistence changes from 6.0.
-asibackbone_ref: main
+asibackbone_ref: v7.0.0
 asibackbone_status: current
 ---
 
 # AsiBackbone 7.0 Compatibility and API Boundary
 
-> **Release status:** AsiBackbone 7.0 is prepared on the implementation repository's `main` branch but is not yet a published package release. Use this page to review or prepare integrations; keep production package references on a released version until 7.0 is published.
+> **Release status:** AsiBackbone 7.0.0 was published on September 26, 2026. Implementation links on this page are pinned to the immutable [`v7.0.0`](https://github.com/AsiBackbone/AsiBackbone/releases/tag/v7.0.0) release tag.
 
 Learning teaches governed-execution architecture. AsiBackbone owns exact package names, runtime behavior, wire contracts, and migrations. Learning samples remain framework-neutral teaching models and do not depend on `AsiBackbone.*` packages.
 
@@ -33,7 +33,7 @@ AsiBackbone 7.0 completes the vocabulary transition begun in 6.0. The 6.0 compat
 | `HandshakeAcknowledgmentEntity` | `AcknowledgmentResponseEntity` |
 | `AuditResidueId` | `DecisionReceiptId` |
 
-The high-frequency current types include [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs), [`AcknowledgmentRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Acknowledgments/AcknowledgmentRequest.cs), [`AcknowledgmentResponse`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Acknowledgments/AcknowledgmentResponse.cs), [`CapabilityGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrant.cs), and [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrantValidator.cs).
+The high-frequency current types include [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs), [`AcknowledgmentRequest`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Acknowledgments/AcknowledgmentRequest.cs), [`AcknowledgmentResponse`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Acknowledgments/AcknowledgmentResponse.cs), [`CapabilityGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrant.cs), and [`CapabilityGrantValidator`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrantValidator.cs).
 
 For execution-boundary validation, use `CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(...)` with explicit `CapabilityGrantBindingExpectations`. The obsolete `CreateExecutionBoundary(...)` overload always fails closed and is retained only for binary compatibility. Metadata-only validation remains deliberately weaker and is not a substitute for execution-boundary checks.
 
@@ -67,11 +67,11 @@ Table names remain unchanged. Replace generated drop/add operations with column 
 
 The public CLR vocabulary changes, but signed and telemetry compatibility strings do not. Canonical artifact tags and payload bytes, OpenTelemetry event and attribute names, diagnostic IDs, EF Core table names, and `AddAsiBackbone*` registration methods keep their 6.x values. Artifacts signed by 6.x continue to verify under 7.0. Do not rename those protocol strings to match the new CLR names.
 
-The authoritative [6.0 to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-600-to-700.md) contains the complete rename inventory, constructor changes, migration operations, and stable-contract list.
+The authoritative [6.0 to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/upgrade-600-to-700.md) contains the complete rename inventory, constructor changes, migration operations, and stable-contract list.
 
 ## Copying Package Syntax
 
-Evaluator construction and endpoint policy markers continue to use the supported builder and `MarkGovernancePolicy(...)` paths. Verify exact signatures in [`GovernancePolicyEvaluatorBuilder`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/GovernancePolicyEvaluatorBuilder.cs) and [`EndpointGovernanceRouteBuilderExtensions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Endpoints/EndpointGovernanceRouteBuilderExtensions.cs).
+Evaluator construction and endpoint policy markers continue to use the supported builder and `MarkGovernancePolicy(...)` paths. Verify exact signatures in [`GovernancePolicyEvaluatorBuilder`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/GovernancePolicyEvaluatorBuilder.cs) and [`EndpointGovernanceRouteBuilderExtensions`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.AspNetCore/Endpoints/EndpointGovernanceRouteBuilderExtensions.cs).
 
 Before publishing package-facing Learning material:
 
@@ -82,6 +82,6 @@ Before publishing package-facing Learning material:
 - use `CreateBoundExecutionBoundary(...)` with explicit binding expectations at execution boundaries;
 - treat DLP numeric enum migration, JSON key changes, and EF Core column renames as deployment work;
 - preserve signed, telemetry, and persistence compatibility strings exactly;
-- link current implementation behavior to `main` and historical version pages to immutable release tags.
+- link current implementation behavior to the immutable `v7.0.0` release tag and historical version pages to their corresponding release tags.
 
 Architecture terms in Learning explain responsibilities and flow; they are not automatically package type names or runtime guarantees. When the two differ, this page directs current readers to the implementation contract while the versioned 6.0 pages preserve the historical record.

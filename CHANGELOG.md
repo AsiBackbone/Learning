@@ -6,6 +6,8 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-26
+
 ### Changed
 
 - Updated the repository-pinned DocFX tool and reviewed modern-template baseline from 2.78.5 to 2.81.0.
@@ -55,6 +57,7 @@ Learning releases are archival and citation snapshots of educational material. T
 
 - Obsolete dependency-check suppressions for packages not used by Learning.
 
-[Unreleased]: https://github.com/AsiBackbone/Learning/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/AsiBackbone/Learning/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/AsiBackbone/Learning/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/AsiBackbone/Learning/compare/v0.15.0...v1.0.0
 [0.15.0]: https://github.com/AsiBackbone/Learning/releases/tag/v0.15.0

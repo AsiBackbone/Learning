@@ -2214,13 +2214,13 @@ The `AsiBackbone/AsiBackbone` repository provides useful implementation surfaces
 
 | Learning concept | Working implementation reference | What to inspect |
 | --- | --- | --- |
-| Policy-context contract | [`IGovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/IGovernanceEvaluationContext.cs) | The minimal context boundary consumed by constraints. |
-| Concrete host-provided context | [`GovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/GovernanceEvaluationContext.cs) | Correlation, policy identity, and normalized metadata supplied by the host. |
-| Policy evaluation | [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) | Constraint evaluation and base decision composition. |
-| Post-composition decision policy | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | A host/domain boundary where broader policy can interpret composed results and context. |
-| Structured governance result | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | Outcome, reasons, correlation, and policy identity returned to the host. |
-| Decision-policy examples | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/custom-decision-policy-examples.md) | Examples of host-provided risk metadata influencing a final decision while execution remains host-owned. |
-| Execution enforcement | [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/host-owned-execution-enforcement.md) | The boundary that keeps decisions and context separate from the protected side effect. |
+| Policy-context contract | [`IGovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Constraints/IGovernanceEvaluationContext.cs) | The minimal context boundary consumed by constraints. |
+| Concrete host-provided context | [`GovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Constraints/GovernanceEvaluationContext.cs) | Correlation, policy identity, and normalized metadata supplied by the host. |
+| Policy evaluation | [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) | Constraint evaluation and base decision composition. |
+| Post-composition decision policy | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | A host/domain boundary where broader policy can interpret composed results and context. |
+| Structured governance result | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | Outcome, reasons, correlation, and policy identity returned to the host. |
+| Decision-policy examples | [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/custom-decision-policy-examples.md) | Examples of host-provided risk metadata influencing a final decision while execution remains host-owned. |
+| Execution enforcement | [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/host-owned-execution-enforcement.md) | The boundary that keeps decisions and context separate from the protected side effect. |
 
 The implementation does not require a particular ML platform, scoring service, probability representation, or calibration method.
 

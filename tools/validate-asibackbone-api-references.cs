@@ -12,6 +12,8 @@ static partial class AsiBackboneApiReferenceValidator
     private const string CurrentApiBoundaryRelativePath =
         "docs/getting-started/asibackbone-7-api-boundary.md";
 
+    private const string CurrentImplementationRef = "v7.0.0";
+
     private const string ValidatorRelativePath =
         "tools/validate-asibackbone-api-references.cs";
 
@@ -20,6 +22,12 @@ static partial class AsiBackboneApiReferenceValidator
         CurrentApiBoundaryRelativePath,
         "docs/getting-started/asibackbone-6-api-boundary.md",
         "docs/getting-started/learning-1-asibackbone-6-compatibility.md"
+    };
+
+    private static readonly HashSet<string> ImmutableHistoricalReleaseRecordPaths = new(StringComparer.Ordinal)
+    {
+        "RELEASE-NOTES-1.0.0.md",
+        "docs/getting-started/learning-1-release-readiness.md"
     };
 
     private static readonly HashSet<string> ForbiddenCurrentSymbols = new(StringComparer.Ordinal)
@@ -160,7 +168,7 @@ static partial class AsiBackboneApiReferenceValidator
     private static partial Regex IdentifierRegex();
 
     [GeneratedRegex(
-        @"https://github\.com/AsiBackbone/AsiBackbone/(?:blob|tree)/(?!(?:main|v6\.0\.0)(?:/|\b))[^\s)\]'>]+",
+        @"https://github\.com/AsiBackbone/AsiBackbone/(?:blob|tree)/(?!(?:v7\.0\.0|v6\.0\.0)(?:/|\b))[^\s)\]'>]+",
         RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
     private static partial Regex StaleImplementationLinkRegex();
 
@@ -255,11 +263,16 @@ static partial class AsiBackboneApiReferenceValidator
                 }
             }
 
+            if (ImmutableHistoricalReleaseRecordPaths.Contains(relativePath))
+            {
+                continue;
+            }
+
             foreach (Match linkMatch in StaleImplementationLinkRegex().Matches(text))
             {
                 int lineNumber = GetLineNumber(text, linkMatch.Index);
                 errors.Add(
-                    $"{relativePath}:{lineNumber} links implementation source outside main or the supported v6.0.0 tag: {linkMatch.Value}");
+                    $"{relativePath}:{lineNumber} links implementation source outside the released v7.0.0 or historical v6.0.0 tags: {linkMatch.Value}");
             }
         }
     }
@@ -312,12 +325,13 @@ static partial class AsiBackboneApiReferenceValidator
                 if (!isCurrentBoundary)
                 {
                     errors.Add(
-                        $"{relativePath} cannot declare itself current; only '{CurrentApiBoundaryRelativePath}' may use the moving implementation boundary.");
+                        $"{relativePath} cannot declare itself current; only '{CurrentApiBoundaryRelativePath}' may declare the current implementation boundary.");
                 }
 
-                if (!expectedRef.Equals("main", StringComparison.OrdinalIgnoreCase))
+                if (!expectedRef.Equals(CurrentImplementationRef, StringComparison.OrdinalIgnoreCase))
                 {
-                    errors.Add($"{relativePath} is current and must declare asibackbone_ref: main.");
+                    errors.Add(
+                        $"{relativePath} is current and must declare asibackbone_ref: {CurrentImplementationRef}.");
                 }
             }
             else if (!status.Equals("historical", StringComparison.OrdinalIgnoreCase))

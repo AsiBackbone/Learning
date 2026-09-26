@@ -1076,14 +1076,14 @@ The Learning example intentionally compresses the architecture so the policy bou
 
 | Tutorial concept | Working implementation | What to inspect |
 | --- | --- | --- |
-| Framework-neutral policy context contract | [`IGovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/IGovernanceEvaluationContext.cs) | The minimum context surface shared by evaluators and constraints. |
-| Concrete context snapshot | [`GovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/GovernanceEvaluationContext.cs) | Correlation ID, policy version/hash, and normalized host-provided metadata. |
-| Explicit outcome vocabulary | [`GovernanceDecisionOutcome`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs) | The framework's allowed, warning, denied, deferred, acknowledgment-required, and escalation-recommended states. |
-| Structured decision result | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | Outcome, stable reason codes, correlation and trace identifiers, policy identity, and `CanProceed`. |
-| Constraint composition | [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) | How constraint results are accumulated and composed into a governance decision. |
-| Domain- or host-specific final decision rules | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | The post-composition boundary that can introduce deferred, acknowledgment-required, or escalation-recommended outcomes. |
-| Transport mapping | [`GovernanceHttpResultMappingExtensions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Results/GovernanceHttpResultMappingExtensions.cs) | How a governance decision is translated into HTTP without moving transport concerns into the Core decision model. |
-| End-to-end policy behavior | [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) | Executable examples of evaluator behavior and decision composition. |
+| Framework-neutral policy context contract | [`IGovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Constraints/IGovernanceEvaluationContext.cs) | The minimum context surface shared by evaluators and constraints. |
+| Concrete context snapshot | [`GovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Constraints/GovernanceEvaluationContext.cs) | Correlation ID, policy version/hash, and normalized host-provided metadata. |
+| Explicit outcome vocabulary | [`GovernanceDecisionOutcome`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs) | The framework's allowed, warning, denied, deferred, acknowledgment-required, and escalation-recommended states. |
+| Structured decision result | [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) | Outcome, stable reason codes, correlation and trace identifiers, policy identity, and `CanProceed`. |
+| Constraint composition | [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) | How constraint results are accumulated and composed into a governance decision. |
+| Domain- or host-specific final decision rules | [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) | The post-composition boundary that can introduce deferred, acknowledgment-required, or escalation-recommended outcomes. |
+| Transport mapping | [`GovernanceHttpResultMappingExtensions`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.AspNetCore/Results/GovernanceHttpResultMappingExtensions.cs) | How a governance decision is translated into HTTP without moving transport concerns into the Core decision model. |
+| End-to-end policy behavior | [`PolicyEvaluatorEndToEndTests`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/tests/AsiBackbone.Core.Tests/Evaluation/PolicyEvaluatorEndToEndTests.cs) | Executable examples of evaluator behavior and decision composition. |
 
 The framework currently distinguishes these outcomes:
 
@@ -1102,17 +1102,17 @@ The Learning example uses the same vocabulary so the conceptual model maps clean
 
 For a code-first inspection, follow these references in order:
 
-1. [`IGovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/IGovernanceEvaluationContext.cs) — begin with the context contract.
-2. [`GovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/GovernanceEvaluationContext.cs) — inspect the default concrete context snapshot.
-3. [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) — follow constraint evaluation and composition.
-4. [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) — see where broader host or domain policy can refine the composed result.
-5. [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — inspect the final structured decision contract.
-6. [`GovernanceHttpResultMappingExtensions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Results/GovernanceHttpResultMappingExtensions.cs) — observe transport mapping after the governance decision exists.
+1. [`IGovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Constraints/IGovernanceEvaluationContext.cs) — begin with the context contract.
+2. [`GovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Constraints/GovernanceEvaluationContext.cs) — inspect the default concrete context snapshot.
+3. [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) — follow constraint evaluation and composition.
+4. [`IGovernanceDecisionPolicy`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/IGovernanceDecisionPolicy.cs) — see where broader host or domain policy can refine the composed result.
+5. [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) — inspect the final structured decision contract.
+6. [`GovernanceHttpResultMappingExtensions`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.AspNetCore/Results/GovernanceHttpResultMappingExtensions.cs) — observe transport mapping after the governance decision exists.
 
 For architectural explanation rather than source code, see:
 
-- [Policy Evaluator Pipeline](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/policy-evaluator-pipeline.md) — explains the evaluator flow and composition boundary.
-- [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/custom-decision-policy-examples.md) — shows how host-specific policy can transform a composed result without pushing those rules into individual constraints.
+- [Policy Evaluator Pipeline](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/policy-evaluator-pipeline.md) — explains the evaluator flow and composition boundary.
+- [Custom Decision Policy Examples](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/custom-decision-policy-examples.md) — shows how host-specific policy can transform a composed result without pushing those rules into individual constraints.
 
 The Learning records such as `ActorContext`, `AccountContext`, and `EnvironmentContext` are teaching-specific shapes. They are not copies of framework production types. The important mapping is architectural: **explicit facts enter evaluation, policy interprets those facts, and a structured decision leaves evaluation**.
 

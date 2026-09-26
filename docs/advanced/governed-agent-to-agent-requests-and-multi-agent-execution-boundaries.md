@@ -1912,11 +1912,11 @@ The working `AsiBackbone` repository provides useful governance primitives and e
 
 Useful implementation specimens include:
 
-- [AI Agent Gateway Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/scenarios/ai-agent-gateway.md) — establishes the single-agent boundary where the agent proposes and the host owns policy context, execution, and operational safeguards.
-- [`CapabilityGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrant.cs) — provides provider-neutral capability metadata that can be studied for subject, operation, resource, audience, scope, policy, and time bindings.
-- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/capability-grant-hardening.md) — covers proof, binding, failure, time, and bounded-use concerns at the execution boundary.
-- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) — provides structured governance evidence that can participate in a larger host-owned decision chain.
-- [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/intent-to-execution-pattern.md) — reinforces that governance artifacts do not themselves perform the protected side effect.
+- [AI Agent Gateway Scenario](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/scenarios/ai-agent-gateway.md) — establishes the single-agent boundary where the agent proposes and the host owns policy context, execution, and operational safeguards.
+- [`CapabilityGrant`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/CapabilityGrants/CapabilityGrant.cs) — provides provider-neutral capability metadata that can be studied for subject, operation, resource, audience, scope, policy, and time bindings.
+- [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/capability-grant-hardening.md) — covers proof, binding, failure, time, and bounded-use concerns at the execution boundary.
+- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Audit/DecisionReceipt.cs) — provides structured governance evidence that can participate in a larger host-owned decision chain.
+- [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/intent-to-execution-pattern.md) — reinforces that governance artifacts do not themselves perform the protected side effect.
 
 These references provide building blocks to inspect.
 
