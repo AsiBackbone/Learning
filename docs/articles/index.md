@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| MediatR pipeline behaviors, decorators, and authorization boundaries | [Your Pipeline Behavior Can Watch the Operation. It Should Not Decide It.](2026/pipeline-behavior-should-not-decide-the-operation.md) |
 | AI-assisted development and maintainer authority | [A Passing Agent Diff Is Not Project Authority](2026/a-passing-agent-diff-is-not-project-authority.md) |
 | Audit evidence and decision provenance | [Your Audit Log Records the Story, Not the Decision](2026/your-audit-log-is-not-evidence.md) |
 | Capability tokens, roles, and claims | [Do You Need a Capability Token, or Are Roles and Claims Enough?](2026/roles-claims-or-capability-token-dotnet.md) |
@@ -36,6 +37,15 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Your Pipeline Behavior Can Watch the Operation. It Should Not Decide It.](2026/pipeline-behavior-should-not-decide-the-operation.md)
+
+**Christopher D. Cavell** · **September 26, 2026**
+
+A generic, operation-agnostic pipeline behavior wraps a call that has already been chosen; it sees the request rather than the resource, cannot express operation-specific outcomes without an operation-specific contract, and can be bypassed by registration order or a second entry path.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/pipeline-behavior-should-not-decide-the-operation.html`
+
 
 ### [A Passing Agent Diff Is Not Project Authority](2026/a-passing-agent-diff-is-not-project-authority.md)
 

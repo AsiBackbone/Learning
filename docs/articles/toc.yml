@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: Your Pipeline Behavior Can Watch the Operation. It Should Not Decide It.
+  href: 2026/pipeline-behavior-should-not-decide-the-operation.md
 - name: A Passing Agent Diff Is Not Project Authority
   href: 2026/a-passing-agent-diff-is-not-project-authority.md
 - name: Your Audit Log Records the Story, Not the Decision
