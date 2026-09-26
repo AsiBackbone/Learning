@@ -24,6 +24,12 @@ static partial class AsiBackboneApiReferenceValidator
         "docs/getting-started/learning-1-asibackbone-6-compatibility.md"
     };
 
+    private static readonly HashSet<string> HistoricalCompatibilityReferencePaths = new(StringComparer.Ordinal)
+    {
+        "docs/getting-started/asibackbone-6-api-boundary.md",
+        "docs/getting-started/learning-1-asibackbone-6-compatibility.md"
+    };
+
     private static readonly HashSet<string> ImmutableHistoricalReleaseRecordPaths = new(StringComparer.Ordinal)
     {
         "RELEASE-NOTES-1.0.0.md",
@@ -266,6 +272,18 @@ static partial class AsiBackboneApiReferenceValidator
             if (ImmutableHistoricalReleaseRecordPaths.Contains(relativePath))
             {
                 continue;
+            }
+
+            foreach (Match linkMatch in ImplementationLinkRegex().Matches(text))
+            {
+                string implementationRef = linkMatch.Groups["ref"].Value;
+
+                if (implementationRef.Equals("v6.0.0", StringComparison.OrdinalIgnoreCase) &&
+                    !HistoricalCompatibilityReferencePaths.Contains(relativePath))
+                {
+                    errors.Add(
+                        $"{relativePath}:{GetLineNumber(text, linkMatch.Index)} uses the historical v6.0.0 implementation ref outside an approved historical compatibility page: {linkMatch.Value}");
+                }
             }
 
             foreach (Match linkMatch in StaleImplementationLinkRegex().Matches(text))
