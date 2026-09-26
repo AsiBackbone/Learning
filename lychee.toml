@@ -39,9 +39,9 @@ exclude = [
   '^https://github\.com/AsiBackbone/Learning/security/advisories/new$',
 
   # These comparisons become resolvable only after the approved merge commit
-  # is tagged v1.0.0. Keep the canonical changelog targets during PR checks.
-  '^https://github\.com/AsiBackbone/Learning/compare/v0\.15\.0\.\.\.v1\.0\.0$',
-  '^https://github\.com/AsiBackbone/Learning/compare/v1\.0\.0\.\.\.HEAD$',
+  # is tagged v1.1.0. Keep the canonical changelog targets during PR checks.
+  '^https://github\.com/AsiBackbone/Learning/compare/v1\.0\.0\.\.\.v1\.1\.0$',
+  '^https://github\.com/AsiBackbone/Learning/compare/v1\.1\.0\.\.\.HEAD$',
 
   # Zenodo DOI occasionally times out for automated link validation.
   '^https://doi\.org/10\.5281/zenodo\.21938556$'
