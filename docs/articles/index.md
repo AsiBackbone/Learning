@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| MediatR pipeline behaviors, decorators, and authorization boundaries | [Your Pipeline Behavior Can Watch the Operation. It Should Not Decide It.](2026/pipeline-behavior-should-not-decide-the-operation.md) |
 | AI-assisted development and maintainer authority | [A Passing Agent Diff Is Not Project Authority](2026/a-passing-agent-diff-is-not-project-authority.md) |
 | Audit evidence and decision provenance | [Your Audit Log Records the Story, Not the Decision](2026/your-audit-log-is-not-evidence.md) |
 | Capability tokens, roles, and claims | [Do You Need a Capability Token, or Are Roles and Claims Enough?](2026/roles-claims-or-capability-token-dotnet.md) |
