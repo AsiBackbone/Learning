@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -70,6 +71,17 @@ static class MetadataValidator
         "^\"(?<date>\\d{4}-\\d{2}-\\d{2})\"$",
         RegexOptions.Compiled);
 
+    private const int RecentlyAddedArticleCount = 3;
+    private const string RecentlyAddedHeading = "## Recently added";
+
+    private static readonly Regex RecentlyAddedLinkRegex = new(
+        @"^- \[(?<text>.+)\]\((?<href>articles/[^)\s]+\.md)\)[ \t]*$",
+        RegexOptions.Compiled);
+
+    private static readonly Regex TitleFrontMatterRegex = new(
+        @"^title:[ \t]*(?<value>.*?)[ \t]*$",
+        RegexOptions.Compiled);
+
     private static readonly HashSet<string> AllowedPatternClassifications = new(StringComparer.Ordinal)
     {
         "Canonical Pattern",
@@ -131,6 +143,7 @@ static class MetadataValidator
         var errors = new List<string>();
 
         ValidateMarkdownSourceStructure(repositoryRoot, errors);
+        ValidateRecentlyAddedArticles(repositoryRoot, errors);
 
         string socialImagePath = Path.Combine(outputRoot, "images", "asibackbone-social.png");
         if (!File.Exists(socialImagePath))
@@ -336,6 +349,118 @@ static class MetadataValidator
             errors.Add(
                 $"{relativePath}:{lineNumber}: '{key}' must be a double-quoted YYYY-MM-DD date.");
         }
+    }
+
+    // Keeps the landing page's "Recently added" list from going stale: it must name the newest published
+    // articles, newest first, using each article's current title.
+    private static void ValidateRecentlyAddedArticles(string repositoryRoot, ICollection<string> errors)
+    {
+        const string landingPage = "docs/index.md";
+        string docsRoot = Path.Combine(repositoryRoot, "docs");
+        string[] landingLines = File.ReadAllLines(Path.Combine(docsRoot, "index.md"));
+
+        int headingIndex = Array.FindIndex(
+            landingLines,
+            line => string.Equals(line.TrimEnd(), RecentlyAddedHeading, StringComparison.Ordinal));
+        if (headingIndex < 0)
+        {
+            errors.Add($"{landingPage}: expected a '{RecentlyAddedHeading}' section.");
+            return;
+        }
+
+        var listed = new List<(string Text, string Href)>();
+        for (int index = headingIndex + 1; index < landingLines.Length; index++)
+        {
+            string line = landingLines[index];
+            if (line.StartsWith('#') || line.StartsWith('<'))
+            {
+                break;
+            }
+
+            Match link = RecentlyAddedLinkRegex.Match(line);
+            if (link.Success)
+            {
+                listed.Add((link.Groups["text"].Value, link.Groups["href"].Value));
+            }
+        }
+
+        string articlesRoot = Path.Combine(docsRoot, "articles");
+        var published = new List<(DateOnly Date, string Href, string Title)>();
+        foreach (string path in Directory.EnumerateFiles(articlesRoot, "*.md", SearchOption.AllDirectories))
+        {
+            if (TryReadArticleFrontMatter(path, out DateOnly date, out string? title))
+            {
+                published.Add((date, NormalizePath(Path.GetRelativePath(docsRoot, path)), title));
+            }
+        }
+
+        var expected = published
+            .OrderByDescending(static article => article.Date)
+            .ThenBy(static article => article.Href, StringComparer.Ordinal)
+            .Take(RecentlyAddedArticleCount)
+            .ToList();
+
+        string Describe(IEnumerable<string> hrefs) => string.Join(", ", hrefs);
+
+        if (!listed.Select(static item => item.Href).SequenceEqual(expected.Select(static item => item.Href), StringComparer.Ordinal))
+        {
+            errors.Add(
+                $"{landingPage}: '{RecentlyAddedHeading}' must list the {RecentlyAddedArticleCount} newest published articles, newest first. " +
+                $"Expected [{Describe(expected.Select(static item => item.Href))}] but found [{Describe(listed.Select(static item => item.Href))}].");
+            return;
+        }
+
+        for (int index = 0; index < expected.Count; index++)
+        {
+            if (!string.Equals(listed[index].Text, expected[index].Title, StringComparison.Ordinal))
+            {
+                errors.Add(
+                    $"{landingPage}: '{RecentlyAddedHeading}' link text for {expected[index].Href} must match the article title " +
+                    $"'{expected[index].Title}' but was '{listed[index].Text}'.");
+            }
+        }
+    }
+
+    private static bool TryReadArticleFrontMatter(string path, out DateOnly published, [NotNullWhen(true)] out string? title)
+    {
+        published = default;
+        title = null;
+        bool hasDate = false;
+
+        using StreamReader reader = new(path);
+        if (!string.Equals(reader.ReadLine()?.TrimEnd(), "---", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        for (string? line = reader.ReadLine(); line is not null; line = reader.ReadLine())
+        {
+            if (string.Equals(line.TrimEnd(), "---", StringComparison.Ordinal))
+            {
+                break;
+            }
+
+            Match date = PublicationDateFrontMatterRegex.Match(line);
+            if (date.Success && date.Groups["key"].Value == "published")
+            {
+                Match quoted = QuotedPublicationDateRegex.Match(date.Groups["value"].Value);
+                hasDate = quoted.Success && DateOnly.TryParseExact(
+                    quoted.Groups["date"].Value,
+                    "yyyy-MM-dd",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out published);
+                continue;
+            }
+
+            Match titleMatch = TitleFrontMatterRegex.Match(line);
+            if (titleMatch.Success)
+            {
+                title = titleMatch.Groups["value"].Value.Trim('"', '\'');
+            }
+        }
+
+        return hasDate && !string.IsNullOrWhiteSpace(title);
     }
 
     private static int ValidateCanonicalUrls(string outputRoot, ICollection<string> errors)
