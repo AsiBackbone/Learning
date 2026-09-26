@@ -37,7 +37,7 @@ The Learning site is the canonical publication host. Cross-posted copies should 
 
 ## 2026 Archive
 
-### [Your Pipeline Behavior Can Watch the Operation. It Should Not Decide It.](2026/pipeline-behavior-can-watch-operation.md)
+### [Your Pipeline Behavior Can Watch the Operation. It Should Not Decide It.](2026/pipeline-behavior-should-not-decide-the-operation.md)
 
 **Christopher D. Cavell** · **September 26, 2026**
 
@@ -45,7 +45,7 @@ The Learning site is the canonical publication host. Cross-posted copies should 
 
 A generic, operation-agnostic pipeline behavior wraps a call that has already been chosen; it sees the request rather than the resource, cannot express operation-specific outcomes without an operation-specific contract, and can be bypassed by registration order or a second entry path.
 
-Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/pipeline-behavior-can-watch-operation.html`
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/pipeline-behavior-should-not-decide-the-operation.html`
 
 
 ### [A Passing Agent Diff Is Not Project Authority](2026/a-passing-agent-diff-is-not-project-authority.md)
