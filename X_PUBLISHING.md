@@ -20,6 +20,21 @@ renames of already eligible documents do not create another post. RSS and X are
 sibling consumers of source frontmatter; the X publisher does not read or
 modify `feed.xml`.
 
+Feed-enabled articles may select hashtags with optional frontmatter:
+
+```yaml
+x_hashtags:
+  - DotNet
+  - AISecurity
+```
+
+Omitting `x_hashtags` uses `#DotNet`. An explicit list must contain one or two
+unique values, must include `DotNet`, and may add one of `AspNetCore`,
+`SoftwareArchitecture`, `CyberSecurity`, `AISecurity`, `AIGovernance`, or
+`DevSecOps`. Values omit the leading `#`; the publisher adds it. The documentation
+build and publisher both reject malformed, unsupported, duplicate, or excessive
+hashtags before any X API create call.
+
 ## Initial setup
 
 1. Create a protected GitHub Environment named `jackdaw-patio-x`. Restrict it to
@@ -56,14 +71,16 @@ New from AsiBackbone Learning:
 
 {title}
 
+#DotNet [#topicalHashtag]
+
 {canonicalUrl}
 ```
 
 Long titles are truncated at a Unicode text-element boundary while preserving
-the canonical URL. Before every create call, the publisher searches recent
-account posts for that URL. A successful create or reconciliation writes its
-post ID and source blob SHA immediately. The cursor advances only after every
-candidate succeeds.
+the selected hashtags and canonical URL within the 280-character budget. Before
+every create call, the publisher searches recent account posts for that URL. A
+successful create or reconciliation writes its post ID and source blob SHA
+immediately. The cursor advances only after every candidate succeeds.
 
 HTTP `400` is treated as a publisher/content defect; `401` and `403` indicate a
 credential or application-permission failure. `429`, `5xx`, and pre-response
