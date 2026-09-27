@@ -6,10 +6,15 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+### Added
+
+- Published [What Should an AI Tool Gateway Validate Before Execution?](docs/articles/2026/validate-ai-tool-call-before-execution.md), an ordered host-side acceptance checklist for AI tool calls with code and tests that prove rejected proposals never reach the executor (#371).
+
 ### Fixed
 
 - Refreshed the landing page's stale copy. **Recently added** now lists the three newest published articles under their current titles, and the Executable Samples card no longer uses a hard-coded sample count.
 - `tools/validate-doc-metadata.cs` now fails the documentation build when **Recently added** does not name the newest published articles, newest first, with matching titles, or when it contains any list item that is not a plain article link.
+- Markdown link validation no longer fetches `AsiBackbone/AsiBackbone` blob and tree URLs live. `tools/validate-organization-links.cs` already resolves each one against a fetched clone, and the live check only added transient GitHub 503 failures.
 
 ## [1.1.0] - 2026-09-26
 

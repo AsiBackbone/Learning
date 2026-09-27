@@ -155,9 +155,9 @@ The goal is to make the reasoning visible—not to prove that one framework or a
 
 Learning 1.1 is the current documentation baseline aligned with released AsiBackbone 7.0.0. The [current compatibility and API boundary](getting-started/asibackbone-7-api-boundary.md) pins implementation references to the immutable release tag; Learning 1.0 / AsiBackbone 6.0 remains available as historical guidance. Recent publications include:
 
+- [What Should an AI Tool Gateway Validate Before Execution?](articles/2026/validate-ai-tool-call-before-execution.md)
 - [Your Pipeline Behavior Can Watch the Operation. It Should Not Decide It.](articles/2026/pipeline-behavior-should-not-decide-the-operation.md)
 - [A Passing Agent Diff Is Not Project Authority](articles/2026/a-passing-agent-diff-is-not-project-authority.md)
-- [Your Audit Log Records the Story, Not the Decision](articles/2026/your-audit-log-is-not-evidence.md)
 
 <details class="home-details">
   <summary>Scope, terminology, and important limitations</summary>
