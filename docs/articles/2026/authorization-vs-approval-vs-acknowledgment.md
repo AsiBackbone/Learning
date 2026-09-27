@@ -18,7 +18,7 @@ x_hashtags:
 
 **Prerequisites:** Familiarity with C# and ASP.NET Core authorization is helpful. No AsiBackbone package, workflow engine, or prior Learning material is required. The code uses `TimeProvider`, available since .NET 8.
 
-**What this article covers:** what authorization, approval, acknowledgment, and execution permission each mean in plain terms; who produces each one, what it binds to, how long it lasts, and what evidence it leaves; what each decision does *not* prove; when ordinary ASP.NET Core authorization followed by immediate execution is enough; how a delayed operation should re-check permission at the point of execution; and the failure modes that appear when one decision quietly stands in for another.
+**What this article covers:** what authorization, approval, acknowledgment, and execution permission each mean in plain terms; who produces each one, what it binds to, how long it lasts, and what evidence it leaves; what each decision does *not* prove; when ordinary ASP.NET Core authorization followed by immediate execution is enough; how a delayed operation should check permission again, claim it once, and execute; and the failure modes that appear when one decision quietly stands in for another.
 
 A background worker picks up a queued job and runs this:
 
@@ -37,10 +37,12 @@ Now ask four ordinary questions about that export:
 
 - The requester was authorized on Monday. Are they still allowed to export this tenant's data on Thursday, when the worker runs?
 - The reviewer approved an export of three fields. The job now lists five. Did anyone approve five?
-- Someone ticked a box saying they understood the file contains personal data. Who ticked it, what text did they see, and was that box ever meant to grant anything?
+- Someone ticked a box about personal data. Who ticked it, which notice were they shown, and was that box ever meant to grant anything?
 - The tenant was placed on a legal hold on Wednesday. Does any of the stored state know that?
 
 The code cannot answer any of them, because it collapsed four different decisions into two flags.
+
+**The short version.** Authorization says who may ask. Approval says an eligible reviewer accepted one exact proposal. Acknowledgment says a specific person accepted one exact notice. None of them says the operation may run *now*. When execution is delayed, the host must check again at the point of execution, claim that permission exactly once, and only then perform the side effect. When execution is immediate and nobody else has to agree, ordinary authorization is usually enough.
 
 > Authorization, approval, and acknowledgment answer different questions. None should silently inherit the authority or evidence semantics of another.
 
@@ -50,10 +52,14 @@ Teams use *authorized*, *approved*, *confirmed*, and *acknowledged* almost inter
 
 | Decision | The question it answers |
 | --- | --- |
-| **Authorization** | May this identified actor request or perform this kind of operation on this resource, under current access policy? |
+| **Authorization** | May this identified actor request this operation on this resource, under current access policy? |
 | **Approval** | Did an eligible reviewer, other than the requester where required, accept this specific proposal at this specific revision? |
-| **Acknowledgment** | Did a specific person demonstrate awareness of a specific warning, consequence, or condition? |
+| **Acknowledgment** | Did a specific person submit an acknowledgment of a specific notice, warning, or condition that the host presented? |
 | **Execution permission** | Is this exact operation still allowed at the moment the protected side effect is about to happen? |
+
+In the simplest case, where the request is handled and the side effect performed immediately, the authorization check is also the check that permits the operation to run. The rest of this article is about what changes when those two moments separate.
+
+*Execution permission* is this article's label, not an industry term. The same idea appears elsewhere as enforcement-time authorization, just-in-time authorization, or time-of-use checking, the fix for time-of-check-to-time-of-use (TOCTOU) gaps. The name matters less than the rule: it is decided at the boundary, not remembered from earlier.
 
 *Confirmed* is deliberately missing. In practice it is used for all four, and also for "the user clicked OK so they didn't fat-finger the button." When you see it in a design, ask which of the four it means. If the answer is "it prevents accidental clicks," it is a user-interface safeguard, which is useful and legitimate, and it should not be recorded or consumed as any of the four decisions above.
 
@@ -65,7 +71,7 @@ A support analyst at a software company needs a full export of one tenant's cust
 
 - Only analysts assigned to the tenant may request an export of its data.
 - Any export containing personal data must be approved by a data steward for that tenant, who may not be the requester.
-- Before an export containing personal data is submitted, the requester must acknowledge that the file contains personal data and must be deleted within seven days.
+- Before an export containing personal data is submitted, the requester must acknowledge a notice that the file contains personal data and must be deleted within seven days.
 - Exports run overnight in a background worker, because large tenants take hours.
 - Nothing may be exported from a tenant on legal hold.
 
@@ -90,12 +96,12 @@ This table is the core of the article. Each row is a property you should be able
 
 | | Authorization | Approval | Acknowledgment | Execution permission |
 | --- | --- | --- | --- | --- |
-| **Question** | May this actor do this kind of thing to this resource? | Did an eligible reviewer accept this exact proposal? | Did this person see and accept this exact notice? | Is this exact operation still allowed right now? |
-| **Produced by** | Access policy evaluated by the host | An eligible reviewer, recorded by the host | The affected or responsible person, recorded by the host | The host, at the protected boundary |
-| **Binds to** | Actor, operation, resource, current policy | Proposal ID, revision or fingerprint, reviewer, reviewer's authority | Actor, challenge ID and version, proposal fingerprint | The exact operation about to run |
-| **Lifetime** | The request or session in which it was evaluated | Until expiry, revocation, rejection, supersession, or material drift | Until expiry, or until the notice or proposal changes | The execution attempt only |
-| **Evidence to retain** | Decision, reason code, policy version, inputs used | Reviewer, disposition, bound fingerprint, time, expiry, rationale where required | Actor, challenge ID and version, bound fingerprint, time | Final check result, policy version, the approval and acknowledgment it relied on, outcome |
-| **Safe downstream inference** | The requester could legitimately *propose* the operation at that time | The reviewer accepted *this revision* at that time | The person was shown *this notice* at that time | The side effect may run, once, now |
+| **Question** | May this actor request this kind of operation on this resource? | Did an eligible reviewer accept this exact proposal? | Did this person acknowledge this exact notice for this proposal? | Is this exact operation still allowed right now? |
+| **Produced by** | Access policy evaluated by the host | An eligible reviewer, recorded by the host | The person the requirement names, recorded by the host | The host, at the protected boundary |
+| **Binds to** | Actor, operation, resource, current policy | Proposal fingerprint, reviewer, reviewer's verified scope, policy version | Actor, notice ID, version, and content hash, proposal fingerprint | The exact operation about to run |
+| **Lifetime** | The request or session in which it was evaluated | Until expiry, revocation, consumption, rejection, supersession, or material drift | Until expiry, or until the notice or proposal changes | One claimed execution attempt |
+| **Evidence to retain** | Decision, reason code, policy version, inputs used | Reviewer, disposition, bound fingerprint, scope, policy version, time, expiry, rationale where required | Actor, notice ID, version, content hash, bound fingerprint, time | Check result, policy version, the approval and acknowledgment relied on, execution ID, outcome |
+| **Safe downstream inference** | The requester could legitimately *propose* the operation at that time | The reviewer accepted *this proposal* at that time | The person submitted acceptance of *this notice* at that time | The side effect may run, once, now |
 
 The rows that teams skip are **binds to** and **lifetime**. A decision without a binding can be reused for something it never considered. A decision without a lifetime becomes permanent by default.
 
@@ -106,15 +112,15 @@ The inverse table is just as useful in design review, because most incidents com
 | Decision | Does not prove |
 | --- | --- |
 | **Authorization** | That anyone reviewed the operation. That the actor is still authorized later. That the resource is still in the state it was in. That a worker running later has the same authority. |
-| **Approval** | That the requester was authorized. That the reviewer was eligible, unless the host checked. That a different revision is acceptable. That policy, resource state, or the requester's access are unchanged. That execution should happen now. |
-| **Acknowledgment** | That the person may perform the operation. That anyone approved it. That the operation is safe or lawful. That the person consented in any legal sense. That a different or updated notice was seen. |
+| **Approval** | That the requester was authorized. That the reviewer was eligible, unless the host checked. That a different proposal is acceptable. That policy, resource state, or the requester's access are unchanged. That execution should happen now. |
+| **Acknowledgment** | That the person may perform the operation. That anyone approved it. That the person read or understood the notice. That the operation is safe or lawful. That the person consented in any legal sense. That a different or updated notice was accepted. |
 | **Execution permission** | That the effect completed. It is a decision to proceed, not a record of the outcome, which needs its own evidence. |
 
 Two rows deserve emphasis.
 
 **Acknowledgment grants nothing.** It satisfies one specific requirement, such as "the requester has been told about the retention rule," and every other constraint still applies. If a checkbox can turn a denied operation into an allowed one, it has become an override, and overrides need an authorized person, not an informed one.
 
-**Acknowledgment is not legal consent.** This article uses acknowledgment in its engineering sense: evidence that a defined notice was shown to and accepted by an identified person. Whether that is sufficient for consent, notice, or disclosure obligations in your jurisdiction or industry is a legal and compliance question, and this article does not answer it.
+**Acknowledgment is not legal consent.** This article uses acknowledgment in its engineering sense: evidence that an identified person submitted acceptance of a notice the host presented. Whether that is sufficient for consent, notice, or disclosure obligations in your jurisdiction or industry is a legal and compliance question, and this article does not answer it.
 
 ## The Proportional Path: When Authorization Is the Whole Story
 
@@ -154,9 +160,11 @@ authenticated actor
     → protected executor, same request
 ```
 
-Here, authorization *is* execution permission, because nothing separates them: the same principal, the same resource instance, the same policy, the same process, and a gap of milliseconds. There is no revision to drift, no second person, and no later worker. Adding a proposal store, an approval queue, and an execution gate to this endpoint would add cost and a false impression of rigor.
+Here, authorization effectively *is* execution permission: the same principal, the same loaded resource, the same policy, the same process, and a gap of milliseconds. There is no revision to drift, no second person, and no later worker. Adding a proposal store, an approval queue, and an execution gate to this endpoint would add cost and a false impression of rigor.
 
-[When ASP.NET Core Authorization Is Enough](../../architecture/when-aspnet-core-authorization-is-enough.md) explores this boundary in depth. The short test is: **if the decision and the side effect happen in the same request, against the same loaded state, and nobody else needs to agree, authorization is usually sufficient.**
+"Same request" does not guarantee that nothing changed. A concurrent update or an external policy change can still land in those milliseconds. For a read-only report, that is usually acceptable. For a mutation, the usual tools apply: optimistic concurrency on the resource, or authorization evaluated inside the same transaction as the write.
+
+[When ASP.NET Core Authorization Is Enough](../../architecture/when-aspnet-core-authorization-is-enough.md) explores this boundary in depth. The short test is: **if the decision and the side effect happen in the same request, nobody else needs to agree, and the relevant state stays valid through the side effect, authorization is usually sufficient.**
 
 The distinctions start to matter when at least one of these is true:
 
@@ -166,18 +174,21 @@ The distinctions start to matter when at least one of these is true:
 - The proposal can be edited after someone has looked at it.
 - The operation is expensive or irreversible enough that "which decision allowed this?" will be asked afterward.
 
-## The Delayed Path: Keep the Decisions Separate, Then Check Again
+## The Delayed Path: Separate Decisions, a Fresh Check, One Claim
 
-For the customer export, the flow has more steps, and each step produces a distinct record:
+For the customer export, each step produces a distinct record, and nothing runs until the last three steps succeed:
 
-```text
-authorized request
-    → exact proposal (ID + revision + fingerprint)
-    → eligible reviewer approval, bound to the fingerprint
-    → bound acknowledgment, when policy requires it
-    → current policy re-evaluation at execution time
-    → narrow execution authority or a direct executor check
-    → protected side effect
+```mermaid
+flowchart TD
+    A["Authorized request"] --> B["Exact proposal<br/>(ID, revision, host-computed fingerprint)"]
+    B --> C["Acknowledgment<br/>bound to fingerprint + notice hash"]
+    B --> D["Approval by eligible reviewer<br/>bound to fingerprint + policy version"]
+    C --> E["Execution check<br/>current access, policy, facts, bindings"]
+    D --> E
+    E -->|Denied or unavailable| X["No side effect"]
+    E -->|Allowed| F["Atomic claim<br/>consume approval, create execution record"]
+    F -->|Already claimed or changed| X
+    F -->|Claimed| G["Executor<br/>idempotent on execution ID"]
 ```
 
 ### The proposal is the thing everyone decides about
@@ -196,24 +207,40 @@ public sealed record ExportProposal(
 
 public static class ProposalFingerprint
 {
+    // Change this tag whenever the set of material fields changes, so old and
+    // new fingerprints can never collide by accident.
+    private const string Format = "export-proposal/v1";
+
     public static string Compute(ExportProposal proposal)
     {
-        // Material fields only, in a canonical order. Changing any of them
-        // produces a new fingerprint and invalidates earlier decisions.
-        var canonical = string.Join('\n',
+        // A structured encoding, not string concatenation: JSON escaping keeps
+        // ["a,b"] distinct from ["a", "b"], and a newline inside Purpose cannot
+        // impersonate a field boundary.
+        var material = new
+        {
+            Format,
             proposal.ProposalId,
+            proposal.Revision,
             proposal.TenantId,
             proposal.RequesterId,
-            string.Join(',', proposal.Fields.Order(StringComparer.Ordinal)),
+            Fields = proposal.Fields.Order(StringComparer.Ordinal).ToArray(),
             proposal.Destination,
-            proposal.Purpose);
+            proposal.Purpose,
+        };
 
-        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(canonical)));
+        var bytes = JsonSerializer.SerializeToUtf8Bytes(material);
+        return Convert.ToHexString(SHA256.HashData(bytes));
     }
 }
 ```
 
-The revision number is useful for people; the fingerprint is what the host compares. A revision counter alone can be reset or reused by a bug. A fingerprint changes whenever the content changes. Deciding which fields are material is a domain decision. Here, adding a field or changing the destination is material; fixing a typo in an internal note is not, which is why the note is not in the fingerprint.
+Three rules make the fingerprint trustworthy:
+
+- **The host computes it from the stored proposal, every time.** A worker must never accept a fingerprint, or an approval binding, supplied by the client or carried in the job message. A hash the caller chose proves nothing.
+- **Revision is part of it.** This example takes the strict rule: every new revision needs fresh approval and acknowledgment, even if its content happens to match an earlier one. If your domain wants approval to follow content rather than revisions, leave the revision out, and say so in the design.
+- **The encoding is unambiguous and stable.** This serializer output is deterministic for one type in one codebase, which is enough when the same service computes and compares. If different services or platforms compute the fingerprint, define a canonical form, such as the JSON Canonicalization Scheme (RFC 8785), and test it across both.
+
+Deciding which fields are material is a domain decision. Here, adding a field or changing the destination is material. Fixing a typo in an internal note is not, which is why the note is not in the fingerprint.
 
 ### Approval, acknowledgment, and authorization are separate records
 
@@ -225,29 +252,34 @@ public sealed record ExportApproval(
     string ProposalId,
     string ProposalFingerprint,
     string ReviewerId,
-    string ReviewerScope,           // e.g. "data-steward:tenant-contoso"
-    string PolicyVersion,
+    string ReviewerScope,           // scope the host verified at approval time, e.g. "data-steward:tenant-contoso"
+    string PolicyVersion,           // policy the approval was given under
     DateTimeOffset ApprovedAt,
-    DateTimeOffset ExpiresAt);
+    DateTimeOffset ExpiresAt,
+    DateTimeOffset? ConsumedAt,
+    DateTimeOffset? RevokedAt);
 
 public sealed record ExportAcknowledgment(
     string AcknowledgmentId,
     string ProposalId,
     string ProposalFingerprint,
     string ActorId,
-    string ChallengeId,             // e.g. "personal-data-export-notice"
-    int ChallengeVersion,
+    string NoticeId,                // e.g. "personal-data-export-notice"
+    int NoticeVersion,              // versions are immutable once published
+    string NoticeContentHash,       // hash of the exact text the host rendered
     DateTimeOffset AcknowledgedAt,
     DateTimeOffset ExpiresAt);
 ```
 
-Notice what these records do *not* contain: a `Status` field that means "go," or the requester's claims, token, or session. Approval records that a reviewer accepted a fingerprint. Acknowledgment records that a person accepted a notice for a fingerprint. Neither is an instruction to execute.
+Notice what these records do *not* contain: a `Status` field that means "go," or the requester's claims, token, or session. Approval records that a reviewer accepted a fingerprint. Acknowledgment records that a person submitted acceptance of a notice for a fingerprint. Neither is an instruction to execute.
+
+Each record is checked when it is created, not only later. When the steward clicks **Approve**, the host verifies that the steward is eligible for this tenant and is not the requester, then records the scope it verified. When the analyst acknowledges, the host records the hash of the notice text it actually rendered, so "which words were on screen" has an answer that does not depend on today's copy of the notice. Neither record proves the person read the text; they prove what the host presented and who submitted acceptance.
 
 At request time, the host evaluates the requester's authorization and stores that decision with its reason code and policy version, as described in [Your Audit Log Records the Story, Not the Decision](your-audit-log-is-not-evidence.md). That record is evidence that the request was legitimate *when it was made*. It is not a ticket the worker may carry forward.
 
 ### Execution permission is decided again, at the boundary
 
-The worker does not trust any stored flag. Immediately before the side effect, it asks the host a fresh question:
+The worker does not trust any stored flag. Immediately before the side effect, it asks the host a fresh question. The check is read-only; it decides, and a separate claim step makes that decision count exactly once.
 
 ```csharp
 public sealed class ExportExecutionGate(
@@ -259,6 +291,20 @@ public sealed class ExportExecutionGate(
     TimeProvider time)
 {
     public async Task<ExecutionCheck> CheckAsync(string proposalId, CancellationToken ct)
+    {
+        try
+        {
+            return await EvaluateAsync(proposalId, ct);
+        }
+        catch (DependencyUnavailableException)
+        {
+            // If the access store, policy, or legal-hold source cannot answer,
+            // the honest result is "not now", never "allowed".
+            return ExecutionCheck.Unavailable("dependency.unavailable");
+        }
+    }
+
+    private async Task<ExecutionCheck> EvaluateAsync(string proposalId, CancellationToken ct)
     {
         var proposal = await proposals.GetCurrentAsync(proposalId, ct);
         if (proposal is null)
@@ -284,12 +330,13 @@ public sealed class ExportExecutionGate(
             return ExecutionCheck.Deny(requirements.ReasonCode); // e.g. "tenant.legal-hold"
         }
 
-        // 3. If approval is required, it must be bound to this exact fingerprint,
-        //    unexpired, and from a reviewer who is still eligible and is not the requester.
+        // 3. Approval: the current unconsumed, unrevoked approval for this exact
+        //    fingerprint, unexpired, given under the current policy version, by a
+        //    reviewer who is still eligible and is not the requester.
         ExportApproval? approval = null;
         if (requirements.ApprovalRequired)
         {
-            approval = await approvals.FindAsync(proposalId, fingerprint, ct);
+            approval = await approvals.FindCurrentAsync(proposalId, fingerprint, ct);
             if (approval is null)
             {
                 return ExecutionCheck.Deny("approval.missing-for-current-revision");
@@ -298,6 +345,11 @@ public sealed class ExportExecutionGate(
             if (approval.ExpiresAt <= now)
             {
                 return ExecutionCheck.Deny("approval.expired");
+            }
+
+            if (approval.PolicyVersion != requirements.PolicyVersion)
+            {
+                return ExecutionCheck.Deny("approval.policy-changed");
             }
 
             if (approval.ReviewerId == proposal.RequesterId)
@@ -313,16 +365,17 @@ public sealed class ExportExecutionGate(
             }
         }
 
-        // 4. If acknowledgment is required, it must be for this fingerprint and the
-        //    notice version current policy requires.
+        // 4. Acknowledgment: by the named actor, for this fingerprint, of the exact
+        //    notice version and text current policy requires.
         ExportAcknowledgment? acknowledgment = null;
         if (requirements.AcknowledgmentRequired)
         {
             acknowledgment = await acknowledgments.FindAsync(proposalId, fingerprint, ct);
             if (acknowledgment is null
                 || acknowledgment.ActorId != proposal.RequesterId
-                || acknowledgment.ChallengeId != requirements.ChallengeId
-                || acknowledgment.ChallengeVersion != requirements.ChallengeVersion
+                || acknowledgment.NoticeId != requirements.NoticeId
+                || acknowledgment.NoticeVersion != requirements.NoticeVersion
+                || acknowledgment.NoticeContentHash != requirements.NoticeContentHash
                 || acknowledgment.ExpiresAt <= now)
             {
                 return ExecutionCheck.Deny("acknowledgment.missing-or-stale");
@@ -335,26 +388,90 @@ public sealed class ExportExecutionGate(
 }
 ```
 
-Several choices in that code are deliberate:
+What the gate adds over the stored flags:
 
-- **Authorization is re-evaluated, not remembered.** An analyst removed from the tenant on Tuesday should not have an export delivered on Thursday.
-- **Policy is evaluated against current facts.** The legal hold placed on Wednesday is a current fact. Step 2 sees it; a stored `Approved` flag cannot.
-- **Approval is looked up by fingerprint.** An approval for revision 2 cannot be found for revision 3. There is no code path that approves one revision and executes another.
-- **Requirements come from current policy.** If policy now requires notice version 4, an acknowledgment of version 3 no longer satisfies it.
-- **Neither approval nor acknowledgment can skip a check.** Each one only satisfies its own requirement. The legal hold still denies the export even though both records are valid.
+- **Re-evaluation instead of memory.** Requester access, current policy, and current facts are read now. The legal hold placed on Wednesday denies the export on Thursday even though the approval and acknowledgment are both valid.
+- **Bindings instead of statuses.** Approval and acknowledgment are found by fingerprint, so a record for revision 2 cannot satisfy revision 3.
+- **An explicit policy-change rule.** This example uses the strict rule: an approval given under an earlier policy version does not carry forward, and the proposal goes back for review. Some domains deliberately allow approvals to survive compatible policy changes. That should be a written rule, not an accident of which fields the worker reads. [Human-in-the-Loop Governance Workflows](../../governance/human-in-the-loop-governance-workflows.md#policy-drift-during-the-review-window) compares the options.
+- **Eligibility then and now.** `ReviewerScope` is evidence of the scope verified when the steward approved. The gate still asks whether the steward is eligible *today*.
+- **Fail closed.** An unreachable dependency returns `Unavailable`, not `Allow`, and the worker does not call the executor. This article keeps the outcome set to allowed, denied, and unavailable. Richer designs distinguish more, such as deferring an export until a hold lifts rather than denying it. [What Should an AI Tool Gateway Validate Before Execution?](validate-ai-tool-call-before-execution.md) uses the same "unavailable is not executed" rule for AI tool calls.
 
-The result, `ExecutionCheck`, records which approval and acknowledgment it relied on and which policy version it applied, so the evidence for *this execution* points to the evidence for the decisions behind it.
+`ExecutionCheck` records which approval and acknowledgment it relied on and which policy version it applied, so the evidence for *this execution* points to the evidence for the decisions behind it.
+
+### Check, then claim, then execute
+
+A check alone does not make execution safe. Between `CheckAsync` returning and the file being written, the proposal could be edited, the approval revoked, or a second worker could pass the same check. The worker closes that gap with an atomic claim:
+
+```csharp
+public sealed class ExportWorker(
+    ExportExecutionGate gate,
+    IExecutionClaims claims,
+    ICustomerDataExporter exporter)
+{
+    public async Task RunAsync(string proposalId, CancellationToken ct)
+    {
+        var check = await gate.CheckAsync(proposalId, ct);
+        if (!check.Allowed)
+        {
+            await claims.RecordNotExecutedAsync(check, ct);
+            return;
+        }
+
+        // One transaction: consume the approval, confirm the proposal still has
+        // the checked fingerprint, and create the execution record.
+        // Returns null if any condition no longer holds or another worker won.
+        var claim = await claims.TryClaimAsync(check, ct);
+        if (claim is null)
+        {
+            return;
+        }
+
+        var outcome = await exporter.ExportAsync(
+            claim.ProposalId, claim.Fingerprint, idempotencyKey: claim.ExecutionId, ct);
+
+        await claims.CompleteAsync(claim, outcome, ct);
+    }
+}
+```
+
+In a relational store, the heart of `TryClaimAsync` is a conditional update that only one caller can win:
+
+```sql
+UPDATE export_approvals
+SET    consumed_at = @now, consumed_by_execution = @execution_id
+WHERE  approval_id = @approval_id
+  AND  proposal_fingerprint = @fingerprint
+  AND  consumed_at IS NULL
+  AND  revoked_at IS NULL
+  AND  expires_at > @now;
+-- In the same transaction: confirm the proposal row still has @fingerprint,
+-- and insert the execution record. A unique constraint on
+-- (proposal_id, fingerprint) stops a duplicate run even when no approval is required.
+```
+
+If the update touches zero rows, the claim fails and nothing runs. Facts that live in the same database, such as the proposal itself, can be rechecked inside the claim. Facts that live elsewhere, such as a legal-hold service, cannot. Keep the gap between check and claim short, and if a stale answer from another system is unacceptable, have the system that performs the effect enforce that rule itself.
+
+The file write cannot join the database transaction, so the claim does not make the export itself exactly-once. The design handles that gap on purpose:
+
+- The execution ID is the exporter's idempotency key, so a retried write for the same claim produces the same file, not a second copy.
+- A crash after the claim leaves an execution record with no outcome. Recovery reconciles that record by asking the exporter what happened to that execution ID. It does not create a fresh claim and run again.
+- An uncertain outcome is recorded as uncertain, not as success or failure, until reconciliation settles it.
 
 ### The worker has its own, narrow authority
 
 The worker does not run as the analyst. It has no copy of the analyst's token, and it should not have one. Carrying a user's session into a job that runs days later extends that session's authority far beyond the request that created it and ties the job's permissions to whatever the token happened to contain.
 
-The worker runs under its own service identity, and its permission is narrow: *run the export for a proposal that passes the gate*. There are two common ways to enforce that:
+This is where *execution permission* and *execution authority* separate:
 
-- **Direct executor check.** The executor calls the gate itself, immediately before writing the file, and refuses to proceed on anything but `Allow`. This is the simplest option and is enough for most applications.
-- **Narrow execution authority.** The gate issues a short-lived, single-use grant bound to the proposal ID and fingerprint, and the executor accepts only that grant. This is useful when the executor is a separate service or trust boundary. [Do You Need a Capability Token, or Are Roles and Claims Enough?](roles-claims-or-capability-token-dotnet.md) covers when this is worth it.
+- **Execution permission** is the host's decision that this operation may run now. The gate and the claim produce it.
+- **Execution authority** is what the executor actually accepts before it performs the side effect: the credential, grant, or claim it validates.
 
-Either way, the approval should be consumed, or marked used, in the same transaction that records the execution attempt, so a retried or duplicated job cannot run the same approval twice.
+The worker runs under its own service identity, and its authority is narrow: *run the export for a claimed execution*. There are two common ways to enforce that:
+
+- **Direct executor check.** The executor runs in the same trust boundary and refuses anything but a valid, unconsumed claim for the proposal and fingerprint it is about to export. This is the simplest option and is enough for most applications.
+- **Narrow execution authority.** When the exporter is a separate service, it should not trust a message that says "the worker checked." The claim step issues a short-lived, single-use grant bound to the execution ID, proposal, and fingerprint, and the exporter validates that grant itself. [Do You Need a Capability Token, or Are Roles and Claims Enough?](roles-claims-or-capability-token-dotnet.md) covers when this is worth it.
+
+The same thinking applies when policy lives in its own service. The gate calls it at execution time, treats "no answer" as unavailable, and records the policy version it was given. A policy decision cached from Monday is Monday's decision.
 
 ## Failure Modes
 
@@ -362,19 +479,19 @@ Each of these starts as a reasonable shortcut.
 
 ### 1. `Acknowledged = true` treated as authorization
 
-A requester who lacks export permission sees a warning, ticks "I understand," and the export proceeds. The checkbox proved awareness. It never proved authority. Acknowledgment should satisfy a named requirement and nothing else, and the actor who acknowledges must be the one the requirement names, not "anyone who can reach the button."
+A requester who lacks export permission sees a warning, ticks "I understand," and the export proceeds. The checkbox recorded acceptance of a notice. It never proved authority. Acknowledgment should satisfy a named requirement and nothing else, and the actor who acknowledges must be the one the requirement names, not "anyone who can reach the button."
 
 ### 2. Workflow state `Approved` treated as indefinite permission
 
-The job row says `Approved`, so the worker runs it whenever it gets to it, whether that is in an hour or next quarter. Every approval needs an expiry, and the executor must enforce it with a trusted clock. `Approved` is a disposition by a reviewer at a point in time, not a standing grant.
+The job row says `Approved`, so the worker runs it whenever it gets to it, whether that is in an hour or next quarter. A status enum describes where the proposal is in its lifecycle; it is the wrong place to store permission. Every approval needs an expiry, and the executor must enforce it with a trusted clock. `Approved` is a disposition by a reviewer at a point in time, not a standing grant.
 
 ### 3. Approving one revision and executing another
 
-The steward approves name and email. The analyst adds phone after approval, and the job keeps its `Approved` status because approval was stored on the job, not on the content. Bind approval to a fingerprint of the material fields, and treat any material edit as a new proposal that needs a new approval. [Human-in-the-Loop Governance Workflows](../../governance/human-in-the-loop-governance-workflows.md) discusses the options for edits during review in detail.
+The steward approves name and email. The analyst adds phone after approval, and the job keeps its `Approved` status because approval was stored on the job, not on the content. Bind approval to a host-computed fingerprint, and treat any material edit as a new revision that needs a new approval. [Human-in-the-Loop Governance Workflows](../../governance/human-in-the-loop-governance-workflows.md) discusses the options for edits during review in detail.
 
 ### 4. Retaining approval after material resource or policy drift
 
-The approval was correct when given. Since then, the tenant went on legal hold, the policy version changed, or the reviewer lost their steward role. An execution-time policy evaluation catches the first two; re-checking the reviewer's eligibility catches the third. Whether an existing approval survives a policy change should be a deliberate rule, such as "revalidate under the latest policy," rather than an accident of which fields the worker happens to read.
+The approval was correct when given. Since then, the tenant went on legal hold, the policy version changed, or the reviewer lost their steward role. Execution-time evaluation catches the hold, an explicit policy-version rule catches the policy change, and re-checking the reviewer's eligibility catches the role change. Each of those should be a line of code, not an assumption.
 
 ### 5. Carrying the requester's session authority into a later worker
 
@@ -384,21 +501,27 @@ The API serializes the user's claims or access token into the job so the worker 
 
 The logs contain `"Export approved by j.doe"` and `"Export completed"`. Neither line names the proposal fingerprint, the policy version, the notice version, or which approval the execution relied on. A reviewer cannot tell whether the approved export and the executed export were the same thing. Record each decision as its own structured record bound to the proposal fingerprint, and have the execution record point to them. [Decision Receipts and Acknowledgment](../../tutorials/decision-receipts-and-acknowledgment.md) develops this evidence model.
 
+### 7. A partial update that slips past the fingerprint
+
+The create endpoint bumps the revision and clears approvals. A later `PATCH /exports/{id}` endpoint, added for a different feature, updates `Fields` in place. It doesn't bump the revision, and the approval row still carries the old fingerprint. If the worker compares against a fingerprint stored on the job, the export runs with fields nobody approved.
+
+The defenses are the ones above, applied consistently. Compute the fingerprint from the full stored proposal at check time, never from a stored copy or from the fields a request happened to change. Route every material write, whatever the endpoint, through one method that creates a new revision and invalidates existing approvals and acknowledgments in the same transaction.
+
 ## Storing Them Together Is Fine; Merging Them Is Not
 
-None of this requires a workflow engine, a specialized governance store, or a capability token. A single `export_requests` table with an `approvals` table and an `acknowledgments` table beside it, plus a gate method the worker calls, is a perfectly good implementation for many applications.
+None of this requires a workflow engine, a specialized governance store, or a capability token. A single `export_requests` table with `approvals`, `acknowledgments`, and `executions` tables beside it, plus a gate the worker calls, is a perfectly good implementation for many applications.
 
 What matters is that the *meanings* stay distinct even when the storage is shared:
 
 - No single column should mean both "a reviewer accepted this" and "the worker may run this."
 - An acknowledgment row should never be counted as an approval row, even if a later query finds that convenient.
-- The job's status should describe where the proposal is in its lifecycle, such as `Pending`, `Approved`, `Rejected`, `Expired`, `Executed`, or `Failed`, not replace the execution check.
+- The job's status should describe the proposal's lifecycle, such as `Pending`, `Approved`, `Rejected`, `Expired`, `Executed`, or `Failed`, not replace the execution check.
 
 If you later adopt a workflow engine, keep the same separation: let the engine own waiting, reminders, and routing, and keep the final execution check in the host that owns the side effect. [Workflow Engines, Human Approval Systems, and Governed Execution](../../architecture/workflow-engines-human-approval-and-governed-execution.md) covers that division of responsibility.
 
 ## Test the Distinctions, Not Only the Happy Path
 
-The most valuable tests prove that one decision cannot stand in for another. Using a small harness that seeds proposals, approvals, acknowledgments, and policy facts, and records executor calls:
+The most valuable tests prove that one decision cannot stand in for another, and that a valid decision runs only once. Using a small harness that seeds proposals, approvals, acknowledgments, and policy facts, and records executor calls:
 
 ```csharp
 [Fact]
@@ -443,47 +566,90 @@ public async Task Valid_approval_and_acknowledgment_do_not_override_a_legal_hold
     Assert.Empty(harness.Executor.Calls);
     Assert.Equal("tenant.legal-hold", harness.LastCheck.ReasonCode);
 }
+
+[Fact]
+public async Task Expired_approval_does_not_execute()
+{
+    var harness = ExportHarness.WithProposal(PersonalDataExport);
+    harness.Acknowledge(by: Analyst, notice: PersonalDataNoticeV3);
+    harness.Approve(by: Steward, validFor: TimeSpan.FromHours(72));
+
+    harness.Time.Advance(TimeSpan.FromHours(73));
+
+    await harness.RunWorkerAsync();
+
+    Assert.Empty(harness.Executor.Calls);
+    Assert.Equal("approval.expired", harness.LastCheck.ReasonCode);
+}
+
+[Fact]
+public async Task Two_workers_with_one_approval_execute_once()
+{
+    var harness = ExportHarness.WithProposal(PersonalDataExport);
+    harness.Acknowledge(by: Analyst, notice: PersonalDataNoticeV3);
+    harness.Approve(by: Steward);
+
+    await Task.WhenAll(harness.RunWorkerAsync(), harness.RunWorkerAsync());
+
+    Assert.Single(harness.Executor.Calls);
+}
 ```
 
-Each test asserts on the executor's call list, not only the returned result. A denied result proves the gate said no; an empty call list proves the export did not happen. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) explains why that difference matters and how to build the recording executor.
+Each test asserts on the executor's call list, not only the returned result. A denied result proves the gate said no; an empty call list proves the export did not happen. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) explains why that difference matters and how to build the recording executor. `harness.Time` is a `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing`, which is why the gate takes `TimeProvider` rather than reading the system clock.
 
-Useful additions to the same suite: an expired approval, a reviewer who has since lost eligibility, a requester who has since lost access, a self-approval, an acknowledgment of an outdated notice version, and a duplicate job that tries to reuse a consumed approval.
+The concurrency test is only meaningful if the harness's claim store enforces the same conditional update as production. An in-memory fake that skips it will pass for the wrong reason. Run that test against a real database in integration tests.
+
+Useful additions: a reviewer who has since lost eligibility, a requester who has since lost access, a self-approval, an approval given under an earlier policy version, an acknowledgment of an outdated notice, a partial update through a second endpoint, and an unavailable policy dependency.
 
 ## How These Terms Map to Learning
 
-If you continue into the rest of the Learning curriculum, the terms line up as follows:
+Learning's broader model describes one path from intent to effect: intent, authoritative context, a policy decision, acknowledgment or approval where required, scoped authority, and host-owned execution. The four decisions in this article sit *inside* that path; they do not replace it. Authorization and execution permission are policy decisions made at different times, approval and acknowledgment are human inputs that satisfy specific requirements, and execution authority is what the executor finally accepts. [Terminology and Established Concepts](../../architecture/terminology-and-established-concepts.md#approval-acknowledgment-authorization-and-authority) is the vocabulary reference for these terms across the curriculum.
 
 | This article | Learning curriculum |
 | --- | --- |
 | Authorization | Authorization and policy evaluation, including [Policy Context and Explicit Decision Outcomes](../../tutorials/policy-context-and-explicit-decision-outcomes.md) |
 | Approval | Human review with an approval disposition, in [Human-in-the-Loop Governance Workflows](../../governance/human-in-the-loop-governance-workflows.md) |
-| Acknowledgment | Acknowledgment challenge and response, in [Decision Receipts and Acknowledgment](../../tutorials/decision-receipts-and-acknowledgment.md) |
-| Execution permission | Revalidation plus execution authority accepted at the host-owned execution boundary, in [Scoped Capability and Host-Owned Execution](../../tutorials/scoped-capability-and-host-owned-execution.md) |
+| Acknowledgment | Acknowledgment challenge and response, in [Decision Receipts and Acknowledgment](../../tutorials/decision-receipts-and-acknowledgment.md) and the [Human Acknowledgment Workflow](../../case-studies/human-acknowledgment-workflow.md#3-acknowledgment-is-not-approval) case study |
+| Execution permission | Revalidation at the execution boundary |
+| Execution authority | Scoped authority accepted by the host-owned executor, in [Scoped Capability and Host-Owned Execution](../../tutorials/scoped-capability-and-host-owned-execution.md) |
 
-These are the terms this repository uses consistently. They are not an industry standard, and your organization may already use different words for the same ideas. Keeping the four decisions distinct matters more than which names you give them.
+These are the terms this repository uses consistently. They are not an industry standard, and your organization may already use different words for the same ideas. Keeping the decisions distinct matters more than which names you give them.
 
 ## A Short Review Checklist
 
-1. **For each flag or status that sounds like permission, which of the four decisions does it record?** If the answer is "several," split it.
-2. **What exact thing does each approval and acknowledgment bind to?** If it is a job ID with editable content, bind it to a fingerprint instead.
-3. **Does every approval and acknowledgment expire, and does the executor enforce the expiry?**
-4. **Is the requester's authorization re-evaluated at execution time, rather than remembered from the request?**
-5. **Is policy evaluated against current facts at execution time, so a new hold, restriction, or policy version is seen?**
-6. **Can acknowledgment satisfy anything other than its own named requirement?** If so, it has become an override.
-7. **Is the reviewer's eligibility checked, including separation from the requester where policy requires it?**
-8. **Does the worker run under its own narrow identity, without the requester's token or claims?**
-9. **Is an approval consumed with the execution attempt, so a retry cannot use it twice?**
-10. **Does the execution record point to the specific approval, acknowledgment, and policy version it relied on?**
-11. **For operations that run in the same request with no reviewer and no notice, did you stop at ordinary authorization?**
+**Authorization**
+
+1. Is the requester's authorization re-evaluated at execution time, rather than remembered from the request?
+2. Does the worker run under its own narrow identity, without the requester's token or claims?
+3. For operations that run in the same request with no reviewer and no notice, did you stop at ordinary authorization?
+
+**Approval**
+
+4. Is each approval bound to a host-computed fingerprint of the full proposal, never to a mutable job ID or a caller-supplied hash?
+5. Does every approval expire, and is it consumed atomically so a retry or second worker cannot use it twice?
+6. Is reviewer eligibility verified when approving and again at execution, and is the rule for policy changes written down?
+
+**Acknowledgment**
+
+7. Does the record capture the exact notice version and the hash of the text the host rendered?
+8. Can acknowledgment satisfy anything other than its own named requirement? If so, it has become an override.
+
+**Execution**
+
+9. Does an unavailable dependency stop execution instead of allowing it?
+10. Is the side effect idempotent on the execution ID, and can an uncertain outcome be reconciled without running again?
+11. Does the execution record point to the approval, acknowledgment, and policy version it relied on?
 
 ## Continue Deeper
 
 For long-running review, including reviewer eligibility, separation of duties, delegation, timeouts, and policy or context drift during the review window, continue with [Human-in-the-Loop Governance Workflows](../../governance/human-in-the-loop-governance-workflows.md).
 
-For the acknowledgment challenge and response model, and the decision receipts that record a pause and later resumption, see [Decision Receipts and Acknowledgment](../../tutorials/decision-receipts-and-acknowledgment.md).
+For the acknowledgment challenge and response model, and the decision receipts that record a pause and later resumption, see [Decision Receipts and Acknowledgment](../../tutorials/decision-receipts-and-acknowledgment.md). The [Human Acknowledgment Workflow](../../case-studies/human-acknowledgment-workflow.md) case study follows one acknowledgment from challenge to execution.
+
+For the AI-shaped version of the same distinction, where a model proposes a refund and a supervisor's approval is separate from both acknowledgment and the agent's authorization, read [What Should an AI Tool Gateway Validate Before Execution?](validate-ai-tool-call-before-execution.md)
 
 If you are deciding whether a workflow engine should own the approval process, [Workflow Engines, Human Approval Systems, and Governed Execution](../../architecture/workflow-engines-human-approval-and-governed-execution.md) separates what an engine does well from what the executing host must still check.
 
 For the boundary between ordinary ASP.NET Core authorization and something larger, read [When ASP.NET Core Authorization Is Enough](../../architecture/when-aspnet-core-authorization-is-enough.md) and [When ASP.NET Core Authorization Is Not Enough](when-aspnet-core-authorization-is-not-enough.md). If the final check happens after the side effect has already begun, [Your Authorization Check Runs Too Late](authorization-check-runs-too-late.md) addresses that ordering problem.
 
-The rule to keep is short: **authorization says who may ask, approval says a reviewer accepted this exact proposal, acknowledgment says a person saw this exact notice, and only a fresh check at the boundary says the operation may run now.**
+The rule to keep is short: **authorization says who may ask, approval says a reviewer accepted this exact proposal, acknowledgment says a person accepted this exact notice, and only a fresh check at the boundary, claimed once, says the operation may run now.**
