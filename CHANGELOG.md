@@ -8,10 +8,12 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ### Added
 
+- Published [Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?](docs/articles/2026/authorization-vs-approval-vs-acknowledgment.md), a practitioner guide that separates authorization, approval, acknowledgment, and execution permission, with an execution-time check and tests showing that none of them silently becomes permission to run a delayed operation (#375).
 - Published [What Should an AI Tool Gateway Validate Before Execution?](docs/articles/2026/validate-ai-tool-call-before-execution.md), an ordered host-side acceptance checklist for AI tool calls with code and tests that prove rejected proposals never reach the executor (#371).
 
 ### Fixed
 
+- Pull request and push link validation now accepts HTTP 503, so a transient outage on a third-party host no longer fails an unrelated change. The weekly scheduled run keeps the strict accept list and still reports links that stay unavailable.
 - Refreshed the landing page's stale copy. **Recently added** now lists the three newest published articles under their current titles, and the Executable Samples card no longer uses a hard-coded sample count.
 - `tools/validate-doc-metadata.cs` now fails the documentation build when **Recently added** does not name the newest published articles, newest first, with matching titles, or when it contains any list item that is not a plain article link.
 - Markdown link validation no longer fetches `AsiBackbone/AsiBackbone` blob and tree URLs live. `tools/validate-organization-links.cs` already resolves each one against a fetched clone, and the live check only added transient GitHub 503 failures.

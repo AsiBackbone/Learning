@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Authorization, approval, acknowledgment, and delayed execution | [Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?](2026/authorization-vs-approval-vs-acknowledgment.md) |
 | Validating AI tool calls before execution | [What Should an AI Tool Gateway Validate Before Execution?](2026/validate-ai-tool-call-before-execution.md) |
 | MediatR pipeline behaviors, decorators, and authorization boundaries | [Your Pipeline Behavior Can Watch the Operation. It Should Not Decide It.](2026/pipeline-behavior-should-not-decide-the-operation.md) |
 | AI-assisted development and maintainer authority | [A Passing Agent Diff Is Not Project Authority](2026/a-passing-agent-diff-is-not-project-authority.md) |
@@ -38,6 +39,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?](2026/authorization-vs-approval-vs-acknowledgment.md)
+
+**Christopher D. Cavell** · **September 27, 2026**
+
+Authorization, approval, and acknowledgment answer different questions, bind to different things, and expire on different clocks. This guide uses one sensitive-data export to show what each decision proves, what it does not, and why none of them should silently become permission to execute later.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/authorization-vs-approval-vs-acknowledgment.html`
 
 ### [What Should an AI Tool Gateway Validate Before Execution?](2026/validate-ai-tool-call-before-execution.md)
 
