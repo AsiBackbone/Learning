@@ -69,6 +69,13 @@ jobs:
       # would fail until it is merged. Both remaps resolve those links against
       # the checked-out tree instead: blob/main for files, tree/main for
       # directories.
+      #
+      # Pull request and push runs also accept HTTP 503. Third-party hosts,
+      # github.com in particular, return transient 503s that have failed
+      # pull requests whose links were valid, and a 503 says nothing about the
+      # change under review. Scheduled and manual runs keep the strict
+      # lychee.toml accept list, so a link that stays unavailable is still
+      # reported as link rot. HTTP 429 is never accepted.
       - name: Validate Markdown links
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
@@ -76,6 +83,7 @@ jobs:
             --root-dir "${{ github.workspace }}"
             --remap "^https://github\.com/AsiBackbone/Learning/blob/main file://${{ github.workspace }}"
             --remap "^https://github\.com/AsiBackbone/Learning/tree/main file://${{ github.workspace }}"
+            ${{ (github.event_name == 'pull_request' || github.event_name == 'push') && '--accept 200..=399,503' || '' }}
             './**/*.md'
           # The pinned action exports this input as GITHUB_TOKEN, which Lychee
           # uses for authenticated GitHub requests and a higher rate limit.

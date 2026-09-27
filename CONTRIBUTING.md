@@ -694,7 +694,7 @@ The self-test includes a valid source link, a deliberately nonexistent path, and
 lychee './**/*.md'
 ```
 
-A missing object reported by the repository-local validator is link rot: update or remove the link. An isolated HTTP 429 from Lychee is GitHub throttling: rerun the failed job after the limit recovers. If 429 responses persist, verify that the workflow still grants `contents: read` and passes `github.token` to the pinned action. Do not add 429 to `accept`; persistent throttling must remain a visible, retryable failure rather than a passing check.
+A missing object reported by the repository-local validator is link rot: update or remove the link. An isolated HTTP 429 from Lychee is GitHub throttling: rerun the failed job after the limit recovers. If 429 responses persist, verify that the workflow still grants `contents: read` and passes `github.token` to the pinned action. Do not add 429 to `accept`; persistent throttling must remain a visible, retryable failure rather than a passing check. Pull request and push runs accept HTTP 503, because a transient third-party outage says nothing about the change under review. The weekly scheduled run keeps the strict accept list, so a link that stays unavailable is still reported.
 
 ## Diagrams
 

@@ -1,5 +1,5 @@
 ---
-description: Authorization, approval, acknowledgment, and execution permission answer different questions. Why none should silently authorize a delayed .NET operation.
+description: Authorization, approval, and acknowledgment answer different questions. Why none should silently become permission to run a delayed .NET operation.
 title: "Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?"
 author: Christopher D. Cavell
 published: "2026-09-27"
@@ -54,7 +54,7 @@ Teams use *authorized*, *approved*, *confirmed*, and *acknowledged* almost inter
 | --- | --- |
 | **Authorization** | May this identified actor request this operation on this resource, under current access policy? |
 | **Approval** | Did an eligible reviewer, other than the requester where required, accept this specific proposal at this specific revision? |
-| **Acknowledgment** | Did a specific person submit an acknowledgment of a specific notice, warning, or condition that the host presented? |
+| **Acknowledgment** | Did this person accept the exact notice, warning, or condition the host presented? |
 | **Execution permission** | Is this exact operation still allowed at the moment the protected side effect is about to happen? |
 
 In the simplest case, where the request is handled and the side effect performed immediately, the authorization check is also the check that permits the operation to run. The rest of this article is about what changes when those two moments separate.
@@ -191,6 +191,8 @@ flowchart TD
     F -->|Claimed| G["Executor<br/>idempotent on execution ID"]
 ```
 
+In words: an authorized request becomes an exact proposal. Acknowledgment and approval each bind to that proposal. At execution time, a fresh check re-evaluates access, policy, facts, and those bindings. If the check allows it, an atomic claim consumes the approval exactly once. Only then does the executor run. A denied or unavailable check, or a lost claim, means no side effect.
+
 ### The proposal is the thing everyone decides about
 
 Approval and acknowledgment are only meaningful if they refer to something exact. Model the export as a proposal with a revision, and have the host compute a fingerprint over every field that matters to the decision:
@@ -273,7 +275,7 @@ public sealed record ExportAcknowledgment(
 
 Notice what these records do *not* contain: a `Status` field that means "go," or the requester's claims, token, or session. Approval records that a reviewer accepted a fingerprint. Acknowledgment records that a person submitted acceptance of a notice for a fingerprint. Neither is an instruction to execute.
 
-Each record is checked when it is created, not only later. When the steward clicks **Approve**, the host verifies that the steward is eligible for this tenant and is not the requester, then records the scope it verified. When the analyst acknowledges, the host records the hash of the notice text it actually rendered, so "which words were on screen" has an answer that does not depend on today's copy of the notice. Neither record proves the person read the text; they prove what the host presented and who submitted acceptance.
+Each record is checked when it is created, not only later. When the steward clicks **Approve**, the host verifies that the steward is eligible for this tenant and is not the requester, then records the scope it verified. When the analyst acknowledges, the host records the notice ID and version it rendered and a hash of that text. The host also retains every published notice version, unchanged, so "which words were on screen" can be answered by retrieving that version, with the hash confirming it is the same text. Neither record proves the person read the text; they prove what the host presented and who submitted acceptance.
 
 At request time, the host evaluates the requester's authorization and stores that decision with its reason code and policy version, as described in [Your Audit Log Records the Story, Not the Decision](your-audit-log-is-not-evidence.md). That record is evidence that the request was legitimate *when it was made*. It is not a ticket the worker may carry forward.
 
@@ -419,15 +421,20 @@ public sealed class ExportWorker(
 
         // One transaction: consume the approval, confirm the proposal still has
         // the checked fingerprint, and create the execution record.
-        // Returns null if any condition no longer holds or another worker won.
+        // The claim stores an immutable snapshot of the checked proposal with the
+        // execution record. Returns null if any condition no longer holds.
         var claim = await claims.TryClaimAsync(check, ct);
         if (claim is null)
         {
+            // Lost the claim: consumed, changed, or claimed by another worker.
+            // This is not a policy denial and should not be recorded as one.
             return;
         }
 
+        // The exporter works from the snapshot, never from a fresh load of the
+        // proposal, and refuses if the snapshot's fingerprint does not match.
         var outcome = await exporter.ExportAsync(
-            claim.ProposalId, claim.Fingerprint, idempotencyKey: claim.ExecutionId, ct);
+            claim.ProposalSnapshot, claim.Fingerprint, idempotencyKey: claim.ExecutionId, ct);
 
         await claims.CompleteAsync(claim, outcome, ct);
     }
@@ -449,7 +456,7 @@ WHERE  approval_id = @approval_id
 -- (proposal_id, fingerprint) stops a duplicate run even when no approval is required.
 ```
 
-If the update touches zero rows, the claim fails and nothing runs. Facts that live in the same database, such as the proposal itself, can be rechecked inside the claim. Facts that live elsewhere, such as a legal-hold service, cannot. Keep the gap between check and claim short, and if a stale answer from another system is unacceptable, have the system that performs the effect enforce that rule itself.
+If the update touches zero rows, the claim fails and nothing runs. If it succeeds, the exporter receives the snapshot captured in the same transaction. An exporter that reloaded the proposal by ID could pick up an edit made a moment after the claim and export something nobody approved. Facts that live in the same database, such as the proposal itself, can be rechecked inside the claim. Facts that live elsewhere, such as a legal-hold service, cannot. Keep the gap between check and claim short, and if a stale answer from another system is unacceptable, have the system that performs the effect enforce that rule itself.
 
 The file write cannot join the database transaction, so the claim does not make the export itself exactly-once. The design handles that gap on purpose:
 
@@ -595,7 +602,7 @@ public async Task Two_workers_with_one_approval_execute_once()
 }
 ```
 
-Each test asserts on the executor's call list, not only the returned result. A denied result proves the gate said no; an empty call list proves the export did not happen. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) explains why that difference matters and how to build the recording executor. `harness.Time` is a `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing`, which is why the gate takes `TimeProvider` rather than reading the system clock.
+Each test asserts on the executor's call list, not only the returned result. A denied result proves the gate said no; an empty call list proves the export did not happen. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) explains why that difference matters and how to build the recording executor. `harness.Time` is a [`FakeTimeProvider`](https://learn.microsoft.com/dotnet/api/microsoft.extensions.time.testing.faketimeprovider) from the `Microsoft.Extensions.TimeProvider.Testing` package, which is why the gate takes `TimeProvider` rather than reading the system clock.
 
 The concurrency test is only meaningful if the harness's claim store enforces the same conditional update as production. An in-memory fake that skips it will pass for the wrong reason. Run that test against a real database in integration tests.
 

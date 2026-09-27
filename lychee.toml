@@ -10,6 +10,8 @@ host_concurrency = 2
 
 # A response must resolve successfully after retries. In particular, HTTP 429
 # remains a retryable failure instead of being mistaken for a valid target.
+# Pull request and push runs widen this to accept HTTP 503 on the command line
+# (see .github/workflows/link-validation.yml); scheduled runs keep this list.
 accept = ["200..=399"]
 
 # Do not attempt to validate localhost/private addresses used in
