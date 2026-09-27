@@ -78,6 +78,10 @@ static class MetadataValidator
         @"^- \[(?<text>.+)\]\((?<href>articles/[^)\s]+\.md)\)[ \t]*$",
         RegexOptions.Compiled);
 
+    private static readonly Regex MarkdownListItemRegex = new(
+        @"^[ \t]*([-*+]|\d+[.)])[ \t]",
+        RegexOptions.Compiled);
+
     private static readonly Regex TitleFrontMatterRegex = new(
         @"^title:[ \t]*(?<value>.*?)[ \t]*$",
         RegexOptions.Compiled);
@@ -381,6 +385,13 @@ static class MetadataValidator
             if (link.Success)
             {
                 listed.Add((link.Groups["text"].Value, link.Groups["href"].Value));
+            }
+            else if (MarkdownListItemRegex.IsMatch(line))
+            {
+                // Prose is allowed around the list, but every list item must be a plain article link.
+                errors.Add(
+                    $"{landingPage}:{index + 1}: '{RecentlyAddedHeading}' list items must be exactly " +
+                    $"'- [Article title](articles/<year>/<slug>.md)' but found '{line.Trim()}'.");
             }
         }
 
