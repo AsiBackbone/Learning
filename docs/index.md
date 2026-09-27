@@ -107,7 +107,7 @@ The material uses a recurring separation of responsibilities:
   <article class="learning-path-card">
     <span class="path-level">Beginner to intermediate</span>
     <h3>Executable Samples</h3>
-    <p>Run five small .NET companions with focused tests that make architectural invariants observable.</p>
+    <p>Run small .NET companion samples for the foundation, governance, security, and ASP.NET Core paths, each with focused tests that make architectural invariants observable.</p>
     <a href="samples/index.md" aria-label="Browse Executable Samples">Browse Executable Samples <span aria-hidden="true">→</span></a>
   </article>
   <article class="learning-path-card">
@@ -155,9 +155,9 @@ The goal is to make the reasoning visible—not to prove that one framework or a
 
 Learning 1.1 is the current documentation baseline aligned with released AsiBackbone 7.0.0. The [current compatibility and API boundary](getting-started/asibackbone-7-api-boundary.md) pins implementation references to the immutable release tag; Learning 1.0 / AsiBackbone 6.0 remains available as historical guidance. Recent publications include:
 
+- [Your Pipeline Behavior Can Watch the Operation. It Should Not Decide It.](articles/2026/pipeline-behavior-should-not-decide-the-operation.md)
 - [A Passing Agent Diff Is Not Project Authority](articles/2026/a-passing-agent-diff-is-not-project-authority.md)
-- [Why an AI Tool Call Is Only a Proposal](articles/2026/why-ai-tool-call-is-only-a-proposal.md)
-- [Your Audit Log Is Not Evidence](articles/2026/your-audit-log-is-not-evidence.md)
+- [Your Audit Log Records the Story, Not the Decision](articles/2026/your-audit-log-is-not-evidence.md)
 
 <details class="home-details">
   <summary>Scope, terminology, and important limitations</summary>

@@ -562,6 +562,7 @@ Before publishing a new standalone article, normally confirm that:
 - [ ] The title and slug describe a recognizable developer problem rather than internal terminology.
 - [ ] `summary` is concise and useful when shown in the RSS feed or an external preview.
 - [ ] `feed: true` opts the article into the existing publication feed.
+- [ ] The landing page's **Recently added** list in `docs/index.md` names the three newest published articles, newest first, using each article's exact `title`, as plain `- [Title](articles/<year>/<slug>.md)` items. `tools/validate-doc-metadata.cs` fails the documentation build when this list is stale or contains any other list item.
 - [ ] The article stands alone without requiring earlier tutorials or Learning-specific background.
 - [ ] The opening establishes a concrete technical problem before introducing repository-specific language.
 - [ ] The article does not assume that the reader adopts `AsiBackbone` or another AsiBackbone implementation.
