@@ -1,12 +1,17 @@
 {
   "schemaVersion": 1,
   "account": "jackdaw-patio",
-  "cursorSha": "233814383c7b66fa278d8adb8429dd2b93f17da2",
+  "cursorSha": "7cb89dbf93267c54128daad4df88ee625454c985",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
       "postId": "2104245183063683131",
       "postedAtUtc": "2026-09-27T16:22:01.4404687+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/authorization-vs-approval-vs-acknowledgment.html": {
+      "sourceBlobSha": "3c95acd9629d1fcf679a4c74def144a1604f9e30",
+      "postId": "2104311064577839363",
+      "postedAtUtc": "2026-09-27T20:43:48.8194681+00:00"
     }
   }
 }
