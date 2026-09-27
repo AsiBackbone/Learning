@@ -3,7 +3,7 @@ description: A host-side checklist for AI tool calls, covering parsing, allowlis
 title: What Should an AI Tool Gateway Validate Before Execution?
 author: Christopher D. Cavell
 published: "2026-09-27"
-summary: Structured model output becomes eligible for execution only after the trusted host independently validates its shape, meaning, context, authority, and current permission. This is the ordered checklist, with code and tests that prove rejected proposals never reach the executor.
+summary: Structured model output becomes eligible for execution only after the trusted host independently validates its shape, meaning, context, authority, and current permission. This is the ordered checklist, covering approvals, retries, and uncertain outcomes, with tests that prove proposals blocked before execution never reach the executor.
 feed: true
 ---
 
@@ -36,7 +36,7 @@ The short rule is: **the model may propose; the host retains execution authority
 
 ## The Threat Model in Four Sentences
 
-The model is an untrusted proposer: its output can be wrong, manipulated by prompt injection, or simply invented. The host is the only authority: it owns identity, current facts, policy, approval, and credentials. The executor is the only path to the side effect, and nothing else can reach it. Logs and records are evidence of what happened, never permission for what happens next.
+The model is an untrusted proposer: its output can be wrong, manipulated by prompt injection, or simply invented. The host is the only authority: it owns identity, current facts, policy, approval, and credentials. The executor is the only path to the side effect, and nothing else can reach it. Logs and records are evidence of what happened, never permission for what happens next: operators and reconciliation may read them, but authorization never does.
 
 ## The Example: A Support Assistant That Can Issue Refunds
 
@@ -71,7 +71,7 @@ Raw model output
 [tool handler]  4. Validate semantics that need no host data
 [tool handler]  5. Resolve authoritative facts from host context
 [tool handler]  6. Evaluate authorization and operational policy
-[tool handler]  7. Require acknowledgment when the operation needs it
+[tool handler]  7. Require human approval when the operation needs it
 [tool handler]  8. Invoke the host-owned executor
       ↓
 [gateway]       9. Record the outcome
@@ -87,7 +87,7 @@ The **gateway** runs steps 1, 2, and 9, which are the same for every tool. Each 
 | 4. Semantics | Do the arguments make sense on their own? | Rejected | No |
 | 5. Host context | Do the arguments fit the current, authoritative facts? | Rejected or unavailable | No |
 | 6. Authorization and policy | May this agent do this to this order now? | Denied | No |
-| 7. Acknowledgment | Has a person approved exactly this refund, if required? | Pending | No |
+| 7. Human approval | Has an authorized person approved exactly this refund, if required? | Pending | No |
 | 8. Execute | Did the write succeed against the facts that were checked? | Unavailable | Yes, once |
 | 9. Record | What happened, and why? | (runs for every outcome) | n/a |
 
@@ -95,7 +95,7 @@ The outcomes are deliberately distinct. `Rejected` means the proposal was not ac
 
 The order matters. Cheap, context-free checks run first, so obviously bad proposals never cost a database read. Checks that need trusted data run only after the proposal is known to be well formed. The protected side effect is the last thing that can happen, not something that has to be undone.
 
-Many model APIs return several tool calls at once. Treat each call as its own pass through steps 1 to 9. A valid call must not carry an invalid sibling through, and one call's approval or success grants nothing to the next.
+Many model APIs return several tool calls at once. Treat each call as its own pass through steps 1 to 9. A valid call must not carry an invalid sibling through, and one call's approval or success grants nothing to the next. If the calls are independent, they can be evaluated in any order. If a later call depends on an earlier one, run them in sequence and stop at the first outcome that is not `Executed`.
 
 ## What the Sequence Stops
 
@@ -110,7 +110,8 @@ Many model APIs return several tool calls at once. Treat each call as its own pa
 | An agent without refund permission | Step 6 (`agent.not-authorized`) |
 | A large refund without a supervisor | Step 7 (`refund.approval-required`) |
 | Another agent refunds the order first | Step 8 (`order.changed`) |
-| A network retry of the same refund | Step 8's idempotency key |
+| A provider retry of the same reservation | Step 8's stored idempotency key |
+| A new attempt while an earlier refund's outcome is unknown | Step 5 (`refund.in-progress`) |
 
 ## Step 1: Parse Structurally
 
@@ -229,6 +230,7 @@ public sealed class ToolGateway(
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
                 // A failing host dependency is an outcome, not a crash in the agent loop.
+                // Log the exception for operators: it may be an outage or a defect.
                 outcome = ToolOutcome.Unavailable("host", "host.error");
             }
         }
@@ -250,11 +252,11 @@ What this step validates:
 - **Membership, with an exact comparison.** The registry uses `StringComparer.Ordinal`, so `Orders.Refund` is not `orders.refund`. Tool names are identifiers, not prose.
 - **Nothing tool-specific runs for an unknown tool.** There is no fallback to a "closest" tool, no reflection, and no `Type.GetType(name)`. An unknown name stops here, before any argument is interpreted.
 - **The registry is the only route to a handler.** If the same handler is also reachable from another endpoint, background job, or auto-dispatching SDK, that path needs the same checks, or this allowlist is only a suggestion.
-- **Host failures stay inside the outcome model.** If the order store times out, the gateway records `host.error` as `Unavailable` rather than letting an exception escape into the agent loop, where a retry policy might treat it as permission to try something else.
+- **Host failures stay inside the outcome model.** If the order store times out, the gateway records `host.error` as `Unavailable` rather than letting an exception escape into the agent loop, where a retry policy might treat it as permission to try something else. Every host failure collapses to the same `host.error` on purpose: the agent loop must not infer retry behavior from internal exceptions. Operators still need the detail, so log the exception itself. A timeout is an outage, but a `NullReferenceException` is a defect, and retry tuning will not fix it.
 
 The unknown name is not written to the record verbatim. Model-chosen text is untrusted, and a log is a sink like any other.
 
-Rate limits belong beside this step, not inside it. A runaway agent loop can issue hundreds of well-formed, rejected calls a minute. A per-conversation or per-agent limit in front of the gateway protects the host, and it is a separate control from any of the validation steps.
+Rate limits belong in front of the gateway, not inside it. A runaway agent loop can issue hundreds of rejected calls a minute. A per-conversation or per-agent limit that runs before parsing protects the host's CPU as well as its database, and it is a separate control from any of the validation steps.
 
 The results use one small type throughout:
 
@@ -324,7 +326,7 @@ It names the fields the model must never supply, and deserializes with options t
 
 ```csharp
 private static readonly string[] HostOwnedFields =
-    ["orderId", "customerId", "tenantId", "agentId", "approved", "approvalId"];
+    ["orderId", "customerId", "tenantId", "agentId", "approved", "approvalId", "idempotencyKey"];
 
 // .NET 10's Strict preset rejects duplicate and unmapped properties,
 // enforces required and nullable members, and refuses numbers in strings.
@@ -365,10 +367,10 @@ if (args is null)
 What this step validates:
 
 - **Required fields.** `[JsonRequired]` makes a missing `reason` a failure, not a default value.
-- **No extra fields.** The `Strict` preset sets `UnmappedMemberHandling.Disallow`, so a model that adds `"note"` or `"priority"` is rejected rather than quietly ignored.
+- **No extra fields.** The `Strict` preset sets `UnmappedMemberHandling.Disallow`, so a model that adds `"note"` or `"priority"` is rejected rather than quietly ignored. That includes a nested object shaped like another tool call: the gateway never interprets structures inside arguments as operations.
 - **Types, strictly.** The preset's strict number handling rejects `"amount": "25"`. A number that arrives as a string is a different input, not a formatting detail.
 - **Exact property names.** Property matching is case-sensitive, so `Amount` is not `amount`.
-- **Host-owned fields get their own reason.** `orderId` would already fail as an unmapped field. Naming it explicitly records `argument.host-owned`, which tells an operator that the model tried to supply identity or approval rather than merely a stray field. This check deliberately ignores case, so `OrderID` and `TenantId` are caught too.
+- **Host-owned fields get their own reason.** `orderId` would already fail as an unmapped field. Naming it explicitly records `argument.host-owned`, which tells an operator that the model tried to supply identity, approval, or an idempotency key rather than merely a stray field. This check deliberately ignores case, so `OrderID` and `TenantId` are caught too.
 
 The `Strict` preset configures the serializer. It does not replace step 1: `JsonDocument` has its own `JsonDocumentOptions`, which is why the parser sets `AllowDuplicateProperties` separately.
 
@@ -430,6 +432,7 @@ public sealed record OrderRecord(
     string Currency,
     decimal RefundableAmount,
     bool OnFraudHold,
+    bool HasUnsettledRefund,
     string Version);
 
 public interface IOrderStore
@@ -448,6 +451,13 @@ if (order is null ||
     return ToolOutcome.Unavailable("context", "order.unavailable");
 }
 
+// An earlier refund whose provider outcome is not yet settled blocks new ones
+// until reconciliation finishes, so a lost response cannot become a second refund.
+if (order.HasUnsettledRefund)
+{
+    return ToolOutcome.Unavailable("context", "refund.in-progress");
+}
+
 if (!string.Equals(order.Currency, args.Currency, StringComparison.Ordinal))
 {
     return ToolOutcome.Reject("context", "currency.mismatch");
@@ -462,7 +472,8 @@ if (args.Amount > order.RefundableAmount)
 What this step validates:
 
 - **Resource identity comes from the host.** The order is `context.BoundOrder`, never a value from the arguments. Step 3 already refused a model-supplied `orderId`. This step is where that refusal pays off: there is no code path that could have used it.
-- **Visibility without leaking existence.** An order in another tenant and an order that does not exist return the same `order.unavailable`. The caller cannot use this tool to learn which orders exist elsewhere.
+- **Visibility without leaking existence.** An order in another tenant and an order that does not exist return the same `order.unavailable`. The model never names an order at all, so it cannot probe for other order IDs either.
+- **No new refund while an earlier one is unsettled.** If an earlier refund was reserved but the provider's answer was lost, a fresh attempt must not start a second one. Step 8 explains how that state arises and how it clears.
 - **The proposal fits current facts.** A refund in the wrong currency, or above the refundable balance, is rejected here. These are semantic checks that need trusted data, so they live after it is loaded.
 - **Freshness is captured.** `order.Version` records exactly which state these checks saw. Step 8 uses it.
 
@@ -493,9 +504,11 @@ What this step validates:
 
 In an ASP.NET Core application, this step is often an `IAuthorizationService` call with a resource-based requirement. That is fine. What matters is that it runs against the authoritative order from step 5, not against the arguments.
 
-## Step 7: Require Acknowledgment When the Operation Needs It
+## Step 7: Require Human Approval When the Operation Needs It
 
-Some operations are allowed, but not without a person agreeing first. Here, refunds above $250 need a supervisor.
+Some operations are allowed, but not without an authorized person deciding first. Here, refunds above $250 need a supervisor's approval.
+
+This is approval by another authority, not acknowledgment. Acknowledgment records that someone was shown a condition and accepted it, such as an agent confirming "this refund cannot be reversed". Approval is a separate decision by someone with the authority to make it. A system can need either one, both, or neither. [Terminology and Established Concepts](../../architecture/terminology-and-established-concepts.md#approval-acknowledgment-authorization-and-authority) explains why they should not be collapsed.
 
 Approval has to be something the host holds, bound to exactly one refund. When the first attempt returns `PendingApproval`, the host's approval workflow records the proposed refund and asks a supervisor. If the supervisor approves, the workflow stores an approval:
 
@@ -514,19 +527,27 @@ public sealed record RefundApproval(
 
 public interface IRefundApprovals
 {
-    Task<RefundApproval?> FindUnusedAsync(OrderId orderId, CancellationToken cancellationToken);
+    // Looks up by the full identity of one refund, not just the order.
+    Task<RefundApproval?> FindUnusedAsync(
+        OrderId orderId,
+        decimal amount,
+        string currency,
+        RefundReason reason,
+        string requestedBy,
+        CancellationToken cancellationToken);
 }
 ```
 
 The handler then accepts a large refund only if an unused approval covers exactly this one:
 
 ```csharp
-// 7. Acknowledgment: large refunds need a host-held approval for exactly this refund.
+// 7. Human approval: large refunds need a host-held approval for exactly this refund.
 string? approvalId = null;
 
 if (args.Amount > ApprovalThreshold)
 {
-    RefundApproval? approval = await approvals.FindUnusedAsync(order.Id, cancellationToken);
+    RefundApproval? approval = await approvals.FindUnusedAsync(
+        order.Id, args.Amount, args.Currency, args.Reason, context.Agent.AgentId, cancellationToken);
 
     if (approval is null ||
         approval.Amount != args.Amount ||
@@ -537,7 +558,7 @@ if (args.Amount > ApprovalThreshold)
         approval.ExpiresAt <= clock.GetUtcNow())
     {
         return new ToolOutcome(
-            ToolOutcomeKind.PendingApproval, "acknowledgment", "refund.approval-required");
+            ToolOutcomeKind.PendingApproval, "approval", "refund.approval-required");
     }
 
     approvalId = approval.ApprovalId;
@@ -548,7 +569,10 @@ What this step validates:
 
 - **Pending is not executed.** Without a covering approval, the handler stops before the executor. Nothing is written, reserved, or partially applied while approval is outstanding.
 - **Approval comes from outside the proposal.** It lives in host storage, not in the model-visible arguments. A model that writes `"approved": true` or `"approvalId": "..."` is rejected at step 3, and nothing here reads the arguments for consent.
-- **Approval covers one exact refund.** A supervisor who approved $280 has not approved $300. The same agent who asked cannot approve their own request. An approval expires.
+- **Approval covers one exact refund.** A supervisor who approved $280 has not approved $300. The store looks up by the refund's full identity, so an unused $280 approval on the same order cannot hide the $300 one. The handler still re-checks every field it relies on, so a store that returns the wrong row cannot widen an approval.
+- **Approval comes from someone else.** The agent who asked cannot approve their own request.
+- **Every approval expires.** An approval with no expiry is permanent authority waiting to be used. If the approval workflow and the gateway run on different machines, compare expiry against one trusted clock, or set expiries with enough margin that small clock differences cannot extend them.
+- **Approval belongs to one tool.** A `RefundApproval` authorizes one refund. Nothing about it can satisfy an approval requirement in `orders.cancel` or any other operation.
 - **Continuation is a new attempt.** Because steps 5 and 6 run again before this check, an approved refund still fails if the order was refunded or placed on hold while it waited.
 
 The approval ID travels to the executor, which marks the approval used in the same local transaction that records the refund. That makes it single-use: a second attempt finds no unused approval and returns to pending.
@@ -612,16 +636,18 @@ return write switch
 The idempotency key is derived by the host, never proposed by the model:
 
 ```csharp
-// The same refund against the same order version always produces the same key,
-// so a retried request cannot become a second refund at the payment provider.
+// Identifies one refund decision: the same tenant, order, version, amount,
+// currency, and reason always produce the same key. The executor stores it with
+// the reservation and reuses it for every provider retry of that reservation.
 private static string IdempotencyKeyFor(OrderRecord order, RefundArguments args)
 {
     string material = string.Join(
         '\n',
+        order.TenantId,
         order.Id.Value,
         order.Version,
         args.Amount.ToString("0.00", CultureInfo.InvariantCulture),
-        args.Currency,
+        order.Currency,
         args.Reason.ToString());
 
     return "refund-" + Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(material)));
@@ -631,12 +657,15 @@ private static string IdempotencyKeyFor(OrderRecord order, RefundArguments args)
 What this step validates:
 
 - **Every value is host-sourced or already validated.** The order, version, currency, agent, key, and approval come from the host. The model contributes only a validated amount and reason.
-- **The local write is conditional.** Inside the executor, one local transaction checks that the order is still at `ExpectedVersion`, reserves the refund against the balance, and consumes the approval. If another agent refunded the order after step 5, the version no longer matches and the result is `VersionConflict`.
-- **The provider call is idempotent.** After the local reservation commits, the executor calls the payment provider with `IdempotencyKey`. If the network drops and the call is retried, the provider sees the same key and does not refund twice.
-- **Uncertainty is reported as uncertainty.** A remote call can time out after the provider has already acted. The executor cannot know which, so it returns `OutcomeUnknown`, which the handler reports as `Unavailable` with `refund.outcome-unknown`, never as `Executed`. A reconciliation job later asks the provider about that key and settles the reserved refund one way or the other.
+- **The local write is conditional, and it is recorded before anything leaves the host.** Inside the executor, one local transaction checks that the order is still at `ExpectedVersion`. It then records a refund operation with its idempotency key, reserves the amount against the balance, marks the order as having an unsettled refund, and consumes the approval. If another agent refunded the order after step 5, the version no longer matches and the result is `VersionConflict`.
+- **The provider call reuses the stored key.** After the reservation commits, the executor calls the payment provider with the key it stored. If the network drops, the executor's own retries of that call send the same key, and the provider does not refund twice.
+- **Uncertainty is reported as uncertainty.** A remote call can time out after the provider has already acted. The executor cannot know which, so it returns `OutcomeUnknown`, which the handler reports as `Unavailable` with `refund.outcome-unknown`, never as `Executed`.
+- **A new attempt cannot start a second refund.** The reservation changed the order's version, so a fresh proposal would derive a new key. That is why step 5 refuses new refunds (`refund.in-progress`) while the order has an unsettled refund. A reconciliation job asks the provider about the stored key, settles the operation as issued or not issued, and clears the flag. Providers keep idempotency keys for a limited time, so reconciliation must finish well within that window. The key alone cannot protect retries indefinitely.
 - **Credentials stay here.** The payment-provider credential lives inside the executor's implementation. It is not in the context, the arguments, or anything the model can see.
 
-The version check and the idempotency key protect against different things. The version check stops a stale decision: once the order changes, an old proposal cannot be replayed against it. The key stops a duplicate side effect: the same decision retried cannot refund twice. Neither makes the operation exactly-once on its own. Together with reconciliation, they make it safe to retry.
+The key's ingredients are deliberate. The version makes it identify one decision: a refund decided against `v12` is a different operation from the same amount decided after the order changed. The tenant keeps keys from colliding if several tenants share one provider account. Joining the parts with a newline, and formatting the amount with two fixed decimals, keeps two different inputs from producing the same material. The hash is a fingerprint, not a signature: it is safe only because the host derives it and the model never supplies one.
+
+The version check and the idempotency key protect against different things. The version check stops a stale decision: once the order changes, an old proposal cannot be replayed against it. The stored key stops a duplicate side effect: the same reservation retried cannot refund twice. The unsettled-refund check stops a new decision from racing an old one whose outcome is unknown. None of these makes the operation exactly-once on its own. Together with reconciliation, they make it safe to retry.
 
 ## Step 9: Record the Outcome
 
@@ -667,7 +696,7 @@ What the model sees next is a separate question. Internal reason codes such as `
 
 ## Prove That Rejected Proposals Never Execute
 
-The architectural promise of this sequence is simple: **every blocked path makes zero executor calls.** The code in this article is an excerpt from a small test project; all of it was compiled and run with .NET 10 and xUnit. A recording executor makes the promise observable:
+The architectural promise of this sequence is simple: **every path blocked before execution makes zero executor calls.** Only outcomes the executor itself reports, such as a version conflict or an unknown provider result, may involve a call, and those must never be reported as executed. The code in this article is an excerpt from a small test project; all of it was compiled and run with .NET 10 and xUnit. A recording executor makes the promise observable:
 
 ```csharp
 public sealed class RecordingRefundExecutor(
@@ -704,12 +733,16 @@ private const string ValidRefund =
 private const string LargeRefund =
     """{"name":"orders.refund","arguments":{"amount":300,"currency":"USD","reason":"Damaged"}}""";
 
-private static OrderRecord Order(bool fraudHold = false, string tenantId = "tenant-a") => new(
+private static OrderRecord Order(
+    bool fraudHold = false,
+    string tenantId = "tenant-a",
+    bool unsettledRefund = false) => new(
     new OrderId("order-1001"),
     TenantId: tenantId,
     Currency: "USD",
     RefundableAmount: 400m,
     OnFraudHold: fraudHold,
+    HasUnsettledRefund: unsettledRefund,
     Version: "v12");
 ```
 
@@ -792,7 +825,7 @@ The approval path is tested in both directions. A covering approval lets the ref
 [Fact]
 public async Task Approved_large_refund_executes_once_with_its_approval()
 {
-    var (gateway, executor, _) = Create(Order(), Approval());
+    var (gateway, executor, _) = Create(Order(), [Approval()]);
 
     ToolOutcome outcome = await gateway.HandleAsync(LargeRefund, Conversation, CancellationToken.None);
 
@@ -812,11 +845,27 @@ public static TheoryData<string, RefundApproval> UnusableApprovals => new()
 public async Task Approval_that_does_not_cover_this_refund_leaves_it_pending(
     string scenario, RefundApproval approval)
 {
-    var (gateway, executor, _) = Create(Order(), approval);
+    var (gateway, executor, _) = Create(Order(), [approval]);
 
     ToolOutcome outcome = await gateway.HandleAsync(LargeRefund, Conversation, CancellationToken.None);
 
     Assert.True(outcome.Kind == ToolOutcomeKind.PendingApproval, scenario);
+    Assert.Equal(0, executor.Calls);
+}
+```
+
+An earlier refund with an unknown outcome must block new ones before they reach the executor:
+
+```csharp
+[Fact]
+public async Task Unsettled_earlier_refund_blocks_a_new_one_without_execution()
+{
+    var (gateway, executor, _) = Create(Order(unsettledRefund: true));
+
+    ToolOutcome outcome = await gateway.HandleAsync(ValidRefund, Conversation, CancellationToken.None);
+
+    Assert.Equal(ToolOutcomeKind.Unavailable, outcome.Kind);
+    Assert.Equal("refund.in-progress", outcome.ReasonCode);
     Assert.Equal(0, executor.Calls);
 }
 ```
@@ -862,7 +911,13 @@ public async Task Valid_proposal_executes_once_with_host_sourced_values()
 }
 ```
 
-The same suite also shows that a fraud hold is denied, that an order in another tenant looks the same as a missing one, that a failing order store is recorded as `host.error` without execution, and that a retried proposal reuses the same idempotency key.
+The same suite also shows that:
+
+- a fraud hold is denied;
+- an order in another tenant looks the same as a missing one;
+- a failing order store is recorded as `host.error` without execution;
+- with unused $280 and $300 approvals on one order, a $300 refund finds the $300 approval;
+- an identical proposal against an unchanged order derives the same idempotency key.
 
 `Assert.Equal(0, executor.Calls)` is the assertion that matters. A result enum proves what the gateway *reported*. The call count proves what it *did*. A gateway that returns `Rejected` after already calling the payment provider would pass a result-only test and fail this one.
 
@@ -914,12 +969,12 @@ Before a model-generated tool call reaches a consequential handler, confirm that
 2. **Tools resolve through a host-owned registry** with exact name comparison and no fallback, reflection, or alternate unchecked path. Each call in a batch is judged on its own.
 3. **The argument schema is explicit.** Fields are required, unknown fields are rejected, types are strict, and host-owned fields such as identity, tenant, or approval are refused by name, whatever their casing.
 4. **Context-free semantics are checked** before any host data is loaded, including values the schema library accepted leniently.
-5. **Authoritative facts come from the host.** The resource comes from session or route context, visibility is checked without revealing existence, proposal values are compared with current facts, and the version that was checked is captured.
+5. **Authoritative facts come from the host.** The resource comes from session or route context, visibility is checked without revealing existence, proposal values are compared with current facts, the version that was checked is captured, and no new side effect starts while an earlier one is unsettled.
 6. **Authorization and operational policy** run against those facts, and denial is recorded separately from rejection.
-7. **Approval is host-held and exact.** It covers one specific refund, comes from someone other than the requester, expires, is used once, and never comes from the arguments.
-8. **The executor is the only path to the side effect.** It holds the credentials, writes conditionally, uses a host-derived idempotency key, and reports an unknown outcome as unknown.
+7. **Human approval is host-held and exact.** It is looked up by and covers one specific operation, comes from someone other than the requester, always expires, is used once, belongs to one tool, and never comes from the arguments.
+8. **The executor is the only path to the side effect.** It holds the credentials, records the operation and its host-derived idempotency key before calling out, writes conditionally, reuses the stored key on retry, reports an unknown outcome as unknown, and leaves reconciliation to settle it within the provider's key-retention window.
 9. **Every outcome is recorded** as an append-only decision, without secrets or raw model text, and the record is never read as permission. What the model is told is a separate, smaller projection.
-10. **Tests assert zero executor calls on every blocked path**, not just the returned result.
+10. **Tests assert zero executor calls on every path blocked before execution**, not just the returned result, and assert that executor-reported failures are never reported as executed.
 
 ## How This Maps to the Learning Vocabulary
 
@@ -930,7 +985,7 @@ If you are following the Learning tutorials, this article uses plainer names for
 | Tool call, parsed and schema-checked (steps 1 to 4) | Intent (typed proposed intent) |
 | Host-bound order, agent, and current facts (step 5) | Context |
 | Authorization and fraud-hold policy (step 6) | Constraints and decision |
-| Host-held supervisor approval (step 7) | Acknowledgment |
+| Host-held supervisor approval (step 7) | Approval by another authority (distinct from acknowledgment) |
 | Refund command with version, key, and approval (step 8) | Scoped authority and host-owned execution |
 | Decision record (step 9) | Evidence |
 

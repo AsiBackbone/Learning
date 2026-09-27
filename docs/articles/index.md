@@ -43,7 +43,7 @@ The Learning site is the canonical publication host. Cross-posted copies should 
 
 **Christopher D. Cavell** · **September 27, 2026**
 
-Structured model output becomes eligible for execution only after the trusted host independently validates its shape, meaning, context, authority, and current permission. This is the ordered checklist, with code and tests that prove rejected proposals never reach the executor.
+Structured model output becomes eligible for execution only after the trusted host independently validates its shape, meaning, context, authority, and current permission. This is the ordered checklist, covering approvals, retries, and uncertain outcomes, with tests that prove proposals blocked before execution never reach the executor.
 
 Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html`
 
