@@ -176,8 +176,9 @@ Point implementation-focused readers to typed proposal/schema validation and the
 ### 5. Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?
 
 - **Priority:** P1
-- **Implementation issue:** Open separately when promoted
-- **Candidate slug:** `authorization-vs-approval-vs-acknowledgment`
+- **Implementation issue:** [#375](https://github.com/AsiBackbone/Learning/issues/375)
+- **Publication:** [Published September 27, 2026](../docs/articles/2026/authorization-vs-approval-vs-acknowledgment.md)
+- **Permanent slug:** `authorization-vs-approval-vs-acknowledgment`
 
 #### Reader / search problem
 

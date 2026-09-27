@@ -8,6 +8,7 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ### Added
 
+- Published [Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?](docs/articles/2026/authorization-vs-approval-vs-acknowledgment.md), a practitioner guide that separates authorization, approval, acknowledgment, and execution permission, with an execution-time check and tests showing that none of them silently becomes permission to run a delayed operation (#375).
 - Published [What Should an AI Tool Gateway Validate Before Execution?](docs/articles/2026/validate-ai-tool-call-before-execution.md), an ordered host-side acceptance checklist for AI tool calls with code and tests that prove rejected proposals never reach the executor (#371).
 
 ### Fixed
