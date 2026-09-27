@@ -15,7 +15,7 @@ feed: true
 
 **Prerequisites:** Familiarity with C# and `System.Text.Json` is helpful. No AI provider, agent framework, AsiBackbone package, or prior Learning material is required. The code targets .NET 10, which added `AllowDuplicateProperties` (step 1) and the `JsonSerializerOptions.Strict` preset (step 3). On older versions, set the equivalent options individually; `RespectNullableAnnotations` needs .NET 9.
 
-**What this article covers:** an ordered, host-owned acceptance sequence for model-generated tool calls, from raw JSON to the protected side effect; what each step validates and what failure looks like; which values the model may supply and which the host must own; approvals, retries, and uncertain outcomes; tests that prove every rejected path makes zero executor calls; and when ordinary framework controls are enough.
+**What this article covers:** an ordered, host-owned acceptance sequence for model-generated tool calls, from raw JSON to the protected side effect; what each step validates and what failure looks like; which values the model may supply and which the host must own; approvals, retries, and uncertain outcomes; tests that prove every path blocked before execution makes zero executor calls; and when ordinary framework controls are enough.
 
 Your application already accepts tool calls from a model. The model returns something like this, and your code is expected to act on it:
 
@@ -326,7 +326,7 @@ It names the fields the model must never supply, and deserializes with options t
 
 ```csharp
 private static readonly string[] HostOwnedFields =
-    ["orderId", "customerId", "tenantId", "agentId", "approved", "approvalId", "idempotencyKey"];
+    ["orderId", "customerId", "tenantId", "agentId", "approved", "approvalId", "idempotencyKey", "version"];
 
 // .NET 10's Strict preset rejects duplicate and unmapped properties,
 // enforces required and nullable members, and refuses numbers in strings.
@@ -370,7 +370,7 @@ What this step validates:
 - **No extra fields.** The `Strict` preset sets `UnmappedMemberHandling.Disallow`, so a model that adds `"note"` or `"priority"` is rejected rather than quietly ignored. That includes a nested object shaped like another tool call: the gateway never interprets structures inside arguments as operations.
 - **Types, strictly.** The preset's strict number handling rejects `"amount": "25"`. A number that arrives as a string is a different input, not a formatting detail.
 - **Exact property names.** Property matching is case-sensitive, so `Amount` is not `amount`.
-- **Host-owned fields get their own reason.** `orderId` would already fail as an unmapped field. Naming it explicitly records `argument.host-owned`, which tells an operator that the model tried to supply identity, approval, or an idempotency key rather than merely a stray field. This check deliberately ignores case, so `OrderID` and `TenantId` are caught too.
+- **Host-owned fields get their own reason.** `orderId` would already fail as an unmapped field. Naming it explicitly records `argument.host-owned`, which tells an operator that the model tried to supply identity, approval, a version, or an idempotency key rather than merely a stray field. This check deliberately ignores case, so `OrderID` and `TenantId` are caught too.
 
 The `Strict` preset configures the serializer. It does not replace step 1: `JsonDocument` has its own `JsonDocumentOptions`, which is why the parser sets `AllowDuplicateProperties` separately.
 
@@ -528,6 +528,7 @@ public sealed record RefundApproval(
 public interface IRefundApprovals
 {
     // Looks up by the full identity of one refund, not just the order.
+    // The handler still re-checks every field it relies on.
     Task<RefundApproval?> FindUnusedAsync(
         OrderId orderId,
         decimal amount,
@@ -571,11 +572,11 @@ What this step validates:
 - **Approval comes from outside the proposal.** It lives in host storage, not in the model-visible arguments. A model that writes `"approved": true` or `"approvalId": "..."` is rejected at step 3, and nothing here reads the arguments for consent.
 - **Approval covers one exact refund.** A supervisor who approved $280 has not approved $300. The store looks up by the refund's full identity, so an unused $280 approval on the same order cannot hide the $300 one. The handler still re-checks every field it relies on, so a store that returns the wrong row cannot widen an approval.
 - **Approval comes from someone else.** The agent who asked cannot approve their own request.
-- **Every approval expires.** An approval with no expiry is permanent authority waiting to be used. If the approval workflow and the gateway run on different machines, compare expiry against one trusted clock, or set expiries with enough margin that small clock differences cannot extend them.
+- **Every approval expires, soon, on the host's terms.** The approval workflow sets a short expiry; nothing in the proposal can extend it. An approval with no expiry, or a very long one, is permanent authority waiting to be used. If the approval workflow and the gateway run on different machines, compare expiry against one trusted clock, or set expiries with enough margin that small clock differences cannot extend them.
 - **Approval belongs to one tool.** A `RefundApproval` authorizes one refund. Nothing about it can satisfy an approval requirement in `orders.cancel` or any other operation.
 - **Continuation is a new attempt.** Because steps 5 and 6 run again before this check, an approved refund still fails if the order was refunded or placed on hold while it waited.
 
-The approval ID travels to the executor, which marks the approval used in the same local transaction that records the refund. That makes it single-use: a second attempt finds no unused approval and returns to pending.
+The approval ID travels to the executor. In the same local transaction that reserves the refund, the executor checks again that the approval is still unused and unexpired, then marks it used. The handler's check alone cannot cover the moment between steps 7 and 8, when the approval could expire or be used by a concurrent attempt. The transaction makes the approval single-use: a second attempt finds no unused approval and returns to pending.
 
 This design keeps approval inside one host. If approved work crosses a process or service boundary, or runs later with less authority than the requester, the approval should travel as a signed, expiring grant bound to the same details. That is the point where capability-style tokens start to earn their place. For a supervisor approving in the same application, a database row is enough.
 
@@ -657,10 +658,12 @@ private static string IdempotencyKeyFor(OrderRecord order, RefundArguments args)
 What this step validates:
 
 - **Every value is host-sourced or already validated.** The order, version, currency, agent, key, and approval come from the host. The model contributes only a validated amount and reason.
-- **The local write is conditional, and it is recorded before anything leaves the host.** Inside the executor, one local transaction checks that the order is still at `ExpectedVersion`. It then records a refund operation with its idempotency key, reserves the amount against the balance, marks the order as having an unsettled refund, and consumes the approval. If another agent refunded the order after step 5, the version no longer matches and the result is `VersionConflict`.
+- **The local write is conditional, and it is recorded before anything leaves the host.** Inside the executor, one local transaction checks that the order is still at `ExpectedVersion`. It then records a refund operation with its idempotency key, reserves the amount against the balance, marks the order as having an unsettled refund, and rechecks and consumes the approval, all atomically. If another agent refunded the order after step 5, the version no longer matches and the result is `VersionConflict`.
 - **The provider call reuses the stored key.** After the reservation commits, the executor calls the payment provider with the key it stored. If the network drops, the executor's own retries of that call send the same key, and the provider does not refund twice.
 - **Uncertainty is reported as uncertainty.** A remote call can time out after the provider has already acted. The executor cannot know which, so it returns `OutcomeUnknown`, which the handler reports as `Unavailable` with `refund.outcome-unknown`, never as `Executed`.
-- **A new attempt cannot start a second refund.** The reservation changed the order's version, so a fresh proposal would derive a new key. That is why step 5 refuses new refunds (`refund.in-progress`) while the order has an unsettled refund. A reconciliation job asks the provider about the stored key, settles the operation as issued or not issued, and clears the flag. Providers keep idempotency keys for a limited time, so reconciliation must finish well within that window. The key alone cannot protect retries indefinitely.
+- **A new attempt cannot start a second refund.** The reservation changed the order's version, so a fresh proposal would derive a new key. That is why step 5 refuses new refunds (`refund.in-progress`) while the order has an unsettled refund.
+- **The flag clears as soon as the outcome is known.** When the provider confirms the refund, the executor records the operation as issued and clears the flag in the same step, so a successful refund does not block the next one. Only an unknown outcome leaves the flag set. A reconciliation job then asks the provider about the stored key, settles the operation as issued or not issued, and clears the flag.
+- **An unresolved operation stays blocked.** Providers keep idempotency keys for a limited time, so reconciliation should finish well within that window. If it cannot, because the provider has no record of the key or the window has passed, the order stays blocked and the operation goes to a person to investigate. Retrying with a new key could refund twice. The key alone cannot protect retries indefinitely.
 - **Credentials stay here.** The payment-provider credential lives inside the executor's implementation. It is not in the context, the arguments, or anything the model can see.
 
 The key's ingredients are deliberate. The version makes it identify one decision: a refund decided against `v12` is a different operation from the same amount decided after the order changed. The tenant keeps keys from colliding if several tenants share one provider account. Joining the parts with a newline, and formatting the amount with two fixed decimals, keeps two different inputs from producing the same material. The hash is a fingerprint, not a signature: it is safe only because the host derives it and the model never supplies one.
