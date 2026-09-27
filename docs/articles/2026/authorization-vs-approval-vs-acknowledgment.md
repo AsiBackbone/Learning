@@ -514,6 +514,10 @@ The create endpoint bumps the revision and clears approvals. A later `PATCH /exp
 
 The defenses are the ones above, applied consistently. Compute the fingerprint from the full stored proposal at check time, never from a stored copy or from the fields a request happened to change. Route every material write, whatever the endpoint, through one method that creates a new revision and invalidates existing approvals and acknowledgments in the same transaction.
 
+### 8. An approval that is checked but never consumed
+
+The gate verifies the approval, the export runs, and nothing marks the approval as used. A queue redelivers the message, an operator clicks **Retry**, or a second worker starts. Each one passes the same check against the same unexpired approval, and one approval produces several exports. Checking an approval proves it is valid; only consuming it, atomically with the execution record, as in the claim step above, makes it single-use.
+
 ## Storing Them Together Is Fine; Merging Them Is Not
 
 None of this requires a workflow engine, a specialized governance store, or a capability token. A single `export_requests` table with `approvals`, `acknowledgments`, and `executions` tables beside it, plus a gate the worker calls, is a perfectly good implementation for many applications.
