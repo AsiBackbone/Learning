@@ -86,12 +86,31 @@ static class MetadataValidator
         @"^title:[ \t]*(?<value>.*?)[ \t]*$",
         RegexOptions.Compiled);
 
+    private static readonly Regex XHashtagsFrontMatterRegex = new(
+        @"^x_hashtags:[ \t]*(?<value>.*?)[ \t]*$",
+        RegexOptions.Compiled);
+
+    private static readonly Regex XHashtagListItemRegex = new(
+        @"^[ \t]+-[ \t]+(?<value>[A-Za-z0-9]+)[ \t]*$",
+        RegexOptions.Compiled);
+
     private static readonly HashSet<string> AllowedPatternClassifications = new(StringComparer.Ordinal)
     {
         "Canonical Pattern",
         "Alternative Pattern",
         "Experimental",
         "General learning material"
+    };
+
+    private static readonly HashSet<string> AllowedXHashtags = new(StringComparer.Ordinal)
+    {
+        "DotNet",
+        "AspNetCore",
+        "SoftwareArchitecture",
+        "CyberSecurity",
+        "AISecurity",
+        "AIGovernance",
+        "DevSecOps"
     };
 
     private static readonly ExpectedPage[] RepresentativePages =
@@ -211,6 +230,11 @@ static class MetadataValidator
             int lineNumber = 0;
             bool inFrontMatter = false;
 
+            if (relativePath.StartsWith("docs/articles/", StringComparison.Ordinal))
+            {
+                ValidateXHashtagFrontMatter(relativePath, File.ReadAllLines(path), errors);
+            }
+
             foreach (string line in File.ReadLines(path))
             {
                 lineNumber++;
@@ -297,6 +321,101 @@ static class MetadataValidator
             {
                 errors.Add($"{relativePath}: expected exactly one H1 heading, found {headingOneCount}.");
             }
+        }
+    }
+
+    private static void ValidateXHashtagFrontMatter(
+        string relativePath,
+        IReadOnlyList<string> lines,
+        ICollection<string> errors)
+    {
+        if (lines.Count == 0 || !string.Equals(lines[0].Trim(), "---", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        int closingIndex = -1;
+        var keyIndexes = new List<int>();
+        for (int index = 1; index < lines.Count; index++)
+        {
+            if (string.Equals(lines[index].Trim(), "---", StringComparison.Ordinal))
+            {
+                closingIndex = index;
+                break;
+            }
+
+            if (XHashtagsFrontMatterRegex.IsMatch(lines[index]))
+            {
+                keyIndexes.Add(index);
+            }
+        }
+
+        if (closingIndex < 0 || keyIndexes.Count == 0)
+        {
+            return;
+        }
+
+        if (keyIndexes.Count > 1)
+        {
+            errors.Add($"{relativePath}: frontmatter key 'x_hashtags' appears more than once.");
+            return;
+        }
+
+        int keyIndex = keyIndexes[0];
+        Match key = XHashtagsFrontMatterRegex.Match(lines[keyIndex]);
+        if (!string.IsNullOrWhiteSpace(key.Groups["value"].Value))
+        {
+            errors.Add(
+                $"{relativePath}:{keyIndex + 1}: 'x_hashtags' must be a YAML block list with one hashtag per item.");
+            return;
+        }
+
+        var hashtags = new List<string>();
+        for (int index = keyIndex + 1; index < closingIndex; index++)
+        {
+            string line = lines[index];
+            if (line.Length > 0 && !char.IsWhiteSpace(line[0]))
+            {
+                break;
+            }
+
+            if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith('#'))
+            {
+                continue;
+            }
+
+            Match item = XHashtagListItemRegex.Match(line);
+            if (!item.Success)
+            {
+                errors.Add(
+                    $"{relativePath}:{index + 1}: 'x_hashtags' entries must use YAML '- Hashtag' list syntax.");
+                continue;
+            }
+
+            hashtags.Add(item.Groups["value"].Value);
+        }
+
+        if (hashtags.Count is < 1 or > 2)
+        {
+            errors.Add($"{relativePath}: 'x_hashtags' must contain one or two entries.");
+            return;
+        }
+
+        if (hashtags.Distinct(StringComparer.Ordinal).Count() != hashtags.Count)
+        {
+            errors.Add($"{relativePath}: 'x_hashtags' entries must be unique.");
+        }
+
+        if (!hashtags.Contains("DotNet", StringComparer.Ordinal))
+        {
+            errors.Add($"{relativePath}: 'x_hashtags' must include 'DotNet'.");
+        }
+
+        foreach (string hashtag in hashtags.Where(hashtag => !AllowedXHashtags.Contains(hashtag)))
+        {
+            errors.Add(
+                $"{relativePath}: unsupported X hashtag '{hashtag}'. Allowed values: " +
+                $"{string.Join(", ", AllowedXHashtags.Order())}.");
         }
     }
 

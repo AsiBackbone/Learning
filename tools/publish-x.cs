@@ -263,6 +263,7 @@ sealed class GitPublicationSelector(GitRepository git, Uri siteRoot)
                 current.Author,
                 current.Published,
                 current.Summary,
+                current.XHashtags,
                 change.NewPath,
                 getBlobSha(change.NewPath),
                 canonicalUrl));
@@ -284,6 +285,17 @@ static class PublicationMetadataReader
     private static readonly HashSet<string> PublicationKeys = new(StringComparer.OrdinalIgnoreCase)
     {
         "title", "author", "published", "summary", "feed"
+    };
+
+    private static readonly HashSet<string> AllowedXHashtags = new(StringComparer.Ordinal)
+    {
+        "DotNet",
+        "AspNetCore",
+        "SoftwareArchitecture",
+        "CyberSecurity",
+        "AISecurity",
+        "AIGovernance",
+        "DevSecOps"
     };
 
     public static PublicationMetadata? Read(string? content, string path, DateOnly today)
@@ -361,6 +373,8 @@ static class PublicationMetadataReader
             return null;
         }
 
+        IReadOnlyList<string> xHashtags = ReadXHashtags(lines, closingIndex, path);
+
         string Required(string key) =>
             values.TryGetValue(key, out string? value) && !string.IsNullOrWhiteSpace(value)
                 ? value.Trim()
@@ -388,7 +402,97 @@ static class PublicationMetadataReader
             Required("title"),
             Required("author"),
             published,
-            Required("summary"));
+            Required("summary"),
+            xHashtags);
+    }
+
+    private static IReadOnlyList<string> ReadXHashtags(
+        IReadOnlyList<string> lines,
+        int closingIndex,
+        string path)
+    {
+        var hashtags = new List<string>();
+        bool found = false;
+
+        for (int index = 1; index < closingIndex; index++)
+        {
+            string line = lines[index];
+            if (line.Length == 0 || char.IsWhiteSpace(line[0]))
+            {
+                continue;
+            }
+
+            int separator = line.IndexOf(':');
+            if (separator <= 0 ||
+                !string.Equals(line[..separator].Trim(), "x_hashtags", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (found)
+            {
+                throw new InvalidDataException($"{path}: frontmatter key 'x_hashtags' appears more than once.");
+            }
+
+            found = true;
+            if (!string.IsNullOrWhiteSpace(line[(separator + 1)..]))
+            {
+                throw new InvalidDataException(
+                    $"{path}: 'x_hashtags' must be a YAML block list with one hashtag per item.");
+            }
+
+            for (
+                index++;
+                index < closingIndex &&
+                (lines[index].Length == 0 || char.IsWhiteSpace(lines[index][0]));
+                index++)
+            {
+                string item = lines[index].Trim();
+                if (item.Length == 0 || item.StartsWith('#'))
+                {
+                    continue;
+                }
+
+                if (!item.StartsWith("- ", StringComparison.Ordinal))
+                {
+                    throw new InvalidDataException(
+                        $"{path}: 'x_hashtags' entries must use YAML '- Hashtag' list syntax.");
+                }
+
+                hashtags.Add(ParseScalar(item[2..].Trim()));
+            }
+
+            index--;
+        }
+
+        if (!found)
+        {
+            return ["DotNet"];
+        }
+
+        if (hashtags.Count is < 1 or > 2)
+        {
+            throw new InvalidDataException($"{path}: 'x_hashtags' must contain one or two entries.");
+        }
+
+        if (hashtags.Distinct(StringComparer.Ordinal).Count() != hashtags.Count)
+        {
+            throw new InvalidDataException($"{path}: 'x_hashtags' entries must be unique.");
+        }
+
+        if (!hashtags.Contains("DotNet", StringComparer.Ordinal))
+        {
+            throw new InvalidDataException($"{path}: 'x_hashtags' must include 'DotNet'.");
+        }
+
+        string? unsupported = hashtags.FirstOrDefault(hashtag => !AllowedXHashtags.Contains(hashtag));
+        if (unsupported is not null)
+        {
+            throw new InvalidDataException(
+                $"{path}: unsupported X hashtag '{unsupported}'. Allowed values: {string.Join(", ", AllowedXHashtags.Order())}.");
+        }
+
+        return hashtags;
     }
 
     private static string ParseScalar(string value)
@@ -506,7 +610,8 @@ sealed class JackdawPatioPostComposer : IXPostComposer
 
     public string Compose(LearningPublication publication)
     {
-        string suffix = $"\n\n{publication.CanonicalUrl}";
+        string hashtags = string.Join(' ', publication.XHashtags.Select(static hashtag => $"#{hashtag}"));
+        string suffix = $"\n\n{hashtags}\n\n{publication.CanonicalUrl}";
         int titleBudget = MaximumLength - CountTextElements(Prefix) - CountTextElements(suffix);
 
         if (titleBudget < 1)
@@ -1001,6 +1106,7 @@ static class XPublisherSelfTest
     private static void TestSelection()
     {
         const string eligible = "---\ntitle: New article\nauthor: Test Author\npublished: 2026-09-12\nsummary: Summary.\nfeed: true\n---\n";
+        const string eligibleWithHashtags = "---\ntitle: New article\nauthor: Test Author\npublished: 2026-09-12\nsummary: Summary.\nfeed: true\nx_hashtags:\n  - DotNet\n  - AISecurity\n---\n";
         const string ineligible = "---\ntitle: Draft\nfeed: false\n---\n";
         var baseFiles = new Dictionary<string, string>(StringComparer.Ordinal)
         {
@@ -1011,7 +1117,7 @@ static class XPublisherSelfTest
         };
         var headFiles = new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["docs/articles/new.md"] = eligible,
+            ["docs/articles/new.md"] = eligibleWithHashtags,
             ["docs/articles/enabled.md"] = eligible,
             ["docs/articles/updated.md"] = eligible.Replace("Summary.", "Updated summary.", StringComparison.Ordinal),
             ["docs/articles/new-name.md"] = eligible,
@@ -1043,6 +1149,14 @@ static class XPublisherSelfTest
         Assert(selected.Count == 2, "new and newly enabled documents should be selected exactly once.");
         Assert(selected.Any(item => item.SourcePath.EndsWith("new.md", StringComparison.Ordinal)), "new document missing.");
         Assert(selected.Any(item => item.SourcePath.EndsWith("enabled.md", StringComparison.Ordinal)), "enabled transition missing.");
+        Assert(
+            selected.Single(item => item.SourcePath.EndsWith("new.md", StringComparison.Ordinal))
+                .XHashtags.SequenceEqual(["DotNet", "AISecurity"]),
+            "explicit X hashtags were not preserved.");
+        Assert(
+            selected.Single(item => item.SourcePath.EndsWith("enabled.md", StringComparison.Ordinal))
+                .XHashtags.SequenceEqual(["DotNet"]),
+            "default X hashtag was not applied.");
     }
 
     private static void TestInvalidMetadata()
@@ -1054,6 +1168,18 @@ static class XPublisherSelfTest
         AssertThrows<InvalidDataException>(() => PublicationMetadataReader.Read(
             "---\ntitle: Bad\nauthor: Test\npublished: not-a-date\nsummary: Bad.\nfeed: true\n---",
             "docs/bad.md",
+            Today));
+        AssertThrows<InvalidDataException>(() => PublicationMetadataReader.Read(
+            "---\ntitle: Bad tags\nauthor: Test\npublished: 2026-09-12\nsummary: Bad.\nfeed: true\nx_hashtags:\n  - AISecurity\n---",
+            "docs/missing-dotnet-tag.md",
+            Today));
+        AssertThrows<InvalidDataException>(() => PublicationMetadataReader.Read(
+            "---\ntitle: Bad tags\nauthor: Test\npublished: 2026-09-12\nsummary: Bad.\nfeed: true\nx_hashtags:\n  - DotNet\n  - MadeUpTopic\n---",
+            "docs/unsupported-tag.md",
+            Today));
+        AssertThrows<InvalidDataException>(() => PublicationMetadataReader.Read(
+            "---\ntitle: Too many tags\nauthor: Test\npublished: 2026-09-12\nsummary: Bad.\nfeed: true\nx_hashtags:\n  - DotNet\n  - AISecurity\n  - DevSecOps\n---",
+            "docs/too-many-tags.md",
             Today));
 
         const string eligible = "---\ntitle: Missing page\nauthor: Test\npublished: 2026-09-12\nsummary: Missing.\nfeed: true\n---";
@@ -1070,9 +1196,10 @@ static class XPublisherSelfTest
     private static void TestComposition()
     {
         string longTitle = string.Concat(Enumerable.Repeat("👩🏽‍💻", 300));
-        LearningPublication publication = Publication(longTitle);
+        LearningPublication publication = Publication(longTitle, hashtags: ["DotNet", "AISecurity"]);
         string post = new JackdawPatioPostComposer().Compose(publication);
         Assert(StringInfo.ParseCombiningCharacters(post).Length <= 280, "post exceeded text-element limit.");
+        Assert(post.Contains("\n\n#DotNet #AISecurity\n\n", StringComparison.Ordinal), "hashtags were not composed.");
         Assert(post.EndsWith(publication.CanonicalUrl, StringComparison.Ordinal), "canonical URL was not preserved.");
     }
 
@@ -1281,8 +1408,9 @@ static class XPublisherSelfTest
 
     private static LearningPublication Publication(
         string title,
-        string canonicalUrl = "https://asibackbone.github.io/Learning/article.html") =>
-        new(title, "Test Author", Today, "Summary", "docs/article.md", "blob", canonicalUrl);
+        string canonicalUrl = "https://asibackbone.github.io/Learning/article.html",
+        IReadOnlyList<string>? hashtags = null) =>
+        new(title, "Test Author", Today, "Summary", hashtags ?? ["DotNet"], "docs/article.md", "blob", canonicalUrl);
 
     private static void Assert(bool condition, string message)
     {
@@ -1430,12 +1558,18 @@ enum GitChangeKind
 
 sealed record GitChange(GitChangeKind Kind, string? OldPath, string NewPath);
 sealed record ProcessResult(int ExitCode, string Output, string Error);
-sealed record PublicationMetadata(string Title, string Author, DateOnly Published, string Summary);
+sealed record PublicationMetadata(
+    string Title,
+    string Author,
+    DateOnly Published,
+    string Summary,
+    IReadOnlyList<string> XHashtags);
 sealed record LearningPublication(
     string Title,
     string Author,
     DateOnly Published,
     string Summary,
+    IReadOnlyList<string> XHashtags,
     string SourcePath,
     string SourceBlobSha,
     string CanonicalUrl);
