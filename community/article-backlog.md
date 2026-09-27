@@ -311,8 +311,9 @@ Lead to Scoped Capability and Host-Owned Execution for the complete lifecycle an
 ### 10. What Should an AI Tool Gateway Validate Before Execution?
 
 - **Priority:** P1
-- **Implementation issue:** Open separately when promoted
-- **Candidate slug:** `validate-ai-tool-call-before-execution`
+- **Implementation issue:** [#371](https://github.com/AsiBackbone/Learning/issues/371)
+- **Publication:** [Published September 27, 2026](../docs/articles/2026/validate-ai-tool-call-before-execution.md)
+- **Permanent slug:** `validate-ai-tool-call-before-execution`
 
 #### Reader / search problem
 
