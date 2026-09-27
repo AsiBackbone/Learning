@@ -9,7 +9,7 @@ Learning releases are archival and citation snapshots of educational material. T
 ### Fixed
 
 - Refreshed the landing page's stale copy. **Recently added** now lists the three newest published articles under their current titles, and the Executable Samples card no longer uses a hard-coded sample count.
-- `tools/validate-doc-metadata.cs` now fails the documentation build when **Recently added** does not name the newest published articles, newest first, with matching titles.
+- `tools/validate-doc-metadata.cs` now fails the documentation build when **Recently added** does not name the newest published articles, newest first, with matching titles, or when it contains any list item that is not a plain article link.
 
 ## [1.1.0] - 2026-09-26
 
