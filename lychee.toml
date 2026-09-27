@@ -34,6 +34,15 @@ exclude_path = ["(^|/)\\.link-targets/"]
 # Transient slowness and throttling are handled by bounded retries. A persistent
 # 429 remains visible so maintainers can retry the job or inspect authentication.
 exclude = [
+  # AsiBackbone source links are validated deterministically by
+  # tools/validate-organization-links.cs, which resolves every blob/tree link's
+  # ref, path, and object type against a fetched clone of the repository. The
+  # only fragments GitHub source pages support are line anchors such as #L10,
+  # which are not HTML anchors that a live check could verify either. A live
+  # check therefore adds no coverage, only dependence on github.com availability:
+  # transient 503s have failed otherwise-valid pull requests.
+  '^https://github\.com/AsiBackbone/AsiBackbone/(blob|tree)/',
+
   # Private vulnerability reporting is intentionally conditional and may
   # return 404 to automated or unauthenticated link checkers.
   '^https://github\.com/AsiBackbone/Learning/security/advisories/new$',
