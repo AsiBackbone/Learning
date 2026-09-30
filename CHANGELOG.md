@@ -8,6 +8,7 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ### Added
 
+- Published [Policy as Code in ASP.NET Core Without Overengineering](docs/articles/2026/policy-as-code-aspnet-core-without-overengineering.md), a selection guide that follows one ASP.NET Core refund endpoint through ordinary code, framework authorization, an in-process policy component, an embedded engine, and a remote decision service, with the pressures that justify each boundary and the obligations remote evaluation adds (#377).
 - Published [Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?](docs/articles/2026/authorization-vs-approval-vs-acknowledgment.md), a practitioner guide that separates authorization, approval, acknowledgment, and execution permission, with an execution-time check and tests showing that none of them silently becomes permission to run a delayed operation (#375).
 - Published [What Should an AI Tool Gateway Validate Before Execution?](docs/articles/2026/validate-ai-tool-call-before-execution.md), an ordered host-side acceptance checklist for AI tool calls with code and tests that prove rejected proposals never reach the executor (#371).
 

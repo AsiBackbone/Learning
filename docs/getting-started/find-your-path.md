@@ -65,6 +65,8 @@ The goal is not to maximize framework adoption. The goal is to make the architec
 
 **Compare the simpler option:** Read [When a Simple Application Service Is Enough](../architecture/when-a-simple-application-service-is-enough.md). These two pages deliberately put simpler application architecture before a larger governed-execution pipeline.
 
+**If someone proposes a policy engine:** Read [Policy as Code in ASP.NET Core Without Overengineering](../articles/2026/policy-as-code-aspnet-core-without-overengineering.md) to choose the smallest policy boundary, from framework authorization to a remote decision service, that meets the real pressure.
+
 **Continue only if needed:** Read [Decision Before Execution](../tutorials/decision-before-execution.md) when the operation must become an explicit decision before a consequential side effect can occur.
 
 **Run and modify it:** If the broader boundary is justified, use the [Decision Before Execution sample and tests](https://github.com/AsiBackbone/Learning/tree/main/samples/decision-before-execution) and the [Decision Before Execution lab](../labs/decision-before-execution.md).

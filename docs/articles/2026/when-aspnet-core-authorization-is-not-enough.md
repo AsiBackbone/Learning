@@ -639,6 +639,7 @@ The last question is the guardrail against overengineering.
 - [Your Authorization Check Runs Too Late](authorization-check-runs-too-late.md) starts from a failure where a blocking rule is discovered after protected work has already begun.
 - [Decision Before Execution](../../tutorials/decision-before-execution.md) explains the foundational proposal → context → decision → host-owned execution boundary.
 - [Policy Context and Explicit Decision Outcomes](../../tutorials/policy-context-and-explicit-decision-outcomes.md) develops the richer `Allowed` / `Denied` / `Deferred` / acknowledgment / escalation decision vocabulary.
+- [Policy as Code in ASP.NET Core Without Overengineering](policy-as-code-aspnet-core-without-overengineering.md) takes the next question: once decision logic outgrows an authorization handler, how far from the application should it move?
 - [Scoped Capability and Host-Owned Execution](../../tutorials/scoped-capability-and-host-owned-execution.md) covers the case where execution authority becomes a narrow artifact distinct from the original authorization result.
 
 ---

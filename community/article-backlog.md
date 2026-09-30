@@ -233,7 +233,8 @@ Use the event-sourcing/audit/provenance comparison for record-model selection an
 
 - **Priority:** P1
 - **Implementation issue:** [#377](https://github.com/AsiBackbone/Learning/issues/377)
-- **Candidate slug:** `policy-as-code-aspnet-core-without-overengineering`
+- **Publication:** [Published September 30, 2026](../docs/articles/2026/policy-as-code-aspnet-core-without-overengineering.md)
+- **Permanent slug:** `policy-as-code-aspnet-core-without-overengineering`
 
 #### Reader / search problem
 

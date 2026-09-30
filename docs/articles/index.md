@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Policy-as-code, policy engines, and remote policy services in ASP.NET Core | [Policy as Code in ASP.NET Core Without Overengineering](2026/policy-as-code-aspnet-core-without-overengineering.md) |
 | Authorization, approval, acknowledgment, and delayed execution | [Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?](2026/authorization-vs-approval-vs-acknowledgment.md) |
 | Validating AI tool calls before execution | [What Should an AI Tool Gateway Validate Before Execution?](2026/validate-ai-tool-call-before-execution.md) |
 | MediatR pipeline behaviors, decorators, and authorization boundaries | [Your Pipeline Behavior Can Watch the Operation. It Should Not Decide It.](2026/pipeline-behavior-should-not-decide-the-operation.md) |
@@ -39,6 +40,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Policy as Code in ASP.NET Core Without Overengineering](2026/policy-as-code-aspnet-core-without-overengineering.md)
+
+**Christopher D. Cavell** · **September 30, 2026**
+
+Policy-as-code is a way to make decision logic explicit, reviewable, and testable, not a requirement to adopt a separate engine or remote service. This guide follows one ASP.NET Core refund endpoint to show when ordinary code or framework authorization is enough, and which real pressures justify an in-process policy component, an embedded engine, or a remote decision service.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/policy-as-code-aspnet-core-without-overengineering.html`
 
 ### [Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?](2026/authorization-vs-approval-vs-acknowledgment.md)
 
