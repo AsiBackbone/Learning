@@ -201,11 +201,12 @@ Lead to Human-in-the-Loop Governance Workflows for long-running review and to De
 
 ---
 
-### 6. Why Audit Logging Is Not the Same as Decision Evidence
+### 6. Your Audit Log Records the Story, Not the Decision
 
 - **Priority:** P1
-- **Implementation issue:** Open separately when promoted
-- **Candidate slug:** `audit-logging-vs-decision-evidence`
+- **Implementation issue:** Not opened; published via [#286](https://github.com/AsiBackbone/Learning/pull/286)
+- **Publication:** [Published September 7, 2026](../docs/articles/2026/your-audit-log-is-not-evidence.md)
+- **Permanent slug:** `your-audit-log-is-not-evidence`
 
 #### Reader / search problem
 
@@ -231,8 +232,9 @@ Use the event-sourcing/audit/provenance comparison for record-model selection an
 ### 7. Policy as Code in ASP.NET Core Without Overengineering
 
 - **Priority:** P1
-- **Implementation issue:** Open separately when promoted
-- **Candidate slug:** `policy-as-code-aspnet-core-without-overengineering`
+- **Implementation issue:** [#377](https://github.com/AsiBackbone/Learning/issues/377)
+- **Publication:** [Published September 30, 2026](../docs/articles/2026/policy-as-code-aspnet-core-without-overengineering.md)
+- **Permanent slug:** `policy-as-code-aspnet-core-without-overengineering`
 
 #### Reader / search problem
 
