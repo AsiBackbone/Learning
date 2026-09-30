@@ -174,10 +174,10 @@ public enum RefundOutcome
 
 public sealed record RefundDecision(RefundOutcome Outcome, string ReasonCode, string? PolicyVersion)
 {
-    // No policy produced this result, so there is no version to record. The
-    // reason code says which fact was missing.
-    public static RefundDecision Unavailable(string reasonCode) =>
-        new(RefundOutcome.Unavailable, reasonCode, PolicyVersion: null);
+    // Without a version: no policy ran, for example because a fact was missing.
+    // With a version: that policy ran, but its answer could not be used.
+    public static RefundDecision Unavailable(string reasonCode, string? policyVersion = null) =>
+        new(RefundOutcome.Unavailable, reasonCode, policyVersion);
 }
 
 public sealed record RefundPolicyContext(
@@ -203,7 +203,7 @@ public interface IRefundPolicy
 }
 ```
 
-The context separates two kinds of input on purpose. The *amount* and the *operation ID* legitimately come from the caller; they describe what is being requested, and the host validates them. Everything below them is a fact the policy relies on, and the host resolves each one itself.
+The context separates two kinds of input on purpose. The *amount* and the *operation ID* legitimately come from the caller; they describe what is being requested, and the host validates them. The client generates the operation ID, typically a random UUID, once per intended refund and reuses it on every retry. Everything below those two fields is a fact the policy relies on, and the host resolves each one itself. That includes currency: the host converts the amount to the settlement currency, or rejects it, before building the context, so the policy compares like with like.
 
 The evaluator is a pure function of its context:
 
@@ -234,8 +234,14 @@ public sealed class RefundPolicy : IRefundPolicy
             return Decide(RefundOutcome.EscalationRecommended, "refund.high-risk-review");
         }
 
+        // A tier the enum defines but this policy version has no limit for is also unusable.
+        if (LimitFor(context.AgentTier) is not { } limit)
+        {
+            return Decide(RefundOutcome.Unavailable, "policy.no-limit-for-tier");
+        }
+
         // A supervisor's approval satisfies the amount limit, and nothing else.
-        if (context.Amount > LimitFor(context.AgentTier) && !ApprovalCovers(context))
+        if (context.Amount > limit && !ApprovalCovers(context))
         {
             return Decide(RefundOutcome.ApprovalRequired, "refund.requires-supervisor");
         }
@@ -253,11 +259,11 @@ public sealed class RefundPolicy : IRefundPolicy
         && approval.OperationId == context.OperationId
         && approval.ApprovedAmount == context.Amount;
 
-    private static decimal LimitFor(AgentTier tier) => tier switch
+    private static decimal? LimitFor(AgentTier tier) => tier switch
     {
         AgentTier.Tier1 => 250m,
         AgentTier.Tier2 => 1_000m,
-        _ => 0m,
+        _ => null,
     };
 
     private static RefundDecision Decide(RefundOutcome outcome, string reasonCode) =>
@@ -268,8 +274,8 @@ public sealed class RefundPolicy : IRefundPolicy
 Three details carry more weight than they appear to:
 
 - **An approval satisfies one requirement.** It lifts the tier limit for this operation and this amount. It does not clear a chargeback, bypass risk escalation, or stand in for the late-refund acknowledgment. If a supervisor's approval could override everything, it would be an override, and overrides need their own rule.
-- **"More than 90 days" means elapsed time.** The host computes `SincePurchase` from its clock and the stored purchase time, so a refund 90 days and 12 hours after purchase is late. If the business means calendar days in the store's time zone, compute that in the host instead, and put the boundary in the tests either way.
-- **Unsupported values fail closed.** An integer cast into an enum, or a risk band added to the risk service before the policy knows it, produces `Unavailable`, not a path that falls through to `Allowed`.
+- **"More than 90 days" means elapsed time.** The host computes `SincePurchase` from an injected `TimeProvider` and the stored purchase time, so a refund 90 days and 12 hours after purchase is late, and tests can control the clock. If the business means calendar days in the store's time zone, compute that in the host instead, and put the boundary in the tests either way.
+- **Unsupported values fail closed.** An integer cast into an enum, a risk band added to the risk service before the policy knows it, or a new agent tier this policy version has no limit for, produces `Unavailable`, not a path that falls through to `Allowed` or quietly picks a default.
 
 Learning's broader material also uses `Deferred` for a valid request that simply has to wait, such as one blocked by a maintenance window. This refund policy has no such rule, so the enum leaves it out. If yours does, add it as its own outcome rather than reusing `ApprovalRequired`, because the next step is waiting, not a person.
 
@@ -303,23 +309,30 @@ app.MapPost("/orders/{orderId}/refunds", async (
         return Results.Forbid();
     }
 
-    // 2. Domain invariant, checked early for a clear error. The executor checks it
-    //    again inside its transaction, because the balance can change before then.
-    if (request.Amount <= 0 || request.Amount > order.RefundableBalance)
-    {
-        return Results.ValidationProblem(new Dictionary<string, string[]>
-        {
-            ["amount"] = ["Amount must be positive and no more than the refundable balance."],
-        });
-    }
-
-    // 3. One stable identity for this refund. A retry with the same ID and parameters
+    // 2. One stable identity for this refund. A retry with the same ID and parameters
     //    returns the same operation; the same ID with a different order or amount is
     //    rejected, never reused.
     var operation = await operations.GetOrCreateAsync(request.OperationId, order.Id, request.Amount, user, ct);
     if (operation is null)
     {
         return Results.Conflict(new { ReasonCode = "operation.parameters-changed" });
+    }
+
+    // A retry of a refund that already ran gets its recorded result. It must not be
+    // judged against a balance that the refund itself has since reduced.
+    if (operation.RecordedResult is { } recorded)
+    {
+        return Results.Ok(recorded);
+    }
+
+    // 3. Domain invariant, checked early for a clear error. The executor checks it
+    //    again when it claims the operation, because the balance can change before then.
+    if (request.Amount <= 0 || request.Amount > order.RefundableBalance)
+    {
+        return Results.ValidationProblem(new Dictionary<string, string[]>
+        {
+            ["amount"] = ["Amount must be positive and no more than the refundable balance."],
+        });
     }
 
     // 4. Operational policy: the host builds trusted context, then asks the policy.
@@ -351,11 +364,16 @@ app.MapPost("/orders/{orderId}/refunds", async (
 .RequireAuthorization();
 ```
 
-The status codes are this host's conventions, not part of the policy: `409` tells the client "act, then retry the same operation," `202` says "someone else now has it," and `503` says "nothing was decided." Another host could map the same outcomes to a UI state or a queue message.
+The status codes are this host's conventions, not part of the policy: `409` tells the client "act, then retry the same operation," `202` says "someone else now has it," and `503` says "nothing was decided." Another host could map the same outcomes to a UI state or a queue message. `RequestApprovalAsync` and `EscalateAsync` are idempotent on `operation.Id` too: a client that retries while the supervisor is still deciding gets the same pending request, not a second one.
 
 `RefundContextBuilder` is where the trust work happens. It reads the agent's tier from the directory, or from a claim the identity provider issued. It asks the risk service for the customer's band. It looks up an acknowledgment and an approval recorded against `operation.Id` instead of believing anything in the request body. Its contract is strict: if any fact cannot be resolved, it returns no context and a reason code such as `risk.unavailable`, and the endpoint records `Unavailable`. The request says what the agent *wants*; the host says what is *true*.
 
-`IRefundExecutor.RefundAsync` receives the operation, not loose values. Inside one transaction it confirms that the operation has not already executed, that the refundable balance still covers the amount, and that any approval it relied on is consumed, and it uses `operation.Id` as the payment gateway's idempotency key. A retried request reaches the same operation and cannot refund twice. The decision record says the refund was *permitted*; the executor records whether it *succeeded*, failed, or ended in an uncertain gateway state, against the same operation ID.
+`IRefundExecutor.RefundAsync` receives the operation, not loose values, and works in two steps that are deliberately not one transaction:
+
+1. **Claim, in the database.** One local transaction marks the operation as executing, reserves the amount against the refundable balance, and consumes any approval it relied on. Each is a conditional update, such as `UPDATE ... WHERE consumed_at IS NULL`, so two concurrent requests or continuations cannot both win. If any condition no longer holds, nothing is claimed and nothing runs.
+2. **Execute, at the gateway.** The call to the payment gateway cannot join that transaction. It uses `operation.Id` as the gateway's idempotency key, and the operation's durable state records the outcome as succeeded, failed, or uncertain. An uncertain outcome, such as a timeout after the request was sent, is settled by asking the gateway about that key, not by claiming and running again.
+
+A retried request therefore reaches the same operation and cannot refund twice. The decision record says the refund was *permitted*; the operation's state says whether it *happened*, and both share the operation ID.
 
 This step fixes every defect in the opening example without new infrastructure:
 
@@ -370,12 +388,22 @@ This step fixes every defect in the opening example without new infrastructure:
 
 #### When the supervisor approves
 
-`ApprovalRequired` ends the request, not the operation. When a supervisor approves, the approval workflow records the approval against the operation ID and amount. The continuation then runs the same policy again, with fresh facts:
+`ApprovalRequired` ends the request, not the operation. When a supervisor approves, the approval workflow records the approval against the operation ID and amount. The continuation then runs the same checks again, with fresh facts:
 
 ```csharp
 public async Task<RefundDecision> ContinueAfterApprovalAsync(Guid operationId, CancellationToken ct)
 {
     var operation = await operations.GetAsync(operationId, ct);
+
+    // Access first: is the requesting agent still permitted to refund this order,
+    // under current directory data? The agent's original token is not replayed.
+    var access = await agentAccess.EvaluateAsync(operation.RequesterId, "orders.refund", operation.OrderId, ct);
+    if (!access.Allowed)
+    {
+        var denied = new RefundDecision(RefundOutcome.Denied, access.ReasonCode, access.PolicyVersion);
+        await decisions.RecordAsync(operation.Id, denied, ct);
+        return denied;
+    }
 
     // Fresh facts, plus the verified approval. Monday's decision is not reused.
     var built = await contexts.BuildForContinuationAsync(operation, ct);
@@ -385,6 +413,8 @@ public async Task<RefundDecision> ContinueAfterApprovalAsync(Guid operationId, C
 
     await decisions.RecordAsync(operation.Id, decision, ct);
 
+    // Only Allowed executes. Any other outcome is handled like the first request:
+    // escalate, ask for acknowledgment, or stop. "We had an approval" is not a path.
     if (decision.Outcome == RefundOutcome.Allowed)
     {
         await executor.RefundAsync(operation, ct);
@@ -394,9 +424,13 @@ public async Task<RefundDecision> ContinueAfterApprovalAsync(Guid operationId, C
 }
 ```
 
+The continuation runs under the approval workflow's own service identity, whose only authority is to continue approved refund operations. It acts *for* the requesting agent without acting *as* them. That is why it asks whether the agent is still permitted, using the same rule as `RefundOrderHandler` evaluated against current directory data. An agent who lost the refund permission or moved to another region while the approval was pending no longer gets the refund.
+
 A chargeback opened while the approval was pending still denies the refund. A customer who became high risk is still escalated. The approval changed exactly one input.
 
-Re-evaluating immediately before execution narrows the gap between decision and effect, but does not close it. Facts in the executor's own database, such as the refundable balance, the operation's state, and approval consumption, are rechecked inside its transaction. Facts that live elsewhere, such as a chargeback raised at the payment processor, can change in the milliseconds between. If that window is unacceptable, the system performing the effect has to enforce the rule itself; here, the payment gateway refusing refunds on disputed charges. [Authorization vs. Approval vs. Acknowledgment](authorization-vs-approval-vs-acknowledgment.md) develops this check, claim, and execute pattern for a delayed operation.
+The policy itself can also change while an approval is pending: finance lowers the tier 2 limit, and a new policy version ships. The continuation evaluates under the *current* version and records it. Whether an approval given under the earlier version still counts is a rule to decide and write down, not an accident. The strict rule is that it does not, and the context builder drops it. [Policy Versioning and Decision Provenance](../../governance/policy-versioning-and-decision-provenance.md#policy-drift-is-a-first-class-state) compares the options.
+
+Re-evaluating immediately before execution narrows the gap between decision and effect, but does not close it. Facts in the executor's own database, such as the refundable balance, the operation's state, and approval consumption, are rechecked when it claims the operation. Facts that live elsewhere, such as a chargeback raised at the payment processor, can change in the milliseconds between. If that window is unacceptable, the system performing the effect has to enforce the rule itself; here, the payment gateway refusing refunds on disputed charges. [Authorization vs. Approval vs. Acknowledgment](authorization-vs-approval-vs-acknowledgment.md) develops this check, claim, and execute pattern for a delayed operation.
 
 ### 4. An embedded rules or policy engine
 
@@ -432,13 +466,14 @@ public sealed class RuleSetRefundPolicy(IRuleEngine engine, IActiveRuleSet rules
             "escalate" => new(RefundOutcome.EscalationRecommended, result.ReasonCode, ruleSet.Version),
 
             // An outcome the host does not understand is never treated as permission.
-            _ => RefundDecision.Unavailable("policy.unrecognized-outcome"),
+            // The rule set did run, so its version is kept as evidence.
+            _ => RefundDecision.Unavailable("policy.unrecognized-outcome", ruleSet.Version),
         };
     }
 }
 ```
 
-The endpoint, the context builder, and the endpoint's tests do not change. What changes is where the rules live and who can change them, and that brings new obligations:
+Moving the *existing* rules into an engine changes nothing outside this class: the endpoint, the context builder, and the endpoint's tests stay as they are. New rules are a different matter. The table above keys on region, segment, and payment method, which the current context does not carry, so adopting it also means the host resolving three more authoritative facts. The engine changes where rules live and who can change them, and that brings new obligations:
 
 - **The rule set is now a deployable artifact.** Publishing needs validation (no gaps or unintended overlaps, every row yields a known outcome), a simulation against recorded contexts, review, and rollback. Without those it is an unreviewed production edit with a nicer editor.
 - **Version provenance moves with it.** `ruleSet.Version` should identify the exact published content, ideally with a content hash, and published rule sets should be immutable.
@@ -516,7 +551,7 @@ public sealed class RemoteRefundPolicyClient(HttpClient http)
             "acknowledge" => new(RefundOutcome.AcknowledgmentRequired, body.ReasonCode, body.PolicyVersion),
             "approve" => new(RefundOutcome.ApprovalRequired, body.ReasonCode, body.PolicyVersion),
             "escalate" => new(RefundOutcome.EscalationRecommended, body.ReasonCode, body.PolicyVersion),
-            _ => RefundDecision.Unavailable("policy.unrecognized-outcome"),
+            _ => RefundDecision.Unavailable("policy.unrecognized-outcome", body.PolicyVersion),
         };
     }
 
@@ -531,9 +566,10 @@ Each of these responses is a contract failure, and each maps to `Unavailable` ra
 { "outcome": "allow", "reasonCode": "refund.permitted", "policyVersion": "" }
 { "outcome": "permit-with-review", "reasonCode": "refund.new-rule", "policyVersion": "v42" }
 { "allowed": true }
+{ "outcome": { "value": "allow", "confidence": 0.9 }, "reasonCode": "refund.permitted", "policyVersion": "v42" }
 ```
 
-The first two cannot be attributed to a policy. The third uses an outcome this client was never taught; the policy service shipped a new rule before its callers were ready. The fourth is someone's older API shape, and deserializes to a record with every field `null`.
+The first two cannot be attributed to a policy. The third uses an outcome this client was never taught; the policy service shipped a new rule before its callers were ready. The fourth is someone's older API shape, and deserializes to a record with every field `null`. The fifth nests the outcome in an object where a string was expected, which fails deserialization and becomes `policy.malformed-response`. Unknown extra fields are ignored by default; if the service adding fields should be a visible contract change, configure the serializer to reject unmapped members.
 
 Evaluation is now asynchronous, has a latency budget, can fail in several distinct ways, and returns a policy version this application did not deploy. Every one of those needs a deliberate answer, covered in [Remote Evaluation Has Its Own Obligations](#remote-evaluation-has-its-own-obligations) below.
 
@@ -549,11 +585,13 @@ The same context builder still runs *before* the call. A remote PDP evaluates wh
 | **Outcomes** | Application results | Succeed or fail | Explicit enum with reason codes, including `Unavailable` | Engine results mapped by the host; unknown results become `Unavailable` | Service results mapped by the host; timeouts, errors, and unknown results become `Unavailable` |
 | **Testing** | Unit tests | Handler tests | Decision tables against a pure function | Decision tables per published rule set, plus simulation | Contract tests against the service and each policy version |
 | **Version provenance** | Build or commit | Build or commit | Explicit version recorded with each decision | Rule set version and content hash | Version returned per decision, recorded by the caller |
-| **Latency** | None added | None added, unless the handler performs lookups | None added | Engine evaluation cost | A network round trip per decision, unless evaluated locally from a bundle |
+| **Latency** | None added | None added, unless the handler performs lookups | None added | Engine evaluation cost | A network round trip per decision |
 | **Availability** | Same as the app | Same as the app, plus any handler dependencies | Same as the app, plus the context sources | Same as the app, plus rule-set loading | New dependency with its own outages |
-| **Caching and freshness** | Not applicable | Not applicable | Not applicable | Rule-set staleness | Bundle or decision staleness, invalidation |
+| **Caching and freshness** | Not applicable | Not applicable | Not applicable | Rule-set staleness | Decision-cache staleness, invalidation |
 | **Operational burden** | Lowest | Low | Low | Moderate: tooling, publishing, a second language | Highest: a service, its deployment, monitoring, and failure modes |
 | **Portability** | Tied to this app | Tied to ASP.NET Core | Tied to this app, easy to extract later | Tied to the engine | Language-neutral for callers |
+
+Centrally published policy evaluated locally from a bundle sits between the last two columns: it has the ownership and cadence of the remote PDP, the latency of the embedded engine, and freshness questions about the bundle rather than about individual decisions.
 
 Two rows deserve emphasis. **Who changes it** and **change cadence** are the rows that most often justify moving right, and they are organizational facts, not technical ones. **Availability** is the row most often forgotten until the first outage.
 
@@ -587,12 +625,12 @@ Is it "may this actor do this to this resource", and is pass/fail a complete ans
 
 Does it fit comfortably in ordinary application code owned by the same team?
   yes → keep it local, explicit, and tested.
-
-Does it need richer outcomes, a trusted context, version evidence, or its own tests?
-  yes → a dedicated in-process policy component.
+  no  → it needs richer outcomes, a trusted context, version evidence, or its own
+        tests: continue.
 
 Does it need specialized authoring, composition, or simulation by non-developers?
-  yes → an embedded engine behind the same component boundary.
+  no  → a dedicated in-process policy component.
+  yes → an embedded engine behind that same component boundary.
 
 Must several services apply it, must it deploy independently, or must its owner
 sit in a separate trust boundary?
@@ -718,6 +756,7 @@ public sealed class RefundPolicyTests
         { "approval for a smaller amount", Baseline with { Amount = 400m, SupervisorApproval = new(Operation, 300m, "sup-7") }, RefundOutcome.ApprovalRequired, "refund.requires-supervisor" },
         { "approval for another operation", Baseline with { Amount = 400m, SupervisorApproval = new(Guid.NewGuid(), 400m, "sup-7") }, RefundOutcome.ApprovalRequired, "refund.requires-supervisor" },
         { "approval does not clear a chargeback", Baseline with { Amount = 400m, HasOpenChargeback = true, SupervisorApproval = new(Operation, 400m, "sup-7") }, RefundOutcome.Denied, "refund.chargeback-open" },
+        { "approval does not skip risk escalation", Baseline with { Amount = 400m, CustomerRisk = RiskBand.High, SupervisorApproval = new(Operation, 400m, "sup-7") }, RefundOutcome.EscalationRecommended, "refund.high-risk-review" },
         { "chargeback denies a small refund", Baseline with { Amount = 5m, HasOpenChargeback = true }, RefundOutcome.Denied, "refund.chargeback-open" },
         { "high risk escalated under limit", Baseline with { CustomerRisk = RiskBand.High }, RefundOutcome.EscalationRecommended, "refund.high-risk-review" },
         { "exactly 90 days is not late", Baseline with { SincePurchase = TimeSpan.FromDays(90) }, RefundOutcome.Allowed, "refund.permitted" },
@@ -798,6 +837,35 @@ public async Task Retried_request_refunds_once()
 
     Assert.Single(app.Gateway.RefundsIssued);
 }
+
+[Fact]
+public async Task Retry_after_a_refund_that_used_most_of_the_balance_returns_the_recorded_result()
+{
+    await using var app = RefundApi.WithAgent(Tier2Agent).WithOrder(OrderWithBalance(900m));
+    var client = app.ClientFor(Tier2Agent);
+    var body = new { operationId = NewOperation, amount = 600m };
+
+    var first = await client.PostAsJsonAsync($"/orders/{OrderId}/refunds", body);
+    var retry = await client.PostAsJsonAsync($"/orders/{OrderId}/refunds", body);   // 300 now remains
+
+    Assert.Equal(HttpStatusCode.OK, first.StatusCode);
+    Assert.Equal(HttpStatusCode.OK, retry.StatusCode);
+    Assert.Single(app.Gateway.RefundsIssued);
+}
+
+[Fact]
+public async Task Chargeback_opened_while_approval_was_pending_does_not_execute()
+{
+    await using var app = RefundApi.WithAgent(Tier1Agent).WithOrder(OrderWithBalance(900m));
+    await app.ClientFor(Tier1Agent)
+        .PostAsJsonAsync($"/orders/{OrderId}/refunds", new { operationId = NewOperation, amount = 400m });
+
+    app.Payments.OpenChargeback(OrderId);
+    var decision = await app.Workflow.ApproveAndContinueAsync(NewOperation, by: Supervisor);
+
+    Assert.Equal(RefundOutcome.Denied, decision.Outcome);
+    Assert.Empty(app.Executor.Calls);
+}
 ```
 
 `RefundApi` is a small harness over `WebApplicationFactory` that seeds agents and orders, fakes the risk service and the payment gateway, and records executor and workflow calls. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) explains how to build that kind of recording harness and why an empty call list is stronger evidence than a status code. The retry test is only meaningful if the fake gateway enforces idempotency keys the way the real one does. [Practical Policy Testing and Decision-Table Strategies](../../governance/practical-policy-testing-and-decision-table-strategies.md) covers equivalence classes, boundary values, conflicting rules, and testing historical policy versions.
@@ -837,7 +905,7 @@ These are the terms this repository uses consistently. They are not an industry 
 
 8. Is the evaluator free of workflow state, side effects, retries, and its own logging, so it is safe to run any number of times?
 9. Is there one stable operation ID from request through acknowledgment, approval, decision, and execution, with the executor idempotent on it?
-10. Does a continued operation get a fresh evaluation rather than reusing the original decision?
+10. Does a continued operation recheck the requester's current access and get a fresh policy evaluation, rather than reusing the original decision or token?
 
 **Operations and evidence**
 

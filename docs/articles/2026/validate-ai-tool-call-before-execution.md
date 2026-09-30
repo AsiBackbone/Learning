@@ -995,6 +995,7 @@ If you are following the Learning tutorials, this article uses plainer names for
 ## Continue Deeper
 
 - [Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?](authorization-vs-approval-vs-acknowledgment.md) is the same distinction outside AI: authorization, approval, and acknowledgment for a delayed data export, each kept separate from permission to execute.
+- [Policy as Code in ASP.NET Core Without Overengineering](policy-as-code-aspnet-core-without-overengineering.md) is the same refund with no model in the loop: where the step 6 policy should live, from an in-process class to a remote decision service.
 - [Why an AI Tool Call Is a Proposal, Not Authority](why-ai-tool-call-is-only-a-proposal.md) makes the argument this checklist implements, and shows how to keep internal reason codes out of what the model sees.
 - [Governed AI Tool Gateway](../../tutorials/governed-ai-tool-gateway.md) and its [runnable sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-ai-tool-gateway/README.md) extend steps 6 to 9 into a full lifecycle with decision receipts, acknowledgment, and scoped execution authority, still without a live model.
 
