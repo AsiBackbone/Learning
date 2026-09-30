@@ -371,7 +371,7 @@ The status codes are this host's conventions, not part of the policy: `409` tell
 `IRefundExecutor.RefundAsync` receives the operation, not loose values, and works in two steps that are deliberately not one transaction:
 
 1. **Claim, in the database.** One local transaction marks the operation as executing, reserves the amount against the refundable balance, and consumes any approval it relied on. Each is a conditional update, such as `UPDATE ... WHERE consumed_at IS NULL`, so two concurrent requests or continuations cannot both win. If any condition no longer holds, nothing is claimed and nothing runs.
-2. **Execute, at the gateway.** The call to the payment gateway cannot join that transaction. It uses `operation.Id` as the gateway's idempotency key, and the operation's durable state records the outcome as succeeded, failed, or uncertain. An uncertain outcome, such as a timeout after the request was sent, is settled by asking the gateway about that key, not by claiming and running again.
+2. **Execute, at the gateway.** The call to the payment gateway cannot join that transaction. It uses `operation.Id` as the gateway's idempotency key, and the operation's durable state records the outcome as succeeded, failed, or uncertain. An uncertain outcome, such as a timeout after the request was sent, is reconciled through whatever recovery mechanism the gateway actually supports: querying a gateway identifier recorded on the operation, processing the gateway's webhook, or safely repeating the identical request with the same idempotency key while the gateway still retains it. Gateways differ here, and idempotency keys often expire, so check your provider's contract rather than assuming a lookup by key exists. Recovery resumes the existing operation; it never creates a new claim or a new key.
 
 A retried request therefore reaches the same operation and cannot refund twice. The decision record says the refund was *permitted*; the operation's state says whether it *happened*, and both share the operation ID.
 
@@ -537,11 +537,15 @@ public sealed class RemoteRefundPolicyClient(HttpClient http)
     private static RefundDecision Map(RemoteDecision? body)
     {
         // No policy version means no provenance: the answer cannot be attributed.
-        if (body is null
-            || string.IsNullOrWhiteSpace(body.PolicyVersion)
-            || string.IsNullOrWhiteSpace(body.ReasonCode))
+        if (body is null || string.IsNullOrWhiteSpace(body.PolicyVersion))
         {
             return RefundDecision.Unavailable("policy.incomplete-response");
+        }
+
+        // A version without a reason code is still unusable, but the version is evidence.
+        if (string.IsNullOrWhiteSpace(body.ReasonCode))
+        {
+            return RefundDecision.Unavailable("policy.incomplete-response", body.PolicyVersion);
         }
 
         return body.Outcome switch
@@ -861,6 +865,20 @@ public async Task Chargeback_opened_while_approval_was_pending_does_not_execute(
         .PostAsJsonAsync($"/orders/{OrderId}/refunds", new { operationId = NewOperation, amount = 400m });
 
     app.Payments.OpenChargeback(OrderId);
+    var decision = await app.Workflow.ApproveAndContinueAsync(NewOperation, by: Supervisor);
+
+    Assert.Equal(RefundOutcome.Denied, decision.Outcome);
+    Assert.Empty(app.Executor.Calls);
+}
+
+[Fact]
+public async Task Agent_who_lost_region_while_approval_was_pending_does_not_get_the_refund()
+{
+    await using var app = RefundApi.WithAgent(Tier1Agent).WithOrder(OrderWithBalance(900m));
+    await app.ClientFor(Tier1Agent)
+        .PostAsJsonAsync($"/orders/{OrderId}/refunds", new { operationId = NewOperation, amount = 400m });
+
+    app.Directory.RemoveRegion(Tier1Agent, OrderRegion);
     var decision = await app.Workflow.ApproveAndContinueAsync(NewOperation, by: Supervisor);
 
     Assert.Equal(RefundOutcome.Denied, decision.Outcome);
