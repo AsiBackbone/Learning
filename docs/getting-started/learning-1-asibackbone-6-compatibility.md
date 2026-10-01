@@ -153,7 +153,7 @@ The durable ideas are:
 - the host retains control of real-world side effects;
 - AI tool calls are proposals until a trusted host evaluates and authorizes the operation;
 - decision evidence, persistence, outbox delivery, signing, telemetry, and execution are related but distinct responsibilities;
-- Learning samples can remain framework-neutral even while current implementation references align to AsiBackbone 6.0.
+- Learning samples can remain framework-neutral even while implementation references for the Learning 1.0 baseline align to AsiBackbone 6.0.
 
 Those concepts remain the reason Learning can teach the architecture independently of one package release.
 
