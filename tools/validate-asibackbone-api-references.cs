@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
-return AsiBackboneApiReferenceValidator.Run();
+return args.Contains("--self-test", StringComparer.Ordinal)
+    ? AsiBackboneApiReferenceValidator.RunSelfTest()
+    : AsiBackboneApiReferenceValidator.Run();
 
 static partial class AsiBackboneApiReferenceValidator
 {
@@ -188,6 +191,11 @@ static partial class AsiBackboneApiReferenceValidator
         RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Multiline)]
     private static partial Regex VersionMetadataRegex();
 
+    [GeneratedRegex(
+        @"^ {0,3}(?<marker>`{3,}|~{3,})",
+        RegexOptions.CultureInvariant)]
+    private static partial Regex MarkdownFenceRegex();
+
     // A "current" claim names an AsiBackbone version, for example "the current `AsiBackbone` 3.x default" or
     // "AsiBackbone 7.0 is the current line". Only the major version is compared with the current implementation ref.
     [GeneratedRegex(
@@ -199,11 +207,6 @@ static partial class AsiBackboneApiReferenceValidator
         @"\bAsiBackbone\b[`*_]*\s+v?(?<major>\d+)(?:\.(?:\d+|x))+\b[^\r\n]{0,40}?\b(?:is|remains)\s+(?:the\s+)?current\b",
         RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
     private static partial Regex VersionBeforeCurrentClaimRegex();
-
-    [GeneratedRegex(
-        @"^asibackbone_status:\s*historical\s*$",
-        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Multiline)]
-    private static partial Regex HistoricalStatusRegex();
 
     public static int Run()
     {
@@ -249,6 +252,52 @@ static partial class AsiBackboneApiReferenceValidator
 
         Console.WriteLine(
             $"Validated current AsiBackbone 7.0 references and immutable historical compatibility pages across {textFiles.Length} instructional file(s): {packageSummary}.");
+        return 0;
+    }
+
+    public static int RunSelfTest()
+    {
+        var failures = new List<string>();
+
+        AssertCurrentVersionClaimCount(
+            "historical front matter exempts the page",
+            "---\nasibackbone_status: historical\n---\nThe current AsiBackbone 3.x default.\n",
+            0,
+            failures);
+        AssertCurrentVersionClaimCount(
+            "body metadata does not exempt the page",
+            "---\ntitle: Current guidance\n---\nasibackbone_status: historical\nThe current AsiBackbone 3.x default.\n",
+            1,
+            failures);
+        AssertCurrentVersionClaimCount(
+            "wrapped stale claims are detected",
+            "The current `AsiBackbone`\n3.x default is fail closed.\n",
+            1,
+            failures);
+        AssertCurrentVersionClaimCount(
+            "shorter nested fence markers do not close the block",
+            "````markdown\nThe current AsiBackbone 3.x default.\n```\nStill fenced.\n````\n",
+            0,
+            failures);
+        AssertCurrentVersionClaimCount(
+            "prose after a matching fence is validated",
+            "````markdown\nThe current AsiBackbone 3.x default.\n```\nStill fenced.\n````\nThe current AsiBackbone 3.x default.\n",
+            1,
+            failures);
+
+        if (failures.Count > 0)
+        {
+            Console.Error.WriteLine("AsiBackbone API-reference validator self-test failed:");
+
+            foreach (string failure in failures)
+            {
+                Console.Error.WriteLine($"- {failure}");
+            }
+
+            return 1;
+        }
+
+        Console.WriteLine("AsiBackbone API-reference validator self-test passed.");
         return 0;
     }
 
@@ -334,54 +383,168 @@ static partial class AsiBackboneApiReferenceValidator
                 continue;
             }
 
-            string text = File.ReadAllText(path);
+            ValidateCurrentVersionClaimsInMarkdown(
+                relativePath,
+                File.ReadAllText(path),
+                currentMajor,
+                errors);
+        }
+    }
 
-            // Pages that declare themselves historical describe the release they record.
-            if (HistoricalStatusRegex().IsMatch(text))
+    private static void ValidateCurrentVersionClaimsInMarkdown(
+        string relativePath,
+        string text,
+        int currentMajor,
+        List<string> errors)
+    {
+        string[] lines = text.Split('\n');
+        bool hasFrontMatter = TryGetYamlFrontMatter(lines, out string frontMatter, out int frontMatterEndIndex);
+
+        // Pages that declare themselves historical describe the release they record.
+        if (hasFrontMatter && VersionMetadataRegex().Matches(frontMatter).Any(match =>
+                match.Groups["key"].Value.Equals("status", StringComparison.OrdinalIgnoreCase) &&
+                match.Groups["value"].Value.Equals("historical", StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        char? fenceMarker = null;
+        int fenceLength = 0;
+        var prose = new StringBuilder();
+        var proseLines = new List<ProseLine>();
+        int firstContentLineIndex = hasFrontMatter ? frontMatterEndIndex + 1 : 0;
+
+        for (int lineIndex = firstContentLineIndex; lineIndex < lines.Length; lineIndex++)
+        {
+            string line = lines[lineIndex].TrimEnd('\r');
+            Match fence = MarkdownFenceRegex().Match(line);
+
+            if (fence.Success)
+            {
+                string marker = fence.Groups["marker"].Value;
+
+                if (fenceMarker is null)
+                {
+                    ValidateProseBlock(relativePath, prose, proseLines, currentMajor, errors);
+                    fenceMarker = marker[0];
+                    fenceLength = marker.Length;
+                }
+                else if (marker[0] == fenceMarker &&
+                         marker.Length >= fenceLength &&
+                         string.IsNullOrWhiteSpace(line[fence.Length..]))
+                {
+                    fenceMarker = null;
+                    fenceLength = 0;
+                }
+
+                continue;
+            }
+
+            if (fenceMarker is not null)
             {
                 continue;
             }
 
-            string[] lines = text.Split('\n');
-            bool insideCodeFence = false;
-
-            for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
+            if (string.IsNullOrWhiteSpace(line))
             {
-                string line = lines[lineIndex].TrimEnd('\r');
-                string trimmedLine = line.TrimStart();
-
-                if (trimmedLine.StartsWith("```", StringComparison.Ordinal) ||
-                    trimmedLine.StartsWith("~~~", StringComparison.Ordinal))
-                {
-                    insideCodeFence = !insideCodeFence;
-                    continue;
-                }
-
-                if (insideCodeFence)
-                {
-                    continue;
-                }
-
-                IEnumerable<Match> claimMatches = CurrentBeforeVersionClaimRegex()
-                    .Matches(line)
-                    .Concat(VersionBeforeCurrentClaimRegex().Matches(line));
-
-                foreach (Match claimMatch in claimMatches)
-                {
-                    string claimedMajorText = claimMatch.Groups["major"].Value;
-
-                    if (!int.TryParse(
-                            claimedMajorText,
-                            System.Globalization.NumberStyles.None,
-                            System.Globalization.CultureInfo.InvariantCulture,
-                            out int claimedMajor) ||
-                        claimedMajor != currentMajor)
-                    {
-                        errors.Add(
-                            $"{relativePath}:{lineIndex + 1} describes AsiBackbone {claimedMajorText}.x as current, but the current implementation ref is {CurrentImplementationRef}: '{claimMatch.Value}'. Name the current version, use version-neutral wording, or mark the page asibackbone_status: historical.");
-                    }
-                }
+                ValidateProseBlock(relativePath, prose, proseLines, currentMajor, errors);
+                continue;
             }
+
+            if (prose.Length > 0)
+            {
+                prose.Append(' ');
+            }
+
+            proseLines.Add(new ProseLine(prose.Length, lineIndex + 1));
+            prose.Append(line.Trim());
+        }
+
+        ValidateProseBlock(relativePath, prose, proseLines, currentMajor, errors);
+    }
+
+    private static void ValidateProseBlock(
+        string relativePath,
+        StringBuilder prose,
+        List<ProseLine> proseLines,
+        int currentMajor,
+        List<string> errors)
+    {
+        if (prose.Length == 0)
+        {
+            return;
+        }
+
+        string proseText = prose.ToString();
+        IEnumerable<Match> claimMatches = CurrentBeforeVersionClaimRegex()
+            .Matches(proseText)
+            .Concat(VersionBeforeCurrentClaimRegex().Matches(proseText));
+
+        foreach (Match claimMatch in claimMatches)
+        {
+            string claimedMajorText = claimMatch.Groups["major"].Value;
+
+            if (!int.TryParse(
+                    claimedMajorText,
+                    System.Globalization.NumberStyles.None,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out int claimedMajor) ||
+                claimedMajor != currentMajor)
+            {
+                int lineNumber = proseLines.Last(line => line.StartIndex <= claimMatch.Index).LineNumber;
+                errors.Add(
+                    $"{relativePath}:{lineNumber} describes AsiBackbone {claimedMajorText}.x as current, but the current implementation ref is {CurrentImplementationRef}: '{claimMatch.Value}'. Name the current version, use version-neutral wording, or mark the page asibackbone_status: historical.");
+            }
+        }
+
+        prose.Clear();
+        proseLines.Clear();
+    }
+
+    private static bool TryGetYamlFrontMatter(
+        string[] lines,
+        out string frontMatter,
+        out int endLineIndex)
+    {
+        frontMatter = string.Empty;
+        endLineIndex = -1;
+
+        if (lines.Length == 0 || !string.Equals(lines[0].TrimEnd('\r'), "---", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        var content = new StringBuilder();
+
+        for (int lineIndex = 1; lineIndex < lines.Length; lineIndex++)
+        {
+            string line = lines[lineIndex].TrimEnd('\r');
+
+            if (string.Equals(line, "---", StringComparison.Ordinal))
+            {
+                frontMatter = content.ToString();
+                endLineIndex = lineIndex;
+                return true;
+            }
+
+            content.AppendLine(line);
+        }
+
+        return false;
+    }
+
+    private static void AssertCurrentVersionClaimCount(
+        string name,
+        string markdown,
+        int expectedCount,
+        List<string> failures)
+    {
+        var errors = new List<string>();
+        ValidateCurrentVersionClaimsInMarkdown("self-test.md", markdown, 7, errors);
+
+        if (errors.Count != expectedCount)
+        {
+            failures.Add($"{name}: expected {expectedCount} error(s), found {errors.Count}.");
         }
     }
 
@@ -422,8 +585,16 @@ static partial class AsiBackboneApiReferenceValidator
             }
 
             string text = File.ReadAllText(path);
+            string[] lines = text.Split('\n');
+
+            if (!TryGetYamlFrontMatter(lines, out string frontMatter, out _))
+            {
+                errors.Add($"{relativePath} must begin with YAML front matter.");
+                continue;
+            }
+
             Dictionary<string, string> metadata = VersionMetadataRegex()
-                .Matches(text)
+                .Matches(frontMatter)
                 .ToDictionary(
                     match => match.Groups["key"].Value.ToLowerInvariant(),
                     match => match.Groups["value"].Value,
@@ -674,4 +845,8 @@ static partial class AsiBackboneApiReferenceValidator
         string PackageId,
         string? Version,
         string RelativePath);
+
+    private sealed record ProseLine(
+        int StartIndex,
+        int LineNumber);
 }
