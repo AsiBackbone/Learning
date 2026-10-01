@@ -18,6 +18,9 @@ Learning releases are archival and citation snapshots of educational material. T
 - Refreshed the landing page's stale copy. **Recently added** now lists the three newest published articles under their current titles, and the Executable Samples card no longer uses a hard-coded sample count.
 - `tools/validate-doc-metadata.cs` now fails the documentation build when **Recently added** does not name the newest published articles, newest first, with matching titles, or when it contains any list item that is not a plain article link.
 - Markdown link validation no longer fetches `AsiBackbone/AsiBackbone` blob and tree URLs live. `tools/validate-organization-links.cs` already resolves each one against a fetched clone, and the live check only added transient GitHub 503 failures.
+- [Constraint Composition and Policy Precedence](docs/governance/constraint-composition-and-policy-precedence.md) no longer describes its fail-closed defaults as "the current `AsiBackbone` 3.x default". It now names the `GovernancePolicyOptions.DenyWhenNoConstraints` and `TreatConstraintExceptionAsDenial` options, which still default to `true` in 7.x.
+- `tools/validate-asibackbone-api-references.cs` now fails the documentation build when a Markdown page describes an AsiBackbone major version other than the current implementation ref as current, for example "the current `AsiBackbone` 3.x default". Release notes, the changelog, version-transition pages, and pages marked `asibackbone_status: historical` are exempt.
+- The AsiBackbone API boundary pages and the landing page no longer call release tags immutable. A Git tag can be moved or deleted unless repository rules prevent it, so the 7.0 boundary page now says to resolve the tag to its commit SHA when a reference must not change. Published release records are unchanged.
 
 ## [1.1.0] - 2026-09-26
 

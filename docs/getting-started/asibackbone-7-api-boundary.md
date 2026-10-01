@@ -6,7 +6,7 @@ asibackbone_status: current
 
 # AsiBackbone 7.0 Compatibility and API Boundary
 
-> **Release status:** AsiBackbone 7.0.0 was published on September 26, 2026. Implementation links on this page are pinned to the immutable [`v7.0.0`](https://github.com/AsiBackbone/AsiBackbone/releases/tag/v7.0.0) release tag.
+> **Release status:** AsiBackbone 7.0.0 was published on September 26, 2026. Implementation links on this page are pinned to the [`v7.0.0`](https://github.com/AsiBackbone/AsiBackbone/releases/tag/v7.0.0) release tag. A Git tag can be moved or deleted unless repository rules prevent it, so resolve the tag to its commit SHA when you need a reference that cannot change.
 
 Learning teaches governed-execution architecture. AsiBackbone owns exact package names, runtime behavior, wire contracts, and migrations. Learning samples remain framework-neutral teaching models and do not depend on `AsiBackbone.*` packages.
 
@@ -82,6 +82,6 @@ Before publishing package-facing Learning material:
 - use `CreateBoundExecutionBoundary(...)` with explicit binding expectations at execution boundaries;
 - treat DLP numeric enum migration, JSON key changes, and EF Core column renames as deployment work;
 - preserve signed, telemetry, and persistence compatibility strings exactly;
-- link current implementation behavior to the immutable `v7.0.0` release tag and historical version pages to their corresponding release tags.
+- link current implementation behavior to the `v7.0.0` release tag and historical version pages to their corresponding release tags.
 
 Architecture terms in Learning explain responsibilities and flow; they are not automatically package type names or runtime guarantees. When the two differ, this page directs current readers to the implementation contract while the versioned 6.0 pages preserve the historical record.

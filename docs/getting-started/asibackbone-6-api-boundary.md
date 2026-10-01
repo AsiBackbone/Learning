@@ -9,7 +9,7 @@ asibackbone_status: historical
 AsiBackbone Learning teaches architecture with two different kinds of code:
 
 1. **Learning-owned teaching models** are small, framework-neutral types compiled from this repository. They make an architectural boundary easy to observe, but they are not package API signatures.
-2. **AsiBackbone 6.0 API examples** preserve the finalized public names and namespaces from the immutable implementation repository tag `v6.0.0`.
+2. **AsiBackbone 6.0 API examples** preserve the finalized public names and namespaces from the implementation repository's `v6.0.0` release tag.
 
 Keep that distinction visible when copying an example. A local teaching type named for a concept may be intentionally smaller than the similarly named framework type.
 
@@ -143,7 +143,7 @@ Before publishing an API-facing Learning change:
 - use finalized 6.0 names and namespaces;
 - use `GovernancePolicyAttribute`, not the 5.x `RequireGovernancePolicyAttribute`, for attribute-based endpoint metadata;
 - do not call removed evaluator constructors or route-builder methods;
-- link historical 6.0 implementation source to the immutable `v6.0.0` tag, never `main`;
+- link historical 6.0 implementation source to the `v6.0.0` release tag, never `main`;
 - pin any future `AsiBackbone.*` sample package reference to a released 6.x version and commit its lock-file update;
 - preserve old names only in clearly historical migration or release material.
 

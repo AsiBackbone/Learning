@@ -664,7 +664,7 @@ The wrong policy set was selected
 
 For governed surfaces, silently treating that state as allow can turn a configuration failure into an authorization or governance bypass.
 
-That is why the current `AsiBackbone` 3.x default is fail closed:
+That is why the current `AsiBackbone` default is fail closed (`GovernancePolicyOptions.DenyWhenNoConstraints` is `true` unless a host changes it):
 
 ```text
 Zero constraints
@@ -727,7 +727,7 @@ Defer for retry
 Escalate for review
 ```
 
-The current `AsiBackbone` 3.x default converts eligible non-cancellation, non-critical constraint exceptions into a denied decision using:
+The current `AsiBackbone` default (`GovernancePolicyOptions.TreatConstraintExceptionAsDenial` is `true`) converts eligible non-cancellation, non-critical constraint exceptions into a denied decision using:
 
 ```text
 asibackbone.policy.constraint_exception

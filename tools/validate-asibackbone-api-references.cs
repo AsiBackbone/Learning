@@ -188,6 +188,23 @@ static partial class AsiBackboneApiReferenceValidator
         RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Multiline)]
     private static partial Regex VersionMetadataRegex();
 
+    // A "current" claim names an AsiBackbone version, for example "the current `AsiBackbone` 3.x default" or
+    // "AsiBackbone 7.0 is the current line". Only the major version is compared with the current implementation ref.
+    [GeneratedRegex(
+        @"\bcurrent\b[^\r\n]{0,40}?\bAsiBackbone\b[`*_]*\s+v?(?<major>\d+)(?:\.(?:\d+|x))+\b",
+        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+    private static partial Regex CurrentBeforeVersionClaimRegex();
+
+    [GeneratedRegex(
+        @"\bAsiBackbone\b[`*_]*\s+v?(?<major>\d+)(?:\.(?:\d+|x))+\b[^\r\n]{0,40}?\b(?:is|remains)\s+(?:the\s+)?current\b",
+        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+    private static partial Regex VersionBeforeCurrentClaimRegex();
+
+    [GeneratedRegex(
+        @"^asibackbone_status:\s*historical\s*$",
+        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Multiline)]
+    private static partial Regex HistoricalStatusRegex();
+
     public static int Run()
     {
         string repositoryRoot;
@@ -206,6 +223,7 @@ static partial class AsiBackboneApiReferenceValidator
         string[] textFiles = EnumerateTextFiles(repositoryRoot).ToArray();
 
         ValidateCurrentSymbolsAndLinks(repositoryRoot, textFiles, errors);
+        ValidateCurrentVersionClaims(repositoryRoot, textFiles, errors);
         ValidateVersionedCompatibilityPages(repositoryRoot, errors);
         int packageReferenceCount = ValidatePackageReferences(repositoryRoot, errors);
         ValidateScopeNotices(repositoryRoot, errors);
@@ -293,6 +311,96 @@ static partial class AsiBackboneApiReferenceValidator
                     $"{relativePath}:{lineNumber} links implementation source outside the released v7.0.0 or historical v6.0.0 tags: {linkMatch.Value}");
             }
         }
+    }
+
+    private static void ValidateCurrentVersionClaims(
+        string repositoryRoot,
+        IEnumerable<string> files,
+        List<string> errors)
+    {
+        int currentMajor = GetCurrentImplementationMajor();
+
+        foreach (string path in files)
+        {
+            if (!string.Equals(Path.GetExtension(path), ".md", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            string relativePath = NormalizeRelativePath(repositoryRoot, path);
+
+            if (IsVersionClaimExemptPath(relativePath))
+            {
+                continue;
+            }
+
+            string text = File.ReadAllText(path);
+
+            // Pages that declare themselves historical describe the release they record.
+            if (HistoricalStatusRegex().IsMatch(text))
+            {
+                continue;
+            }
+
+            string[] lines = text.Split('\n');
+            bool insideCodeFence = false;
+
+            for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
+            {
+                string line = lines[lineIndex].TrimEnd('\r');
+                string trimmedLine = line.TrimStart();
+
+                if (trimmedLine.StartsWith("```", StringComparison.Ordinal) ||
+                    trimmedLine.StartsWith("~~~", StringComparison.Ordinal))
+                {
+                    insideCodeFence = !insideCodeFence;
+                    continue;
+                }
+
+                if (insideCodeFence)
+                {
+                    continue;
+                }
+
+                IEnumerable<Match> claimMatches = CurrentBeforeVersionClaimRegex()
+                    .Matches(line)
+                    .Concat(VersionBeforeCurrentClaimRegex().Matches(line));
+
+                foreach (Match claimMatch in claimMatches)
+                {
+                    string claimedMajorText = claimMatch.Groups["major"].Value;
+
+                    if (!int.TryParse(
+                            claimedMajorText,
+                            System.Globalization.NumberStyles.None,
+                            System.Globalization.CultureInfo.InvariantCulture,
+                            out int claimedMajor) ||
+                        claimedMajor != currentMajor)
+                    {
+                        errors.Add(
+                            $"{relativePath}:{lineIndex + 1} describes AsiBackbone {claimedMajorText}.x as current, but the current implementation ref is {CurrentImplementationRef}: '{claimMatch.Value}'. Name the current version, use version-neutral wording, or mark the page asibackbone_status: historical.");
+                    }
+                }
+            }
+        }
+    }
+
+    private static bool IsVersionClaimExemptPath(string relativePath)
+    {
+        return string.Equals(relativePath, "CHANGELOG.md", StringComparison.Ordinal) ||
+               relativePath.StartsWith("RELEASE-NOTES-", StringComparison.Ordinal) ||
+               VersionTransitionReferencePaths.Contains(relativePath) ||
+               ImmutableHistoricalReleaseRecordPaths.Contains(relativePath);
+    }
+
+    private static int GetCurrentImplementationMajor()
+    {
+        string version = CurrentImplementationRef.TrimStart('v', 'V');
+        int separatorIndex = version.IndexOf('.', StringComparison.Ordinal);
+
+        return int.Parse(
+            separatorIndex < 0 ? version : version[..separatorIndex],
+            System.Globalization.CultureInfo.InvariantCulture);
     }
 
     private static void ValidateVersionedCompatibilityPages(

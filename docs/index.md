@@ -153,7 +153,7 @@ The goal is to make the reasoning visible—not to prove that one framework or a
 
 ## Recently added
 
-Learning 1.1 is the current documentation baseline aligned with released AsiBackbone 7.0.0. The [current compatibility and API boundary](getting-started/asibackbone-7-api-boundary.md) pins implementation references to the immutable release tag; Learning 1.0 / AsiBackbone 6.0 remains available as historical guidance. Recent publications include:
+Learning 1.1 is the current documentation baseline aligned with released AsiBackbone 7.0.0. The [current compatibility and API boundary](getting-started/asibackbone-7-api-boundary.md) pins implementation references to the `v7.0.0` release tag; Learning 1.0 / AsiBackbone 6.0 remains available as historical guidance. Recent publications include:
 
 - [Policy as Code in ASP.NET Core Without Overengineering](articles/2026/policy-as-code-aspnet-core-without-overengineering.md)
 - [Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?](articles/2026/authorization-vs-approval-vs-acknowledgment.md)
