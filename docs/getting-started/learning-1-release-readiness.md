@@ -36,7 +36,7 @@ All four Learning 1.0 milestone issues are closed. [PR #349](https://github.com/
 - The API-reference validator rejects removed 5.x APIs and implementation links that do not target `main`, except in the two explicitly historical migration/reference pages.
 - Learning-owned samples are framework-neutral teaching models. Their indexes and README files identify that boundary and direct readers to the exact 6.0 API guide.
 - Previously published pages renamed for 6.0 terminology retain redirect stubs, and the renamed sample retains a pointer at its former repository path.
-- Getting Started, the root README, and primary navigation identify Learning 1.0 as the production documentation baseline aligned with AsiBackbone 6.0.
+- At the time of the Learning 1.0 review, Getting Started, the root README, and primary navigation identified Learning 1.0 as the production documentation baseline aligned with AsiBackbone 6.0.
 
 ## Validation Record
 
@@ -84,8 +84,8 @@ Publication-time generation, attestation, upload, anonymous-download verificatio
 
 - [x] Learning 1.0 milestone implementation issues are complete or have an explicit administrative deferral rationale.
 - [x] Terminology and API-facing examples align with the AsiBackbone 6.0 production surface.
-- [x] Current production pages are protected from removed 6.0 APIs by repository validation.
-- [x] Getting Started, primary navigation, and project-status messaging identify Learning 1.0 as the production baseline.
+- [x] The production pages in the reviewed Learning 1.0 release candidate were protected from removed 6.0 APIs by repository validation.
+- [x] Getting Started, primary navigation, and project-status messaging identified Learning 1.0 as the production baseline for the reviewed release candidate.
 - [x] Local DocFX, metadata, API-reference, sample, formatting, and release-evidence tests pass.
 - [x] Current security, workflow-analysis, dependency-analysis, and supply-chain checks are green on the `main` history incorporated into the release branch.
 - [x] [PR #349](https://github.com/AsiBackbone/Learning/pull/349) passes Documentation Validation, Link Validation, Sample Validation, and required branch checks.
