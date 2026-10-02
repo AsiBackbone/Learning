@@ -33,6 +33,12 @@ static partial class AsiBackboneApiReferenceValidator
         "docs/getting-started/learning-1-asibackbone-6-compatibility.md"
     };
 
+    private static readonly HashSet<string> ReleasedImplementationRefs = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "v6.0.0",
+        CurrentImplementationRef
+    };
+
     private static readonly HashSet<string> ImmutableHistoricalReleaseRecordPaths = new(StringComparer.Ordinal)
     {
         "RELEASE-NOTES-1.0.0.md",
@@ -196,6 +202,11 @@ static partial class AsiBackboneApiReferenceValidator
         RegexOptions.CultureInvariant)]
     private static partial Regex MarkdownFenceRegex();
 
+    [GeneratedRegex(
+        @"^[0-9a-f]{40}$",
+        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+    private static partial Regex FullCommitShaRegex();
+
     // A "current" claim names an AsiBackbone version, for example "the current `AsiBackbone` 3.x default" or
     // "AsiBackbone 7.0 is the current line". Only the major version is compared with the current implementation ref.
     [GeneratedRegex(
@@ -298,6 +309,26 @@ static partial class AsiBackboneApiReferenceValidator
             "prose after a matching fence is validated",
             "````markdown\nThe current AsiBackbone 3.x default.\n```\nStill fenced.\n````\nThe current AsiBackbone 3.x default.\n",
             1,
+            failures);
+        AssertPinnedImplementationRef(
+            "released implementation tags are pinned",
+            "v6.0.0",
+            true,
+            failures);
+        AssertPinnedImplementationRef(
+            "full commit SHAs are pinned",
+            "0123456789abcdef0123456789abcdef01234567",
+            true,
+            failures);
+        AssertPinnedImplementationRef(
+            "mutable branches are not pinned",
+            "develop",
+            false,
+            failures);
+        AssertPinnedImplementationRef(
+            "unknown version-shaped refs are not approved release tags",
+            "v8.0.0",
+            false,
             failures);
 
         if (failures.Count > 0)
@@ -651,6 +682,26 @@ static partial class AsiBackboneApiReferenceValidator
         }
     }
 
+    private static void AssertPinnedImplementationRef(
+        string name,
+        string implementationRef,
+        bool expected,
+        List<string> failures)
+    {
+        bool actual = IsPinnedImplementationRef(implementationRef);
+
+        if (actual != expected)
+        {
+            failures.Add($"{name}: expected {expected}, found {actual} for '{implementationRef}'.");
+        }
+    }
+
+    private static bool IsPinnedImplementationRef(string implementationRef)
+    {
+        return ReleasedImplementationRefs.Contains(implementationRef) ||
+               FullCommitShaRegex().IsMatch(implementationRef);
+    }
+
     private static bool IsVersionClaimExemptPath(string relativePath)
     {
         return string.Equals(relativePath, "CHANGELOG.md", StringComparison.Ordinal) ||
@@ -710,10 +761,10 @@ static partial class AsiBackboneApiReferenceValidator
                 continue;
             }
 
-            if (status.Equals("historical", StringComparison.OrdinalIgnoreCase) &&
-                expectedRef.Equals("main", StringComparison.OrdinalIgnoreCase))
+            if (!IsPinnedImplementationRef(expectedRef))
             {
-                errors.Add($"{relativePath} is historical and must use a pinned implementation ref, not main.");
+                errors.Add(
+                    $"{relativePath} declares unpinned implementation ref '{expectedRef}'. Use an approved release tag ({string.Join(", ", ReleasedImplementationRefs.Order())}) or a full 40-character commit SHA.");
             }
 
             bool isCurrentBoundary = relativePath.Equals(
@@ -737,12 +788,6 @@ static partial class AsiBackboneApiReferenceValidator
             else if (!status.Equals("historical", StringComparison.OrdinalIgnoreCase))
             {
                 errors.Add($"{relativePath} has unsupported asibackbone_status '{status}'. Use current or historical.");
-            }
-
-            if (!isCurrentBoundary && expectedRef.Equals("main", StringComparison.OrdinalIgnoreCase))
-            {
-                errors.Add(
-                    $"{relativePath} is a versioned compatibility page and must pin an implementation ref instead of main.");
             }
 
             foreach (Match linkMatch in ImplementationLinkRegex().Matches(text))
