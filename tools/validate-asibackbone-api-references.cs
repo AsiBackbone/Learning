@@ -33,6 +33,12 @@ static partial class AsiBackboneApiReferenceValidator
         "docs/getting-started/learning-1-asibackbone-6-compatibility.md"
     };
 
+    private static readonly HashSet<string> ReleasedImplementationRefs = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "v6.0.0",
+        CurrentImplementationRef
+    };
+
     private static readonly HashSet<string> ImmutableHistoricalReleaseRecordPaths = new(StringComparer.Ordinal)
     {
         "RELEASE-NOTES-1.0.0.md",
@@ -177,12 +183,7 @@ static partial class AsiBackboneApiReferenceValidator
     private static partial Regex IdentifierRegex();
 
     [GeneratedRegex(
-        @"https://github\.com/AsiBackbone/AsiBackbone/(?:blob|tree)/(?!(?:v7\.0\.0|v6\.0\.0)(?:/|\b))[^\s)\]'>]+",
-        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
-    private static partial Regex StaleImplementationLinkRegex();
-
-    [GeneratedRegex(
-        @"https://github\.com/AsiBackbone/AsiBackbone/(?:blob|tree)/(?<ref>[^/\s)\]'>]+)/[^\s)\]'>]+",
+        @"https://github\.com/AsiBackbone/AsiBackbone/(?:blob|tree)/(?<ref>[^/\s)\]'>]+)(?:/[^\s)\]'>]*)?",
         RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
     private static partial Regex ImplementationLinkRegex();
 
@@ -195,6 +196,11 @@ static partial class AsiBackboneApiReferenceValidator
         @"^ {0,3}(?<marker>`{3,}|~{3,})",
         RegexOptions.CultureInvariant)]
     private static partial Regex MarkdownFenceRegex();
+
+    [GeneratedRegex(
+        @"^[0-9a-f]{40}$",
+        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+    private static partial Regex FullCommitShaRegex();
 
     // A "current" claim names an AsiBackbone version, for example "the current `AsiBackbone` 3.x default" or
     // "AsiBackbone 7.0 is the current line". Only the major version is compared with the current implementation ref.
@@ -251,7 +257,7 @@ static partial class AsiBackboneApiReferenceValidator
             : $"{packageReferenceCount} AsiBackbone 7.x package reference(s)";
 
         Console.WriteLine(
-            $"Validated current AsiBackbone 7.0 references and immutable historical compatibility pages across {textFiles.Length} instructional file(s): {packageSummary}.");
+            $"Validated current AsiBackbone 7.0 references and version-pinned historical compatibility pages across {textFiles.Length} instructional file(s): {packageSummary}.");
         return 0;
     }
 
@@ -261,7 +267,7 @@ static partial class AsiBackboneApiReferenceValidator
 
         AssertCurrentVersionClaimCount(
             "historical front matter exempts the page",
-            "---\nasibackbone_status: historical\n---\nThe current AsiBackbone 3.x default.\n",
+            "---\ndescription: Use the current AsiBackbone 3.x API.\nasibackbone_status: historical\n---\nThe current AsiBackbone 3.x default.\n",
             0,
             failures);
         AssertCurrentVersionClaimCount(
@@ -275,6 +281,21 @@ static partial class AsiBackboneApiReferenceValidator
             1,
             failures);
         AssertCurrentVersionClaimCount(
+            "reverse-order stale claims are detected",
+            "AsiBackbone 6.0 remains the current implementation line.\n",
+            1,
+            failures);
+        AssertCurrentVersionClaimCount(
+            "stale claims in front matter are detected",
+            "---\ndescription: Use the current AsiBackbone 3.x API.\n---\n# Current guidance\n",
+            1,
+            failures);
+        AssertCurrentVersionClaimCount(
+            "wrapped stale claims in front matter are detected",
+            "---\ndescription: >-\n  Use the current AsiBackbone\n  3.x API.\n---\n# Current guidance\n",
+            1,
+            failures);
+        AssertCurrentVersionClaimCount(
             "shorter nested fence markers do not close the block",
             "````markdown\nThe current AsiBackbone 3.x default.\n```\nStill fenced.\n````\n",
             0,
@@ -283,6 +304,50 @@ static partial class AsiBackboneApiReferenceValidator
             "prose after a matching fence is validated",
             "````markdown\nThe current AsiBackbone 3.x default.\n```\nStill fenced.\n````\nThe current AsiBackbone 3.x default.\n",
             1,
+            failures);
+        AssertPinnedImplementationRef(
+            "released implementation tags are pinned",
+            "v6.0.0",
+            true,
+            failures);
+        AssertPinnedImplementationRef(
+            "full commit SHAs are pinned",
+            "0123456789abcdef0123456789abcdef01234567",
+            true,
+            failures);
+        AssertPinnedImplementationRef(
+            "mutable branches are not pinned",
+            "develop",
+            false,
+            failures);
+        AssertPinnedImplementationRef(
+            "unknown version-shaped refs are not approved release tags",
+            "v8.0.0",
+            false,
+            failures);
+        AssertImplementationLinkErrorCount(
+            "full commit SHA links are accepted",
+            "docs/getting-started/asibackbone-6-api-boundary.md",
+            "https://github.com/AsiBackbone/AsiBackbone/blob/0123456789abcdef0123456789abcdef01234567/src/Example.cs",
+            0,
+            failures);
+        AssertImplementationLinkErrorCount(
+            "mutable branch links are rejected",
+            "docs/getting-started/asibackbone-6-api-boundary.md",
+            "https://github.com/AsiBackbone/AsiBackbone/blob/develop/src/Example.cs",
+            1,
+            failures);
+        AssertImplementationLinkErrorCount(
+            "pathless mutable branch links are rejected",
+            "docs/getting-started/asibackbone-6-api-boundary.md",
+            "https://github.com/AsiBackbone/AsiBackbone/tree/main",
+            1,
+            failures);
+        AssertImplementationLinkErrorCount(
+            "pathless full commit SHA links are accepted",
+            "docs/getting-started/asibackbone-6-api-boundary.md",
+            "https://github.com/AsiBackbone/AsiBackbone/blob/0123456789abcdef0123456789abcdef01234567",
+            0,
             failures);
 
         if (failures.Count > 0)
@@ -343,22 +408,34 @@ static partial class AsiBackboneApiReferenceValidator
 
             foreach (Match linkMatch in ImplementationLinkRegex().Matches(text))
             {
-                string implementationRef = linkMatch.Groups["ref"].Value;
-
-                if (implementationRef.Equals("v6.0.0", StringComparison.OrdinalIgnoreCase) &&
-                    !HistoricalCompatibilityReferencePaths.Contains(relativePath))
-                {
-                    errors.Add(
-                        $"{relativePath}:{GetLineNumber(text, linkMatch.Index)} uses the historical v6.0.0 implementation ref outside an approved historical compatibility page: {linkMatch.Value}");
-                }
+                ValidateImplementationLinkRef(
+                    relativePath,
+                    GetLineNumber(text, linkMatch.Index),
+                    linkMatch.Groups["ref"].Value,
+                    linkMatch.Value,
+                    errors);
             }
+        }
+    }
 
-            foreach (Match linkMatch in StaleImplementationLinkRegex().Matches(text))
-            {
-                int lineNumber = GetLineNumber(text, linkMatch.Index);
-                errors.Add(
-                    $"{relativePath}:{lineNumber} links implementation source outside the released v7.0.0 or historical v6.0.0 tags: {linkMatch.Value}");
-            }
+    private static void ValidateImplementationLinkRef(
+        string relativePath,
+        int lineNumber,
+        string implementationRef,
+        string link,
+        List<string> errors)
+    {
+        if (implementationRef.Equals("v6.0.0", StringComparison.OrdinalIgnoreCase) &&
+            !HistoricalCompatibilityReferencePaths.Contains(relativePath))
+        {
+            errors.Add(
+                $"{relativePath}:{lineNumber} uses the historical v6.0.0 implementation ref outside an approved historical compatibility page: {link}");
+        }
+
+        if (!IsPinnedImplementationRef(implementationRef))
+        {
+            errors.Add(
+                $"{relativePath}:{lineNumber} links implementation source through unpinned ref '{implementationRef}': {link}");
         }
     }
 
@@ -412,6 +489,17 @@ static partial class AsiBackboneApiReferenceValidator
         int fenceLength = 0;
         var prose = new StringBuilder();
         var proseLines = new List<ProseLine>();
+
+        if (hasFrontMatter)
+        {
+            ValidateFrontMatterVersionClaims(
+                relativePath,
+                lines,
+                frontMatterEndIndex,
+                currentMajor,
+                errors);
+        }
+
         int firstContentLineIndex = hasFrontMatter ? frontMatterEndIndex + 1 : 0;
 
         for (int lineIndex = firstContentLineIndex; lineIndex < lines.Length; lineIndex++)
@@ -461,6 +549,83 @@ static partial class AsiBackboneApiReferenceValidator
         }
 
         ValidateProseBlock(relativePath, prose, proseLines, currentMajor, errors);
+    }
+
+    private static void ValidateFrontMatterVersionClaims(
+        string relativePath,
+        string[] lines,
+        int frontMatterEndIndex,
+        int currentMajor,
+        List<string> errors)
+    {
+        var prose = new StringBuilder();
+        var proseLines = new List<ProseLine>();
+        bool collectingUserFacingValue = false;
+
+        for (int lineIndex = 1; lineIndex < frontMatterEndIndex; lineIndex++)
+        {
+            string line = lines[lineIndex].TrimEnd('\r');
+            bool isTopLevel = line.Length > 0 && !char.IsWhiteSpace(line[0]);
+
+            if (isTopLevel)
+            {
+                ValidateProseBlock(relativePath, prose, proseLines, currentMajor, errors);
+                collectingUserFacingValue = false;
+
+                int separatorIndex = line.IndexOf(':');
+
+                if (separatorIndex <= 0 ||
+                    line[..separatorIndex] is not ("title" or "description" or "summary"))
+                {
+                    continue;
+                }
+
+                collectingUserFacingValue = true;
+                string value = line[(separatorIndex + 1)..].Trim();
+
+                if (IsYamlBlockScalarHeader(value))
+                {
+                    continue;
+                }
+
+                AppendProseLine(prose, proseLines, value, lineIndex + 1);
+                continue;
+            }
+
+            if (collectingUserFacingValue)
+            {
+                AppendProseLine(prose, proseLines, line, lineIndex + 1);
+            }
+        }
+
+        ValidateProseBlock(relativePath, prose, proseLines, currentMajor, errors);
+    }
+
+    private static bool IsYamlBlockScalarHeader(string value)
+    {
+        return value.Length > 0 &&
+               value[0] is '>' or '|' &&
+               value[1..].All(character => character is '+' or '-' || char.IsDigit(character));
+    }
+
+    private static void AppendProseLine(
+        StringBuilder prose,
+        List<ProseLine> proseLines,
+        string line,
+        int lineNumber)
+    {
+        if (string.IsNullOrWhiteSpace(line))
+        {
+            return;
+        }
+
+        if (prose.Length > 0)
+        {
+            prose.Append(' ');
+        }
+
+        proseLines.Add(new ProseLine(prose.Length, lineNumber));
+        prose.Append(line.Trim());
     }
 
     private static void ValidateProseBlock(
@@ -548,6 +713,55 @@ static partial class AsiBackboneApiReferenceValidator
         }
     }
 
+    private static void AssertPinnedImplementationRef(
+        string name,
+        string implementationRef,
+        bool expected,
+        List<string> failures)
+    {
+        bool actual = IsPinnedImplementationRef(implementationRef);
+
+        if (actual != expected)
+        {
+            failures.Add($"{name}: expected {expected}, found {actual} for '{implementationRef}'.");
+        }
+    }
+
+    private static void AssertImplementationLinkErrorCount(
+        string name,
+        string relativePath,
+        string link,
+        int expectedCount,
+        List<string> failures)
+    {
+        Match linkMatch = ImplementationLinkRegex().Match(link);
+
+        if (!linkMatch.Success)
+        {
+            failures.Add($"{name}: test link was not recognized as an implementation link.");
+            return;
+        }
+
+        var errors = new List<string>();
+        ValidateImplementationLinkRef(
+            relativePath,
+            1,
+            linkMatch.Groups["ref"].Value,
+            linkMatch.Value,
+            errors);
+
+        if (errors.Count != expectedCount)
+        {
+            failures.Add($"{name}: expected {expectedCount} error(s), found {errors.Count}.");
+        }
+    }
+
+    private static bool IsPinnedImplementationRef(string implementationRef)
+    {
+        return ReleasedImplementationRefs.Contains(implementationRef) ||
+               FullCommitShaRegex().IsMatch(implementationRef);
+    }
+
     private static bool IsVersionClaimExemptPath(string relativePath)
     {
         return string.Equals(relativePath, "CHANGELOG.md", StringComparison.Ordinal) ||
@@ -607,10 +821,10 @@ static partial class AsiBackboneApiReferenceValidator
                 continue;
             }
 
-            if (status.Equals("historical", StringComparison.OrdinalIgnoreCase) &&
-                expectedRef.Equals("main", StringComparison.OrdinalIgnoreCase))
+            if (!IsPinnedImplementationRef(expectedRef))
             {
-                errors.Add($"{relativePath} is historical and must use an immutable implementation ref, not main.");
+                errors.Add(
+                    $"{relativePath} declares unpinned implementation ref '{expectedRef}'. Use an approved release tag ({string.Join(", ", ReleasedImplementationRefs.Order())}) or a full 40-character commit SHA.");
             }
 
             bool isCurrentBoundary = relativePath.Equals(
@@ -634,12 +848,6 @@ static partial class AsiBackboneApiReferenceValidator
             else if (!status.Equals("historical", StringComparison.OrdinalIgnoreCase))
             {
                 errors.Add($"{relativePath} has unsupported asibackbone_status '{status}'. Use current or historical.");
-            }
-
-            if (!isCurrentBoundary && expectedRef.Equals("main", StringComparison.OrdinalIgnoreCase))
-            {
-                errors.Add(
-                    $"{relativePath} is a versioned compatibility page and must pin an immutable implementation ref instead of main.");
             }
 
             foreach (Match linkMatch in ImplementationLinkRegex().Matches(text))
