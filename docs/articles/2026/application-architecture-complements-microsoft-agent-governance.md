@@ -750,8 +750,10 @@ public sealed class RefundExecutor(
         // reservation the point at which both the decision's policy and the order state held.
         if (governance.CurrentPolicySet.Id != command.PolicySetId)
         {
-            await reservations.ReleaseAsync(command.OperationId, "policy_set_changed", CancellationToken.None);
-            return RefundResult.NotExecuted("stale_context");
+            // Not ReleaseAsync: nothing was sent to the provider, so this is a rollback that leaves
+            // the operation retryable under the same ID, not a terminal failure.
+            await reservations.RollBackAsync(command.OperationId, "policy_set_changed", CancellationToken.None);
+            return RefundResult.NotExecuted("policy_set_changed"); // re-run the whole flow, same operation ID
         }
 
         // Only after the reservation commits, call the provider with an idempotency key derived
@@ -796,11 +798,11 @@ public sealed class RefundExecutor(
 
 `ReserveAsync` is where the atomicity lives. In an EF Core implementation, it is a conditional `ExecuteUpdateAsync` on the order (matching tenant, order ID, expected revision, and a refundable balance that still covers the amount, then decrementing the balance and incrementing the revision), the insert of the Pending operation, the approval's conditional consume when the decision carries one (matching the decision's `ApprovalRequirement` exactly, still Approved, and unexpired, then marking it Consumed), and, when the decision carries an acknowledged warning, the same conditional consume of that acknowledgment (matching operation ID, fingerprint, and warning key, still unconsumed and unexpired), all inside one database transaction that commits before the provider is called. If any part fails, none of it happened, so a crash can never leave a reserved balance with no operation record or an approval that was used without a reservation.
 
-The finalization methods are just as conditional. `CompleteAsync` moves an operation from Pending or Unknown to Succeeded and records the provider reference. `ReleaseAsync` moves it from Pending or Unknown to Failed and restores the refundable balance in the same transaction, so the balance can be restored only once. `MarkUnknownAsync` moves it from Pending to Unknown and leaves the reservation in place. Reconciliation calls the same methods once it learns the provider's answer. If the process crashes before a finalization write lands, the operation is still Pending, and reconciliation treats a Pending operation older than its time budget exactly like an Unknown one.
+The finalization methods are just as conditional. `CompleteAsync` moves an operation from Pending or Unknown to Succeeded and records the provider reference. `ReleaseAsync` moves it from Pending or Unknown to Failed and restores the refundable balance in the same transaction, so the balance can be restored only once. `MarkUnknownAsync` moves it from Pending to Unknown and leaves the reservation in place. `RollBackAsync` is different from all three: it is valid only before the provider has been called, moves the operation from Pending to RolledBack, and restores the balance in the same transaction. RolledBack is not terminal. `ReserveAsync` accepts an operation that is either new or RolledBack, so the re-run keeps its operation ID, its idempotency key, and the approval and acknowledgment binding that depend on it. Reusing the key is safe precisely because the provider never saw it; Failed, by contrast, is terminal, and its operation ID is never reserved again. Reconciliation calls the same methods once it learns the provider's answer. If the process crashes before a finalization write lands, the operation is still Pending, and reconciliation treats a Pending operation older than its time budget exactly like an Unknown one.
 
 The risk check uses a revision when the risk system exposes one; if it does not, recheck the specific flags that would revoke permission. Because the risk system cannot join the order database's transaction, a short window remains between that read and the reservation. Where that window matters, ask the risk system for a lease or hold that it honors until the operation settles, or have the payment path check the hold itself, and document whatever window remains rather than assuming it away.
 
-The policy set gets the same treatment as the order and risk state. `RefundCommand.From` copies the decision's policy set ID into the command, and the executor compares it with the active policy set after the reservation commits but before the provider is called. A policy published between evaluation and that point turns the old allow into `stale_context`: the reservation is released and the flow re-runs under the new policy, which may deny, ask for approval, or allow again. Any approval or acknowledgment the reservation consumed stays consumed; it was bound to the old policy set and could not count under the new one anyway. Holding the runtime lease longer would not achieve this, because a lease keeps an old kernel alive but does not stop a new policy from becoming active. A policy that becomes active after the check governs the next refund, not one that is already reserved.
+The policy set gets the same treatment as the order and risk state. `RefundCommand.From` copies the decision's policy set ID into the command, and the executor compares it with the active policy set after the reservation commits but before the provider is called. A policy published between evaluation and that point turns the old allow into `policy_set_changed`: the reservation is rolled back and the flow re-runs under the new policy with the same operation ID, which may deny, ask for approval, or allow again. Any approval or acknowledgment the reservation consumed stays consumed; it was bound to the old policy set and could not count under the new one anyway. Holding the runtime lease longer would not achieve this, because a lease keeps an old kernel alive but does not stop a new policy from becoming active. A policy that becomes active after the check governs the next refund, not one that is already reserved.
 
 The reservation is deliberate. Reducing the refundable balance before calling the provider prevents two concurrent refunds from both spending the same balance, and the operation's recorded state decides what happens to that reservation afterward. A permanently failed refund gives the balance back; an unknown one holds it until reconciliation knows the answer.
 
@@ -839,7 +841,8 @@ Even in-process evaluation can fail. A policy file can fail to load or contain a
 | Evaluation exceeds its time budget (sidecar or remote backend) | `Unavailable` | A bounded retry with backoff | Treat a timeout as an allow |
 | A circuit breaker around evaluation is open | `Unavailable` | After the breaker's retry-after interval | Bypass the breaker for "important" calls |
 | A governance rate limit is reached | `Deferred` | After the window | Retry in a tight loop until a call gets through |
-| The order, risk state, or active policy set changed before execution | Not executed (`stale_context`) | Re-run the whole flow | Replay the old decision against the new state |
+| The order or risk state changed before execution | Not executed (`stale_context`) | Re-run the whole flow | Replay the old decision against the new state |
+| The active policy set changed after the reservation, before the provider call | Rolled back (`policy_set_changed`) | Re-run the whole flow with the same operation ID | Mark the operation Failed, or send with a new idempotency key |
 | The provider call timed out after sending | `Unknown` execution outcome | Reconcile using the same idempotency key | Decide again and send with a new key |
 
 Failure semantics can reasonably differ by risk, but only as an explicit, per-tool decision. Moving money fails closed with no exception. A read-only `orders.lookup` tool might, as a documented and recorded risk decision, fall back to ordinary application authorization while governance is unavailable. Express that choice in code for the specific tool; do not let a generic `catch` block turn every governance failure into "proceed."
@@ -1049,6 +1052,8 @@ public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial) : IDispos
     private readonly object gate = new(); // serializes Replace and Dispose
     private GovernanceRuntime current = initial;
     private int disposed;
+    private long requestedGeneration; // assigned when a Replace call starts
+    private long publishedGeneration; // generation of `current`; written only under the lock
 
     // Reading the ID needs no lease; it never touches the kernel.
     public PolicySetInfo CurrentPolicySet => Volatile.Read(ref current).PolicySet;
@@ -1070,9 +1075,14 @@ public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial) : IDispos
         }
     }
 
-    public void Replace(GovernanceSnapshot snapshot)
+    // Returns false when a newer Replace call has already published: the later request wins,
+    // however long each build takes.
+    public bool Replace(GovernanceSnapshot snapshot)
     {
         ObjectDisposedException.ThrowIf(Volatile.Read(ref disposed) == 1, this);
+
+        // The generation records the order in which replacements were requested.
+        long generation = Interlocked.Increment(ref requestedGeneration);
 
         // Build and verify outside the lock; it reads no shared state.
         GovernanceRuntime next = snapshot.CreateRuntime();
@@ -1086,9 +1096,17 @@ public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial) : IDispos
                 throw new ObjectDisposedException(nameof(GovernanceRuntimeHolder));
             }
 
+            if (generation < publishedGeneration)
+            {
+                next.Retire(); // a slower, older build never overwrites a newer published snapshot
+                return false;
+            }
+
             GovernanceRuntime previous = current;
+            publishedGeneration = generation;
             Volatile.Write(ref current, next);
             previous.Retire(); // disposed when its last in-flight evaluation releases its lease
+            return true;
         }
     }
 
@@ -1110,7 +1128,7 @@ public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial) : IDispos
 }
 ```
 
-At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation leases one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. The replaced runtime is retired rather than disposed: new evaluations can no longer lease it, and its kernel, with its metrics resources, is disposed when the last in-flight evaluation releases its lease. Evaluation is synchronous here, so a lease lasts only as long as one `EvaluateToolCall`. `Replace` and `Dispose` are serialized, so a replacement can never be published after the holder is disposed; one that loses that race is retired immediately, and once the holder is disposed, `Acquire` and `Replace` throw `ObjectDisposedException` instead of spinning on a retired runtime. The options file must not list `PolicyPaths`, because the package would load those files itself, outside the snapshot; `CreateOptions` rejects them. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
+At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation leases one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. The replaced runtime is retired rather than disposed: new evaluations can no longer lease it, and its kernel, with its metrics resources, is disposed when the last in-flight evaluation releases its lease. Evaluation is synchronous here, so a lease lasts only as long as one `EvaluateToolCall`. Each `Replace` call takes a generation number when it starts, and a build that finishes after a newer one has been published is retired instead of published, so concurrent replacements take effect in the order they were requested, not the order their builds happened to finish. `Replace` and `Dispose` are serialized, so a replacement can never be published after the holder is disposed; one that loses that race is retired immediately, and once the holder is disposed, `Acquire` and `Replace` throw `ObjectDisposedException` instead of spinning on a retired runtime. The options file must not list `PolicyPaths`, because the package would load those files itself, outside the snapshot; `CreateOptions` rejects them. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
 
 Keep secrets and raw model text out of the decision record, and never read the record back as permission. Evidence explains what happened; it does not authorize what happens next. [Your Audit Log Records the Story, Not the Decision](your-audit-log-is-not-evidence.md) covers the difference between a log line and evidence that can be trusted later.
 
@@ -1321,7 +1339,7 @@ public sealed class AgentGovernanceRefundPolicyContractTests
 }
 ```
 
-The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, and the governance event still carries the host's operation ID. Add an executor test that publishes a new policy set between evaluation and reservation and expects `stale_context` with zero provider calls, approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
+The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, and the governance event still carries the host's operation ID. Add an executor test that publishes a new policy set between evaluation and reservation and expects `policy_set_changed`, a RolledBack operation that can be reserved again, and zero provider calls, a holder test showing that an older snapshot finishing its build last does not replace a newer one, approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
 
 ## Common Failure Modes
 
