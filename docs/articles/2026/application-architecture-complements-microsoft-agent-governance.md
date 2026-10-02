@@ -297,22 +297,23 @@ public sealed record ApprovalRequirement(
         new(context.OperationId,
             context.ProposalFingerprint,
             decision.PolicySetId,
-            decision.MatchedPolicy
-                ?? throw new InvalidOperationException("An approval rule from an unnamed policy cannot be satisfied."),
-            decision.MatchedRule
-                ?? throw new InvalidOperationException("An unnamed approval rule cannot be satisfied."),
+            Named(decision.MatchedPolicy, "An approval rule from an unnamed policy cannot be satisfied."),
+            Named(decision.MatchedRule, "An unnamed approval rule cannot be satisfied."),
             CanonicalGroups(decision.RequiredApprovers),
             context.AssistantAgentId,
             context.RiskTier);
 
+    private static string Named(string? value, string error) =>
+        string.IsNullOrWhiteSpace(value) ? throw new InvalidOperationException(error) : value;
+
     // Sorted, de-duplicated, length-prefixed: the same set of groups always yields the same string.
-    // A rule that names no approver group cannot be satisfied, so it fails closed here.
+    // A rule that names no approver group, or any blank one, cannot be satisfied, so it fails closed here.
     private static string CanonicalGroups(IReadOnlyList<string>? groups) =>
-        groups is { Count: > 0 }
+        groups is { Count: > 0 } && !groups.Any(string.IsNullOrWhiteSpace)
             ? string.Concat(groups.Distinct(StringComparer.Ordinal)
                                   .Order(StringComparer.Ordinal)
                                   .Select(g => $"{g.Length}:{g};"))
-            : throw new InvalidOperationException("An approval rule without approvers cannot be satisfied.");
+            : throw new InvalidOperationException("An approval rule without valid approvers cannot be satisfied.");
 
     public IReadOnlyList<string> ApproverGroupNames() =>
         ApproverGroups.Length == 0 ? [] : ParseGroups(ApproverGroups);
@@ -394,12 +395,15 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceRuntimeHolder runtimes
 
             return decision.Outcome switch
             {
-                // An approval requirement that names no policy, rule, or approver can never be
-                // satisfied. Fail closed here instead of opening a request nobody can decide.
+                // An approval requirement with a missing or blank policy name, rule name, or
+                // approver entry can never be satisfied. Fail closed here instead of opening a
+                // request nobody can decide. Blank counts as missing: the loader accepts "" and " ".
                 GovernedOutcome.ApprovalRequired when
-                    decision.MatchedPolicy is null
-                    || decision.MatchedRule is null
-                    || result.PolicyDecision?.Approvers?.Any() != true =>
+                    string.IsNullOrWhiteSpace(decision.MatchedPolicy)
+                    || string.IsNullOrWhiteSpace(decision.MatchedRule)
+                    || result.PolicyDecision?.Approvers is not { } approvers
+                    || !approvers.Any()
+                    || approvers.Any(string.IsNullOrWhiteSpace) =>
                     Decide(GovernedOutcome.Unavailable, "approval_rule_without_approvers",
                         decision.MatchedPolicy, decision.MatchedRule, policySetId),
 
@@ -433,7 +437,7 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceRuntimeHolder runtimes
 
             // Application choice: a governance warning on a refund needs explicit confirmation.
             // A verified acknowledgment of this exact warning, under this policy set, completes it.
-            (true, "warn") when policy is not null && rule is not null
+            (true, "warn") when !string.IsNullOrWhiteSpace(policy) && !string.IsNullOrWhiteSpace(rule)
                              && context.AcknowledgedWarnings.Contains(WarningKeys.For(policySetId, policy, rule)) =>
                 Decide(GovernedOutcome.Allowed, "warning_acknowledged", policy, rule, policySetId)
                     with { AcknowledgedWarning = WarningKeys.For(policySetId, policy, rule) },
@@ -486,7 +490,7 @@ A few choices in that mapping are deliberate:
 - **Rate limiting has two states.** In current releases, a call that matches a `rate_limit` rule while its window still has room comes back with `Allowed == true` and the action `rate_limit`; once the limit is exhausted, it comes back with `Allowed == false` and `rate_limited`. The first is an ordinary allow. The second is `Deferred`: the refund is valid but must wait. Mapping only one of them would either defer allowed calls or let exhausted ones fall through to a plain denial.
 - **Unrecognized blocks are denials; unrecognized allows are unavailable.** A preview package can add policy actions. If a call is blocked for a reason the adapter does not know, it stays blocked. If a call is allowed by a decision the adapter cannot explain, the application refuses to treat that as permission.
 - **A block can arrive without the policy decision you expect.** Microsoft documents that ring checks and prompt-injection checks, when enabled, run before policy evaluation. The `(false, _)` arm treats any such block as a denial without depending on which check produced it.
-- **Treating `warn` as acknowledgment is an application decision.** The library says the call may proceed with a flag. For money movement, this application chooses to make the support agent confirm the warning first. That choice needs a completion path, or every re-evaluation would ask again forever: once the support agent confirms, the host records an acknowledgment bound to the proposal fingerprint and a warning key made of the policy set ID, the matched policy's name, and the matched rule's name; rule names are unique only within a policy, so the policy name keeps one policy's acknowledged warning from satisfying another policy's rule of the same name. The next evaluation sees that key in `AcknowledgedWarnings` and allows the refund, and the executor consumes the acknowledgment atomically when it reserves the balance. An acknowledgment of a different warning, a different refund, or a policy set that has since changed does not count, and a warning from an unnamed policy or rule can never be acknowledged. A read-only tool might simply log it.
+- **Treating `warn` as acknowledgment is an application decision.** The library says the call may proceed with a flag. For money movement, this application chooses to make the support agent confirm the warning first. That choice needs a completion path, or every re-evaluation would ask again forever: once the support agent confirms, the host records an acknowledgment bound to the proposal fingerprint and a warning key made of the policy set ID, the matched policy's name, and the matched rule's name; rule names are unique only within a policy, so the policy name keeps one policy's acknowledged warning from satisfying another policy's rule of the same name. The next evaluation sees that key in `AcknowledgedWarnings` and allows the refund, and the executor consumes the acknowledgment atomically when it reserves the balance. An acknowledgment of a different warning, a different refund, or a policy set that has since changed does not count, and a warning from a policy or rule with a missing or blank name can never be acknowledged. A read-only tool might simply log it.
 - **Not every outcome comes from the library.** `Escalated` comes from the host's own fraud-hold rule, shown in the next section. The outcome type describes the application's control flow, not one component's vocabulary.
 
 ## Keep the Protected Side Effect Behind the Boundary
@@ -618,6 +622,25 @@ public static class GovernanceStartupChecks
                 "No agent-governance policies are loaded. Refusing to start.");
         }
 
+        // Name check: the loader accepts blank policy and rule names, and blank approver entries,
+        // but approvals and acknowledgments are bound to these names. Reject them before anything runs.
+        var blankNames = policies
+            .SelectMany(policy =>
+                (string.IsNullOrWhiteSpace(policy.Name) ? ["a policy with a blank name"] : Array.Empty<string>())
+                .Concat(policy.Rules
+                    .Where(rule => string.IsNullOrWhiteSpace(rule.Name))
+                    .Select(_ => $"a rule with a blank name in '{policy.Name}'"))
+                .Concat(policy.Rules
+                    .Where(rule => rule.Approvers?.Any(string.IsNullOrWhiteSpace) == true)
+                    .Select(rule => $"a blank approver in '{policy.Name}/{rule.Name}'")))
+            .ToList();
+
+        if (blankNames.Count > 0)
+        {
+            throw new InvalidOperationException(
+                $"Agent-governance configuration has blank identifiers: {string.Join("; ", blankNames)}. Refusing to start.");
+        }
+
         // Identity check: the package accepts duplicate rule names, but parts of it resolve rule
         // configuration (such as a rate limit's Limit) by rule name alone, and approvals and warning
         // acknowledgments here are bound to the rule. Until every package lookup is scoped to
@@ -658,7 +681,7 @@ public static class GovernanceStartupChecks
 }
 ```
 
-Run the checks with the same `GovernanceOptions` that production uses. Each answers a different question. The policy count confirms that something was loaded. The identity check confirms that every rule name is unique across the whole policy set. The package's loader accepts duplicates, and the current .NET middleware resolves some rule configuration, such as a rate limit's `Limit`, by rule name alone, so a match in one policy could be enforced with another policy's settings, and two rules sharing a name could share one approval or acknowledgment. Approvals and acknowledgments still carry the policy name as well; the stricter uniqueness rule only removes the ambiguity in the package's own lookups, and can be relaxed to (policy, rule) pairs once every lookup in the version you pin is scoped that way. The `DefaultAction` check confirms the configuration: a probe alone cannot, because a policy with `default_action: allow` and a rule that happens to deny the probe tool would still return `Allowed == false`. The probe confirms the effective behavior under the real options. None of them verifies individual rules; the adapter contract tests later in this article cover those.
+Run the checks with the same `GovernanceOptions` that production uses. Each answers a different question. The policy count confirms that something was loaded. The name check rejects blank policy names, blank rule names, and blank approver entries, which the loader accepts but which could never identify an approval or acknowledgment. The identity check confirms that every rule name is unique across the whole policy set. The package's loader accepts duplicates, and the current .NET middleware resolves some rule configuration, such as a rate limit's `Limit`, by rule name alone, so a match in one policy could be enforced with another policy's settings, and two rules sharing a name could share one approval or acknowledgment. Approvals and acknowledgments still carry the policy name as well; the stricter uniqueness rule only removes the ambiguity in the package's own lookups, and can be relaxed to (policy, rule) pairs once every lookup in the version you pin is scoped that way. The `DefaultAction` check confirms the configuration: a probe alone cannot, because a policy with `default_action: allow` and a rule that happens to deny the probe tool would still return `Allowed == false`. The probe confirms the effective behavior under the real options. None of them verifies individual rules; the adapter contract tests later in this article cover those.
 
 ## Policy Verdicts Are Not Approval, Acknowledgment, or Execution Permission
 
@@ -707,7 +730,7 @@ public sealed record RefundAcknowledgment(
 
 `GetVerifiedWarningKeysAsync` returns only keys whose acknowledgment is unexpired and unconsumed, and the consume at execution checks the expiry again, so an acknowledgment that lapses between evaluation and reservation does not count. The person confirming is the acting support agent; acknowledgment proves awareness of a specific warning, not authority.
 
-The policy rule names the approver group, as `approvers: [support-supervisors]` does above, and the adapter carries that list from the package's decision into `GovernedDecision.RequiredApprovers` and from there into the stored `ApprovalRequirement`. The host never looks the policy up a second time, so the groups it enforces are exactly the groups the rule declared when it required approval. When a supervisor decides, the workflow checks, at that moment, that the person belongs to one of `Requirement.ApproverGroupNames()` for this tenant, rejects self-approval, and records the group it checked. A rule that requires approval but names no approver, or comes from an unnamed policy or rule, can never be satisfied, so the adapter maps it to `Unavailable` and no approval request is ever opened; `ApprovalRequirement.For` refuses to build a requirement for it as a second guard.
+The policy rule names the approver group, as `approvers: [support-supervisors]` does above, and the adapter carries that list from the package's decision into `GovernedDecision.RequiredApprovers` and from there into the stored `ApprovalRequirement`. The host never looks the policy up a second time, so the groups it enforces are exactly the groups the rule declared when it required approval. When a supervisor decides, the workflow checks, at that moment, that the person belongs to one of `Requirement.ApproverGroupNames()` for this tenant, rejects self-approval, and records the group it checked. A rule that requires approval but names no approver or a blank one, or comes from a policy or rule with a missing or blank name, can never be satisfied, so the adapter maps it to `Unavailable` and no approval request is ever opened; `ApprovalRequirement.For` refuses to build a requirement for it as a second guard.
 
 When the supervisor approves, the continuation does not replay the original decision. It starts again from current facts:
 
@@ -1378,6 +1401,14 @@ public sealed class AgentGovernanceRefundPolicyContractTests
     }
 
     [Fact]
+    public void Startup_rejects_blank_policy_rule_and_approver_names()
+    {
+        // A policy whose require_approval rule declares approvers: [" "].
+        Assert.Throws<InvalidOperationException>(
+            () => TestGovernance.Runtime(TestPolicies.ApprovalRuleWithBlankApprover));
+    }
+
+    [Fact]
     public void Startup_rejects_a_rule_name_reused_in_another_policy()
     {
         // A second policy, with a different policy name, that also declares a rule
@@ -1390,7 +1421,7 @@ public sealed class AgentGovernanceRefundPolicyContractTests
 }
 ```
 
-The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, a rule name reused in another policy stops startup, and the governance event still carries the host's operation ID. Add an executor test that publishes a new policy set between evaluation and reservation and expects `policy_set_changed`, a RolledBack operation that can be reserved again, and zero provider calls, a holder test showing that an older snapshot finishing its build last does not replace a newer one, approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
+The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, blank identifiers and a rule name reused in another policy stop startup, and the governance event still carries the host's operation ID. Add an executor test that publishes a new policy set between evaluation and reservation and expects `policy_set_changed`, a RolledBack operation that can be reserved again, and zero provider calls, a holder test showing that an older snapshot finishing its build last does not replace a newer one, approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
 
 ## Common Failure Modes
 
@@ -1436,7 +1467,7 @@ Before a governed agent action reaches a consequential side effect, confirm that
 2. **Each rule has one owner.** Domain invariants live in the application; agent-specific governance rules live in the policy.
 3. **The verdict is translated, not collapsed.** Approval-required, deferred, escalated, acknowledgment-required, and unavailable remain distinct, and unrecognized decisions never become permission.
 4. **Application authorization runs explicitly,** and only `Allowed` reaches the executor, which is reachable only through the gateway.
-5. **Governance is verified at startup.** At least one policy is loaded, every rule name is unique across the policy set, every loaded policy declares `default_action: deny`, an unregistered tool is actually denied, and the kernel and its policy set ID both come from one immutable snapshot of the package version, options, and policy files.
+5. **Governance is verified at startup.** At least one policy is loaded, no policy name, rule name, or approver entry is blank, every rule name is unique across the policy set, every loaded policy declares `default_action: deny`, an unregistered tool is actually denied, and the kernel and its policy set ID both come from one immutable snapshot of the package version, options, and policy files.
 6. **Approval and acknowledgment are host workflow state.** An approval is looked up only after evaluation names the requirement, and it is bound to that exact requirement (operation, proposal fingerprint, policy set, policy, rule, declared approver groups, assistant, and risk tier), checked again at consumption. Both have expiry, eligibility, and single use. An acknowledgment is bound to the proposal fingerprint, the specific warning, and the policy set, so an acknowledged warning completes instead of being requested again.
 7. **Execution revalidates every mutable fact that could revoke permission,** reserves before calling out, and bounds execution authority only where delay or delegation requires it.
 8. **Failure semantics are explicit per tool.** An ambiguous governance result never authorizes execution, and an ambiguous execution outcome is reconciled before any new execution attempt.
