@@ -12,6 +12,11 @@ Learning releases are archival and citation snapshots of educational material. T
 - Published [Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?](docs/articles/2026/authorization-vs-approval-vs-acknowledgment.md), a practitioner guide that separates authorization, approval, acknowledgment, and execution permission, with an execution-time check and tests showing that none of them silently becomes permission to run a delayed operation (#375).
 - Published [What Should an AI Tool Gateway Validate Before Execution?](docs/articles/2026/validate-ai-tool-call-before-execution.md), an ordered host-side acceptance checklist for AI tool calls with code and tests that prove rejected proposals never reach the executor (#371).
 
+### Changed
+
+- Pinned every workflow job to `ubuntu-24.04` instead of `ubuntu-latest`, which GitHub migrates to Ubuntu 26 beginning October 19, 2026. Moving to a newer runner image is now an explicit, reviewable change.
+- Dependabot commit messages use the prefix `chore` with the dependency scope, producing `chore(deps): ...` instead of `chore(deps)(deps): ...`.
+
 ### Fixed
 
 - Pull request and push link validation now accepts HTTP 503, so a transient outage on a third-party host no longer fails an unrelated change. The weekly scheduled run keeps the strict accept list and still reports links that stay unavailable.

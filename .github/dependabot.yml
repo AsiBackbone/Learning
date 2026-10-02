@@ -16,7 +16,7 @@ updates:
       default-days: 7
     open-pull-requests-limit: 5
     commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore"
       include: "scope"
     groups:
       nuget-dependencies:
@@ -36,7 +36,7 @@ updates:
       default-days: 7
     open-pull-requests-limit: 5
     commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore"
       include: "scope"
     groups:
       github-actions:
