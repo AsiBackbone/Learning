@@ -75,6 +75,8 @@ Model sees registered tools
 
 Tool visibility and registration reduce proposal surface. They do not automatically prove permission for every resource and argument reachable by a tool.
 
+For a concrete .NET walkthrough of this composition with a runtime agent-governance library, see [How Application Architecture Complements Microsoft.AgentGovernance](../articles/2026/application-architecture-complements-microsoft-agent-governance.md), which follows one AI-proposed refund from policy evaluation through approval, revalidation, protected execution, and evidence.
+
 ### API gateway plus application decision
 
 ~~~text

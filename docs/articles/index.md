@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Microsoft.AgentGovernance and host application architecture | [How Application Architecture Complements Microsoft.AgentGovernance](2026/application-architecture-complements-microsoft-agent-governance.md) |
 | Policy-as-code, policy engines, and remote policy services in ASP.NET Core | [Policy as Code in ASP.NET Core Without Overengineering](2026/policy-as-code-aspnet-core-without-overengineering.md) |
 | Authorization, approval, acknowledgment, and delayed execution | [Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?](2026/authorization-vs-approval-vs-acknowledgment.md) |
 | Validating AI tool calls before execution | [What Should an AI Tool Gateway Validate Before Execution?](2026/validate-ai-tool-call-before-execution.md) |
@@ -40,6 +41,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [How Application Architecture Complements Microsoft.AgentGovernance](2026/application-architecture-complements-microsoft-agent-governance.md)
+
+**Christopher D. Cavell** · **October 2, 2026**
+
+Microsoft.AgentGovernance gives .NET teams deterministic runtime policy evaluation for agent actions. That verdict is strongest when the surrounding application still owns authoritative context, workflow state, protected execution, failure handling, and evidence. This guide follows one AI-proposed refund through a host-owned control flow and shows where the governance verdict belongs.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/application-architecture-complements-microsoft-agent-governance.html`
 
 ### [Policy as Code in ASP.NET Core Without Overengineering](2026/policy-as-code-aspnet-core-without-overengineering.md)
 
