@@ -143,7 +143,35 @@ public sealed record RefundContext(
     bool FraudHold,
     long RiskRevision,         // the risk snapshot the decision was based on
     RiskTier RiskTier,
-    ApprovalState Approval);   // host-verified, bound to this operation
+    string ProposalFingerprint, // binds approval to this exact refund
+    ApprovalState Approval);    // host-verified against the fingerprint
+
+public static class RefundProposalFingerprint
+{
+    // Length-prefixed fields, so no value can run into its neighbor, and a version tag,
+    // so changing the canonical form can never silently match approvals made under the old one.
+    public static string Compute(
+        string tenantId, string orderId, long orderRevision,
+        long amountMinor, string currency, RefundReason reason)
+    {
+        var canonical = new StringBuilder("refund-proposal/v1");
+        foreach (string field in new[]
+        {
+            tenantId,
+            orderId,
+            orderRevision.ToString(CultureInfo.InvariantCulture),
+            amountMinor.ToString(CultureInfo.InvariantCulture),
+            currency.ToUpperInvariant(),
+            reason.ToString(),
+        })
+        {
+            canonical.Append('|').Append(field.Length).Append(':').Append(field);
+        }
+
+        byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(canonical.ToString()));
+        return "v1:" + Convert.ToHexString(hash).ToLowerInvariant();
+    }
+}
 
 public sealed class RefundContextResolver(IOrderStore orders, IRiskStore risk, IApprovalStore approvals)
 {
@@ -159,10 +187,14 @@ public sealed class RefundContextResolver(IOrderStore orders, IRiskStore risk, I
         long amountMinor = Money.ToMinorUnits(proposal.Amount, proposal.Currency);
         RiskSnapshot snapshot = await risk.GetAsync(session.TenantId, order.CustomerId, ct);
 
-        // Verified only for an unexpired approval by an eligible supervisor
-        // that covers this operation, this amount, and this order revision.
-        ApprovalState approval = await approvals.GetStateAsync(
-            operationId, amountMinor, order.Revision, ct);
+        // The fingerprint is recomputed from current, host-resolved values on every resolution.
+        string fingerprint = RefundProposalFingerprint.Compute(
+            session.TenantId, order.Id, order.Revision, amountMinor, proposal.Currency, proposal.Reason);
+
+        // Verified only for an unexpired approval by an eligible supervisor whose stored
+        // fingerprint equals this one. Changing the order, revision, amount, currency, or
+        // reason while reusing the operation ID produces a different fingerprint: no match.
+        ApprovalState approval = await approvals.GetStateAsync(operationId, fingerprint, ct);
 
         return new RefundContext(
             operationId,
@@ -180,6 +212,7 @@ public sealed class RefundContextResolver(IOrderStore orders, IRiskStore risk, I
             snapshot.FraudHold,
             snapshot.Revision,
             snapshot.Tier,
+            fingerprint,
             approval);
     }
 }
@@ -189,7 +222,7 @@ Three details carry the design:
 
 - **The order and tenant come from the host.** The conversation was opened for one order and the session belongs to one tenant. A tool argument that names a different order or tenant is ignored, not trusted because it parsed.
 - **Two identities, two owners.** `AssistantAgentId` is the identity the governance library reasons about: which agent is acting, at which trust level. The support agent and the tenant are application identity semantics that the library does not own. Governance can restrict what this assistant may do; application authorization, for example ordinary ASP.NET Core resource-based authorization, decides what this person may do for this tenant and this order. You usually need both.
-- **Approval is looked up, never proposed.** The approval state comes from the host's own store, bound to the operation, the amount, and the order revision. Nothing the model writes can turn it into `Verified`.
+- **Approval is looked up, never proposed.** The approval state comes from the host's own store, and it is `Verified` only when the stored approval's fingerprint equals one recomputed from the current tenant, order, revision, amount, currency, and reason. Reusing an operation ID for a different refund produces a different fingerprint and no match. Nothing the model writes can turn it into `Verified`.
 
 The governance policy then sees only host-built values. Here is a policy in the `governance.toolkit/v1` format that Microsoft documents for the .NET engine:
 
@@ -269,7 +302,7 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicyS
                 toolName: "orders.refund",
                 args: new()
                 {
-                    ["operation_id"] = context.OperationId.ToString("N"), // correlation only, never a policy input
+                    ["operation_id"] = context.OperationId.ToString("N"), // correlation only; policy rules must not depend on it
                     ["tenant_id"] = context.TenantId,
                     ["amount_minor"] = context.AmountMinor,
                     ["currency"] = context.Currency,
@@ -477,7 +510,7 @@ Several decisions in this flow sound like permission. They answer different ques
 | --- | --- | --- | --- | --- |
 | Governance verdict | Is this agent permitted to take this action under the current governance rules? | `Microsoft.AgentGovernance` | The evaluated input and the loaded policy set | The moment of evaluation |
 | Application authorization | May this support agent act on this order for this tenant? | The application, for example ASP.NET Core authorization | User, tenant, and resource | The request |
-| Approval | Has an eligible supervisor approved this exact refund? | Host workflow | Operation, amount, order revision, and approver | Until it expires or is used |
+| Approval | Has an eligible supervisor approved this exact refund? | Host workflow | Operation, proposal fingerprint, and approver | Until it expires or is used |
 | Acknowledgment | Has the support agent confirmed this specific warning? | Host workflow | Operation and the warning shown | Until it is used |
 | Execution permission | Is the refund still permitted against the current state? | Executor revalidation | Current order state | The conditional write |
 
@@ -492,7 +525,7 @@ Keep long-running state out of the evaluator. Microsoft documents the .NET polic
 ```csharp
 public sealed record RefundApproval(
     Guid OperationId,
-    string ProposalFingerprint,  // versioned hash of order, revision, amount, currency, and reason
+    string ProposalFingerprint,  // RefundProposalFingerprint: tenant, order, revision, amount, currency, reason
     long OrderRevision,
     long AmountMinor,
     string RequestedBy,          // the support agent who asked
@@ -587,7 +620,7 @@ public sealed class RefundExecutor(IRefundReservations reservations, IRiskStore 
 }
 ```
 
-`ReserveAsync` is where the atomicity lives. In an EF Core implementation, it is a conditional `ExecuteUpdateAsync` on the order (matching tenant, order ID, expected revision, and a refundable balance that still covers the amount, then decrementing the balance and incrementing the revision), the insert of the Pending operation, and the approval's conditional consume, all inside one database transaction that commits before the provider is called. If any part fails, none of it happened, so a crash can never leave a reserved balance with no operation record or an approval that was used without a reservation.
+`ReserveAsync` is where the atomicity lives. In an EF Core implementation, it is a conditional `ExecuteUpdateAsync` on the order (matching tenant, order ID, expected revision, and a refundable balance that still covers the amount, then decrementing the balance and incrementing the revision), the insert of the Pending operation, and the approval's conditional consume (matching operation ID and proposal fingerprint, still Approved, and unexpired, then marking it Consumed), all inside one database transaction that commits before the provider is called. If any part fails, none of it happened, so a crash can never leave a reserved balance with no operation record or an approval that was used without a reservation.
 
 The finalization methods are just as conditional. `CompleteAsync` moves an operation from Pending or Unknown to Succeeded and records the provider reference. `ReleaseAsync` moves it from Pending or Unknown to Failed and restores the refundable balance in the same transaction, so the balance can be restored only once. `MarkUnknownAsync` moves it from Pending to Unknown and leaves the reservation in place. Reconciliation calls the same methods once it learns the provider's answer. If the process crashes before a finalization write lands, the operation is still Pending, and reconciliation treats a Pending operation older than its time budget exactly like an Unknown one.
 
@@ -650,7 +683,7 @@ Four kinds of records describe this flow. They are often stored in different pla
 
 Microsoft states plainly that the toolkit's audit trail records attempts, not outcomes. Execution evidence is therefore the application's job. Telemetry supports diagnosis, but it is sampled, aggregated, and retention-managed; it is not a reliable answer to "who approved refund 7f3c, under which policy, and did the money move?"
 
-Correlate the records through the operation ID that the host assigns. The decision, workflow, and execution records all carry it, and the adapter passes it into the evaluated arguments as `operation_id`, so the governance event emitted for that evaluation carries the same key instead of only the package's own identifiers. No policy rule should read it; it is there for correlation. Because the package is in preview, the adapter contract tests later in this article confirm that the event your pinned version emits still contains it. Also record which policy set was actually loaded. The host knows which files it gave the kernel, so it can identify them at startup:
+Correlate the records through the operation ID that the host assigns. The decision, workflow, and execution records all carry it, and the adapter passes it into the evaluated arguments as `operation_id`, so the governance event emitted for that evaluation carries the same key, inside its recorded arguments, instead of only the package's own identifiers. The package merges every argument into the policy evaluation context, so nothing stops a rule from reading it; keeping rules independent of it is a convention for policy authors, and the value is there only for correlation. Because the package is in preview, the adapter contract tests later in this article confirm that the event your pinned version emits still contains it. Also record which policy set was actually loaded. The host knows which files it gave the kernel, so it can identify them at startup:
 
 ```csharp
 public sealed record PolicySetInfo(string Id)
@@ -806,7 +839,10 @@ public sealed class AgentGovernanceRefundPolicyContractTests
 
         string expected = context.OperationId.ToString("N");
         Assert.Contains(events, e =>
-            e.Data.TryGetValue("operation_id", out object? id) && Equals(id, expected));
+            e.Data.TryGetValue("arguments", out object? args) &&
+            args is IReadOnlyDictionary<string, object> arguments &&
+            arguments.TryGetValue("operation_id", out object? id) &&
+            Equals(id, expected));
     }
 
     [Fact]
@@ -821,7 +857,7 @@ public sealed class AgentGovernanceRefundPolicyContractTests
 }
 ```
 
-The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, a permissive default cannot hide behind a denied probe, and the governance event still carries the host's operation ID. Add executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
+The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, a permissive default cannot hide behind a denied probe, and the governance event still carries the host's operation ID. Add approval-store tests showing that an approval reused with a different amount, currency, reason, order, or revision is not `Verified`, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
 
 ## Common Failure Modes
 
@@ -868,7 +904,7 @@ Before a governed agent action reaches a consequential side effect, confirm that
 3. **The verdict is translated, not collapsed.** Approval-required, deferred, escalated, acknowledgment-required, and unavailable remain distinct, and unrecognized decisions never become permission.
 4. **Application authorization runs explicitly,** and only `Allowed` reaches the executor, which is reachable only through the gateway.
 5. **Governance is verified at startup.** At least one policy is loaded, every loaded policy declares `default_action: deny`, an unregistered tool is actually denied, and the set is identified by a policy set ID.
-6. **Approval and acknowledgment are host workflow state,** bound to operation, amount, and revision, with expiry, eligibility, and single use.
+6. **Approval and acknowledgment are host workflow state,** bound to the operation and a proposal fingerprint recomputed at lookup and again at consumption, with expiry, eligibility, and single use.
 7. **Execution revalidates every mutable fact that could revoke permission,** reserves before calling out, and bounds execution authority only where delay or delegation requires it.
 8. **Failure semantics are explicit per tool.** An ambiguous governance result never authorizes execution, and an ambiguous execution outcome is reconciled before any new execution attempt.
 9. **Evidence binds policy, workflow, and execution records** through the operation ID; telemetry is not treated as evidence.
