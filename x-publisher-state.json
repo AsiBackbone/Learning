@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "account": "jackdaw-patio",
-  "cursorSha": "8563bd8fcbed9c86a339a29eea60566d9e88f412",
+  "cursorSha": "667651f8dff9ac58eb0c6ea91a92ef1ca39e2470",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
@@ -17,6 +17,11 @@
       "sourceBlobSha": "3393dba5f4714a70589d8481b734db521dc59ba8",
       "postId": "2105250555522433127",
       "postedAtUtc": "2026-09-30T10:57:00.9245124+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/application-architecture-complements-microsoft-agent-governance.html": {
+      "sourceBlobSha": "6d24c7735cccfa765ee04d5eafee7675a0fecee5",
+      "postId": "2106141504100315233",
+      "postedAtUtc": "2026-10-02T21:57:19.5983297+00:00"
     }
   }
 }
