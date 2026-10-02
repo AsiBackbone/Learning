@@ -127,7 +127,7 @@ public sealed record RefundProposal(decimal Amount, string Currency, RefundReaso
 
 public sealed record RefundContext(
     Guid OperationId,
-    string AssistantAgentId,   // registered assistant identity, from configuration
+    string AssistantAgentId,   // registered assistant DID from configuration, e.g. did:mesh:support-assistant
     string SupportAgentId,     // the authenticated person
     string TenantId,           // from the authenticated session
     string OrderId,            // from the conversation, never from tool arguments
@@ -671,7 +671,9 @@ public static class GovernanceStartupChecks
         }
 
         // Behavior check: an unregistered tool must actually be denied with these options.
-        var probe = kernel.EvaluateToolCall("startup-probe", "governance.unregistered-probe-tool");
+        // The kernel rejects agent IDs that are not DIDs (did:mesh:, legacy did:agentmesh:, or
+        // did:mcp:), so the probe needs a syntactically valid one to test policy behavior at all.
+        var probe = kernel.EvaluateToolCall("did:mesh:startup-probe", "governance.unregistered-probe-tool");
         if (probe.Allowed)
         {
             throw new InvalidOperationException(
@@ -681,7 +683,7 @@ public static class GovernanceStartupChecks
 }
 ```
 
-Run the checks with the same `GovernanceOptions` that production uses. Each answers a different question. The policy count confirms that something was loaded. The name check rejects blank policy names, blank rule names, and blank approver entries, which the loader accepts but which could never identify an approval or acknowledgment. The identity check confirms that every rule name is unique across the whole policy set. The package's loader accepts duplicates, and the current .NET middleware resolves some rule configuration, such as a rate limit's `Limit`, by rule name alone, so a match in one policy could be enforced with another policy's settings, and two rules sharing a name could share one approval or acknowledgment. Approvals and acknowledgments still carry the policy name as well; the stricter uniqueness rule only removes the ambiguity in the package's own lookups, and can be relaxed to (policy, rule) pairs once every lookup in the version you pin is scoped that way. The `DefaultAction` check confirms the configuration: a probe alone cannot, because a policy with `default_action: allow` and a rule that happens to deny the probe tool would still return `Allowed == false`. The probe confirms the effective behavior under the real options. None of them verifies individual rules; the adapter contract tests later in this article cover those.
+Run the checks with the same `GovernanceOptions` that production uses. Each answers a different question. The policy count confirms that something was loaded. The name check rejects blank policy names, blank rule names, and blank approver entries, which the loader accepts but which could never identify an approval or acknowledgment. The identity check confirms that every rule name is unique across the whole policy set. The package's loader accepts duplicates, and the current .NET middleware resolves some rule configuration, such as a rate limit's `Limit`, by rule name alone, so a match in one policy could be enforced with another policy's settings, and two rules sharing a name could share one approval or acknowledgment. Approvals and acknowledgments still carry the policy name as well; the stricter uniqueness rule only removes the ambiguity in the package's own lookups, and can be relaxed to (policy, rule) pairs once every lookup in the version you pin is scoped that way. The `DefaultAction` check confirms the configuration: a probe alone cannot, because a policy with `default_action: allow` and a rule that happens to deny the probe tool would still return `Allowed == false`. The probe confirms the effective behavior under the real options; it uses a well-formed `did:mesh:` agent ID because the kernel rejects agent IDs that are not DIDs before any policy runs, which would otherwise make the check fail for every configuration, valid or not. The assistant's own configured agent ID must be a DID for the same reason. None of them verifies individual rules; the adapter contract tests later in this article cover those.
 
 ## Policy Verdicts Are Not Approval, Acknowledgment, or Execution Permission
 
