@@ -125,8 +125,6 @@ Resolve the context first, then build the evaluation input from it:
 ```csharp
 public sealed record RefundProposal(decimal Amount, string Currency, RefundReason Reason);
 
-public enum ApprovalState { None, Pending, Verified }
-
 public sealed record RefundContext(
     Guid OperationId,
     string AssistantAgentId,   // registered assistant identity, from configuration
@@ -144,7 +142,6 @@ public sealed record RefundContext(
     long RiskRevision,         // the risk snapshot the decision was based on
     RiskTier RiskTier,
     string ProposalFingerprint, // binds approval and acknowledgment to this exact refund
-    ApprovalState Approval,     // host-verified against the fingerprint
     IReadOnlySet<string> AcknowledgedWarnings); // warning keys confirmed for this fingerprint
 
 public static class RefundProposalFingerprint
@@ -175,11 +172,7 @@ public static class RefundProposalFingerprint
 }
 
 public sealed class RefundContextResolver(
-    IOrderStore orders,
-    IRiskStore risk,
-    IApprovalStore approvals,
-    IAcknowledgmentStore acknowledgments,
-    PolicySetInfo policySet)   // the policy set the running kernel was built from
+    IOrderStore orders, IRiskStore risk, IAcknowledgmentStore acknowledgments)
 {
     public async Task<RefundContext?> ResolveAsync(
         RefundProposal proposal, ConversationSession session, Guid operationId, CancellationToken ct)
@@ -196,13 +189,6 @@ public sealed class RefundContextResolver(
         // The fingerprint is recomputed from current, host-resolved values on every resolution.
         string fingerprint = RefundProposalFingerprint.Compute(
             session.TenantId, order.Id, order.Revision, amountMinor, proposal.Currency, proposal.Reason);
-
-        // Verified only for an unexpired approval by an eligible supervisor whose stored
-        // fingerprint equals this one and that was granted under the policy set running now.
-        // Changing the order, revision, amount, currency, or reason produces a different
-        // fingerprint; changing any rule, approver group, or option produces a different
-        // policy set ID. Either way: no match, and the current policy asks again.
-        ApprovalState approval = await approvals.GetStateAsync(operationId, fingerprint, policySet.Id, ct);
 
         // Unconsumed acknowledgments the acting support agent recorded for this exact proposal.
         IReadOnlySet<string> acknowledged = await acknowledgments.GetVerifiedWarningKeysAsync(
@@ -225,7 +211,6 @@ public sealed class RefundContextResolver(
             snapshot.Revision,
             snapshot.Tier,
             fingerprint,
-            approval,
             acknowledged);
     }
 }
@@ -235,7 +220,7 @@ Three details carry the design:
 
 - **The order and tenant come from the host.** The conversation was opened for one order and the session belongs to one tenant. A tool argument that names a different order or tenant is ignored, not trusted because it parsed.
 - **Two identities, two owners.** `AssistantAgentId` is the identity the governance library reasons about: which agent is acting, at which trust level. The support agent and the tenant are application identity semantics that the library does not own. Governance can restrict what this assistant may do; application authorization, for example ordinary ASP.NET Core resource-based authorization, decides what this person may do for this tenant and this order. You usually need both.
-- **Approval is looked up, never proposed.** The approval state comes from the host's own store, and it is `Verified` only when the stored approval's fingerprint equals one recomputed from the current tenant, order, revision, amount, currency, and reason. Reusing an operation ID for a different refund produces a different fingerprint and no match. The approval is also bound to the policy set it was granted under, so a policy change, such as a stricter approver group, invalidates it instead of letting it satisfy rules it was never checked against. Nothing the model writes can turn it into `Verified`.
+- **Approval is not part of the context.** Whether an approval counts depends on which rule of the current policy requires it, and that is not known until the policy has been evaluated. The gateway handles approval as a second step, after the first evaluation names the requirement. Nothing the model writes can mark a refund as approved.
 
 The governance policy then sees only host-built values. Here is a policy in the `governance.toolkit/v1` format that Microsoft documents for the .NET engine:
 
@@ -270,7 +255,7 @@ Microsoft's .NET tutorial documents how each policy action sets the result's `Al
 
 A host that checks only `result.Allowed` therefore treats "a supervisor must approve this" exactly like "this is forbidden." The assistant is told no, the support agent sees a refusal, and no approval request is ever created. Worse, someone eventually "fixes" the refusal by retrying until a different path succeeds.
 
-Microsoft's own design direction points the same way. The toolkit's accepted [ADR-0030, the action-bound approval protocol](https://microsoft.github.io/agent-governance-toolkit/adr/0030-action-bound-approval-protocol/), treats `require_approval` as a suspended decision rather than an allow or an ordinary denial, binds an approval to the exact action, and revalidates before execution. Its reference implementation landed in the Python SDK first, and Microsoft tracks parity for the other SDKs, including .NET, in [a separate issue](https://github.com/microsoft/agent-governance-toolkit/issues/3083). The .NET package's repository documentation already describes action-bound approval-chain APIs, so the tracker and repository documentation can temporarily differ during preview development. Check the exact package version you pin rather than assuming that documentation on the repository's main branch matches the published package. Either way, the documented `EvaluateToolCall` result reports `Allowed == false` for this action, so the distinction survives only if the host preserves it.
+Microsoft's own design direction points the same way. The toolkit's accepted [ADR-0030, the action-bound approval protocol](https://microsoft.github.io/agent-governance-toolkit/adr/0030-action-bound-approval-protocol/), treats `require_approval` as a suspended decision rather than an allow or an ordinary denial, binds an approval to the exact action, and revalidates before execution. Its reference implementation landed in the Python SDK first; the .NET action-bound approval-chain implementation later merged in [PR #3363](https://github.com/microsoft/agent-governance-toolkit/pull/3363), while [issue #3083](https://github.com/microsoft/agent-governance-toolkit/issues/3083) remains open as the cross-language parity tracker. Because repository documentation and published preview packages can differ, check the exact package version you pin rather than assuming that documentation on the repository's main branch matches it. Regardless, the documented `EvaluateToolCall` result reports `Allowed == false` for `require_approval`, so the distinction survives only if the host preserves it.
 
 The application's control flow should preserve the distinctions it acts on. Define the outcomes in the application's own terms:
 
@@ -291,27 +276,65 @@ public sealed record GovernedDecision(
     string ReasonCode,
     string? MatchedRule,
     string PolicySetId,
-    string? AcknowledgedWarning = null); // set when an acknowledgment must be consumed at execution
+    string? AcknowledgedWarning = null,             // consumed at execution when set
+    ApprovalRequirement? ConsumesApproval = null);  // consumed at execution when set
+
+// The exact requirement an approval satisfies. A different rule, policy set, proposal,
+// assistant, or risk tier is a different requirement, and an approval for one never counts for another.
+public sealed record ApprovalRequirement(
+    Guid OperationId,
+    string ProposalFingerprint,
+    string PolicySetId,
+    string Rule,
+    string AssistantAgentId,
+    RiskTier RiskTier)
+{
+    public static ApprovalRequirement For(RefundContext context, GovernedDecision decision) =>
+        new(context.OperationId,
+            context.ProposalFingerprint,
+            decision.PolicySetId,
+            decision.MatchedRule
+                ?? throw new InvalidOperationException("An unnamed approval rule cannot be satisfied."),
+            context.AssistantAgentId,
+            context.RiskTier);
+
+    public bool Covers(RefundContext context, string policySetId) =>
+        OperationId == context.OperationId
+        && ProposalFingerprint == context.ProposalFingerprint
+        && PolicySetId == policySetId
+        && AssistantAgentId == context.AssistantAgentId
+        && RiskTier == context.RiskTier;
+}
 
 public interface IRefundGovernance
 {
-    GovernedDecision Evaluate(RefundContext context);
+    // verifiedApproval: an approval the host has matched to the requirement a previous
+    // evaluation of this same context reported. Null on the first evaluation.
+    GovernedDecision Evaluate(RefundContext context, ApprovalRequirement? verifiedApproval = null);
 }
 ```
 
-These names belong to the application. `Microsoft.AgentGovernance` does not need to expose them, and neither does any other governance library you might use instead. The adapter is the only class that knows the package's types:
+These names belong to the application. `Microsoft.AgentGovernance` does not need to expose them, and neither does any other governance library you might use instead. Outside the governance runtime shown later, the adapter is the only class that knows the package's types:
 
 ```csharp
 using AgentGovernance;
 
-public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicySetInfo policySet)
-    : IRefundGovernance
+public sealed class AgentGovernanceRefundPolicy(GovernanceRuntimeHolder runtimes) : IRefundGovernance
 {
-    public GovernedDecision Evaluate(RefundContext context)
+    public GovernedDecision Evaluate(RefundContext context, ApprovalRequirement? verifiedApproval = null)
     {
+        // One runtime per evaluation: the decision and its policy set ID describe the same kernel.
+        GovernanceRuntime runtime = runtimes.Current;
+        string policySetId = runtime.PolicySet.Id;
+
+        if (verifiedApproval is not null && !verifiedApproval.Covers(context, policySetId))
+        {
+            return Decide(GovernedOutcome.Unavailable, "approval_binding_mismatch", null, policySetId);
+        }
+
         try
         {
-            var result = kernel.EvaluateToolCall(
+            var result = runtime.EvaluateToolCall(
                 agentId: context.AssistantAgentId,
                 toolName: "orders.refund",
                 args: new()
@@ -321,56 +344,64 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicyS
                     ["amount_minor"] = context.AmountMinor,
                     ["currency"] = context.Currency,
                     ["risk_tier"] = context.RiskTier.ToString(),
-                    ["approval"] = context.Approval == ApprovalState.Verified ? "verified" : "none",
+                    ["approval"] = verifiedApproval is null ? "none" : "verified",
                 });
 
             // Interpolation works whether the pinned version exposes Action as a string or an enum.
             string action = GovernanceActionNames.Normalize($"{result.PolicyDecision?.Action}");
-            return Map(result.Allowed, action, result.PolicyDecision?.MatchedRule, context);
+            GovernedDecision decision = Map(
+                result.Allowed, action, result.PolicyDecision?.MatchedRule, context, policySetId);
+
+            // Only an allow reached through this approval consumes it.
+            return decision.Outcome == GovernedOutcome.Allowed && verifiedApproval is not null
+                ? decision with { ConsumesApproval = verifiedApproval }
+                : decision;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            return Decide(GovernedOutcome.Unavailable, "governance_evaluation_failed", rule: null);
+            return Decide(GovernedOutcome.Unavailable, "governance_evaluation_failed", null, policySetId);
         }
     }
 
-    private GovernedDecision Map(bool allowed, string action, string? rule, RefundContext context) =>
+    private static GovernedDecision Map(
+        bool allowed, string action, string? rule, RefundContext context, string policySetId) =>
         (allowed, action) switch
         {
             // A rate_limit rule matched and the call is still within its window.
             (true, "allow" or "log" or "ratelimit") =>
-                Decide(GovernedOutcome.Allowed, "allowed", rule),
+                Decide(GovernedOutcome.Allowed, "allowed", rule, policySetId),
 
             // Application choice: a governance warning on a refund needs explicit confirmation.
             // A verified acknowledgment of this exact warning, under this policy set, completes it.
             (true, "warn") when rule is not null
-                             && context.AcknowledgedWarnings.Contains(WarningKey(rule)) =>
-                Decide(GovernedOutcome.Allowed, "warning_acknowledged", rule)
-                    with { AcknowledgedWarning = WarningKey(rule) },
+                             && context.AcknowledgedWarnings.Contains(WarningKey(policySetId, rule)) =>
+                Decide(GovernedOutcome.Allowed, "warning_acknowledged", rule, policySetId)
+                    with { AcknowledgedWarning = WarningKey(policySetId, rule) },
 
             (true, "warn") =>
-                Decide(GovernedOutcome.AcknowledgmentRequired, "governance_warning", rule),
+                Decide(GovernedOutcome.AcknowledgmentRequired, "governance_warning", rule, policySetId),
 
             (false, "requireapproval") =>
-                Decide(GovernedOutcome.ApprovalRequired, "approval_required", rule),
+                Decide(GovernedOutcome.ApprovalRequired, "approval_required", rule, policySetId),
 
             // The window's limit is exhausted: valid, but must wait.
             (false, "ratelimited" or "ratelimit") =>
-                Decide(GovernedOutcome.Deferred, "rate_limited", rule),
+                Decide(GovernedOutcome.Deferred, "rate_limited", rule, policySetId),
 
             (false, _) =>
-                Decide(GovernedOutcome.Denied, "governance_denied", rule),
+                Decide(GovernedOutcome.Denied, "governance_denied", rule, policySetId),
 
             // Allowed by a decision this adapter does not recognize: never infer permission.
             (true, _) =>
-                Decide(GovernedOutcome.Unavailable, "unrecognized_governance_decision", rule),
+                Decide(GovernedOutcome.Unavailable, "unrecognized_governance_decision", rule, policySetId),
         };
 
     // Binding the key to the policy set means a changed policy requires a fresh acknowledgment.
-    private string WarningKey(string rule) => $"{policySet.Id}#{rule}";
+    private static string WarningKey(string policySetId, string rule) => $"{policySetId}#{rule}";
 
-    private GovernedDecision Decide(GovernedOutcome outcome, string reasonCode, string? rule) =>
-        new(outcome, reasonCode, rule, policySet.Id);
+    private static GovernedDecision Decide(
+        GovernedOutcome outcome, string reasonCode, string? rule, string policySetId) =>
+        new(outcome, reasonCode, rule, policySetId);
 }
 
 public static class GovernanceActionNames
@@ -429,6 +460,7 @@ public sealed class RefundGateway(
     IAuthorizationService authorization,
     RefundDomainRules domainRules,
     IRefundGovernance governance,
+    IApprovalStore approvals,
     IRefundWorkflow workflow,
     IRefundExecutor executor,
     IDecisionRecorder recorder)
@@ -452,6 +484,18 @@ public sealed class RefundGateway(
         }
 
         GovernedDecision decision = domainRules.Check(context) ?? governance.Evaluate(context);
+
+        // Approval is matched to the requirement the current policy actually states. Evaluate
+        // without approval first; only then look for an approval bound to that exact requirement.
+        if (decision is { Outcome: GovernedOutcome.ApprovalRequired, MatchedRule: not null })
+        {
+            ApprovalRequirement requirement = ApprovalRequirement.For(context, decision);
+            if (await approvals.IsApprovedAsync(requirement, ct)) // unexpired, eligible, unconsumed
+            {
+                decision = governance.Evaluate(context, verifiedApproval: requirement);
+            }
+        }
+
         await recorder.RecordDecisionAsync(context, decision, ct);
 
         return decision.Outcome switch
@@ -478,6 +522,8 @@ Denied, deferred, unavailable, escalated, or not yet approved or acknowledged
         ↓
 Protected executor invocation count = 0
 ```
+
+The approval step deserves a note. An approval is never looked up before the policy has said what it requires. The first evaluation runs with `approval = 'none'` and reports the rule that requires approval. The host then looks for an approval bound to that exact requirement: this operation, this proposal fingerprint, this policy set, this rule, this assistant, and this risk tier. Only if one exists does a second evaluation run with `approval = 'verified'`, and only an allow reached that way carries the approval forward to be consumed. If the risk tier changes, or the same policy set holds a stricter approval rule that now matches, the requirement is different and an approval for the old one does not count. This sketch handles one approval requirement per refund; a policy that stacks several needs the same step repeated for each, with every approval consumed together.
 
 Three practical consequences follow.
 
@@ -543,14 +589,11 @@ None of these implies another. A `require_approval` verdict says that approval i
 
 A policy engine determines whether an action is currently permitted. A workflow answers different questions: whether an eligible reviewer approved a specific proposal, and whether that approval still applies.
 
-Keep application workflow state out of the evaluator. Evaluation is not entirely free of side effects in the current .NET package: it maintains its own rate-limit windows and emits audit events and metrics. Those are the package's concerns. What belongs to the application is the workflow: do not move approval tables into policy conditions, and do not create, change, or consume approvals and acknowledgments from inside evaluation because the hook happens to be convenient. The policy receives one host-verified fact, `approval == 'verified'`. The record behind that fact lives in the application:
+Keep application workflow state out of the evaluator. Evaluation is not entirely free of side effects in the current .NET package: it maintains its own rate-limit windows and emits audit events and metrics. Those are the package's concerns. What belongs to the application is the workflow: do not move approval tables into policy conditions, and do not create, change, or consume approvals and acknowledgments from inside evaluation because the hook happens to be convenient. The policy receives one host-verified fact, `approval == 'verified'`, and only on the second evaluation, after the host has matched an approval to the requirement the first evaluation reported. The record behind that fact lives in the application:
 
 ```csharp
 public sealed record RefundApproval(
-    Guid OperationId,
-    string ProposalFingerprint,  // RefundProposalFingerprint: tenant, order, revision, amount, currency, reason
-    string PolicySetId,          // the policy set whose rule required this approval
-    string RequiredByRule,       // that rule's name, for evidence and reviewer routing
+    ApprovalRequirement Requirement, // operation, proposal fingerprint, policy set, rule, assistant, risk tier
     long OrderRevision,
     long AmountMinor,
     string RequestedBy,          // the support agent who asked
@@ -568,16 +611,20 @@ When the supervisor approves, the continuation does not replay the original deci
 ```text
 Supervisor approves operation 7f3c…
       ↓
-Reload order, risk, and approval state
+Reload order and risk state; recompute the proposal fingerprint
       ↓
 Domain invariants          (a fraud hold set while waiting now escalates)
       ↓
-Governance evaluation      (approval = "verified" for this amount and revision)
+Governance evaluation      (approval = "none": which rule requires approval now?)
+      ↓
+Approval lookup            (bound to that exact requirement, or no match)
+      ↓
+Governance evaluation      (approval = "verified")
       ↓
 Executor                   (conditional write that also consumes the approval)
 ```
 
-The continuation runs under the workflow's own service identity and rechecks the support agent's current access to the order; it does not reuse the original request's token. If the governance policy changed while the approval was pending, the policy set ID changed with it, so the old approval no longer verifies. The new evaluation runs under the new policy and, if that policy still requires approval, the workflow requests a new one under the new rules and approver group. That is the intended behavior: an approval satisfies a requirement of the policy it was granted under, not whatever policy happens to be running when execution resumes. The workflow records the decision's policy set ID and matched rule when it creates the request, and the executor's conditional consume checks the policy set ID again. [Human-in-the-Loop Governance Workflows](../../governance/human-in-the-loop-governance-workflows.md) goes deeper on reviewer eligibility, expiry, and pending-state design.
+The continuation runs under the workflow's own service identity and rechecks the support agent's current access to the order; it does not reuse the original request's token. If the governance policy changed while the approval was pending, the policy set ID changed with it; if the risk tier changed, or a different approval rule in the same policy set now matches, the requirement changed. In each case the old approval matches nothing, and if the current policy still requires approval, the workflow requests a new one under the current rule and approver group. That is the intended behavior: an approval satisfies the requirement it was granted for, not whatever requirement applies when execution resumes. The workflow stores the full `ApprovalRequirement` when it creates the request, and the executor's conditional consume matches it again. [Human-in-the-Loop Governance Workflows](../../governance/human-in-the-loop-governance-workflows.md) goes deeper on reviewer eligibility, expiry, and pending-state design.
 
 ## Revalidate at Execution Time, and Scope Authority to the Lifecycle
 
@@ -647,7 +694,7 @@ public sealed class RefundExecutor(IRefundReservations reservations, IRiskStore 
 }
 ```
 
-`ReserveAsync` is where the atomicity lives. In an EF Core implementation, it is a conditional `ExecuteUpdateAsync` on the order (matching tenant, order ID, expected revision, and a refundable balance that still covers the amount, then decrementing the balance and incrementing the revision), the insert of the Pending operation, the approval's conditional consume (matching operation ID, proposal fingerprint, and the current policy set ID, still Approved, and unexpired, then marking it Consumed), and, when the decision carries an acknowledged warning, the same conditional consume of that acknowledgment (matching operation ID, fingerprint, and warning key), all inside one database transaction that commits before the provider is called. If any part fails, none of it happened, so a crash can never leave a reserved balance with no operation record or an approval that was used without a reservation.
+`ReserveAsync` is where the atomicity lives. In an EF Core implementation, it is a conditional `ExecuteUpdateAsync` on the order (matching tenant, order ID, expected revision, and a refundable balance that still covers the amount, then decrementing the balance and incrementing the revision), the insert of the Pending operation, the approval's conditional consume when the decision carries one (matching the decision's `ApprovalRequirement` exactly, still Approved, and unexpired, then marking it Consumed), and, when the decision carries an acknowledged warning, the same conditional consume of that acknowledgment (matching operation ID, fingerprint, and warning key), all inside one database transaction that commits before the provider is called. If any part fails, none of it happened, so a crash can never leave a reserved balance with no operation record or an approval that was used without a reservation.
 
 The finalization methods are just as conditional. `CompleteAsync` moves an operation from Pending or Unknown to Succeeded and records the provider reference. `ReleaseAsync` moves it from Pending or Unknown to Failed and restores the refundable balance in the same transaction, so the balance can be restored only once. `MarkUnknownAsync` moves it from Pending to Unknown and leaves the reservation in place. Reconciliation calls the same methods once it learns the provider's answer. If the process crashes before a finalization write lands, the operation is still Pending, and reconciliation treats a Pending operation older than its time budget exactly like an Unknown one.
 
@@ -743,14 +790,15 @@ public sealed class GovernanceSnapshot
     // optionsPath: every decision-affecting GovernanceOptions setting, including conflict strategy,
     // rings and thresholds, and prompt-injection settings. If evaluation uses an external backend,
     // pass its configuration file in the same way; nothing that changes decisions stays outside.
-    public static GovernanceSnapshot Load(string optionsPath, IReadOnlyList<string> policyPathsInLoadOrder)
-    {
+    public static GovernanceSnapshot Load(string optionsPath, IReadOnlyList<string> policyPathsInLoadOrder) =>
         // Read every input exactly once. The ID and the kernel both come from these bytes.
-        byte[] options = File.ReadAllBytes(optionsPath);
-        var policies = policyPathsInLoadOrder
-            .Select(path => (Name: Path.GetFileName(path), Bytes: File.ReadAllBytes(path)))
-            .ToList();
+        FromBytes(
+            File.ReadAllBytes(optionsPath),
+            policyPathsInLoadOrder.Select(path => (Path.GetFileName(path), File.ReadAllBytes(path))).ToList());
 
+    public static GovernanceSnapshot FromBytes(
+        byte[] options, IReadOnlyList<(string Name, byte[] Bytes)> policies)
+    {
         using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
 
         void Field(byte[] value)
@@ -782,8 +830,8 @@ public sealed class GovernanceSnapshot
         return snapshot;
     }
 
-    // Built from the snapshot's bytes, never from the files again.
-    public GovernanceKernel CreateKernel()
+    // The only way to obtain a kernel: built from the snapshot's bytes, verified, and sealed.
+    public GovernanceRuntime CreateRuntime()
     {
         var kernel = new GovernanceKernel(CreateOptions());
         foreach (string yaml in policyYaml)
@@ -791,16 +839,53 @@ public sealed class GovernanceSnapshot
             kernel.LoadPolicyFromYaml(yaml);
         }
 
-        return kernel;
+        GovernanceStartupChecks.Verify(kernel);
+        return new GovernanceRuntime(kernel, PolicySet);
     }
 
     private GovernanceOptions CreateOptions() =>
         JsonSerializer.Deserialize<GovernanceOptions>(optionsJson, StrictJson)
         ?? throw new InvalidOperationException("The governance options file is empty.");
 }
+
+// Holds the kernel privately, so nothing can load, clear, or reconfigure policies after startup.
+public sealed class GovernanceRuntime : IDisposable
+{
+    private readonly GovernanceKernel kernel;
+
+    internal GovernanceRuntime(GovernanceKernel kernel, PolicySetInfo policySet)
+    {
+        this.kernel = kernel;
+        PolicySet = policySet;
+    }
+
+    public PolicySetInfo PolicySet { get; }
+
+    public ToolCallResult EvaluateToolCall(string agentId, string toolName, Dictionary<string, object> args) =>
+        kernel.EvaluateToolCall(agentId, toolName, args);
+
+    public void OnAllEvents(Action<GovernanceEvent> handler) => kernel.OnAllEvents(handler);
+
+    public void Dispose() => kernel.Dispose();
+}
+
+// A configuration change publishes a whole new runtime, so the kernel and its policy set ID change together.
+public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial)
+{
+    private GovernanceRuntime current = initial;
+
+    public GovernanceRuntime Current => Volatile.Read(ref current);
+
+    public GovernanceRuntime Replace(GovernanceSnapshot snapshot)
+    {
+        GovernanceRuntime next = snapshot.CreateRuntime(); // verified before it becomes visible
+        // Subscribe event handlers to `next` here, before publishing it.
+        return Interlocked.Exchange(ref current, next);    // dispose once in-flight evaluations finish
+    }
+}
 ```
 
-At startup, load the snapshot once, create the kernel from it, run `GovernanceStartupChecks.Verify` on that kernel, and register the snapshot's `PolicySet` as the single `PolicySetInfo` the adapter, the context resolver, and the evidence recorder share. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
+At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation captures one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
 
 Keep secrets and raw model text out of the decision record, and never read the record back as permission. Evidence explains what happened; it does not authorize what happens next. [Your Audit Log Records the Story, Not the Decision](your-audit-log-is-not-evidence.md) covers the difference between a log line and evidence that can be trusted later.
 
@@ -884,37 +969,44 @@ Adapter contract tests run against the real package with an inline policy. Becau
 public sealed class AgentGovernanceRefundPolicyContractTests
 {
     [Theory]
-    [InlineData(15_000L, ApprovalState.None, GovernedOutcome.Allowed)]
-    [InlineData(24_000L, ApprovalState.None, GovernedOutcome.ApprovalRequired)]
-    [InlineData(24_000L, ApprovalState.Pending, GovernedOutcome.ApprovalRequired)]
-    [InlineData(24_000L, ApprovalState.Verified, GovernedOutcome.Allowed)]
+    [InlineData(15_000L, false, GovernedOutcome.Allowed)]
+    [InlineData(24_000L, false, GovernedOutcome.ApprovalRequired)]
+    [InlineData(24_000L, true, GovernedOutcome.Allowed)]
     public void Maps_documented_policy_actions_to_application_outcomes(
-        long amountMinor, ApprovalState approval, GovernedOutcome expected)
+        long amountMinor, bool approved, GovernedOutcome expected)
     {
-        using var kernel = new GovernanceKernel(new GovernanceOptions
-        {
-            ConflictStrategy = ConflictResolutionStrategy.PriorityFirstMatch,
-        });
-        kernel.LoadPolicyFromYaml(TestPolicies.SupportAssistantRefunds); // the policy shown earlier
+        // TestGovernance.Runtime builds a GovernanceSnapshot from inline options and policy text.
+        var policy = new AgentGovernanceRefundPolicy(
+            TestGovernance.Runtime(TestPolicies.SupportAssistantRefunds)); // the policy shown earlier
+        RefundContext context = TestData.Context(amountMinor);
 
-        var policy = new AgentGovernanceRefundPolicy(kernel, new PolicySetInfo("test"));
-
-        GovernedDecision decision = policy.Evaluate(TestData.Context(amountMinor, approval));
+        GovernedDecision first = policy.Evaluate(context);
+        GovernedDecision decision = approved
+            ? policy.Evaluate(context, ApprovalRequirement.For(context, first))
+            : first;
 
         Assert.Equal(expected, decision.Outcome);
     }
 
     [Fact]
+    public void Approval_for_another_risk_tier_never_counts()
+    {
+        var policy = new AgentGovernanceRefundPolicy(
+            TestGovernance.Runtime(TestPolicies.SupportAssistantRefunds));
+        RefundContext lowRisk = TestData.Context(24_000L) with { RiskTier = RiskTier.Low };
+        ApprovalRequirement approvedForLowRisk = ApprovalRequirement.For(lowRisk, policy.Evaluate(lowRisk));
+
+        RefundContext highRisk = lowRisk with { RiskTier = RiskTier.High };
+
+        Assert.Equal(GovernedOutcome.Unavailable, policy.Evaluate(highRisk, approvedForLowRisk).Outcome);
+    }
+
+    [Fact]
     public void Maps_both_rate_limit_states()
     {
-        using var kernel = new GovernanceKernel(new GovernanceOptions
-        {
-            ConflictStrategy = ConflictResolutionStrategy.PriorityFirstMatch,
-        });
-        kernel.LoadPolicyFromYaml(TestPolicies.OneAssistantRefundPerHour); // rate_limit rule, limit "1/hour"
-
-        var policy = new AgentGovernanceRefundPolicy(kernel, new PolicySetInfo("test"));
-        RefundContext context = TestData.Context(5_000L, ApprovalState.None);
+        var policy = new AgentGovernanceRefundPolicy(
+            TestGovernance.Runtime(TestPolicies.OneAssistantRefundPerHour)); // rate_limit rule, limit "1/hour"
+        RefundContext context = TestData.Context(5_000L);
 
         Assert.Equal(GovernedOutcome.Allowed, policy.Evaluate(context).Outcome);  // within the window
         Assert.Equal(GovernedOutcome.Deferred, policy.Evaluate(context).Outcome); // limit exhausted
@@ -923,17 +1015,13 @@ public sealed class AgentGovernanceRefundPolicyContractTests
     [Fact]
     public void Governance_event_carries_the_host_operation_id()
     {
-        using var kernel = new GovernanceKernel(new GovernanceOptions
-        {
-            ConflictStrategy = ConflictResolutionStrategy.PriorityFirstMatch,
-        });
-        kernel.LoadPolicyFromYaml(TestPolicies.SupportAssistantRefunds);
+        GovernanceRuntimeHolder runtimes = TestGovernance.Runtime(TestPolicies.SupportAssistantRefunds);
 
         var events = new List<GovernanceEvent>();
-        kernel.OnAllEvents(events.Add);
+        runtimes.Current.OnAllEvents(events.Add);
 
-        RefundContext context = TestData.Context(15_000L, ApprovalState.None);
-        new AgentGovernanceRefundPolicy(kernel, new PolicySetInfo("test")).Evaluate(context);
+        RefundContext context = TestData.Context(15_000L);
+        new AgentGovernanceRefundPolicy(runtimes).Evaluate(context);
 
         string expected = context.OperationId.ToString("N");
         Assert.Contains(events, e =>
@@ -946,40 +1034,37 @@ public sealed class AgentGovernanceRefundPolicyContractTests
     [Fact]
     public void Acknowledged_warning_completes_only_for_the_same_policy_set_and_rule()
     {
-        using var kernel = new GovernanceKernel();
-        kernel.LoadPolicyFromYaml(TestPolicies.WarnOnAssistantRefunds); // warn rule "refund-warning"
+        GovernanceRuntimeHolder runtimes = TestGovernance.Runtime(TestPolicies.WarnOnAssistantRefunds); // warn rule "refund-warning"
+        var policy = new AgentGovernanceRefundPolicy(runtimes);
+        string currentKey = $"{runtimes.Current.PolicySet.Id}#refund-warning";
 
-        var policy = new AgentGovernanceRefundPolicy(kernel, new PolicySetInfo("set-a"));
-
-        RefundContext unacknowledged = TestData.Context(5_000L, ApprovalState.None);
+        RefundContext unacknowledged = TestData.Context(5_000L);
         RefundContext acknowledged = unacknowledged with
         {
-            AcknowledgedWarnings = new HashSet<string> { "set-a#refund-warning" },
+            AcknowledgedWarnings = new HashSet<string> { currentKey },
         };
         RefundContext acknowledgedUnderOldPolicy = unacknowledged with
         {
-            AcknowledgedWarnings = new HashSet<string> { "set-old#refund-warning" },
+            AcknowledgedWarnings = new HashSet<string> { "sha256:previous#refund-warning" },
         };
 
         Assert.Equal(GovernedOutcome.AcknowledgmentRequired, policy.Evaluate(unacknowledged).Outcome);
         Assert.Equal(GovernedOutcome.Allowed, policy.Evaluate(acknowledged).Outcome);
-        Assert.Equal("set-a#refund-warning", policy.Evaluate(acknowledged).AcknowledgedWarning);
+        Assert.Equal(currentKey, policy.Evaluate(acknowledged).AcknowledgedWarning);
         Assert.Equal(GovernedOutcome.AcknowledgmentRequired, policy.Evaluate(acknowledgedUnderOldPolicy).Outcome);
     }
 
     [Fact]
     public void Startup_rejects_a_permissive_default_even_when_the_probe_is_denied()
     {
-        using var kernel = new GovernanceKernel();
         // default_action: allow, plus a rule that denies only the probe tool.
-        kernel.LoadPolicyFromYaml(TestPolicies.PermissiveDefaultThatDeniesTheProbe);
-
-        Assert.Throws<InvalidOperationException>(() => GovernanceStartupChecks.Verify(kernel));
+        Assert.Throws<InvalidOperationException>(
+            () => TestGovernance.Runtime(TestPolicies.PermissiveDefaultThatDeniesTheProbe));
     }
 }
 ```
 
-The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, a permissive default cannot hide behind a denied probe, and the governance event still carries the host's operation ID. Add approval-store tests showing that an approval reused with a different amount, currency, reason, order, or revision is not `Verified`, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
+The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, a permissive default cannot hide behind a denied probe, and the governance event still carries the host's operation ID. Add approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
 
 ## Common Failure Modes
 
@@ -1026,7 +1111,7 @@ Before a governed agent action reaches a consequential side effect, confirm that
 3. **The verdict is translated, not collapsed.** Approval-required, deferred, escalated, acknowledgment-required, and unavailable remain distinct, and unrecognized decisions never become permission.
 4. **Application authorization runs explicitly,** and only `Allowed` reaches the executor, which is reachable only through the gateway.
 5. **Governance is verified at startup.** At least one policy is loaded, every loaded policy declares `default_action: deny`, an unregistered tool is actually denied, and the kernel and its policy set ID both come from one immutable snapshot of the package version, options, and policy files.
-6. **Approval and acknowledgment are host workflow state,** bound to the operation, a proposal fingerprint recomputed at lookup and again at consumption, and the policy set they were granted under, with expiry, eligibility, and single use. An acknowledgment is also bound to the specific warning and policy set, so an acknowledged warning completes instead of being requested again.
+6. **Approval and acknowledgment are host workflow state.** An approval is looked up only after evaluation names the requirement, and it is bound to that exact requirement (operation, proposal fingerprint, policy set, rule, assistant, and risk tier), checked again at consumption. Both have expiry, eligibility, and single use. An acknowledgment is bound to the proposal fingerprint, the specific warning, and the policy set, so an acknowledged warning completes instead of being requested again.
 7. **Execution revalidates every mutable fact that could revoke permission,** reserves before calling out, and bounds execution authority only where delay or delegation requires it.
 8. **Failure semantics are explicit per tool.** An ambiguous governance result never authorizes execution, and an ambiguous execution outcome is reconciled before any new execution attempt.
 9. **Evidence binds policy, workflow, and execution records** through the operation ID; telemetry is not treated as evidence.
