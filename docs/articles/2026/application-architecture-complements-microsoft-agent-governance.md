@@ -256,7 +256,6 @@ These names belong to the application. `Microsoft.AgentGovernance` does not need
 
 ```csharp
 using AgentGovernance;
-using AgentGovernance.Policy;
 
 public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicySetInfo policySet)
     : IRefundGovernance
@@ -277,7 +276,9 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicyS
                     ["approval"] = context.Approval == ApprovalState.Verified ? "verified" : "none",
                 });
 
-            return Map(result.Allowed, result.PolicyDecision?.Action, result.PolicyDecision?.MatchedRule);
+            // Interpolation works whether the pinned version exposes Action as a string or an enum.
+            string action = Normalize($"{result.PolicyDecision?.Action}");
+            return Map(result.Allowed, action, result.PolicyDecision?.MatchedRule);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -285,20 +286,26 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicyS
         }
     }
 
-    private GovernedDecision Map(bool allowed, PolicyAction? action, string? rule) =>
+    // "require_approval", "RequireApproval", and "requireapproval" all become "requireapproval".
+    private static string Normalize(string action) =>
+        action.Replace("_", "", StringComparison.Ordinal)
+              .Replace("-", "", StringComparison.Ordinal)
+              .ToLowerInvariant();
+
+    private GovernedDecision Map(bool allowed, string action, string? rule) =>
         (allowed, action) switch
         {
-            (true, PolicyAction.Allow or PolicyAction.Log) =>
+            (true, "allow" or "log") =>
                 Decide(GovernedOutcome.Allowed, "allowed", rule),
 
             // Application choice: a governance warning on a refund needs explicit confirmation.
-            (true, PolicyAction.Warn) =>
+            (true, "warn") =>
                 Decide(GovernedOutcome.AcknowledgmentRequired, "governance_warning", rule),
 
-            (false, PolicyAction.RequireApproval) =>
+            (false, "requireapproval") =>
                 Decide(GovernedOutcome.ApprovalRequired, "approval_required", rule),
 
-            (false, PolicyAction.RateLimit) =>
+            (false, "ratelimit") =>
                 Decide(GovernedOutcome.Deferred, "rate_limited", rule),
 
             (false, _) =>
@@ -315,6 +322,8 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicyS
 ```
 
 A few choices in that mapping are deliberate:
+
+- **The adapter matches normalized action names, not the package's types.** Microsoft's .NET tutorial presents the decision's action as the `PolicyAction` enum, while current releases of the package expose `PolicyDecision.Action` as a lowercase string such as `requireapproval` or `ratelimit`. Normalizing the value to lowercase without separators keeps the mapping independent of that representation, and the adapter contract tests below fail if a future release renames an action.
 
 - **Unrecognized blocks are denials; unrecognized allows are unavailable.** A preview package can add policy actions. If a call is blocked for a reason the adapter does not know, it stays blocked. If a call is allowed by a decision the adapter cannot explain, the application refuses to treat that as permission.
 - **A block can arrive without the policy decision you expect.** Microsoft documents that ring checks and prompt-injection checks, when enabled, run before policy evaluation. The `(false, _)` arm treats any such block as a denial without depending on which check produced it.
@@ -414,11 +423,16 @@ Three practical consequences follow.
 
 **Every path to the side effect goes through the boundary.** The assistant's tool is rarely the only way to issue a refund. A background job that retries failed refunds, an internal administration endpoint, and a second agent all need to pass through the same gateway or an equivalent that is just as explicit. In an ASP.NET Core application, keep the executor internal to the module, register it only where the gateway needs it, and keep payment credentials inside it.
 
-**A governance layer that is not configured governs nothing.** Microsoft's limitations page warns that a policy evaluator with no policies loaded defaults to `allow`, and recommends a deny-by-default posture in production. Make "policies loaded and deny-by-default" a startup condition rather than an assumption:
+**A governance layer that is not configured governs nothing.** Microsoft's limitations page warns that a policy evaluator with no policies loaded defaults to `allow`, and recommends a deny-by-default posture in production. Empty-policy behavior also differs across SDKs and versions: current releases of the .NET package deny an evaluation when no policies are loaded. A probe that only checks for a denial therefore cannot tell "deny-by-default" from "nothing loaded." Make both conditions explicit at startup rather than assuming either:
 
 ```csharp
-// At startup: refuse to expose the refund tool if the policy set is not deny-by-default.
-// With no policies loaded, the documented default is allow, so this probe would pass through.
+// At startup: require a loaded policy set, then require it to be deny-by-default.
+if (kernel.PolicyEngine.ListPolicies().Count == 0)
+{
+    throw new InvalidOperationException(
+        "No agent-governance policies are loaded. Refusing to start.");
+}
+
 var probe = kernel.EvaluateToolCall("startup-probe", "governance.unregistered-probe-tool");
 
 if (probe.Allowed)
@@ -428,7 +442,7 @@ if (probe.Allowed)
 }
 ```
 
-Run the probe with the same `GovernanceOptions` that production uses. It verifies the default posture, not each rule; the adapter contract tests later in this article cover the rules.
+Run the checks with the same `GovernanceOptions` that production uses. The first confirms that policies were actually loaded; the second verifies the default posture, not each rule. The adapter contract tests later in this article cover the rules.
 
 ## Policy Verdicts Are Not Approval, Acknowledgment, or Execution Permission
 
@@ -509,17 +523,48 @@ public sealed class RefundExecutor(IRefundReservations reservations, IRiskStore 
         }
 
         // Only after the reservation commits, call the provider with an idempotency key derived
-        // from the operation ID.
-        //   Succeeded:            mark the operation Succeeded; the reservation becomes the refund.
-        //   Terminal failure:     mark it Failed and release the reservation, restoring the balance.
-        //   Timeout or ambiguity: mark it Unknown and keep the reservation until reconciliation with
-        //                         the same key settles it; never decide again and send a new request.
-        return await payments.RefundAsync(command, idempotencyKey: command.OperationId.ToString("N"), ct);
+        // from the operation ID. Finalization writes use CancellationToken.None so that a caller
+        // who gives up waiting cannot leave the recorded state behind the provider's.
+        ProviderRefundResult outcome;
+        try
+        {
+            outcome = await payments.RefundAsync(
+                command, idempotencyKey: command.OperationId.ToString("N"), ct);
+        }
+        catch (Exception)
+        {
+            // A timeout, a dropped connection, or a cancellation after sending: the refund may or
+            // may not have happened. Keep the reservation; reconcile with the same key.
+            await reservations.MarkUnknownAsync(command.OperationId, CancellationToken.None);
+            return RefundResult.OutcomeUnknown("provider_outcome_unknown");
+        }
+
+        switch (outcome.Status)
+        {
+            case ProviderRefundStatus.Succeeded:
+                // The reservation becomes the refund.
+                await reservations.CompleteAsync(
+                    command.OperationId, outcome.ProviderReference, CancellationToken.None);
+                return RefundResult.Executed(outcome.ProviderReference);
+
+            case ProviderRefundStatus.Rejected:
+                // Terminal: the provider will never perform this refund. Restore the balance.
+                await reservations.ReleaseAsync(
+                    command.OperationId, outcome.FailureCode, CancellationToken.None);
+                return RefundResult.NotExecuted("provider_rejected");
+
+            default:
+                // Anything the executor cannot classify is treated as unknown, never as failed.
+                await reservations.MarkUnknownAsync(command.OperationId, CancellationToken.None);
+                return RefundResult.OutcomeUnknown("provider_outcome_unknown");
+        }
     }
 }
 ```
 
 `ReserveAsync` is where the atomicity lives. In an EF Core implementation, it is a conditional `ExecuteUpdateAsync` on the order (matching tenant, order ID, expected revision, and a refundable balance that still covers the amount, then decrementing the balance and incrementing the revision), the insert of the Pending operation, and the approval's conditional consume, all inside one database transaction that commits before the provider is called. If any part fails, none of it happened, so a crash can never leave a reserved balance with no operation record or an approval that was used without a reservation.
+
+The finalization methods are just as conditional. `CompleteAsync` moves an operation from Pending or Unknown to Succeeded and records the provider reference. `ReleaseAsync` moves it from Pending or Unknown to Failed and restores the refundable balance in the same transaction, so the balance can be restored only once. `MarkUnknownAsync` moves it from Pending to Unknown and leaves the reservation in place. Reconciliation calls the same methods once it learns the provider's answer. If the process crashes before a finalization write lands, the operation is still Pending, and reconciliation treats a Pending operation older than its time budget exactly like an Unknown one.
 
 The risk check uses a revision when the risk system exposes one; if it does not, recheck the specific flags that would revoke permission. Because the risk system cannot join the order database's transaction, a short window remains between that read and the reservation. Where that window matters, ask the risk system for a lease or hold that it honors until the operation settles, or have the payment path check the hold itself, and document whatever window remains rather than assuming it away.
 
@@ -751,7 +796,7 @@ Before a governed agent action reaches a consequential side effect, confirm that
 2. **Each rule has one owner.** Domain invariants live in the application; agent-specific governance rules live in the policy.
 3. **The verdict is translated, not collapsed.** Approval-required, deferred, escalated, acknowledgment-required, and unavailable remain distinct, and unrecognized decisions never become permission.
 4. **Application authorization runs explicitly,** and only `Allowed` reaches the executor, which is reachable only through the gateway.
-5. **Governance is verified at startup.** Policies are loaded, deny-by-default, and identified by a policy set ID.
+5. **Governance is verified at startup.** At least one policy is loaded, the set is deny-by-default, and it is identified by a policy set ID.
 6. **Approval and acknowledgment are host workflow state,** bound to operation, amount, and revision, with expiry, eligibility, and single use.
 7. **Execution revalidates every mutable fact that could revoke permission,** reserves before calling out, and bounds execution authority only where delay or delegation requires it.
 8. **Failure semantics are explicit per tool.** An ambiguous governance result never authorizes execution, and an ambiguous execution outcome is reconciled before any new execution attempt.
