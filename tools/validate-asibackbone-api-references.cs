@@ -183,7 +183,7 @@ static partial class AsiBackboneApiReferenceValidator
     private static partial Regex IdentifierRegex();
 
     [GeneratedRegex(
-        @"https://github\.com/AsiBackbone/AsiBackbone/(?:blob|tree)/(?<ref>[^/\s)\]'>]+)/[^\s)\]'>]+",
+        @"https://github\.com/AsiBackbone/AsiBackbone/(?:blob|tree)/(?<ref>[^/\s)\]'>]+)(?:/[^\s)\]'>]*)?",
         RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
     private static partial Regex ImplementationLinkRegex();
 
@@ -336,6 +336,18 @@ static partial class AsiBackboneApiReferenceValidator
             "docs/getting-started/asibackbone-6-api-boundary.md",
             "https://github.com/AsiBackbone/AsiBackbone/blob/develop/src/Example.cs",
             1,
+            failures);
+        AssertImplementationLinkErrorCount(
+            "pathless mutable branch links are rejected",
+            "docs/getting-started/asibackbone-6-api-boundary.md",
+            "https://github.com/AsiBackbone/AsiBackbone/tree/main",
+            1,
+            failures);
+        AssertImplementationLinkErrorCount(
+            "pathless full commit SHA links are accepted",
+            "docs/getting-started/asibackbone-6-api-boundary.md",
+            "https://github.com/AsiBackbone/AsiBackbone/blob/0123456789abcdef0123456789abcdef01234567",
+            0,
             failures);
 
         if (failures.Count > 0)
