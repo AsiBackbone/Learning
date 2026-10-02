@@ -1043,7 +1043,8 @@ public sealed class GovernanceRuntime
     public ToolCallResult EvaluateToolCall(string agentId, string toolName, Dictionary<string, object> args) =>
         kernel.EvaluateToolCall(agentId, toolName, args);
 
-    public void OnAllEvents(Action<GovernanceEvent> handler) => kernel.OnAllEvents(handler);
+    // Internal: only the holder subscribes, so every runtime it publishes gets the same handlers.
+    internal void OnAllEvents(Action<GovernanceEvent> handler) => kernel.OnAllEvents(handler);
 
     // Increment first, then check: paired with Retire, which marks first, then checks. Both
     // Interlocked operations are full fences, so one side always sees the other.
@@ -1099,13 +1100,32 @@ public sealed class RuntimeLease : IDisposable
 
 // A configuration change publishes a whole new runtime, so the kernel and its policy set ID change
 // together, and the old runtime is retired rather than disposed out from under in-flight evaluations.
-public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial) : IDisposable
+public sealed class GovernanceRuntimeHolder : IDisposable
 {
     private readonly object gate = new(); // serializes Replace and Dispose
-    private GovernanceRuntime current = initial;
+    private readonly Action<GovernanceEvent>[] eventHandlers;
+    private GovernanceRuntime current;
     private int disposed;
     private long requestedGeneration; // assigned when a Replace call starts
     private long publishedGeneration; // generation of `current`; written only under the lock
+
+    // The holder owns the event subscriptions, such as the evidence recorder's handler, and applies
+    // them to the initial runtime and to every replacement before it is published. Evidence keeps
+    // flowing across policy reloads instead of silently stopping at the first one.
+    public GovernanceRuntimeHolder(GovernanceRuntime initial, IEnumerable<Action<GovernanceEvent>> eventHandlers)
+    {
+        this.eventHandlers = eventHandlers.ToArray();
+        Subscribe(initial);
+        current = initial;
+    }
+
+    private void Subscribe(GovernanceRuntime runtime)
+    {
+        foreach (Action<GovernanceEvent> handler in eventHandlers)
+        {
+            runtime.OnAllEvents(handler);
+        }
+    }
 
     // Reading the ID needs no lease; it never touches the kernel.
     public PolicySetInfo CurrentPolicySet => Volatile.Read(ref current).PolicySet;
@@ -1139,7 +1159,15 @@ public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial) : IDispos
 
         // Build and verify outside the lock; it reads no shared state.
         GovernanceRuntime next = snapshot.CreateRuntime();
-        // Subscribe event handlers to `next` here, before publishing it.
+        try
+        {
+            Subscribe(next); // before publishing: no evaluation on `next` can go unrecorded
+        }
+        catch
+        {
+            next.Retire();
+            throw;
+        }
 
         lock (gate)
         {
@@ -1191,7 +1219,7 @@ public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial) : IDispos
 }
 ```
 
-At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. If loading or verification fails, `CreateRuntime` disposes the half-built kernel before rethrowing, so a broken configuration retried by a file watcher does not leak a kernel on every attempt. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation leases one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. The replaced runtime is retired rather than disposed: new evaluations can no longer lease it, and its kernel, with its metrics resources, is disposed when the last in-flight evaluation releases its lease. Evaluation is synchronous here, so a lease lasts only as long as one `EvaluateToolCall`. Each `Replace` call takes a generation number when it starts, and a build that finishes after a newer one has been published is retired instead of published, so concurrent replacements take effect in the order they were requested, not the order their builds happened to finish. A snapshot identical to the running one is not published at all. The kernel holds rate-limit windows and circuit-breaker state in memory, so republishing an unchanged configuration, for example on every file-watcher event, would reset those controls and let repeated reloads bypass a `1/hour` limit. A genuine policy change does start the new kernel with fresh windows; if a limit must survive policy changes, enforce it in the host or in a store outside the kernel as well. `Replace` and `Dispose` are serialized, so a replacement can never be published after the holder is disposed; one that loses that race is retired immediately, and once the holder is disposed, `Acquire` and `Replace` throw `ObjectDisposedException` instead of spinning on a retired runtime. The options file must not list `PolicyPaths`, because the package would load those files itself, outside the snapshot; `CreateOptions` rejects them. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
+At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result, passing it the event handlers the application needs, such as the evidence recorder's. The holder owns those subscriptions and applies them to every replacement before publishing it, because a new kernel starts with none; without that, governance events would stop reaching the recorder after the first policy reload. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. If loading or verification fails, `CreateRuntime` disposes the half-built kernel before rethrowing, so a broken configuration retried by a file watcher does not leak a kernel on every attempt. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation leases one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. The replaced runtime is retired rather than disposed: new evaluations can no longer lease it, and its kernel, with its metrics resources, is disposed when the last in-flight evaluation releases its lease. Evaluation is synchronous here, so a lease lasts only as long as one `EvaluateToolCall`. Each `Replace` call takes a generation number when it starts, and a build that finishes after a newer one has been published is retired instead of published, so concurrent replacements take effect in the order they were requested, not the order their builds happened to finish. A snapshot identical to the running one is not published at all. The kernel holds rate-limit windows and circuit-breaker state in memory, so republishing an unchanged configuration, for example on every file-watcher event, would reset those controls and let repeated reloads bypass a `1/hour` limit. A genuine policy change does start the new kernel with fresh windows; if a limit must survive policy changes, enforce it in the host or in a store outside the kernel as well. `Replace` and `Dispose` are serialized, so a replacement can never be published after the holder is disposed; one that loses that race is retired immediately, and once the holder is disposed, `Acquire` and `Replace` throw `ObjectDisposedException` instead of spinning on a retired runtime. The options file must not list `PolicyPaths`, because the package would load those files itself, outside the snapshot; `CreateOptions` rejects them. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
 
 Keep secrets and raw model text out of the decision record, and never read the record back as permission. Evidence explains what happened; it does not authorize what happens next. [Your Audit Log Records the Story, Not the Decision](your-audit-log-is-not-evidence.md) covers the difference between a log line and evidence that can be trusted later.
 
@@ -1335,24 +1363,37 @@ public sealed class AgentGovernanceRefundPolicyContractTests
     [Fact]
     public void Governance_event_carries_the_host_operation_id()
     {
-        GovernanceRuntimeHolder runtimes = TestGovernance.Runtime(TestPolicies.SupportAssistantRefunds);
-
         var events = new List<GovernanceEvent>();
-        using (RuntimeLease lease = runtimes.Acquire())
-        {
-            lease.Runtime.OnAllEvents(events.Add);
-        }
+        GovernanceRuntimeHolder runtimes = TestGovernance.Runtime(
+            eventHandlers: [events.Add], TestPolicies.SupportAssistantRefunds);
 
         RefundContext context = TestData.Context(15_000L);
         new AgentGovernanceRefundPolicy(runtimes).Evaluate(context);
 
-        string expected = context.OperationId.ToString("N");
-        Assert.Contains(events, e =>
-            e.Data.TryGetValue("arguments", out object? args) &&
-            args is IReadOnlyDictionary<string, object> arguments &&
-            arguments.TryGetValue("operation_id", out object? id) &&
-            Equals(id, expected));
+        Assert.Contains(events, e => CarriesOperationId(e, context.OperationId));
     }
+
+    [Fact]
+    public void Event_handlers_follow_the_runtime_across_a_replacement()
+    {
+        var events = new List<GovernanceEvent>();
+        GovernanceRuntimeHolder runtimes = TestGovernance.Runtime(
+            eventHandlers: [events.Add], TestPolicies.SupportAssistantRefunds);
+
+        // A different policy set, so the replacement is actually published.
+        Assert.True(runtimes.Replace(TestGovernance.Snapshot(TestPolicies.SupportAssistantRefundsRevised)));
+
+        RefundContext context = TestData.Context(15_000L);
+        new AgentGovernanceRefundPolicy(runtimes).Evaluate(context);
+
+        Assert.Contains(events, e => CarriesOperationId(e, context.OperationId));
+    }
+
+    private static bool CarriesOperationId(GovernanceEvent e, Guid operationId) =>
+        e.Data.TryGetValue("arguments", out object? args) &&
+        args is IReadOnlyDictionary<string, object> arguments &&
+        arguments.TryGetValue("operation_id", out object? id) &&
+        Equals(id, operationId.ToString("N"));
 
     [Fact]
     public void Acknowledged_warning_completes_only_for_the_same_policy_set_policy_and_rule()
@@ -1421,7 +1462,7 @@ public sealed class AgentGovernanceRefundPolicyContractTests
 }
 ```
 
-The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, blank identifiers and a rule name reused in another policy stop startup, and the governance event still carries the host's operation ID. Add an executor test that publishes a new policy set between evaluation and reservation and expects `policy_set_changed`, a RolledBack operation that can be reserved again, and zero provider calls, a holder test showing that an older snapshot finishing its build last does not replace a newer one, approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
+The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, blank identifiers and a rule name reused in another policy stop startup, and the governance event still carries the host's operation ID, including from a runtime published by a later reload. Add an executor test that publishes a new policy set between evaluation and reservation and expects `policy_set_changed`, a RolledBack operation that can be reserved again, and zero provider calls, a holder test showing that an older snapshot finishing its build last does not replace a newer one, approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
 
 ## Common Failure Modes
 
