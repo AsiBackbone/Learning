@@ -1,0 +1,28 @@
+{
+  "id": 24341839,
+  "name": "automation/x-publisher-state",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "AsiBackbone/Learning",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [],
+      "include": [
+        "refs/heads/automation/x-publisher-state"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "non_fast_forward"
+    },
+    {
+      "type": "required_linear_history"
+    }
+  ],
+  "bypass_actors": []
+}
