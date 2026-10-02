@@ -31,7 +31,7 @@ env:
 jobs:
   validate-and-build-evidence:
     name: Validate release and build evidence
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     permissions:
       contents: read
@@ -146,7 +146,7 @@ jobs:
     name: Attest and publish durable evidence
     if: github.event_name == 'release'
     needs: validate-and-build-evidence
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     permissions:
       attestations: write
