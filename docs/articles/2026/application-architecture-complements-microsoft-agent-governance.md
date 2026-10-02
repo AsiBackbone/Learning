@@ -1021,17 +1021,22 @@ public sealed class RuntimeLease : IDisposable
 // together, and the old runtime is retired rather than disposed out from under in-flight evaluations.
 public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial) : IDisposable
 {
+    private readonly object gate = new(); // serializes Replace and Dispose
     private GovernanceRuntime current = initial;
+    private int disposed;
 
     // Reading the ID needs no lease; it never touches the kernel.
     public PolicySetInfo CurrentPolicySet => Volatile.Read(ref current).PolicySet;
 
     // A retired runtime is never handed out: if a replacement retires the runtime between the
-    // read and the lease, the loop reads again and leases its successor.
+    // read and the lease, the loop reads again and leases its successor. After Dispose there is
+    // no successor, so the loop stops with ObjectDisposedException instead of spinning.
     public RuntimeLease Acquire()
     {
         while (true)
         {
+            ObjectDisposedException.ThrowIf(Volatile.Read(ref disposed) == 1, this);
+
             GovernanceRuntime runtime = Volatile.Read(ref current);
             if (runtime.TryAcquire())
             {
@@ -1042,17 +1047,45 @@ public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial) : IDispos
 
     public void Replace(GovernanceSnapshot snapshot)
     {
-        GovernanceRuntime next = snapshot.CreateRuntime(); // verified before it becomes visible
+        ObjectDisposedException.ThrowIf(Volatile.Read(ref disposed) == 1, this);
+
+        // Build and verify outside the lock; it reads no shared state.
+        GovernanceRuntime next = snapshot.CreateRuntime();
         // Subscribe event handlers to `next` here, before publishing it.
-        GovernanceRuntime previous = Interlocked.Exchange(ref current, next);
-        previous.Retire(); // disposed when its last in-flight evaluation releases its lease
+
+        lock (gate)
+        {
+            if (disposed == 1)
+            {
+                next.Retire(); // a replacement that lost the race with Dispose is retired, not leaked
+                throw new ObjectDisposedException(nameof(GovernanceRuntimeHolder));
+            }
+
+            GovernanceRuntime previous = current;
+            Volatile.Write(ref current, next);
+            previous.Retire(); // disposed when its last in-flight evaluation releases its lease
+        }
     }
 
-    public void Dispose() => Volatile.Read(ref current).Retire();
+    public void Dispose()
+    {
+        lock (gate)
+        {
+            if (disposed == 1)
+            {
+                return;
+            }
+
+            // Mark the holder first, then retire: an Acquire that finds the runtime retired
+            // re-reads the flag and throws rather than looping forever.
+            Volatile.Write(ref disposed, 1);
+            current.Retire();
+        }
+    }
 }
 ```
 
-At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation leases one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. The replaced runtime is retired rather than disposed: new evaluations can no longer lease it, and its kernel, with its metrics resources, is disposed when the last in-flight evaluation releases its lease. Evaluation is synchronous here, so a lease lasts only as long as one `EvaluateToolCall`. The options file must not list `PolicyPaths`, because the package would load those files itself, outside the snapshot; `CreateOptions` rejects them. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
+At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation leases one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. The replaced runtime is retired rather than disposed: new evaluations can no longer lease it, and its kernel, with its metrics resources, is disposed when the last in-flight evaluation releases its lease. Evaluation is synchronous here, so a lease lasts only as long as one `EvaluateToolCall`. `Replace` and `Dispose` are serialized, so a replacement can never be published after the holder is disposed; one that loses that race is retired immediately, and once the holder is disposed, `Acquire` and `Replace` throw `ObjectDisposedException` instead of spinning on a retired runtime. The options file must not list `PolicyPaths`, because the package would load those files itself, outside the snapshot; `CreateOptions` rejects them. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
 
 Keep secrets and raw model text out of the decision record, and never read the record back as permission. Evidence explains what happened; it does not authorize what happens next. [Your Audit Log Records the Story, Not the Decision](your-audit-log-is-not-evidence.md) covers the difference between a log line and evidence that can be trusted later.
 
