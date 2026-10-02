@@ -394,11 +394,20 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceRuntimeHolder runtimes
 
             return decision.Outcome switch
             {
+                // An approval requirement that names no policy, rule, or approver can never be
+                // satisfied. Fail closed here instead of opening a request nobody can decide.
+                GovernedOutcome.ApprovalRequired when
+                    decision.MatchedPolicy is null
+                    || decision.MatchedRule is null
+                    || result.PolicyDecision?.Approvers?.Any() != true =>
+                    Decide(GovernedOutcome.Unavailable, "approval_rule_without_approvers",
+                        decision.MatchedPolicy, decision.MatchedRule, policySetId),
+
                 // Carry the policy-declared approver groups to the host workflow; the host does
                 // not look the policy up again, and cannot drift from what the rule required.
                 GovernedOutcome.ApprovalRequired => decision with
                 {
-                    RequiredApprovers = result.PolicyDecision?.Approvers?.ToArray() ?? [],
+                    RequiredApprovers = result.PolicyDecision!.Approvers!.ToArray(),
                 },
 
                 // Only an allow reached through this approval consumes it.
@@ -681,7 +690,7 @@ public sealed record RefundAcknowledgment(
 
 `GetVerifiedWarningKeysAsync` returns only keys whose acknowledgment is unexpired and unconsumed, and the consume at execution checks the expiry again, so an acknowledgment that lapses between evaluation and reservation does not count. The person confirming is the acting support agent; acknowledgment proves awareness of a specific warning, not authority.
 
-The policy rule names the approver group, as `approvers: [support-supervisors]` does above, and the adapter carries that list from the package's decision into `GovernedDecision.RequiredApprovers` and from there into the stored `ApprovalRequirement`. The host never looks the policy up a second time, so the groups it enforces are exactly the groups the rule declared when it required approval. When a supervisor decides, the workflow checks, at that moment, that the person belongs to one of `Requirement.ApproverGroupNames()` for this tenant, rejects self-approval, and records the group it checked. A rule that requires approval but names no approver can never be satisfied: `ApprovalRequirement.For` refuses to build a requirement for it, and the gateway never looks for one.
+The policy rule names the approver group, as `approvers: [support-supervisors]` does above, and the adapter carries that list from the package's decision into `GovernedDecision.RequiredApprovers` and from there into the stored `ApprovalRequirement`. The host never looks the policy up a second time, so the groups it enforces are exactly the groups the rule declared when it required approval. When a supervisor decides, the workflow checks, at that moment, that the person belongs to one of `Requirement.ApproverGroupNames()` for this tenant, rejects self-approval, and records the group it checked. A rule that requires approval but names no approver, or comes from an unnamed policy or rule, can never be satisfied, so the adapter maps it to `Unavailable` and no approval request is ever opened; `ApprovalRequirement.For` refuses to build a requirement for it as a second guard.
 
 When the supervisor approves, the continuation does not replay the original decision. It starts again from current facts:
 
@@ -710,7 +719,11 @@ An allow verdict at 10:02 against order revision 41 is not permission at 14:30 a
 The execution boundary revalidates every mutable fact whose change would revoke permission, either directly or through a versioned precondition. The order row is not the only such fact. The fraud hold lives in a separate risk system and can change without changing the order's revision, so a check on the order alone would still let a refund through after a hold was placed. The executor therefore rechecks both:
 
 ```csharp
-public sealed class RefundExecutor(IRefundReservations reservations, IRiskStore risk, IPaymentProvider payments)
+public sealed class RefundExecutor(
+    IRefundReservations reservations,
+    IRiskStore risk,
+    IPaymentProvider payments,
+    GovernanceRuntimeHolder governance)
     : IRefundExecutor
 {
     public async Task<RefundResult> ExecuteAsync(RefundCommand command, CancellationToken ct)
@@ -729,6 +742,16 @@ public sealed class RefundExecutor(IRefundReservations reservations, IRiskStore 
         if (!reservation.Reserved)
         {
             return RefundResult.NotExecuted("stale_context"); // re-run the whole flow; never replay the decision
+        }
+
+        // The decision was made under command.PolicySetId. If a different policy set became
+        // active before the reservation committed, the allow is obsolete: release the reservation
+        // and re-run the whole flow under the new policy. Checking after the commit makes the
+        // reservation the point at which both the decision's policy and the order state held.
+        if (governance.CurrentPolicySet.Id != command.PolicySetId)
+        {
+            await reservations.ReleaseAsync(command.OperationId, "policy_set_changed", CancellationToken.None);
+            return RefundResult.NotExecuted("stale_context");
         }
 
         // Only after the reservation commits, call the provider with an idempotency key derived
@@ -777,6 +800,8 @@ The finalization methods are just as conditional. `CompleteAsync` moves an opera
 
 The risk check uses a revision when the risk system exposes one; if it does not, recheck the specific flags that would revoke permission. Because the risk system cannot join the order database's transaction, a short window remains between that read and the reservation. Where that window matters, ask the risk system for a lease or hold that it honors until the operation settles, or have the payment path check the hold itself, and document whatever window remains rather than assuming it away.
 
+The policy set gets the same treatment as the order and risk state. `RefundCommand.From` copies the decision's policy set ID into the command, and the executor compares it with the active policy set after the reservation commits but before the provider is called. A policy published between evaluation and that point turns the old allow into `stale_context`: the reservation is released and the flow re-runs under the new policy, which may deny, ask for approval, or allow again. Any approval or acknowledgment the reservation consumed stays consumed; it was bound to the old policy set and could not count under the new one anyway. Holding the runtime lease longer would not achieve this, because a lease keeps an old kernel alive but does not stop a new policy from becoming active. A policy that becomes active after the check governs the next refund, not one that is already reserved.
+
 The reservation is deliberate. Reducing the refundable balance before calling the provider prevents two concurrent refunds from both spending the same balance, and the operation's recorded state decides what happens to that reservation afterward. A permanently failed refund gives the balance back; an unknown one holds it until reconciliation knows the answer.
 
 How much more execution authority to model depends on how far execution travels from the decision:
@@ -814,7 +839,7 @@ Even in-process evaluation can fail. A policy file can fail to load or contain a
 | Evaluation exceeds its time budget (sidecar or remote backend) | `Unavailable` | A bounded retry with backoff | Treat a timeout as an allow |
 | A circuit breaker around evaluation is open | `Unavailable` | After the breaker's retry-after interval | Bypass the breaker for "important" calls |
 | A governance rate limit is reached | `Deferred` | After the window | Retry in a tight loop until a call gets through |
-| The order or risk state changed before execution | Not executed (`stale_context`) | Re-run the whole flow | Replay the old decision against the new state |
+| The order, risk state, or active policy set changed before execution | Not executed (`stale_context`) | Re-run the whole flow | Replay the old decision against the new state |
 | The provider call timed out after sending | `Unknown` execution outcome | Reconcile using the same idempotency key | Decide again and send with a new key |
 
 Failure semantics can reasonably differ by risk, but only as an explicit, per-tool decision. Moving money fails closed with no exception. A read-only `orders.lookup` tool might, as a documented and recorded risk decision, fall back to ordinary application authorization while governance is unavailable. Express that choice in code for the specific tool; do not let a generic `catch` block turn every governance failure into "proceed."
@@ -1296,7 +1321,7 @@ public sealed class AgentGovernanceRefundPolicyContractTests
 }
 ```
 
-The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, and the governance event still carries the host's operation ID. Add approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
+The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, and the governance event still carries the host's operation ID. Add an executor test that publishes a new policy set between evaluation and reservation and expects `stale_context` with zero provider calls, approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
 
 ## Common Failure Modes
 
