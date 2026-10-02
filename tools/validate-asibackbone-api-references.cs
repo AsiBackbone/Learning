@@ -285,6 +285,11 @@ static partial class AsiBackboneApiReferenceValidator
             1,
             failures);
         AssertCurrentVersionClaimCount(
+            "wrapped stale claims in front matter are detected",
+            "---\ndescription: >-\n  Use the current AsiBackbone\n  3.x API.\n---\n# Current guidance\n",
+            1,
+            failures);
+        AssertCurrentVersionClaimCount(
             "shorter nested fence markers do not close the block",
             "````markdown\nThe current AsiBackbone 3.x default.\n```\nStill fenced.\n````\n",
             0,
@@ -493,22 +498,72 @@ static partial class AsiBackboneApiReferenceValidator
     {
         var prose = new StringBuilder();
         var proseLines = new List<ProseLine>();
+        bool collectingUserFacingValue = false;
 
-        // Treat each metadata line independently so claims in user-facing title,
-        // description, or summary values are checked without joining YAML keys.
         for (int lineIndex = 1; lineIndex < frontMatterEndIndex; lineIndex++)
         {
             string line = lines[lineIndex].TrimEnd('\r');
+            bool isTopLevel = line.Length > 0 && !char.IsWhiteSpace(line[0]);
 
-            if (string.IsNullOrWhiteSpace(line))
+            if (isTopLevel)
             {
+                ValidateProseBlock(relativePath, prose, proseLines, currentMajor, errors);
+                collectingUserFacingValue = false;
+
+                int separatorIndex = line.IndexOf(':');
+
+                if (separatorIndex <= 0 ||
+                    line[..separatorIndex] is not ("title" or "description" or "summary"))
+                {
+                    continue;
+                }
+
+                collectingUserFacingValue = true;
+                string value = line[(separatorIndex + 1)..].Trim();
+
+                if (IsYamlBlockScalarHeader(value))
+                {
+                    continue;
+                }
+
+                AppendProseLine(prose, proseLines, value, lineIndex + 1);
                 continue;
             }
 
-            proseLines.Add(new ProseLine(0, lineIndex + 1));
-            prose.Append(line.Trim());
-            ValidateProseBlock(relativePath, prose, proseLines, currentMajor, errors);
+            if (collectingUserFacingValue)
+            {
+                AppendProseLine(prose, proseLines, line, lineIndex + 1);
+            }
         }
+
+        ValidateProseBlock(relativePath, prose, proseLines, currentMajor, errors);
+    }
+
+    private static bool IsYamlBlockScalarHeader(string value)
+    {
+        return value.Length > 0 &&
+               value[0] is '>' or '|' &&
+               value[1..].All(character => character is '+' or '-' || char.IsDigit(character));
+    }
+
+    private static void AppendProseLine(
+        StringBuilder prose,
+        List<ProseLine> proseLines,
+        string line,
+        int lineNumber)
+    {
+        if (string.IsNullOrWhiteSpace(line))
+        {
+            return;
+        }
+
+        if (prose.Length > 0)
+        {
+            prose.Append(' ');
+        }
+
+        proseLines.Add(new ProseLine(prose.Length, lineNumber));
+        prose.Append(line.Trim());
     }
 
     private static void ValidateProseBlock(
