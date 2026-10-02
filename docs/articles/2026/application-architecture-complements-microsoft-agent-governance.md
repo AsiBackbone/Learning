@@ -231,21 +231,21 @@ name: support-assistant-refunds
 default_action: deny
 rules:
   - name: refund-needs-supervisor-approval
-    condition: "tool_name == 'orders.refund' and amount_minor > 20000 and approval != 'verified'"
+    condition: "agent_did == 'did:mesh:support-assistant' and tool_name == 'orders.refund' and amount_minor > 20000 and approval != 'verified'"
     action: require_approval
     priority: 100
     approvers:
       - support-supervisors
 
   - name: allow-assistant-refunds
-    condition: "tool_name == 'orders.refund'"
+    condition: "agent_did == 'did:mesh:support-assistant' and tool_name == 'orders.refund'"
     action: allow
     priority: 10
 ```
 
-With the documented default conflict strategy, `PriorityFirstMatch`, the highest-priority matching rule wins. A $240 refund without a verified approval matches the approval rule. A $150 refund, or a $240 refund whose approval the host has verified, falls through to the allow rule. Anything else is denied by default.
+Both rules name the assistant. The .NET middleware adds the agent ID it receives to the evaluation context as `agent_did`, and the host passes the registered assistant DID from configuration, never a value from the model, so `agent_did == 'did:mesh:support-assistant'` is what limits refunds to that assistant. Without it, every agent evaluated by this kernel could match the allow rule. The host-built argument dictionary never contains an `agent_did` key of its own. With the documented default conflict strategy, `PriorityFirstMatch`, the highest-priority matching rule wins. A $240 refund from the support assistant without a verified approval matches the approval rule. A $150 refund, or a $240 refund whose approval the host has verified, falls through to the allow rule. Anything else, including any refund proposed by a different agent, is denied by default.
 
-Two cautions apply to that file. First, Microsoft notes that the .NET engine still uses this format while the Python, Rust, and TypeScript runtimes evaluate a newer manifest format, and that the .NET documentation will change when the engine migrates. That is one more reason to keep package-specific code inside a single adapter with its own tests. Second, the documentation shows numeric comparison operators but does not spell out how every numeric type is compared. Confirm how the version you pin compares the values you pass, and cover the threshold in a policy test.
+Two cautions apply to that file. First, Microsoft notes that the .NET engine still uses this format while the Python, Rust, and TypeScript runtimes evaluate a newer manifest format, and that the .NET documentation will change when the engine migrates. That is one more reason to keep package-specific code inside a single adapter with its own tests. Second, the documentation shows numeric comparison operators but does not spell out how every numeric type is compared. Confirm how the version you pin compares the values you pass and that it still exposes the agent ID as `agent_did`, and cover the threshold and a refund from a different agent ID in policy tests.
 
 Notice what is *not* in the policy file: the refundable balance, the currency match, and the fraud hold. Those are domain invariants, and the host checks them before the governance call. The governance policy owns the agent-specific rules: which assistants may refund at all, and the approval threshold for agent-proposed refunds. Each rule has one source of authority. Copying the balance check into the YAML would give the rule two owners and a window in which they disagree.
 
@@ -906,10 +906,15 @@ Microsoft states plainly that the toolkit's audit trail records attempts, not ou
 
 Correlate the records through the operation ID that the host assigns. The decision, workflow, and execution records all carry it, and the adapter passes it into the evaluated arguments as `operation_id`, so the governance event emitted for that evaluation carries the same key, inside its recorded arguments, instead of only the package's own identifiers. The package merges every argument into the policy evaluation context, so nothing stops a rule from reading it; keeping rules independent of it is a convention for policy authors, and the value is there only for correlation. Because the package is in preview, the adapter contract tests later in this article confirm that the event your pinned version emits still contains it. Also record which policy set was actually loaded, and identify it by everything that can change a decision. The same policy files can decide differently under a different conflict strategy, with execution rings or prompt-injection detection switched on, or with different thresholds; equal-priority ties can depend on load order; and a file that changes on disk after the kernel loaded it must not relabel decisions the kernel made from the old content.
 
-Both problems have one fix: read every input exactly once into an immutable snapshot, derive the identifier from those bytes, and build the kernel from the same bytes. All decision-affecting options live in one versioned options file that is part of the snapshot, rather than being set in code where the digest cannot see them. The sample is scoped to the package's in-process policy engine. An external policy backend would have to be constructed and registered inside `CreateRuntime`, from configuration that is part of the snapshot, so that its configuration is both hashed and actually used; hashing a backend's configuration file without building the backend from it would label decisions with a configuration nothing evaluates:
+Both problems have one fix: read every input exactly once into an immutable snapshot, derive the content digest from those bytes, and build the kernel from the same bytes. The digest alone is not enough to bind workflow records, because content can repeat. If the configuration changes from A to B and is later rolled back to A, a digest-only ID would make an unexpired approval or acknowledgment granted under the first A count again. The policy set ID therefore combines the digest with an activation epoch: a number the configuration release process assigns once per activation, stores with the release, and never reuses. A rollback is released as a new activation with a higher epoch, so it gets a new ID, and every instance and restart that loads the same release agrees on that ID. All decision-affecting options live in one versioned options file that is part of the snapshot, rather than being set in code where the digest cannot see them. The sample is scoped to the package's in-process policy engine. An external policy backend would have to be constructed and registered inside `CreateRuntime`, from configuration that is part of the snapshot, so that its configuration is both hashed and actually used; hashing a backend's configuration file without building the backend from it would label decisions with a configuration nothing evaluates:
 
 ```csharp
-public sealed record PolicySetInfo(string Id);
+// Id binds approvals, acknowledgments, and commands. It names one activation of one configuration:
+// returning to earlier content is a new activation with a new Id, never a return to the old one.
+public sealed record PolicySetInfo(long ActivationEpoch, string ContentDigest)
+{
+    public string Id => $"activation-{ActivationEpoch}:{ContentDigest}";
+}
 
 public sealed class GovernanceSnapshot
 {
@@ -937,15 +942,22 @@ public sealed class GovernanceSnapshot
     // optionsPath: every decision-affecting GovernanceOptions setting, including conflict strategy,
     // rings and thresholds, and prompt-injection settings. This sample covers the in-process
     // policy engine only; it does not configure an external policy backend.
-    public static GovernanceSnapshot Load(string optionsPath, IReadOnlyList<string> policyPathsInLoadOrder) =>
+    // activationEpoch: assigned once per policy activation by the configuration release process and
+    // stored durably with the release, so every instance and every restart that loads the release
+    // sees the same number, and no later activation, including a rollback, ever reuses it.
+    public static GovernanceSnapshot Load(
+        long activationEpoch, string optionsPath, IReadOnlyList<string> policyPathsInLoadOrder) =>
         // Read every input exactly once. The ID and the kernel both come from these bytes.
         FromBytes(
+            activationEpoch,
             File.ReadAllBytes(optionsPath),
             policyPathsInLoadOrder.Select(path => (Path.GetFileName(path), File.ReadAllBytes(path))).ToList());
 
     public static GovernanceSnapshot FromBytes(
-        byte[] options, IReadOnlyList<(string Name, byte[] Bytes)> policies)
+        long activationEpoch, byte[] options, IReadOnlyList<(string Name, byte[] Bytes)> policies)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(activationEpoch);
+
         // Copy before hashing: a caller that mutates its arrays afterward must not be able to
         // change what the kernel loads without changing the ID.
         options = options.ToArray();
@@ -973,6 +985,7 @@ public sealed class GovernanceSnapshot
         }
 
         var policySet = new PolicySetInfo(
+            activationEpoch,
             "sha256:" + Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant());
 
         var snapshot = new GovernanceSnapshot(
@@ -1150,8 +1163,8 @@ public sealed class GovernanceRuntimeHolder : IDisposable
     }
 
     // Returns false when nothing was published: either a newer Replace call already published
-    // (the later request wins, however long each build takes) or the snapshot is identical to the
-    // running one.
+    // (the later request wins, however long each build takes), the snapshot belongs to an older
+    // activation epoch than the running one, or the snapshot is identical to the running one.
     public bool Replace(GovernanceSnapshot snapshot)
     {
         ObjectDisposedException.ThrowIf(Volatile.Read(ref disposed) == 1, this);
@@ -1183,6 +1196,22 @@ public sealed class GovernanceRuntimeHolder : IDisposable
             {
                 next.Retire(); // a slower, older build never overwrites a newer published snapshot
                 return false;
+            }
+
+            if (next.PolicySet.ActivationEpoch < current.PolicySet.ActivationEpoch)
+            {
+                // A replayed older release. A rollback must be released as a new, higher epoch,
+                // so that records bound to the earlier activation of that content stay invalid.
+                next.Retire();
+                return false;
+            }
+
+            if (next.PolicySet.ActivationEpoch == current.PolicySet.ActivationEpoch
+                && !StringComparer.Ordinal.Equals(next.PolicySet.ContentDigest, current.PolicySet.ContentDigest))
+            {
+                next.Retire();
+                throw new InvalidOperationException(
+                    "Two different governance configurations cannot share an activation epoch.");
             }
 
             if (StringComparer.Ordinal.Equals(next.PolicySet.Id, current.PolicySet.Id))
@@ -1221,7 +1250,7 @@ public sealed class GovernanceRuntimeHolder : IDisposable
 }
 ```
 
-At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result, passing it the event handlers the application needs, such as the evidence recorder's. The holder owns those subscriptions and applies them to every replacement before publishing it, because a new kernel starts with none; without that, governance events would stop reaching the recorder after the first policy reload. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. If loading or verification fails, `CreateRuntime` disposes the half-built kernel before rethrowing, so a broken configuration retried by a file watcher does not leak a kernel on every attempt. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation leases one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. The replaced runtime is retired rather than disposed: new evaluations can no longer lease it, and its kernel, with its metrics resources, is disposed when the last in-flight evaluation releases its lease. Evaluation is synchronous here, so a lease lasts only as long as one `EvaluateToolCall`. Each `Replace` call takes a generation number when it starts, and a build that finishes after a newer one has been published is retired instead of published, so concurrent replacements take effect in the order they were requested, not the order their builds happened to finish. A snapshot identical to the running one is not published at all. The kernel holds rate-limit windows and circuit-breaker state in memory, so republishing an unchanged configuration, for example on every file-watcher event, would reset those controls and let repeated reloads bypass a `1/hour` limit. A genuine policy change does start the new kernel with fresh windows; if a limit must survive policy changes, enforce it in the host or in a store outside the kernel as well. `Replace` and `Dispose` are serialized, so a replacement can never be published after the holder is disposed; one that loses that race is retired immediately, and once the holder is disposed, `Acquire` and `Replace` throw `ObjectDisposedException` instead of spinning on a retired runtime. The options file must not list `PolicyPaths`, because the package would load those files itself, outside the snapshot; `CreateOptions` rejects them. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
+At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result, passing it the event handlers the application needs, such as the evidence recorder's. The holder owns those subscriptions and applies them to every replacement before publishing it, because a new kernel starts with none; without that, governance events would stop reaching the recorder after the first policy reload. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. If loading or verification fails, `CreateRuntime` disposes the half-built kernel before rethrowing, so a broken configuration retried by a file watcher does not leak a kernel on every attempt. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation leases one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. The replaced runtime is retired rather than disposed: new evaluations can no longer lease it, and its kernel, with its metrics resources, is disposed when the last in-flight evaluation releases its lease. Evaluation is synchronous here, so a lease lasts only as long as one `EvaluateToolCall`. Each `Replace` call takes a generation number when it starts, and a build that finishes after a newer one has been published is retired instead of published, so concurrent replacements take effect in the order they were requested, not the order their builds happened to finish. The activation epoch only moves forward: a snapshot with an older epoch than the running one is retired instead of published, so replaying an old release cannot revive the ID that earlier approvals were bound to, and two different configurations with the same epoch stop the replacement with an error. A snapshot identical to the running one, same content and same epoch, is not published at all. The kernel holds rate-limit windows and circuit-breaker state in memory, so republishing an unchanged configuration, for example on every file-watcher event, would reset those controls and let repeated reloads bypass a `1/hour` limit. A genuine policy change does start the new kernel with fresh windows; if a limit must survive policy changes, enforce it in the host or in a store outside the kernel as well. `Replace` and `Dispose` are serialized, so a replacement can never be published after the holder is disposed; one that loses that race is retired immediately, and once the holder is disposed, `Acquire` and `Replace` throw `ObjectDisposedException` instead of spinning on a retired runtime. The options file must not list `PolicyPaths`, because the package would load those files itself, outside the snapshot; `CreateOptions` rejects them. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one, and with the activation epoch, neither can two activations of the same configuration. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
 
 Keep secrets and raw model text out of the decision record, and never read the record back as permission. Evidence explains what happened; it does not authorize what happens next. [Your Audit Log Records the Story, Not the Decision](your-audit-log-is-not-evidence.md) covers the difference between a log line and evidence that can be trusted later.
 
@@ -1311,7 +1340,8 @@ public sealed class AgentGovernanceRefundPolicyContractTests
     public void Maps_documented_policy_actions_to_application_outcomes(
         long amountMinor, bool approved, GovernedOutcome expected)
     {
-        // TestGovernance.Runtime builds a GovernanceSnapshot from inline options and policy text.
+        // TestGovernance.Runtime builds a GovernanceSnapshot from inline options and policy text,
+        // at activation epoch 1; TestGovernance.Snapshot takes the epoch explicitly.
         var policy = new AgentGovernanceRefundPolicy(
             TestGovernance.Runtime(TestPolicies.SupportAssistantRefunds)); // the policy shown earlier
         RefundContext context = TestData.Context(amountMinor);
@@ -1322,6 +1352,19 @@ public sealed class AgentGovernanceRefundPolicyContractTests
             : first;
 
         Assert.Equal(expected, decision.Outcome);
+    }
+
+    [Theory]
+    [InlineData(15_000L)]
+    [InlineData(24_000L)]
+    public void Refunds_from_another_agent_are_denied_at_any_amount(long amountMinor)
+    {
+        var policy = new AgentGovernanceRefundPolicy(
+            TestGovernance.Runtime(TestPolicies.SupportAssistantRefunds));
+        // TestData.Context uses did:mesh:support-assistant; any other registered agent matches no rule.
+        RefundContext context = TestData.Context(amountMinor) with { AssistantAgentId = "did:mesh:other-assistant" };
+
+        Assert.Equal(GovernedOutcome.Denied, policy.Evaluate(context).Outcome);
     }
 
     [Fact]
@@ -1382,13 +1425,36 @@ public sealed class AgentGovernanceRefundPolicyContractTests
         GovernanceRuntimeHolder runtimes = TestGovernance.Runtime(
             eventHandlers: [events.Add], TestPolicies.SupportAssistantRefunds);
 
-        // A different policy set, so the replacement is actually published.
-        Assert.True(runtimes.Replace(TestGovernance.Snapshot(TestPolicies.SupportAssistantRefundsRevised)));
+        // A different policy set in a later activation, so the replacement is actually published.
+        Assert.True(runtimes.Replace(
+            TestGovernance.Snapshot(activationEpoch: 2, TestPolicies.SupportAssistantRefundsRevised)));
 
         RefundContext context = TestData.Context(15_000L);
         new AgentGovernanceRefundPolicy(runtimes).Evaluate(context);
 
         Assert.Contains(events, e => CarriesOperationId(e, context.OperationId));
+    }
+
+    [Fact]
+    public void Rolling_back_to_earlier_content_never_revives_its_approvals()
+    {
+        GovernanceRuntimeHolder runtimes = TestGovernance.Runtime(TestPolicies.SupportAssistantRefunds); // epoch 1
+        var policy = new AgentGovernanceRefundPolicy(runtimes);
+        RefundContext context = TestData.Context(24_000L);
+        ApprovalRequirement approvedUnderFirstA = ApprovalRequirement.For(context, policy.Evaluate(context));
+
+        // A -> B -> A: the rollback is released as a new activation of the same content.
+        Assert.True(runtimes.Replace(
+            TestGovernance.Snapshot(activationEpoch: 2, TestPolicies.SupportAssistantRefundsRevised)));
+        Assert.True(runtimes.Replace(
+            TestGovernance.Snapshot(activationEpoch: 3, TestPolicies.SupportAssistantRefunds)));
+
+        Assert.Equal(GovernedOutcome.Unavailable, policy.Evaluate(context, approvedUnderFirstA).Outcome);
+
+        // Replaying the original release cannot bring its ID back either.
+        Assert.False(runtimes.Replace(
+            TestGovernance.Snapshot(activationEpoch: 1, TestPolicies.SupportAssistantRefunds)));
+        Assert.Equal(3, runtimes.CurrentPolicySet.ActivationEpoch);
     }
 
     private static bool CarriesOperationId(GovernanceEvent e, Guid operationId) =>
@@ -1415,7 +1481,7 @@ public sealed class AgentGovernanceRefundPolicyContractTests
         {
             AcknowledgedWarnings = new HashSet<string>
             {
-                WarningKeys.For("sha256:previous", "assistant-refund-warnings", "refund-warning"),
+                WarningKeys.For("activation-0:sha256:previous", "assistant-refund-warnings", "refund-warning"),
             },
         };
         RefundContext acknowledgedForSameRuleNameInAnotherPolicy = unacknowledged with
@@ -1464,7 +1530,7 @@ public sealed class AgentGovernanceRefundPolicyContractTests
 }
 ```
 
-The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, blank identifiers and a rule name reused in another policy stop startup, and the governance event still carries the host's operation ID, including from a runtime published by a later reload. Add an executor test that publishes a new policy set between evaluation and reservation and expects `policy_set_changed`, a RolledBack operation that can be reserved again, and zero provider calls, a holder test showing that an older snapshot finishing its build last does not replace a newer one, approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
+The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, a refund from any agent other than the registered assistant is denied, an approval granted for one requirement never satisfies another, including after a rollback to earlier policy content, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, blank identifiers and a rule name reused in another policy stop startup, and the governance event still carries the host's operation ID, including from a runtime published by a later reload. Add an executor test that publishes a new policy set between evaluation and reservation and expects `policy_set_changed`, a RolledBack operation that can be reserved again, and zero provider calls, a holder test showing that an older snapshot finishing its build last does not replace a newer one, approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
 
 ## Common Failure Modes
 
