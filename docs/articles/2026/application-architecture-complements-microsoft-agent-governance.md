@@ -278,16 +278,18 @@ public sealed record GovernedDecision(
     string? MatchedRule,
     string PolicySetId,
     string? AcknowledgedWarning = null,             // consumed at execution when set
-    ApprovalRequirement? ConsumesApproval = null);  // consumed at execution when set
+    ApprovalRequirement? ConsumesApproval = null,   // consumed at execution when set
+    IReadOnlyList<string>? RequiredApprovers = null); // approver groups the matched rule declares
 
-// The exact requirement an approval satisfies. A different rule, policy set, proposal,
-// assistant, or risk tier is a different requirement, and an approval for one never counts for another.
+// The exact requirement an approval satisfies. A different rule, policy set, proposal, approver
+// groups, assistant, or risk tier is a different requirement, and an approval for one never counts for another.
 public sealed record ApprovalRequirement(
     Guid OperationId,
     string ProposalFingerprint,
     string PolicySetId,
     string Policy,
     string Rule,
+    string ApproverGroups,      // canonical form of the groups the policy declared
     string AssistantAgentId,
     RiskTier RiskTier)
 {
@@ -299,8 +301,35 @@ public sealed record ApprovalRequirement(
                 ?? throw new InvalidOperationException("An approval rule from an unnamed policy cannot be satisfied."),
             decision.MatchedRule
                 ?? throw new InvalidOperationException("An unnamed approval rule cannot be satisfied."),
+            CanonicalGroups(decision.RequiredApprovers),
             context.AssistantAgentId,
             context.RiskTier);
+
+    // Sorted, de-duplicated, length-prefixed: the same set of groups always yields the same string.
+    // A rule that names no approver group cannot be satisfied, so it fails closed here.
+    private static string CanonicalGroups(IReadOnlyList<string>? groups) =>
+        groups is { Count: > 0 }
+            ? string.Concat(groups.Distinct(StringComparer.Ordinal)
+                                  .Order(StringComparer.Ordinal)
+                                  .Select(g => $"{g.Length}:{g};"))
+            : throw new InvalidOperationException("An approval rule without approvers cannot be satisfied.");
+
+    public IReadOnlyList<string> ApproverGroupNames() =>
+        ApproverGroups.Length == 0 ? [] : ParseGroups(ApproverGroups);
+
+    private static List<string> ParseGroups(string canonical)
+    {
+        var groups = new List<string>();
+        for (int i = 0; i < canonical.Length;)
+        {
+            int colon = canonical.IndexOf(':', i);
+            int length = int.Parse(canonical.AsSpan(i, colon - i), CultureInfo.InvariantCulture);
+            groups.Add(canonical.Substring(colon + 1, length));
+            i = colon + 1 + length + 1; // skip the trailing ';'
+        }
+
+        return groups;
+    }
 
     public bool Covers(RefundContext context, string policySetId) =>
         OperationId == context.OperationId
@@ -327,8 +356,10 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceRuntimeHolder runtimes
 {
     public GovernedDecision Evaluate(RefundContext context, ApprovalRequirement? verifiedApproval = null)
     {
-        // One runtime per evaluation: the decision and its policy set ID describe the same kernel.
-        GovernanceRuntime runtime = runtimes.Current;
+        // One leased runtime per evaluation: the decision and its policy set ID describe the same
+        // kernel, and that kernel cannot be disposed until the lease is released.
+        using RuntimeLease lease = runtimes.Acquire();
+        GovernanceRuntime runtime = lease.Runtime;
         string policySetId = runtime.PolicySet.Id;
 
         if (verifiedApproval is not null && !verifiedApproval.Covers(context, policySetId))
@@ -361,10 +392,21 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceRuntimeHolder runtimes
                 context,
                 policySetId);
 
-            // Only an allow reached through this approval consumes it.
-            return decision.Outcome == GovernedOutcome.Allowed && verifiedApproval is not null
-                ? decision with { ConsumesApproval = verifiedApproval }
-                : decision;
+            return decision.Outcome switch
+            {
+                // Carry the policy-declared approver groups to the host workflow; the host does
+                // not look the policy up again, and cannot drift from what the rule required.
+                GovernedOutcome.ApprovalRequired => decision with
+                {
+                    RequiredApprovers = result.PolicyDecision?.Approvers?.ToArray() ?? [],
+                },
+
+                // Only an allow reached through this approval consumes it.
+                GovernedOutcome.Allowed when verifiedApproval is not null =>
+                    decision with { ConsumesApproval = verifiedApproval },
+
+                _ => decision,
+            };
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -502,7 +544,13 @@ public sealed class RefundGateway(
 
         // Approval is matched to the requirement the current policy actually states. Evaluate
         // without approval first; only then look for an approval bound to that exact requirement.
-        if (decision is { Outcome: GovernedOutcome.ApprovalRequired, MatchedPolicy: not null, MatchedRule: not null })
+        if (decision is
+            {
+                Outcome: GovernedOutcome.ApprovalRequired,
+                MatchedPolicy: not null,
+                MatchedRule: not null,
+                RequiredApprovers.Count: > 0,
+            })
         {
             ApprovalRequirement requirement = ApprovalRequirement.For(context, decision);
             if (await approvals.IsApprovedAsync(requirement, ct)) // unexpired, eligible, unconsumed
@@ -538,7 +586,7 @@ Denied, deferred, unavailable, escalated, or not yet approved or acknowledged
 Protected executor invocation count = 0
 ```
 
-The approval step deserves a note. An approval is never looked up before the policy has said what it requires. The first evaluation runs with `approval = 'none'` and reports the rule that requires approval. The host then looks for an approval bound to that exact requirement: this operation, this proposal fingerprint, this policy set, this policy and rule, this assistant, and this risk tier. Only if one exists does a second evaluation run with `approval = 'verified'`, and only an allow reached that way carries the approval forward to be consumed. If the risk tier changes, or the same policy set holds a stricter approval rule that now matches, the requirement is different and an approval for the old one does not count. This sketch handles one approval requirement per refund; a policy that stacks several needs the same step repeated for each, with every approval consumed together.
+The approval step deserves a note. An approval is never looked up before the policy has said what it requires. The first evaluation runs with `approval = 'none'` and reports the rule that requires approval. The host then looks for an approval bound to that exact requirement: this operation, this proposal fingerprint, this policy set, this policy and rule, the approver groups that rule declared, this assistant, and this risk tier. Only if one exists does a second evaluation run with `approval = 'verified'`, and only an allow reached that way carries the approval forward to be consumed. If the risk tier changes, or the same policy set holds a stricter approval rule that now matches, the requirement is different and an approval for the old one does not count. This sketch handles one approval requirement per refund; a policy that stacks several needs the same step repeated for each, with every approval consumed together.
 
 Three practical consequences follow.
 
@@ -612,7 +660,8 @@ public sealed record RefundApproval(
     long OrderRevision,
     long AmountMinor,
     string RequestedBy,          // the support agent who asked
-    string? DecidedBy,           // an eligible supervisor, never the requester
+    string? DecidedBy,           // a member of one of Requirement's approver groups, never the requester
+    string? DecidedAsMemberOf,   // the group membership checked when the decision was recorded
     DateTimeOffset ExpiresAt,
     ApprovalStatus Status);      // Pending, Approved, Rejected, Expired, Consumed
 ```
@@ -632,7 +681,7 @@ public sealed record RefundAcknowledgment(
 
 `GetVerifiedWarningKeysAsync` returns only keys whose acknowledgment is unexpired and unconsumed, and the consume at execution checks the expiry again, so an acknowledgment that lapses between evaluation and reservation does not count. The person confirming is the acting support agent; acknowledgment proves awareness of a specific warning, not authority.
 
-The policy rule can name an approver group, as `approvers: [support-supervisors]` does above. The application still resolves that group to people when the approval is decided, checks that the person is eligible for this tenant, and rejects self-approval.
+The policy rule names the approver group, as `approvers: [support-supervisors]` does above, and the adapter carries that list from the package's decision into `GovernedDecision.RequiredApprovers` and from there into the stored `ApprovalRequirement`. The host never looks the policy up a second time, so the groups it enforces are exactly the groups the rule declared when it required approval. When a supervisor decides, the workflow checks, at that moment, that the person belongs to one of `Requirement.ApproverGroupNames()` for this tenant, rejects self-approval, and records the group it checked. A rule that requires approval but names no approver can never be satisfied: `ApprovalRequirement.For` refuses to build a requirement for it, and the gateway never looks for one.
 
 When the supervisor approves, the continuation does not replay the original decision. It starts again from current facts:
 
@@ -895,9 +944,13 @@ public sealed class GovernanceSnapshot
 }
 
 // Holds the kernel privately, so nothing can load, clear, or reconfigure policies after startup.
-public sealed class GovernanceRuntime : IDisposable
+// Its lifetime is lease-counted: a retired runtime is disposed only after its last lease ends.
+public sealed class GovernanceRuntime
 {
     private readonly GovernanceKernel kernel;
+    private int leases;   // in-flight evaluations
+    private int retired;  // 1 once a replacement has been published
+    private int disposed; // 1 once the kernel has been disposed
 
     internal GovernanceRuntime(GovernanceKernel kernel, PolicySetInfo policySet)
     {
@@ -912,26 +965,94 @@ public sealed class GovernanceRuntime : IDisposable
 
     public void OnAllEvents(Action<GovernanceEvent> handler) => kernel.OnAllEvents(handler);
 
-    public void Dispose() => kernel.Dispose();
+    // Increment first, then check: paired with Retire, which marks first, then checks. Both
+    // Interlocked operations are full fences, so one side always sees the other.
+    internal bool TryAcquire()
+    {
+        Interlocked.Increment(ref leases);
+        if (Volatile.Read(ref retired) == 1)
+        {
+            Release();
+            return false;
+        }
+
+        return true;
+    }
+
+    internal void Release()
+    {
+        if (Interlocked.Decrement(ref leases) == 0 && Volatile.Read(ref retired) == 1)
+        {
+            DisposeOnce();
+        }
+    }
+
+    internal void Retire()
+    {
+        Interlocked.Exchange(ref retired, 1);
+        if (Volatile.Read(ref leases) == 0)
+        {
+            DisposeOnce();
+        }
+    }
+
+    private void DisposeOnce()
+    {
+        if (Interlocked.Exchange(ref disposed, 1) == 0)
+        {
+            kernel.Dispose();
+        }
+    }
 }
 
-// A configuration change publishes a whole new runtime, so the kernel and its policy set ID change together.
-public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial)
+public sealed class RuntimeLease : IDisposable
+{
+    private GovernanceRuntime? runtime;
+
+    internal RuntimeLease(GovernanceRuntime runtime) => this.runtime = runtime;
+
+    public GovernanceRuntime Runtime =>
+        Volatile.Read(ref runtime) ?? throw new ObjectDisposedException(nameof(RuntimeLease));
+
+    public void Dispose() => Interlocked.Exchange(ref runtime, null)?.Release();
+}
+
+// A configuration change publishes a whole new runtime, so the kernel and its policy set ID change
+// together, and the old runtime is retired rather than disposed out from under in-flight evaluations.
+public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial) : IDisposable
 {
     private GovernanceRuntime current = initial;
 
-    public GovernanceRuntime Current => Volatile.Read(ref current);
+    // Reading the ID needs no lease; it never touches the kernel.
+    public PolicySetInfo CurrentPolicySet => Volatile.Read(ref current).PolicySet;
 
-    public GovernanceRuntime Replace(GovernanceSnapshot snapshot)
+    // A retired runtime is never handed out: if a replacement retires the runtime between the
+    // read and the lease, the loop reads again and leases its successor.
+    public RuntimeLease Acquire()
+    {
+        while (true)
+        {
+            GovernanceRuntime runtime = Volatile.Read(ref current);
+            if (runtime.TryAcquire())
+            {
+                return new RuntimeLease(runtime);
+            }
+        }
+    }
+
+    public void Replace(GovernanceSnapshot snapshot)
     {
         GovernanceRuntime next = snapshot.CreateRuntime(); // verified before it becomes visible
         // Subscribe event handlers to `next` here, before publishing it.
-        return Interlocked.Exchange(ref current, next);    // dispose once in-flight evaluations finish
+        GovernanceRuntime previous = Interlocked.Exchange(ref current, next);
+        previous.Retire(); // disposed when its last in-flight evaluation releases its lease
     }
+
+    public void Dispose() => Volatile.Read(ref current).Retire();
 }
 ```
 
-At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation captures one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. The options file must not list `PolicyPaths`, because the package would load those files itself, outside the snapshot; `CreateOptions` rejects them. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
+At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation leases one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. The replaced runtime is retired rather than disposed: new evaluations can no longer lease it, and its kernel, with its metrics resources, is disposed when the last in-flight evaluation releases its lease. Evaluation is synchronous here, so a lease lasts only as long as one `EvaluateToolCall`. The options file must not list `PolicyPaths`, because the package would load those files itself, outside the snapshot; `CreateOptions` rejects them. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
 
 Keep secrets and raw model text out of the decision record, and never read the record back as permission. Evidence explains what happened; it does not authorize what happens next. [Your Audit Log Records the Story, Not the Decision](your-audit-log-is-not-evidence.md) covers the difference between a log line and evidence that can be trusted later.
 
@@ -1048,6 +1169,20 @@ public sealed class AgentGovernanceRefundPolicyContractTests
     }
 
     [Fact]
+    public void Approval_requirement_carries_the_policy_declared_approvers()
+    {
+        var policy = new AgentGovernanceRefundPolicy(
+            TestGovernance.Runtime(TestPolicies.SupportAssistantRefunds));
+        RefundContext context = TestData.Context(24_000L);
+
+        GovernedDecision decision = policy.Evaluate(context);
+        ApprovalRequirement requirement = ApprovalRequirement.For(context, decision);
+
+        Assert.Equal(new[] { "support-supervisors" }, decision.RequiredApprovers);
+        Assert.Equal(new[] { "support-supervisors" }, requirement.ApproverGroupNames());
+    }
+
+    [Fact]
     public void Maps_both_rate_limit_states()
     {
         var policy = new AgentGovernanceRefundPolicy(
@@ -1064,7 +1199,10 @@ public sealed class AgentGovernanceRefundPolicyContractTests
         GovernanceRuntimeHolder runtimes = TestGovernance.Runtime(TestPolicies.SupportAssistantRefunds);
 
         var events = new List<GovernanceEvent>();
-        runtimes.Current.OnAllEvents(events.Add);
+        using (RuntimeLease lease = runtimes.Acquire())
+        {
+            lease.Runtime.OnAllEvents(events.Add);
+        }
 
         RefundContext context = TestData.Context(15_000L);
         new AgentGovernanceRefundPolicy(runtimes).Evaluate(context);
@@ -1083,7 +1221,7 @@ public sealed class AgentGovernanceRefundPolicyContractTests
         // Policy "assistant-refund-warnings" with warn rule "refund-warning".
         GovernanceRuntimeHolder runtimes = TestGovernance.Runtime(TestPolicies.WarnOnAssistantRefunds);
         var policy = new AgentGovernanceRefundPolicy(runtimes);
-        string policySetId = runtimes.Current.PolicySet.Id;
+        string policySetId = runtimes.CurrentPolicySet.Id;
         string currentKey = WarningKeys.For(policySetId, "assistant-refund-warnings", "refund-warning");
 
         RefundContext unacknowledged = TestData.Context(5_000L);
@@ -1125,7 +1263,7 @@ public sealed class AgentGovernanceRefundPolicyContractTests
 }
 ```
 
-The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, a permissive default cannot hide behind a denied probe, and the governance event still carries the host's operation ID. Add approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
+The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, and the governance event still carries the host's operation ID. Add approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
 
 ## Common Failure Modes
 
@@ -1172,7 +1310,7 @@ Before a governed agent action reaches a consequential side effect, confirm that
 3. **The verdict is translated, not collapsed.** Approval-required, deferred, escalated, acknowledgment-required, and unavailable remain distinct, and unrecognized decisions never become permission.
 4. **Application authorization runs explicitly,** and only `Allowed` reaches the executor, which is reachable only through the gateway.
 5. **Governance is verified at startup.** At least one policy is loaded, every loaded policy declares `default_action: deny`, an unregistered tool is actually denied, and the kernel and its policy set ID both come from one immutable snapshot of the package version, options, and policy files.
-6. **Approval and acknowledgment are host workflow state.** An approval is looked up only after evaluation names the requirement, and it is bound to that exact requirement (operation, proposal fingerprint, policy set, policy, rule, assistant, and risk tier), checked again at consumption. Both have expiry, eligibility, and single use. An acknowledgment is bound to the proposal fingerprint, the specific warning, and the policy set, so an acknowledged warning completes instead of being requested again.
+6. **Approval and acknowledgment are host workflow state.** An approval is looked up only after evaluation names the requirement, and it is bound to that exact requirement (operation, proposal fingerprint, policy set, policy, rule, declared approver groups, assistant, and risk tier), checked again at consumption. Both have expiry, eligibility, and single use. An acknowledgment is bound to the proposal fingerprint, the specific warning, and the policy set, so an acknowledged warning completes instead of being requested again.
 7. **Execution revalidates every mutable fact that could revoke permission,** reserves before calling out, and bounds execution authority only where delay or delegation requires it.
 8. **Failure semantics are explicit per tool.** An ambiguous governance result never authorizes execution, and an ambiguous execution outcome is reconciled before any new execution attempt.
 9. **Evidence binds policy, workflow, and execution records** through the operation ID; telemetry is not treated as evidence.
