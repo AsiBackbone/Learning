@@ -618,6 +618,22 @@ public static class GovernanceStartupChecks
                 "No agent-governance policies are loaded. Refusing to start.");
         }
 
+        // Identity check: approvals and warning acknowledgments are bound to (policy name, rule
+        // name), and the package accepts duplicates. Two rules sharing that pair would share a
+        // workflow binding, so the pair must be unique across the whole policy set.
+        var duplicateRuleIdentities = policies
+            .SelectMany(policy => policy.Rules.Select(rule => new { Policy = policy.Name, Rule = rule.Name }))
+            .GroupBy(identity => identity)
+            .Where(group => group.Count() > 1)
+            .Select(group => $"{group.Key.Policy}/{group.Key.Rule}")
+            .ToList();
+
+        if (duplicateRuleIdentities.Count > 0)
+        {
+            throw new InvalidOperationException(
+                $"Agent-governance rule identities are duplicated: {string.Join(", ", duplicateRuleIdentities)}. Refusing to start.");
+        }
+
         // Configuration check: every loaded policy must declare default_action: deny.
         var permissive = policies
             .Where(policy => GovernanceActionNames.Normalize($"{policy.DefaultAction}") != "deny")
@@ -641,7 +657,7 @@ public static class GovernanceStartupChecks
 }
 ```
 
-Run the checks with the same `GovernanceOptions` that production uses. Each answers a different question. The policy count confirms that something was loaded. The `DefaultAction` check confirms the configuration: a probe alone cannot, because a policy with `default_action: allow` and a rule that happens to deny the probe tool would still return `Allowed == false`. The probe confirms the effective behavior under the real options. None of them verifies individual rules; the adapter contract tests later in this article cover those.
+Run the checks with the same `GovernanceOptions` that production uses. Each answers a different question. The policy count confirms that something was loaded. The identity check confirms that every (policy name, rule name) pair is unique, because the package's loader accepts duplicates while this article binds approvals and acknowledgments to that pair; two rules sharing one identity would otherwise share one approval or acknowledgment. The `DefaultAction` check confirms the configuration: a probe alone cannot, because a policy with `default_action: allow` and a rule that happens to deny the probe tool would still return `Allowed == false`. The probe confirms the effective behavior under the real options. None of them verifies individual rules; the adapter contract tests later in this article cover those.
 
 ## Policy Verdicts Are Not Approval, Acknowledgment, or Execution Permission
 
@@ -1336,10 +1352,21 @@ public sealed class AgentGovernanceRefundPolicyContractTests
         Assert.Throws<InvalidOperationException>(
             () => TestGovernance.Runtime(TestPolicies.PermissiveDefaultThatDeniesTheProbe));
     }
+
+    [Fact]
+    public void Startup_rejects_duplicate_policy_and_rule_identities()
+    {
+        // Two policy files that both declare policy "support-assistant-refunds"
+        // with a rule named "refund-needs-supervisor-approval".
+        Assert.Throws<InvalidOperationException>(
+            () => TestGovernance.Runtime(
+                TestPolicies.SupportAssistantRefunds,
+                TestPolicies.SupportAssistantRefundsDuplicateRuleName));
+    }
 }
 ```
 
-The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, and the governance event still carries the host's operation ID. Add an executor test that publishes a new policy set between evaluation and reservation and expects `policy_set_changed`, a RolledBack operation that can be reserved again, and zero provider calls, a holder test showing that an older snapshot finishing its build last does not replace a newer one, approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
+The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, duplicate policy and rule identities stop startup, and the governance event still carries the host's operation ID. Add an executor test that publishes a new policy set between evaluation and reservation and expects `policy_set_changed`, a RolledBack operation that can be reserved again, and zero provider calls, a holder test showing that an older snapshot finishing its build last does not replace a newer one, approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
 
 ## Common Failure Modes
 
@@ -1385,7 +1412,7 @@ Before a governed agent action reaches a consequential side effect, confirm that
 2. **Each rule has one owner.** Domain invariants live in the application; agent-specific governance rules live in the policy.
 3. **The verdict is translated, not collapsed.** Approval-required, deferred, escalated, acknowledgment-required, and unavailable remain distinct, and unrecognized decisions never become permission.
 4. **Application authorization runs explicitly,** and only `Allowed` reaches the executor, which is reachable only through the gateway.
-5. **Governance is verified at startup.** At least one policy is loaded, every loaded policy declares `default_action: deny`, an unregistered tool is actually denied, and the kernel and its policy set ID both come from one immutable snapshot of the package version, options, and policy files.
+5. **Governance is verified at startup.** At least one policy is loaded, every (policy name, rule name) identity is unique, every loaded policy declares `default_action: deny`, an unregistered tool is actually denied, and the kernel and its policy set ID both come from one immutable snapshot of the package version, options, and policy files.
 6. **Approval and acknowledgment are host workflow state.** An approval is looked up only after evaluation names the requirement, and it is bound to that exact requirement (operation, proposal fingerprint, policy set, policy, rule, declared approver groups, assistant, and risk tier), checked again at consumption. Both have expiry, eligibility, and single use. An acknowledgment is bound to the proposal fingerprint, the specific warning, and the policy set, so an acknowledged warning completes instead of being requested again.
 7. **Execution revalidates every mutable fact that could revoke permission,** reserves before calling out, and bounds execution authority only where delay or delegation requires it.
 8. **Failure semantics are explicit per tool.** An ambiguous governance result never authorizes execution, and an ambiguous execution outcome is reconciled before any new execution attempt.
