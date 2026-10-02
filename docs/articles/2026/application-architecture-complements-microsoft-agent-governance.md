@@ -143,8 +143,9 @@ public sealed record RefundContext(
     bool FraudHold,
     long RiskRevision,         // the risk snapshot the decision was based on
     RiskTier RiskTier,
-    string ProposalFingerprint, // binds approval to this exact refund
-    ApprovalState Approval);    // host-verified against the fingerprint
+    string ProposalFingerprint, // binds approval and acknowledgment to this exact refund
+    ApprovalState Approval,     // host-verified against the fingerprint
+    IReadOnlySet<string> AcknowledgedWarnings); // warning keys confirmed for this fingerprint
 
 public static class RefundProposalFingerprint
 {
@@ -173,7 +174,8 @@ public static class RefundProposalFingerprint
     }
 }
 
-public sealed class RefundContextResolver(IOrderStore orders, IRiskStore risk, IApprovalStore approvals)
+public sealed class RefundContextResolver(
+    IOrderStore orders, IRiskStore risk, IApprovalStore approvals, IAcknowledgmentStore acknowledgments)
 {
     public async Task<RefundContext?> ResolveAsync(
         RefundProposal proposal, ConversationSession session, Guid operationId, CancellationToken ct)
@@ -196,6 +198,10 @@ public sealed class RefundContextResolver(IOrderStore orders, IRiskStore risk, I
         // reason while reusing the operation ID produces a different fingerprint: no match.
         ApprovalState approval = await approvals.GetStateAsync(operationId, fingerprint, ct);
 
+        // Unconsumed acknowledgments the acting support agent recorded for this exact proposal.
+        IReadOnlySet<string> acknowledged = await acknowledgments.GetVerifiedWarningKeysAsync(
+            operationId, fingerprint, session.SupportAgentId, ct);
+
         return new RefundContext(
             operationId,
             session.AssistantAgentId,
@@ -213,7 +219,8 @@ public sealed class RefundContextResolver(IOrderStore orders, IRiskStore risk, I
             snapshot.Revision,
             snapshot.Tier,
             fingerprint,
-            approval);
+            approval,
+            acknowledged);
     }
 }
 ```
@@ -277,7 +284,8 @@ public sealed record GovernedDecision(
     GovernedOutcome Outcome,
     string ReasonCode,
     string? MatchedRule,
-    string PolicySetId);
+    string PolicySetId,
+    string? AcknowledgedWarning = null); // set when an acknowledgment must be consumed at execution
 
 public interface IRefundGovernance
 {
@@ -312,7 +320,7 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicyS
 
             // Interpolation works whether the pinned version exposes Action as a string or an enum.
             string action = GovernanceActionNames.Normalize($"{result.PolicyDecision?.Action}");
-            return Map(result.Allowed, action, result.PolicyDecision?.MatchedRule);
+            return Map(result.Allowed, action, result.PolicyDecision?.MatchedRule, context);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -320,7 +328,7 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicyS
         }
     }
 
-    private GovernedDecision Map(bool allowed, string action, string? rule) =>
+    private GovernedDecision Map(bool allowed, string action, string? rule, RefundContext context) =>
         (allowed, action) switch
         {
             // A rate_limit rule matched and the call is still within its window.
@@ -328,6 +336,12 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicyS
                 Decide(GovernedOutcome.Allowed, "allowed", rule),
 
             // Application choice: a governance warning on a refund needs explicit confirmation.
+            // A verified acknowledgment of this exact warning, under this policy set, completes it.
+            (true, "warn") when rule is not null
+                             && context.AcknowledgedWarnings.Contains(WarningKey(rule)) =>
+                Decide(GovernedOutcome.Allowed, "warning_acknowledged", rule)
+                    with { AcknowledgedWarning = WarningKey(rule) },
+
             (true, "warn") =>
                 Decide(GovernedOutcome.AcknowledgmentRequired, "governance_warning", rule),
 
@@ -345,6 +359,9 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicyS
             (true, _) =>
                 Decide(GovernedOutcome.Unavailable, "unrecognized_governance_decision", rule),
         };
+
+    // Binding the key to the policy set means a changed policy requires a fresh acknowledgment.
+    private string WarningKey(string rule) => $"{policySet.Id}#{rule}";
 
     private GovernedDecision Decide(GovernedOutcome outcome, string reasonCode, string? rule) =>
         new(outcome, reasonCode, rule, policySet.Id);
@@ -366,7 +383,7 @@ A few choices in that mapping are deliberate:
 - **Rate limiting has two states.** In current releases, a call that matches a `rate_limit` rule while its window still has room comes back with `Allowed == true` and the action `rate_limit`; once the limit is exhausted, it comes back with `Allowed == false` and `rate_limited`. The first is an ordinary allow. The second is `Deferred`: the refund is valid but must wait. Mapping only one of them would either defer allowed calls or let exhausted ones fall through to a plain denial.
 - **Unrecognized blocks are denials; unrecognized allows are unavailable.** A preview package can add policy actions. If a call is blocked for a reason the adapter does not know, it stays blocked. If a call is allowed by a decision the adapter cannot explain, the application refuses to treat that as permission.
 - **A block can arrive without the policy decision you expect.** Microsoft documents that ring checks and prompt-injection checks, when enabled, run before policy evaluation. The `(false, _)` arm treats any such block as a denial without depending on which check produced it.
-- **Treating `warn` as acknowledgment is an application decision.** The library says the call may proceed with a flag. For money movement, this application chooses to make the support agent confirm the warning first. A read-only tool might simply log it.
+- **Treating `warn` as acknowledgment is an application decision.** The library says the call may proceed with a flag. For money movement, this application chooses to make the support agent confirm the warning first. That choice needs a completion path, or every re-evaluation would ask again forever: once the support agent confirms, the host records an acknowledgment bound to the proposal fingerprint and a warning key made of the policy set ID and the matched rule. The next evaluation sees that key in `AcknowledgedWarnings` and allows the refund, and the executor consumes the acknowledgment atomically when it reserves the balance. An acknowledgment of a different warning, a different refund, or a policy set that has since changed does not count, and an unnamed rule can never be acknowledged. A read-only tool might simply log it.
 - **Not every outcome comes from the library.** `Escalated` comes from the host's own fraud-hold rule, shown in the next section. The outcome type describes the application's control flow, not one component's vocabulary.
 
 ## Keep the Protected Side Effect Behind the Boundary
@@ -434,7 +451,7 @@ public sealed class RefundGateway(
         return decision.Outcome switch
         {
             GovernedOutcome.Allowed =>
-                await executor.ExecuteAsync(RefundCommand.From(context), ct),
+                await executor.ExecuteAsync(RefundCommand.From(context, decision), ct),
             GovernedOutcome.ApprovalRequired =>
                 await workflow.RequestApprovalAsync(context, decision, ct),
             GovernedOutcome.AcknowledgmentRequired =>
@@ -520,7 +537,7 @@ None of these implies another. A `require_approval` verdict says that approval i
 
 A policy engine determines whether an action is currently permitted. A workflow answers different questions: whether an eligible reviewer approved a specific proposal, and whether that approval still applies.
 
-Keep long-running state out of the evaluator. Microsoft documents the .NET policy engine's evaluation as side-effect free; keep it that way. Do not move approval tables into policy conditions, and do not mutate workflow state from inside evaluation because the hook happens to be convenient. The policy receives one host-verified fact, `approval == 'verified'`. The record behind that fact lives in the application:
+Keep application workflow state out of the evaluator. Evaluation is not entirely free of side effects in the current .NET package: it maintains its own rate-limit windows and emits audit events and metrics. Those are the package's concerns. What belongs to the application is the workflow: do not move approval tables into policy conditions, and do not create, change, or consume approvals and acknowledgments from inside evaluation because the hook happens to be convenient. The policy receives one host-verified fact, `approval == 'verified'`. The record behind that fact lives in the application:
 
 ```csharp
 public sealed record RefundApproval(
@@ -533,6 +550,8 @@ public sealed record RefundApproval(
     DateTimeOffset ExpiresAt,
     ApprovalStatus Status);      // Pending, Approved, Rejected, Expired, Consumed
 ```
+
+Acknowledgment follows the same pattern with a smaller record: the operation ID, the proposal fingerprint, the warning key, the support agent who confirmed it, when, and whether it has been consumed. The person confirming is the acting support agent, not a supervisor; acknowledgment proves awareness of a specific warning, not authority.
 
 The policy rule can name an approver group, as `approvers: [support-supervisors]` does above. The application still resolves that group to people when the approval is decided, checks that the person is eligible for this tenant, and rejects self-approval.
 
@@ -620,7 +639,7 @@ public sealed class RefundExecutor(IRefundReservations reservations, IRiskStore 
 }
 ```
 
-`ReserveAsync` is where the atomicity lives. In an EF Core implementation, it is a conditional `ExecuteUpdateAsync` on the order (matching tenant, order ID, expected revision, and a refundable balance that still covers the amount, then decrementing the balance and incrementing the revision), the insert of the Pending operation, and the approval's conditional consume (matching operation ID and proposal fingerprint, still Approved, and unexpired, then marking it Consumed), all inside one database transaction that commits before the provider is called. If any part fails, none of it happened, so a crash can never leave a reserved balance with no operation record or an approval that was used without a reservation.
+`ReserveAsync` is where the atomicity lives. In an EF Core implementation, it is a conditional `ExecuteUpdateAsync` on the order (matching tenant, order ID, expected revision, and a refundable balance that still covers the amount, then decrementing the balance and incrementing the revision), the insert of the Pending operation, the approval's conditional consume (matching operation ID and proposal fingerprint, still Approved, and unexpired, then marking it Consumed), and, when the decision carries an acknowledged warning, the same conditional consume of that acknowledgment (matching operation ID, fingerprint, and warning key), all inside one database transaction that commits before the provider is called. If any part fails, none of it happened, so a crash can never leave a reserved balance with no operation record or an approval that was used without a reservation.
 
 The finalization methods are just as conditional. `CompleteAsync` moves an operation from Pending or Unknown to Succeeded and records the provider reference. `ReleaseAsync` moves it from Pending or Unknown to Failed and restores the refundable balance in the same transaction, so the balance can be restored only once. `MarkUnknownAsync` moves it from Pending to Unknown and leaves the reservation in place. Reconciliation calls the same methods once it learns the provider's answer. If the process crashes before a finalization write lands, the operation is still Pending, and reconciliation treats a Pending operation older than its time budget exactly like an Unknown one.
 
@@ -677,26 +696,41 @@ Four kinds of records describe this flow. They are often stored in different pla
 | Kind | Answers | In this example | Binds to |
 | --- | --- | --- | --- |
 | Policy decision evidence | What did governance decide, under which rules? | Governance events from the kernel, plus the matched rule and policy set ID in the host's decision record | The evaluated input and the policy set |
-| Workflow evidence | Who approved or acknowledged what, and when? | The approval record | Operation ID, proposal fingerprint, order revision |
+| Workflow evidence | Who approved or acknowledged what, and when? | The approval and acknowledgment records | Operation ID, proposal fingerprint, order revision |
 | Execution evidence | What happened to the side effect? | The executor's claim, the provider reference, and a Succeeded, Failed, or Unknown outcome | Operation ID and idempotency key |
 | Telemetry | How is the system behaving? | Metrics such as `agent_governance.tool_calls_blocked`, logs, and traces | Aggregates and samples |
 
 Microsoft states plainly that the toolkit's audit trail records attempts, not outcomes. Execution evidence is therefore the application's job. Telemetry supports diagnosis, but it is sampled, aggregated, and retention-managed; it is not a reliable answer to "who approved refund 7f3c, under which policy, and did the money move?"
 
-Correlate the records through the operation ID that the host assigns. The decision, workflow, and execution records all carry it, and the adapter passes it into the evaluated arguments as `operation_id`, so the governance event emitted for that evaluation carries the same key, inside its recorded arguments, instead of only the package's own identifiers. The package merges every argument into the policy evaluation context, so nothing stops a rule from reading it; keeping rules independent of it is a convention for policy authors, and the value is there only for correlation. Because the package is in preview, the adapter contract tests later in this article confirm that the event your pinned version emits still contains it. Also record which policy set was actually loaded. The host knows which files it gave the kernel, so it can identify them at startup:
+Correlate the records through the operation ID that the host assigns. The decision, workflow, and execution records all carry it, and the adapter passes it into the evaluated arguments as `operation_id`, so the governance event emitted for that evaluation carries the same key, inside its recorded arguments, instead of only the package's own identifiers. The package merges every argument into the policy evaluation context, so nothing stops a rule from reading it; keeping rules independent of it is a convention for policy authors, and the value is there only for correlation. Because the package is in preview, the adapter contract tests later in this article confirm that the event your pinned version emits still contains it. Also record which policy set was actually loaded, and identify it by everything that can change a decision. The same files can decide differently under a different conflict strategy, and equal-priority ties can depend on the order in which policies were loaded, so the identifier covers the package version, the behavior-affecting options, and the files in load order:
 
 ```csharp
 public sealed record PolicySetInfo(string Id)
 {
-    public static PolicySetInfo FromFiles(IEnumerable<string> paths)
+    // Pass the files in the exact order the kernel loads them; do not sort them here.
+    public static PolicySetInfo From(IReadOnlyList<string> policyFilesInLoadOrder, GovernanceOptions options)
     {
         using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
 
-        foreach (string path in paths.Order(StringComparer.Ordinal))
+        void Field(byte[] value)
         {
-            byte[] content = File.ReadAllBytes(path);
-            hash.AppendData(Encoding.UTF8.GetBytes($"{Path.GetFileName(path)}\n{content.Length}\n"));
-            hash.AppendData(content);
+            hash.AppendData(Encoding.UTF8.GetBytes($"{value.Length}:"));
+            hash.AppendData(value);
+        }
+
+        void Text(string value) => Field(Encoding.UTF8.GetBytes(value));
+
+        Text("policy-set/v1");
+        Text(typeof(GovernanceKernel).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+            ?? throw new InvalidOperationException("Cannot identify the governance package version."));
+        Text(options.ConflictStrategy.ToString());
+        // Add every other option that changes decisions in the version you pin.
+
+        foreach (string path in policyFilesInLoadOrder)
+        {
+            Text(Path.GetFileName(path));
+            Field(File.ReadAllBytes(path));
         }
 
         return new PolicySetInfo("sha256:" + Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant());
@@ -846,6 +880,30 @@ public sealed class AgentGovernanceRefundPolicyContractTests
     }
 
     [Fact]
+    public void Acknowledged_warning_completes_only_for_the_same_policy_set_and_rule()
+    {
+        using var kernel = new GovernanceKernel();
+        kernel.LoadPolicyFromYaml(TestPolicies.WarnOnAssistantRefunds); // warn rule "refund-warning"
+
+        var policy = new AgentGovernanceRefundPolicy(kernel, new PolicySetInfo("set-a"));
+
+        RefundContext unacknowledged = TestData.Context(5_000L, ApprovalState.None);
+        RefundContext acknowledged = unacknowledged with
+        {
+            AcknowledgedWarnings = new HashSet<string> { "set-a#refund-warning" },
+        };
+        RefundContext acknowledgedUnderOldPolicy = unacknowledged with
+        {
+            AcknowledgedWarnings = new HashSet<string> { "set-old#refund-warning" },
+        };
+
+        Assert.Equal(GovernedOutcome.AcknowledgmentRequired, policy.Evaluate(unacknowledged).Outcome);
+        Assert.Equal(GovernedOutcome.Allowed, policy.Evaluate(acknowledged).Outcome);
+        Assert.Equal("set-a#refund-warning", policy.Evaluate(acknowledged).AcknowledgedWarning);
+        Assert.Equal(GovernedOutcome.AcknowledgmentRequired, policy.Evaluate(acknowledgedUnderOldPolicy).Outcome);
+    }
+
+    [Fact]
     public void Startup_rejects_a_permissive_default_even_when_the_probe_is_denied()
     {
         using var kernel = new GovernanceKernel();
@@ -868,7 +926,7 @@ The first group proves the boundary: whatever governance decides, only `Allowed`
 - **Persisting an allow decision.** An earlier allow, replayed after the policy or the resource changed, authorizes an operation nobody evaluated.
 - **Confusing approval, acknowledgment, and authorization.** Each answers a different question, and none silently becomes permission to execute.
 - **Assuming audit logging proves non-execution.** A recorded denial shows what governance decided, not what every other code path did.
-- **Putting workflow state or side effects inside the policy evaluator.** Evaluation stays deterministic and side-effect free; workflow and execution live in the application.
+- **Putting application workflow state or business side effects inside the policy evaluator.** The package keeps its own rate-limit and telemetry state; approvals, acknowledgments, and execution live in the application.
 - **Failing open on governance errors.** Proceeding when evaluation fails, times out, or was never configured is a risk decision. Make it explicitly, per tool, or do not make it at all.
 - **Duplicating one rule in several layers.** A balance check in the YAML, the handler, and the executor drifts. Give each rule one owner, and let the executor revalidate only the facts that can change before the write.
 - **Wrapping every low-risk call in heavyweight machinery.** Approval workflows, grants, and remote decision points have costs. Use them where the lifecycle needs them.
@@ -904,7 +962,7 @@ Before a governed agent action reaches a consequential side effect, confirm that
 3. **The verdict is translated, not collapsed.** Approval-required, deferred, escalated, acknowledgment-required, and unavailable remain distinct, and unrecognized decisions never become permission.
 4. **Application authorization runs explicitly,** and only `Allowed` reaches the executor, which is reachable only through the gateway.
 5. **Governance is verified at startup.** At least one policy is loaded, every loaded policy declares `default_action: deny`, an unregistered tool is actually denied, and the set is identified by a policy set ID.
-6. **Approval and acknowledgment are host workflow state,** bound to the operation and a proposal fingerprint recomputed at lookup and again at consumption, with expiry, eligibility, and single use.
+6. **Approval and acknowledgment are host workflow state,** bound to the operation and a proposal fingerprint recomputed at lookup and again at consumption, with expiry, eligibility, and single use. An acknowledgment is also bound to the specific warning and policy set, so an acknowledged warning completes instead of being requested again.
 7. **Execution revalidates every mutable fact that could revoke permission,** reserves before calling out, and bounds execution authority only where delay or delegation requires it.
 8. **Failure semantics are explicit per tool.** An ambiguous governance result never authorizes execution, and an ambiguous execution outcome is reconciled before any new execution attempt.
 9. **Evidence binds policy, workflow, and execution records** through the operation ID; telemetry is not treated as evidence.
