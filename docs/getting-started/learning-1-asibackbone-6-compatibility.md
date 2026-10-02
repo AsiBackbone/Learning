@@ -8,7 +8,7 @@ asibackbone_status: historical
 
 > **Historical baseline:** Learning 1.0 documents and teaches the AsiBackbone 6.0 production surface. Use the [AsiBackbone 7.0 API Boundary](asibackbone-7-api-boundary.md) for current package syntax.
 
-Learning 1.0 is the educational companion to AsiBackbone 6.0. Its API-facing examples and implementation links are interpreted against the immutable `v6.0.0` product baseline.
+Learning 1.0 is the educational companion to AsiBackbone 6.0. Its API-facing examples and implementation links are interpreted against the pinned `v6.0.0` product baseline.
 
 It does **not** mean that Learning depends on the AsiBackbone packages. Most Learning samples remain framework-neutral teaching models, and the architecture lessons are intended to remain useful even when you implement them without AsiBackbone.
 

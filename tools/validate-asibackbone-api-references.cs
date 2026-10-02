@@ -251,7 +251,7 @@ static partial class AsiBackboneApiReferenceValidator
             : $"{packageReferenceCount} AsiBackbone 7.x package reference(s)";
 
         Console.WriteLine(
-            $"Validated current AsiBackbone 7.0 references and immutable historical compatibility pages across {textFiles.Length} instructional file(s): {packageSummary}.");
+            $"Validated current AsiBackbone 7.0 references and version-pinned historical compatibility pages across {textFiles.Length} instructional file(s): {packageSummary}.");
         return 0;
     }
 
@@ -261,7 +261,7 @@ static partial class AsiBackboneApiReferenceValidator
 
         AssertCurrentVersionClaimCount(
             "historical front matter exempts the page",
-            "---\nasibackbone_status: historical\n---\nThe current AsiBackbone 3.x default.\n",
+            "---\ndescription: Use the current AsiBackbone 3.x API.\nasibackbone_status: historical\n---\nThe current AsiBackbone 3.x default.\n",
             0,
             failures);
         AssertCurrentVersionClaimCount(
@@ -272,6 +272,16 @@ static partial class AsiBackboneApiReferenceValidator
         AssertCurrentVersionClaimCount(
             "wrapped stale claims are detected",
             "The current `AsiBackbone`\n3.x default is fail closed.\n",
+            1,
+            failures);
+        AssertCurrentVersionClaimCount(
+            "reverse-order stale claims are detected",
+            "AsiBackbone 6.0 remains the current implementation line.\n",
+            1,
+            failures);
+        AssertCurrentVersionClaimCount(
+            "stale claims in front matter are detected",
+            "---\ndescription: Use the current AsiBackbone 3.x API.\n---\n# Current guidance\n",
             1,
             failures);
         AssertCurrentVersionClaimCount(
@@ -412,6 +422,17 @@ static partial class AsiBackboneApiReferenceValidator
         int fenceLength = 0;
         var prose = new StringBuilder();
         var proseLines = new List<ProseLine>();
+
+        if (hasFrontMatter)
+        {
+            ValidateFrontMatterVersionClaims(
+                relativePath,
+                lines,
+                frontMatterEndIndex,
+                currentMajor,
+                errors);
+        }
+
         int firstContentLineIndex = hasFrontMatter ? frontMatterEndIndex + 1 : 0;
 
         for (int lineIndex = firstContentLineIndex; lineIndex < lines.Length; lineIndex++)
@@ -461,6 +482,33 @@ static partial class AsiBackboneApiReferenceValidator
         }
 
         ValidateProseBlock(relativePath, prose, proseLines, currentMajor, errors);
+    }
+
+    private static void ValidateFrontMatterVersionClaims(
+        string relativePath,
+        string[] lines,
+        int frontMatterEndIndex,
+        int currentMajor,
+        List<string> errors)
+    {
+        var prose = new StringBuilder();
+        var proseLines = new List<ProseLine>();
+
+        // Treat each metadata line independently so claims in user-facing title,
+        // description, or summary values are checked without joining YAML keys.
+        for (int lineIndex = 1; lineIndex < frontMatterEndIndex; lineIndex++)
+        {
+            string line = lines[lineIndex].TrimEnd('\r');
+
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
+
+            proseLines.Add(new ProseLine(0, lineIndex + 1));
+            prose.Append(line.Trim());
+            ValidateProseBlock(relativePath, prose, proseLines, currentMajor, errors);
+        }
     }
 
     private static void ValidateProseBlock(
@@ -610,7 +658,7 @@ static partial class AsiBackboneApiReferenceValidator
             if (status.Equals("historical", StringComparison.OrdinalIgnoreCase) &&
                 expectedRef.Equals("main", StringComparison.OrdinalIgnoreCase))
             {
-                errors.Add($"{relativePath} is historical and must use an immutable implementation ref, not main.");
+                errors.Add($"{relativePath} is historical and must use a pinned implementation ref, not main.");
             }
 
             bool isCurrentBoundary = relativePath.Equals(
@@ -639,7 +687,7 @@ static partial class AsiBackboneApiReferenceValidator
             if (!isCurrentBoundary && expectedRef.Equals("main", StringComparison.OrdinalIgnoreCase))
             {
                 errors.Add(
-                    $"{relativePath} is a versioned compatibility page and must pin an immutable implementation ref instead of main.");
+                    $"{relativePath} is a versioned compatibility page and must pin an implementation ref instead of main.");
             }
 
             foreach (Match linkMatch in ImplementationLinkRegex().Matches(text))
