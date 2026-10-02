@@ -269,6 +269,7 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicyS
                 toolName: "orders.refund",
                 args: new()
                 {
+                    ["operation_id"] = context.OperationId.ToString("N"), // correlation only, never a policy input
                     ["tenant_id"] = context.TenantId,
                     ["amount_minor"] = context.AmountMinor,
                     ["currency"] = context.Currency,
@@ -277,7 +278,7 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicyS
                 });
 
             // Interpolation works whether the pinned version exposes Action as a string or an enum.
-            string action = Normalize($"{result.PolicyDecision?.Action}");
+            string action = GovernanceActionNames.Normalize($"{result.PolicyDecision?.Action}");
             return Map(result.Allowed, action, result.PolicyDecision?.MatchedRule);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -286,16 +287,11 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicyS
         }
     }
 
-    // "require_approval", "RequireApproval", and "requireapproval" all become "requireapproval".
-    private static string Normalize(string action) =>
-        action.Replace("_", "", StringComparison.Ordinal)
-              .Replace("-", "", StringComparison.Ordinal)
-              .ToLowerInvariant();
-
     private GovernedDecision Map(bool allowed, string action, string? rule) =>
         (allowed, action) switch
         {
-            (true, "allow" or "log") =>
+            // A rate_limit rule matched and the call is still within its window.
+            (true, "allow" or "log" or "ratelimit") =>
                 Decide(GovernedOutcome.Allowed, "allowed", rule),
 
             // Application choice: a governance warning on a refund needs explicit confirmation.
@@ -305,7 +301,8 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicyS
             (false, "requireapproval") =>
                 Decide(GovernedOutcome.ApprovalRequired, "approval_required", rule),
 
-            (false, "ratelimit") =>
+            // The window's limit is exhausted: valid, but must wait.
+            (false, "ratelimited" or "ratelimit") =>
                 Decide(GovernedOutcome.Deferred, "rate_limited", rule),
 
             (false, _) =>
@@ -319,12 +316,21 @@ public sealed class AgentGovernanceRefundPolicy(GovernanceKernel kernel, PolicyS
     private GovernedDecision Decide(GovernedOutcome outcome, string reasonCode, string? rule) =>
         new(outcome, reasonCode, rule, policySet.Id);
 }
+
+public static class GovernanceActionNames
+{
+    // "require_approval", "RequireApproval", and "requireapproval" all become "requireapproval".
+    public static string Normalize(string action) =>
+        action.Replace("_", "", StringComparison.Ordinal)
+              .Replace("-", "", StringComparison.Ordinal)
+              .ToLowerInvariant();
+}
 ```
 
 A few choices in that mapping are deliberate:
 
 - **The adapter matches normalized action names, not the package's types.** Microsoft's .NET tutorial presents the decision's action as the `PolicyAction` enum, while current releases of the package expose `PolicyDecision.Action` as a lowercase string such as `requireapproval` or `ratelimit`. Normalizing the value to lowercase without separators keeps the mapping independent of that representation, and the adapter contract tests below fail if a future release renames an action.
-
+- **Rate limiting has two states.** In current releases, a call that matches a `rate_limit` rule while its window still has room comes back with `Allowed == true` and the action `rate_limit`; once the limit is exhausted, it comes back with `Allowed == false` and `rate_limited`. The first is an ordinary allow. The second is `Deferred`: the refund is valid but must wait. Mapping only one of them would either defer allowed calls or let exhausted ones fall through to a plain denial.
 - **Unrecognized blocks are denials; unrecognized allows are unavailable.** A preview package can add policy actions. If a call is blocked for a reason the adapter does not know, it stays blocked. If a call is allowed by a decision the adapter cannot explain, the application refuses to treat that as permission.
 - **A block can arrive without the policy decision you expect.** Microsoft documents that ring checks and prompt-injection checks, when enabled, run before policy evaluation. The `(false, _)` arm treats any such block as a denial without depending on which check produced it.
 - **Treating `warn` as acknowledgment is an application decision.** The library says the call may proceed with a flag. For money movement, this application chooses to make the support agent confirm the warning first. A read-only tool might simply log it.
@@ -423,26 +429,45 @@ Three practical consequences follow.
 
 **Every path to the side effect goes through the boundary.** The assistant's tool is rarely the only way to issue a refund. A background job that retries failed refunds, an internal administration endpoint, and a second agent all need to pass through the same gateway or an equivalent that is just as explicit. In an ASP.NET Core application, keep the executor internal to the module, register it only where the gateway needs it, and keep payment credentials inside it.
 
-**A governance layer that is not configured governs nothing.** Microsoft's limitations page warns that a policy evaluator with no policies loaded defaults to `allow`, and recommends a deny-by-default posture in production. Empty-policy behavior also differs across SDKs and versions: current releases of the .NET package deny an evaluation when no policies are loaded. A probe that only checks for a denial therefore cannot tell "deny-by-default" from "nothing loaded." Make both conditions explicit at startup rather than assuming either:
+**A governance layer that is not configured governs nothing.** Microsoft's limitations page warns that a policy evaluator with no policies loaded defaults to `allow`, and recommends a deny-by-default posture in production. Empty-policy behavior also differs across SDKs and versions: current releases of the .NET package deny an evaluation when no policies are loaded. A probe that only checks for a denial therefore cannot tell "deny-by-default" from "nothing loaded." Make the configuration and its effect explicit startup conditions rather than assumptions:
 
 ```csharp
-// At startup: require a loaded policy set, then require it to be deny-by-default.
-if (kernel.PolicyEngine.ListPolicies().Count == 0)
+public static class GovernanceStartupChecks
 {
-    throw new InvalidOperationException(
-        "No agent-governance policies are loaded. Refusing to start.");
-}
+    // Call once at startup, before the refund tool is exposed.
+    public static void Verify(GovernanceKernel kernel)
+    {
+        var policies = kernel.PolicyEngine.ListPolicies();
+        if (policies.Count == 0)
+        {
+            throw new InvalidOperationException(
+                "No agent-governance policies are loaded. Refusing to start.");
+        }
 
-var probe = kernel.EvaluateToolCall("startup-probe", "governance.unregistered-probe-tool");
+        // Configuration check: every loaded policy must declare default_action: deny.
+        var permissive = policies
+            .Where(policy => GovernanceActionNames.Normalize($"{policy.DefaultAction}") != "deny")
+            .Select(policy => policy.Name)
+            .ToList();
 
-if (probe.Allowed)
-{
-    throw new InvalidOperationException(
-        "The agent-governance policy set allowed an unregistered tool. Refusing to start.");
+        if (permissive.Count > 0)
+        {
+            throw new InvalidOperationException(
+                $"Agent-governance policies are not deny-by-default: {string.Join(", ", permissive)}. Refusing to start.");
+        }
+
+        // Behavior check: an unregistered tool must actually be denied with these options.
+        var probe = kernel.EvaluateToolCall("startup-probe", "governance.unregistered-probe-tool");
+        if (probe.Allowed)
+        {
+            throw new InvalidOperationException(
+                "The agent-governance policy set allowed an unregistered tool. Refusing to start.");
+        }
+    }
 }
 ```
 
-Run the checks with the same `GovernanceOptions` that production uses. The first confirms that policies were actually loaded; the second verifies the default posture, not each rule. The adapter contract tests later in this article cover the rules.
+Run the checks with the same `GovernanceOptions` that production uses. Each answers a different question. The policy count confirms that something was loaded. The `DefaultAction` check confirms the configuration: a probe alone cannot, because a policy with `default_action: allow` and a rule that happens to deny the probe tool would still return `Allowed == false`. The probe confirms the effective behavior under the real options. None of them verifies individual rules; the adapter contract tests later in this article cover those.
 
 ## Policy Verdicts Are Not Approval, Acknowledgment, or Execution Permission
 
@@ -625,7 +650,7 @@ Four kinds of records describe this flow. They are often stored in different pla
 
 Microsoft states plainly that the toolkit's audit trail records attempts, not outcomes. Execution evidence is therefore the application's job. Telemetry supports diagnosis, but it is sampled, aggregated, and retention-managed; it is not a reliable answer to "who approved refund 7f3c, under which policy, and did the money move?"
 
-Correlate the records through the operation ID that the host assigns, and record which policy set was actually loaded. The host knows which files it gave the kernel, so it can identify them at startup:
+Correlate the records through the operation ID that the host assigns. The decision, workflow, and execution records all carry it, and the adapter passes it into the evaluated arguments as `operation_id`, so the governance event emitted for that evaluation carries the same key instead of only the package's own identifiers. No policy rule should read it; it is there for correlation. Because the package is in preview, the adapter contract tests later in this article confirm that the event your pinned version emits still contains it. Also record which policy set was actually loaded. The host knows which files it gave the kernel, so it can identify them at startup:
 
 ```csharp
 public sealed record PolicySetInfo(string Id)
@@ -747,10 +772,56 @@ public sealed class AgentGovernanceRefundPolicyContractTests
 
         Assert.Equal(expected, decision.Outcome);
     }
+
+    [Fact]
+    public void Maps_both_rate_limit_states()
+    {
+        using var kernel = new GovernanceKernel(new GovernanceOptions
+        {
+            ConflictStrategy = ConflictResolutionStrategy.PriorityFirstMatch,
+        });
+        kernel.LoadPolicyFromYaml(TestPolicies.OneAssistantRefundPerHour); // rate_limit rule, limit "1/hour"
+
+        var policy = new AgentGovernanceRefundPolicy(kernel, new PolicySetInfo("test"));
+        RefundContext context = TestData.Context(5_000L, ApprovalState.None);
+
+        Assert.Equal(GovernedOutcome.Allowed, policy.Evaluate(context).Outcome);  // within the window
+        Assert.Equal(GovernedOutcome.Deferred, policy.Evaluate(context).Outcome); // limit exhausted
+    }
+
+    [Fact]
+    public void Governance_event_carries_the_host_operation_id()
+    {
+        using var kernel = new GovernanceKernel(new GovernanceOptions
+        {
+            ConflictStrategy = ConflictResolutionStrategy.PriorityFirstMatch,
+        });
+        kernel.LoadPolicyFromYaml(TestPolicies.SupportAssistantRefunds);
+
+        var events = new List<GovernanceEvent>();
+        kernel.OnAllEvents(events.Add);
+
+        RefundContext context = TestData.Context(15_000L, ApprovalState.None);
+        new AgentGovernanceRefundPolicy(kernel, new PolicySetInfo("test")).Evaluate(context);
+
+        string expected = context.OperationId.ToString("N");
+        Assert.Contains(events, e =>
+            e.Data.TryGetValue("operation_id", out object? id) && Equals(id, expected));
+    }
+
+    [Fact]
+    public void Startup_rejects_a_permissive_default_even_when_the_probe_is_denied()
+    {
+        using var kernel = new GovernanceKernel();
+        // default_action: allow, plus a rule that denies only the probe tool.
+        kernel.LoadPolicyFromYaml(TestPolicies.PermissiveDefaultThatDeniesTheProbe);
+
+        Assert.Throws<InvalidOperationException>(() => GovernanceStartupChecks.Verify(kernel));
+    }
 }
 ```
 
-The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation: the package's documented actions still map to the outcomes the application depends on. Add executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
+The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, a permissive default cannot hide behind a denied probe, and the governance event still carries the host's operation ID. Add executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
 
 ## Common Failure Modes
 
@@ -796,7 +867,7 @@ Before a governed agent action reaches a consequential side effect, confirm that
 2. **Each rule has one owner.** Domain invariants live in the application; agent-specific governance rules live in the policy.
 3. **The verdict is translated, not collapsed.** Approval-required, deferred, escalated, acknowledgment-required, and unavailable remain distinct, and unrecognized decisions never become permission.
 4. **Application authorization runs explicitly,** and only `Allowed` reaches the executor, which is reachable only through the gateway.
-5. **Governance is verified at startup.** At least one policy is loaded, the set is deny-by-default, and it is identified by a policy set ID.
+5. **Governance is verified at startup.** At least one policy is loaded, every loaded policy declares `default_action: deny`, an unregistered tool is actually denied, and the set is identified by a policy set ID.
 6. **Approval and acknowledgment are host workflow state,** bound to operation, amount, and revision, with expiry, eligibility, and single use.
 7. **Execution revalidates every mutable fact that could revoke permission,** reserves before calling out, and bounds execution authority only where delay or delegation requires it.
 8. **Failure semantics are explicit per tool.** An ambiguous governance result never authorizes execution, and an ambiguous execution outcome is reconciled before any new execution attempt.
