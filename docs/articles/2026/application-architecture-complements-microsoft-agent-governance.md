@@ -175,7 +175,11 @@ public static class RefundProposalFingerprint
 }
 
 public sealed class RefundContextResolver(
-    IOrderStore orders, IRiskStore risk, IApprovalStore approvals, IAcknowledgmentStore acknowledgments)
+    IOrderStore orders,
+    IRiskStore risk,
+    IApprovalStore approvals,
+    IAcknowledgmentStore acknowledgments,
+    PolicySetInfo policySet)   // the policy set the running kernel was built from
 {
     public async Task<RefundContext?> ResolveAsync(
         RefundProposal proposal, ConversationSession session, Guid operationId, CancellationToken ct)
@@ -194,9 +198,11 @@ public sealed class RefundContextResolver(
             session.TenantId, order.Id, order.Revision, amountMinor, proposal.Currency, proposal.Reason);
 
         // Verified only for an unexpired approval by an eligible supervisor whose stored
-        // fingerprint equals this one. Changing the order, revision, amount, currency, or
-        // reason while reusing the operation ID produces a different fingerprint: no match.
-        ApprovalState approval = await approvals.GetStateAsync(operationId, fingerprint, ct);
+        // fingerprint equals this one and that was granted under the policy set running now.
+        // Changing the order, revision, amount, currency, or reason produces a different
+        // fingerprint; changing any rule, approver group, or option produces a different
+        // policy set ID. Either way: no match, and the current policy asks again.
+        ApprovalState approval = await approvals.GetStateAsync(operationId, fingerprint, policySet.Id, ct);
 
         // Unconsumed acknowledgments the acting support agent recorded for this exact proposal.
         IReadOnlySet<string> acknowledged = await acknowledgments.GetVerifiedWarningKeysAsync(
@@ -229,7 +235,7 @@ Three details carry the design:
 
 - **The order and tenant come from the host.** The conversation was opened for one order and the session belongs to one tenant. A tool argument that names a different order or tenant is ignored, not trusted because it parsed.
 - **Two identities, two owners.** `AssistantAgentId` is the identity the governance library reasons about: which agent is acting, at which trust level. The support agent and the tenant are application identity semantics that the library does not own. Governance can restrict what this assistant may do; application authorization, for example ordinary ASP.NET Core resource-based authorization, decides what this person may do for this tenant and this order. You usually need both.
-- **Approval is looked up, never proposed.** The approval state comes from the host's own store, and it is `Verified` only when the stored approval's fingerprint equals one recomputed from the current tenant, order, revision, amount, currency, and reason. Reusing an operation ID for a different refund produces a different fingerprint and no match. Nothing the model writes can turn it into `Verified`.
+- **Approval is looked up, never proposed.** The approval state comes from the host's own store, and it is `Verified` only when the stored approval's fingerprint equals one recomputed from the current tenant, order, revision, amount, currency, and reason. Reusing an operation ID for a different refund produces a different fingerprint and no match. The approval is also bound to the policy set it was granted under, so a policy change, such as a stricter approver group, invalidates it instead of letting it satisfy rules it was never checked against. Nothing the model writes can turn it into `Verified`.
 
 The governance policy then sees only host-built values. Here is a policy in the `governance.toolkit/v1` format that Microsoft documents for the .NET engine:
 
@@ -543,6 +549,8 @@ Keep application workflow state out of the evaluator. Evaluation is not entirely
 public sealed record RefundApproval(
     Guid OperationId,
     string ProposalFingerprint,  // RefundProposalFingerprint: tenant, order, revision, amount, currency, reason
+    string PolicySetId,          // the policy set whose rule required this approval
+    string RequiredByRule,       // that rule's name, for evidence and reviewer routing
     long OrderRevision,
     long AmountMinor,
     string RequestedBy,          // the support agent who asked
@@ -569,7 +577,7 @@ Governance evaluation      (approval = "verified" for this amount and revision)
 Executor                   (conditional write that also consumes the approval)
 ```
 
-The continuation runs under the workflow's own service identity and rechecks the support agent's current access to the order; it does not reuse the original request's token. If the governance policy changed while the approval was pending, the new evaluation uses the new policy, and the old approval may no longer be enough. That is the intended behavior: approval satisfies one requirement of the current policy, not every requirement of the old one. [Human-in-the-Loop Governance Workflows](../../governance/human-in-the-loop-governance-workflows.md) goes deeper on reviewer eligibility, expiry, and pending-state design.
+The continuation runs under the workflow's own service identity and rechecks the support agent's current access to the order; it does not reuse the original request's token. If the governance policy changed while the approval was pending, the policy set ID changed with it, so the old approval no longer verifies. The new evaluation runs under the new policy and, if that policy still requires approval, the workflow requests a new one under the new rules and approver group. That is the intended behavior: an approval satisfies a requirement of the policy it was granted under, not whatever policy happens to be running when execution resumes. The workflow records the decision's policy set ID and matched rule when it creates the request, and the executor's conditional consume checks the policy set ID again. [Human-in-the-Loop Governance Workflows](../../governance/human-in-the-loop-governance-workflows.md) goes deeper on reviewer eligibility, expiry, and pending-state design.
 
 ## Revalidate at Execution Time, and Scope Authority to the Lifecycle
 
@@ -639,7 +647,7 @@ public sealed class RefundExecutor(IRefundReservations reservations, IRiskStore 
 }
 ```
 
-`ReserveAsync` is where the atomicity lives. In an EF Core implementation, it is a conditional `ExecuteUpdateAsync` on the order (matching tenant, order ID, expected revision, and a refundable balance that still covers the amount, then decrementing the balance and incrementing the revision), the insert of the Pending operation, the approval's conditional consume (matching operation ID and proposal fingerprint, still Approved, and unexpired, then marking it Consumed), and, when the decision carries an acknowledged warning, the same conditional consume of that acknowledgment (matching operation ID, fingerprint, and warning key), all inside one database transaction that commits before the provider is called. If any part fails, none of it happened, so a crash can never leave a reserved balance with no operation record or an approval that was used without a reservation.
+`ReserveAsync` is where the atomicity lives. In an EF Core implementation, it is a conditional `ExecuteUpdateAsync` on the order (matching tenant, order ID, expected revision, and a refundable balance that still covers the amount, then decrementing the balance and incrementing the revision), the insert of the Pending operation, the approval's conditional consume (matching operation ID, proposal fingerprint, and the current policy set ID, still Approved, and unexpired, then marking it Consumed), and, when the decision carries an acknowledged warning, the same conditional consume of that acknowledgment (matching operation ID, fingerprint, and warning key), all inside one database transaction that commits before the provider is called. If any part fails, none of it happened, so a crash can never leave a reserved balance with no operation record or an approval that was used without a reservation.
 
 The finalization methods are just as conditional. `CompleteAsync` moves an operation from Pending or Unknown to Succeeded and records the provider reference. `ReleaseAsync` moves it from Pending or Unknown to Failed and restores the refundable balance in the same transaction, so the balance can be restored only once. `MarkUnknownAsync` moves it from Pending to Unknown and leaves the reservation in place. Reconciliation calls the same methods once it learns the provider's answer. If the process crashes before a finalization write lands, the operation is still Pending, and reconciliation treats a Pending operation older than its time budget exactly like an Unknown one.
 
@@ -702,14 +710,47 @@ Four kinds of records describe this flow. They are often stored in different pla
 
 Microsoft states plainly that the toolkit's audit trail records attempts, not outcomes. Execution evidence is therefore the application's job. Telemetry supports diagnosis, but it is sampled, aggregated, and retention-managed; it is not a reliable answer to "who approved refund 7f3c, under which policy, and did the money move?"
 
-Correlate the records through the operation ID that the host assigns. The decision, workflow, and execution records all carry it, and the adapter passes it into the evaluated arguments as `operation_id`, so the governance event emitted for that evaluation carries the same key, inside its recorded arguments, instead of only the package's own identifiers. The package merges every argument into the policy evaluation context, so nothing stops a rule from reading it; keeping rules independent of it is a convention for policy authors, and the value is there only for correlation. Because the package is in preview, the adapter contract tests later in this article confirm that the event your pinned version emits still contains it. Also record which policy set was actually loaded, and identify it by everything that can change a decision. The same files can decide differently under a different conflict strategy, and equal-priority ties can depend on the order in which policies were loaded, so the identifier covers the package version, the behavior-affecting options, and the files in load order:
+Correlate the records through the operation ID that the host assigns. The decision, workflow, and execution records all carry it, and the adapter passes it into the evaluated arguments as `operation_id`, so the governance event emitted for that evaluation carries the same key, inside its recorded arguments, instead of only the package's own identifiers. The package merges every argument into the policy evaluation context, so nothing stops a rule from reading it; keeping rules independent of it is a convention for policy authors, and the value is there only for correlation. Because the package is in preview, the adapter contract tests later in this article confirm that the event your pinned version emits still contains it. Also record which policy set was actually loaded, and identify it by everything that can change a decision. The same policy files can decide differently under a different conflict strategy, with execution rings or prompt-injection detection switched on, or with different thresholds; equal-priority ties can depend on load order; and a file that changes on disk after the kernel loaded it must not relabel decisions the kernel made from the old content.
+
+Both problems have one fix: read every input exactly once into an immutable snapshot, derive the identifier from those bytes, and build the kernel from the same bytes. All decision-affecting options live in one versioned options file that is part of the snapshot, rather than being set in code where the digest cannot see them:
 
 ```csharp
-public sealed record PolicySetInfo(string Id)
+public sealed record PolicySetInfo(string Id);
+
+public sealed class GovernanceSnapshot
 {
-    // Pass the files in the exact order the kernel loads them; do not sort them here.
-    public static PolicySetInfo From(IReadOnlyList<string> policyFilesInLoadOrder, GovernanceOptions options)
+    private static readonly JsonSerializerOptions StrictJson = new()
     {
+        // A misspelled or unsupported option fails startup instead of being silently ignored.
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        Converters = { new JsonStringEnumConverter() },
+    };
+
+    private static readonly UTF8Encoding StrictUtf8 = new(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
+
+    private readonly byte[] optionsJson;
+    private readonly IReadOnlyList<string> policyYaml;
+
+    private GovernanceSnapshot(PolicySetInfo policySet, byte[] optionsJson, IReadOnlyList<string> policyYaml)
+    {
+        PolicySet = policySet;
+        this.optionsJson = optionsJson;
+        this.policyYaml = policyYaml;
+    }
+
+    public PolicySetInfo PolicySet { get; }
+
+    // optionsPath: every decision-affecting GovernanceOptions setting, including conflict strategy,
+    // rings and thresholds, and prompt-injection settings. If evaluation uses an external backend,
+    // pass its configuration file in the same way; nothing that changes decisions stays outside.
+    public static GovernanceSnapshot Load(string optionsPath, IReadOnlyList<string> policyPathsInLoadOrder)
+    {
+        // Read every input exactly once. The ID and the kernel both come from these bytes.
+        byte[] options = File.ReadAllBytes(optionsPath);
+        var policies = policyPathsInLoadOrder
+            .Select(path => (Name: Path.GetFileName(path), Bytes: File.ReadAllBytes(path)))
+            .ToList();
+
         using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
 
         void Field(byte[] value)
@@ -720,23 +761,46 @@ public sealed record PolicySetInfo(string Id)
 
         void Text(string value) => Field(Encoding.UTF8.GetBytes(value));
 
-        Text("policy-set/v1");
+        Text("governance-snapshot/v1");
         Text(typeof(GovernanceKernel).Assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
             ?? throw new InvalidOperationException("Cannot identify the governance package version."));
-        Text(options.ConflictStrategy.ToString());
-        // Add every other option that changes decisions in the version you pin.
-
-        foreach (string path in policyFilesInLoadOrder)
+        Field(options);
+        foreach (var (name, bytes) in policies) // load order preserved, never sorted
         {
-            Text(Path.GetFileName(path));
-            Field(File.ReadAllBytes(path));
+            Text(name);
+            Field(bytes);
         }
 
-        return new PolicySetInfo("sha256:" + Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant());
+        var policySet = new PolicySetInfo(
+            "sha256:" + Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant());
+
+        var snapshot = new GovernanceSnapshot(
+            policySet, options, policies.Select(p => StrictUtf8.GetString(p.Bytes)).ToList());
+
+        _ = snapshot.CreateOptions(); // fail at load time, not at first use, if the options are invalid
+        return snapshot;
     }
+
+    // Built from the snapshot's bytes, never from the files again.
+    public GovernanceKernel CreateKernel()
+    {
+        var kernel = new GovernanceKernel(CreateOptions());
+        foreach (string yaml in policyYaml)
+        {
+            kernel.LoadPolicyFromYaml(yaml);
+        }
+
+        return kernel;
+    }
+
+    private GovernanceOptions CreateOptions() =>
+        JsonSerializer.Deserialize<GovernanceOptions>(optionsJson, StrictJson)
+        ?? throw new InvalidOperationException("The governance options file is empty.");
 }
 ```
+
+At startup, load the snapshot once, create the kernel from it, run `GovernanceStartupChecks.Verify` on that kernel, and register the snapshot's `PolicySet` as the single `PolicySetInfo` the adapter, the context resolver, and the evidence recorder share. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
 
 Keep secrets and raw model text out of the decision record, and never read the record back as permission. Evidence explains what happened; it does not authorize what happens next. [Your Audit Log Records the Story, Not the Decision](your-audit-log-is-not-evidence.md) covers the difference between a log line and evidence that can be trusted later.
 
@@ -961,8 +1025,8 @@ Before a governed agent action reaches a consequential side effect, confirm that
 2. **Each rule has one owner.** Domain invariants live in the application; agent-specific governance rules live in the policy.
 3. **The verdict is translated, not collapsed.** Approval-required, deferred, escalated, acknowledgment-required, and unavailable remain distinct, and unrecognized decisions never become permission.
 4. **Application authorization runs explicitly,** and only `Allowed` reaches the executor, which is reachable only through the gateway.
-5. **Governance is verified at startup.** At least one policy is loaded, every loaded policy declares `default_action: deny`, an unregistered tool is actually denied, and the set is identified by a policy set ID.
-6. **Approval and acknowledgment are host workflow state,** bound to the operation and a proposal fingerprint recomputed at lookup and again at consumption, with expiry, eligibility, and single use. An acknowledgment is also bound to the specific warning and policy set, so an acknowledged warning completes instead of being requested again.
+5. **Governance is verified at startup.** At least one policy is loaded, every loaded policy declares `default_action: deny`, an unregistered tool is actually denied, and the kernel and its policy set ID both come from one immutable snapshot of the package version, options, and policy files.
+6. **Approval and acknowledgment are host workflow state,** bound to the operation, a proposal fingerprint recomputed at lookup and again at consumption, and the policy set they were granted under, with expiry, eligibility, and single use. An acknowledgment is also bound to the specific warning and policy set, so an acknowledged warning completes instead of being requested again.
 7. **Execution revalidates every mutable fact that could revoke permission,** reserves before calling out, and bounds execution authority only where delay or delegation requires it.
 8. **Failure semantics are explicit per tool.** An ambiguous governance result never authorizes execution, and an ambiguous execution outcome is reconciled before any new execution attempt.
 9. **Evidence binds policy, workflow, and execution records** through the operation ID; telemetry is not treated as evidence.
