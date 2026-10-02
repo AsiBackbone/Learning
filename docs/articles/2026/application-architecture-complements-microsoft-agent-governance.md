@@ -618,20 +618,21 @@ public static class GovernanceStartupChecks
                 "No agent-governance policies are loaded. Refusing to start.");
         }
 
-        // Identity check: approvals and warning acknowledgments are bound to (policy name, rule
-        // name), and the package accepts duplicates. Two rules sharing that pair would share a
-        // workflow binding, so the pair must be unique across the whole policy set.
-        var duplicateRuleIdentities = policies
+        // Identity check: the package accepts duplicate rule names, but parts of it resolve rule
+        // configuration (such as a rate limit's Limit) by rule name alone, and approvals and warning
+        // acknowledgments here are bound to the rule. Until every package lookup is scoped to
+        // (policy, rule), a rule name must be unique across the whole policy set, not just its policy.
+        var duplicateRuleNames = policies
             .SelectMany(policy => policy.Rules.Select(rule => new { Policy = policy.Name, Rule = rule.Name }))
-            .GroupBy(identity => identity)
+            .GroupBy(identity => identity.Rule, StringComparer.Ordinal)
             .Where(group => group.Count() > 1)
-            .Select(group => $"{group.Key.Policy}/{group.Key.Rule}")
+            .Select(group => $"{group.Key} (in {string.Join(", ", group.Select(identity => identity.Policy))})")
             .ToList();
 
-        if (duplicateRuleIdentities.Count > 0)
+        if (duplicateRuleNames.Count > 0)
         {
             throw new InvalidOperationException(
-                $"Agent-governance rule identities are duplicated: {string.Join(", ", duplicateRuleIdentities)}. Refusing to start.");
+                $"Agent-governance rule names are duplicated: {string.Join("; ", duplicateRuleNames)}. Refusing to start.");
         }
 
         // Configuration check: every loaded policy must declare default_action: deny.
@@ -657,7 +658,7 @@ public static class GovernanceStartupChecks
 }
 ```
 
-Run the checks with the same `GovernanceOptions` that production uses. Each answers a different question. The policy count confirms that something was loaded. The identity check confirms that every (policy name, rule name) pair is unique, because the package's loader accepts duplicates while this article binds approvals and acknowledgments to that pair; two rules sharing one identity would otherwise share one approval or acknowledgment. The `DefaultAction` check confirms the configuration: a probe alone cannot, because a policy with `default_action: allow` and a rule that happens to deny the probe tool would still return `Allowed == false`. The probe confirms the effective behavior under the real options. None of them verifies individual rules; the adapter contract tests later in this article cover those.
+Run the checks with the same `GovernanceOptions` that production uses. Each answers a different question. The policy count confirms that something was loaded. The identity check confirms that every rule name is unique across the whole policy set. The package's loader accepts duplicates, and the current .NET middleware resolves some rule configuration, such as a rate limit's `Limit`, by rule name alone, so a match in one policy could be enforced with another policy's settings, and two rules sharing a name could share one approval or acknowledgment. Approvals and acknowledgments still carry the policy name as well; the stricter uniqueness rule only removes the ambiguity in the package's own lookups, and can be relaxed to (policy, rule) pairs once every lookup in the version you pin is scoped that way. The `DefaultAction` check confirms the configuration: a probe alone cannot, because a policy with `default_action: allow` and a rule that happens to deny the probe tool would still return `Allowed == false`. The probe confirms the effective behavior under the real options. None of them verifies individual rules; the adapter contract tests later in this article cover those.
 
 ## Policy Verdicts Are Not Approval, Acknowledgment, or Execution Permission
 
@@ -1091,8 +1092,9 @@ public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial) : IDispos
         }
     }
 
-    // Returns false when a newer Replace call has already published: the later request wins,
-    // however long each build takes.
+    // Returns false when nothing was published: either a newer Replace call already published
+    // (the later request wins, however long each build takes) or the snapshot is identical to the
+    // running one.
     public bool Replace(GovernanceSnapshot snapshot)
     {
         ObjectDisposedException.ThrowIf(Volatile.Read(ref disposed) == 1, this);
@@ -1115,6 +1117,16 @@ public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial) : IDispos
             if (generation < publishedGeneration)
             {
                 next.Retire(); // a slower, older build never overwrites a newer published snapshot
+                return false;
+            }
+
+            if (StringComparer.Ordinal.Equals(next.PolicySet.Id, current.PolicySet.Id))
+            {
+                // Same configuration: keep the running kernel and its rate-limit windows and
+                // circuit-breaker state, but advance the generation so an older in-flight build
+                // still cannot publish afterward.
+                publishedGeneration = generation;
+                next.Retire();
                 return false;
             }
 
@@ -1144,7 +1156,7 @@ public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial) : IDispos
 }
 ```
 
-At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation leases one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. The replaced runtime is retired rather than disposed: new evaluations can no longer lease it, and its kernel, with its metrics resources, is disposed when the last in-flight evaluation releases its lease. Evaluation is synchronous here, so a lease lasts only as long as one `EvaluateToolCall`. Each `Replace` call takes a generation number when it starts, and a build that finishes after a newer one has been published is retired instead of published, so concurrent replacements take effect in the order they were requested, not the order their builds happened to finish. `Replace` and `Dispose` are serialized, so a replacement can never be published after the holder is disposed; one that loses that race is retired immediately, and once the holder is disposed, `Acquire` and `Replace` throw `ObjectDisposedException` instead of spinning on a retired runtime. The options file must not list `PolicyPaths`, because the package would load those files itself, outside the snapshot; `CreateOptions` rejects them. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
+At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation leases one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. The replaced runtime is retired rather than disposed: new evaluations can no longer lease it, and its kernel, with its metrics resources, is disposed when the last in-flight evaluation releases its lease. Evaluation is synchronous here, so a lease lasts only as long as one `EvaluateToolCall`. Each `Replace` call takes a generation number when it starts, and a build that finishes after a newer one has been published is retired instead of published, so concurrent replacements take effect in the order they were requested, not the order their builds happened to finish. A snapshot identical to the running one is not published at all. The kernel holds rate-limit windows and circuit-breaker state in memory, so republishing an unchanged configuration, for example on every file-watcher event, would reset those controls and let repeated reloads bypass a `1/hour` limit. A genuine policy change does start the new kernel with fresh windows; if a limit must survive policy changes, enforce it in the host or in a store outside the kernel as well. `Replace` and `Dispose` are serialized, so a replacement can never be published after the holder is disposed; one that loses that race is retired immediately, and once the holder is disposed, `Acquire` and `Replace` throw `ObjectDisposedException` instead of spinning on a retired runtime. The options file must not list `PolicyPaths`, because the package would load those files itself, outside the snapshot; `CreateOptions` rejects them. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
 
 Keep secrets and raw model text out of the decision record, and never read the record back as permission. Evidence explains what happened; it does not authorize what happens next. [Your Audit Log Records the Story, Not the Decision](your-audit-log-is-not-evidence.md) covers the difference between a log line and evidence that can be trusted later.
 
@@ -1354,19 +1366,19 @@ public sealed class AgentGovernanceRefundPolicyContractTests
     }
 
     [Fact]
-    public void Startup_rejects_duplicate_policy_and_rule_identities()
+    public void Startup_rejects_a_rule_name_reused_in_another_policy()
     {
-        // Two policy files that both declare policy "support-assistant-refunds"
-        // with a rule named "refund-needs-supervisor-approval".
+        // A second policy, with a different policy name, that also declares a rule
+        // named "refund-needs-supervisor-approval".
         Assert.Throws<InvalidOperationException>(
             () => TestGovernance.Runtime(
                 TestPolicies.SupportAssistantRefunds,
-                TestPolicies.SupportAssistantRefundsDuplicateRuleName));
+                TestPolicies.OtherPolicyReusingTheApprovalRuleName));
     }
 }
 ```
 
-The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, duplicate policy and rule identities stop startup, and the governance event still carries the host's operation ID. Add an executor test that publishes a new policy set between evaluation and reservation and expects `policy_set_changed`, a RolledBack operation that can be reserved again, and zero provider calls, a holder test showing that an older snapshot finishing its build last does not replace a newer one, approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
+The first group proves the boundary: whatever governance decides, only `Allowed` reaches the executor. The second group proves the translation and the configuration checks: the package's actions, including both rate-limit states, still map to the outcomes the application depends on, an approval granted for one requirement never satisfies another, the policy-declared approver groups reach the stored requirement, a permissive default cannot hide behind a denied probe, a rule name reused in another policy stops startup, and the governance event still carries the host's operation ID. Add an executor test that publishes a new policy set between evaluation and reservation and expects `policy_set_changed`, a RolledBack operation that can be reserved again, and zero provider calls, a holder test showing that an older snapshot finishing its build last does not replace a newer one, approval-store tests showing that an approval is found only for its exact requirement, so one granted for a different amount, currency, reason, order, revision, rule, policy set, or risk tier is never returned, and executor tests for a changed order revision, a fraud hold placed after the decision, a terminal provider failure that releases the reservation, and an unknown outcome that keeps it. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) covers counting executors, composition-root tests, and the time-of-check-to-time-of-use window in more depth.
 
 ## Common Failure Modes
 
@@ -1412,7 +1424,7 @@ Before a governed agent action reaches a consequential side effect, confirm that
 2. **Each rule has one owner.** Domain invariants live in the application; agent-specific governance rules live in the policy.
 3. **The verdict is translated, not collapsed.** Approval-required, deferred, escalated, acknowledgment-required, and unavailable remain distinct, and unrecognized decisions never become permission.
 4. **Application authorization runs explicitly,** and only `Allowed` reaches the executor, which is reachable only through the gateway.
-5. **Governance is verified at startup.** At least one policy is loaded, every (policy name, rule name) identity is unique, every loaded policy declares `default_action: deny`, an unregistered tool is actually denied, and the kernel and its policy set ID both come from one immutable snapshot of the package version, options, and policy files.
+5. **Governance is verified at startup.** At least one policy is loaded, every rule name is unique across the policy set, every loaded policy declares `default_action: deny`, an unregistered tool is actually denied, and the kernel and its policy set ID both come from one immutable snapshot of the package version, options, and policy files.
 6. **Approval and acknowledgment are host workflow state.** An approval is looked up only after evaluation names the requirement, and it is bound to that exact requirement (operation, proposal fingerprint, policy set, policy, rule, declared approver groups, assistant, and risk tier), checked again at consumption. Both have expiry, eligibility, and single use. An acknowledgment is bound to the proposal fingerprint, the specific warning, and the policy set, so an acknowledged warning completes instead of being requested again.
 7. **Execution revalidates every mutable fact that could revoke permission,** reserves before calling out, and bounds execution authority only where delay or delegation requires it.
 8. **Failure semantics are explicit per tool.** An ambiguous governance result never authorizes execution, and an ambiguous execution outcome is reconciled before any new execution attempt.
