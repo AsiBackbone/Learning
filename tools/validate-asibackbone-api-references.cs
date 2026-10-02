@@ -183,11 +183,6 @@ static partial class AsiBackboneApiReferenceValidator
     private static partial Regex IdentifierRegex();
 
     [GeneratedRegex(
-        @"https://github\.com/AsiBackbone/AsiBackbone/(?:blob|tree)/(?!(?:v7\.0\.0|v6\.0\.0)(?:/|\b))[^\s)\]'>]+",
-        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
-    private static partial Regex StaleImplementationLinkRegex();
-
-    [GeneratedRegex(
         @"https://github\.com/AsiBackbone/AsiBackbone/(?:blob|tree)/(?<ref>[^/\s)\]'>]+)/[^\s)\]'>]+",
         RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
     private static partial Regex ImplementationLinkRegex();
@@ -330,6 +325,18 @@ static partial class AsiBackboneApiReferenceValidator
             "v8.0.0",
             false,
             failures);
+        AssertImplementationLinkErrorCount(
+            "full commit SHA links are accepted",
+            "docs/getting-started/asibackbone-6-api-boundary.md",
+            "https://github.com/AsiBackbone/AsiBackbone/blob/0123456789abcdef0123456789abcdef01234567/src/Example.cs",
+            0,
+            failures);
+        AssertImplementationLinkErrorCount(
+            "mutable branch links are rejected",
+            "docs/getting-started/asibackbone-6-api-boundary.md",
+            "https://github.com/AsiBackbone/AsiBackbone/blob/develop/src/Example.cs",
+            1,
+            failures);
 
         if (failures.Count > 0)
         {
@@ -389,22 +396,34 @@ static partial class AsiBackboneApiReferenceValidator
 
             foreach (Match linkMatch in ImplementationLinkRegex().Matches(text))
             {
-                string implementationRef = linkMatch.Groups["ref"].Value;
-
-                if (implementationRef.Equals("v6.0.0", StringComparison.OrdinalIgnoreCase) &&
-                    !HistoricalCompatibilityReferencePaths.Contains(relativePath))
-                {
-                    errors.Add(
-                        $"{relativePath}:{GetLineNumber(text, linkMatch.Index)} uses the historical v6.0.0 implementation ref outside an approved historical compatibility page: {linkMatch.Value}");
-                }
+                ValidateImplementationLinkRef(
+                    relativePath,
+                    GetLineNumber(text, linkMatch.Index),
+                    linkMatch.Groups["ref"].Value,
+                    linkMatch.Value,
+                    errors);
             }
+        }
+    }
 
-            foreach (Match linkMatch in StaleImplementationLinkRegex().Matches(text))
-            {
-                int lineNumber = GetLineNumber(text, linkMatch.Index);
-                errors.Add(
-                    $"{relativePath}:{lineNumber} links implementation source outside the released v7.0.0 or historical v6.0.0 tags: {linkMatch.Value}");
-            }
+    private static void ValidateImplementationLinkRef(
+        string relativePath,
+        int lineNumber,
+        string implementationRef,
+        string link,
+        List<string> errors)
+    {
+        if (implementationRef.Equals("v6.0.0", StringComparison.OrdinalIgnoreCase) &&
+            !HistoricalCompatibilityReferencePaths.Contains(relativePath))
+        {
+            errors.Add(
+                $"{relativePath}:{lineNumber} uses the historical v6.0.0 implementation ref outside an approved historical compatibility page: {link}");
+        }
+
+        if (!IsPinnedImplementationRef(implementationRef))
+        {
+            errors.Add(
+                $"{relativePath}:{lineNumber} links implementation source through unpinned ref '{implementationRef}': {link}");
         }
     }
 
@@ -693,6 +712,35 @@ static partial class AsiBackboneApiReferenceValidator
         if (actual != expected)
         {
             failures.Add($"{name}: expected {expected}, found {actual} for '{implementationRef}'.");
+        }
+    }
+
+    private static void AssertImplementationLinkErrorCount(
+        string name,
+        string relativePath,
+        string link,
+        int expectedCount,
+        List<string> failures)
+    {
+        Match linkMatch = ImplementationLinkRegex().Match(link);
+
+        if (!linkMatch.Success)
+        {
+            failures.Add($"{name}: test link was not recognized as an implementation link.");
+            return;
+        }
+
+        var errors = new List<string>();
+        ValidateImplementationLinkRef(
+            relativePath,
+            1,
+            linkMatch.Groups["ref"].Value,
+            linkMatch.Value,
+            errors);
+
+        if (errors.Count != expectedCount)
+        {
+            failures.Add($"{name}: expected {expectedCount} error(s), found {errors.Count}.");
         }
     }
 
