@@ -850,7 +850,7 @@ Capability tokens are not mandatory for every integration. Most same-request age
 
 ## Decide Failure Semantics Explicitly
 
-Even in-process evaluation can fail. A policy file can fail to load or contain an error, evaluation can throw, a circuit breaker that you place around evaluation can open, and a deployment can move evaluation into a sidecar or an external policy backend that adds latency and network failure. Microsoft's limitations page states that the toolkit fails closed on runtime errors during policy evaluation. That describes what happens inside evaluation. What the application does when it has no trustworthy decision, and what it tells the user and the model, is still an architecture decision that the application owns.
+Even in-process evaluation can fail. A policy file can fail to load or contain an error, evaluation can throw, a circuit breaker that you place around evaluation can open, and a deployment can move evaluation into a sidecar or an external policy backend that adds latency and network failure. Microsoft's limitations page describes a fail-closed posture, but the current .NET policy engine can propagate evaluation exceptions, including cancellation, without producing a decision. The application must therefore handle that path itself: the adapter above maps evaluation exceptions to `Unavailable`, and lets cancellation propagate so the request ends without reaching the executor. Do not remove that handling on the assumption that the package fails closed for you. What the application tells the user and the model is still an architecture decision that the application owns.
 
 | Situation | Application outcome | Retry? | Never |
 | --- | --- | --- | --- |
@@ -881,7 +881,7 @@ Microsoft states plainly that the toolkit's audit trail records attempts, not ou
 
 Correlate the records through the operation ID that the host assigns. The decision, workflow, and execution records all carry it, and the adapter passes it into the evaluated arguments as `operation_id`, so the governance event emitted for that evaluation carries the same key, inside its recorded arguments, instead of only the package's own identifiers. The package merges every argument into the policy evaluation context, so nothing stops a rule from reading it; keeping rules independent of it is a convention for policy authors, and the value is there only for correlation. Because the package is in preview, the adapter contract tests later in this article confirm that the event your pinned version emits still contains it. Also record which policy set was actually loaded, and identify it by everything that can change a decision. The same policy files can decide differently under a different conflict strategy, with execution rings or prompt-injection detection switched on, or with different thresholds; equal-priority ties can depend on load order; and a file that changes on disk after the kernel loaded it must not relabel decisions the kernel made from the old content.
 
-Both problems have one fix: read every input exactly once into an immutable snapshot, derive the identifier from those bytes, and build the kernel from the same bytes. All decision-affecting options live in one versioned options file that is part of the snapshot, rather than being set in code where the digest cannot see them:
+Both problems have one fix: read every input exactly once into an immutable snapshot, derive the identifier from those bytes, and build the kernel from the same bytes. All decision-affecting options live in one versioned options file that is part of the snapshot, rather than being set in code where the digest cannot see them. The sample is scoped to the package's in-process policy engine. An external policy backend would have to be constructed and registered inside `CreateRuntime`, from configuration that is part of the snapshot, so that its configuration is both hashed and actually used; hashing a backend's configuration file without building the backend from it would label decisions with a configuration nothing evaluates:
 
 ```csharp
 public sealed record PolicySetInfo(string Id);
@@ -910,8 +910,8 @@ public sealed class GovernanceSnapshot
     public PolicySetInfo PolicySet { get; }
 
     // optionsPath: every decision-affecting GovernanceOptions setting, including conflict strategy,
-    // rings and thresholds, and prompt-injection settings. If evaluation uses an external backend,
-    // pass its configuration file in the same way; nothing that changes decisions stays outside.
+    // rings and thresholds, and prompt-injection settings. This sample covers the in-process
+    // policy engine only; it does not configure an external policy backend.
     public static GovernanceSnapshot Load(string optionsPath, IReadOnlyList<string> policyPathsInLoadOrder) =>
         // Read every input exactly once. The ID and the kernel both come from these bytes.
         FromBytes(
@@ -961,12 +961,24 @@ public sealed class GovernanceSnapshot
     public GovernanceRuntime CreateRuntime()
     {
         var kernel = new GovernanceKernel(CreateOptions());
-        foreach (string yaml in policyYaml)
+        try
         {
-            kernel.LoadPolicyFromYaml(yaml);
+            foreach (string yaml in policyYaml)
+            {
+                kernel.LoadPolicyFromYaml(yaml);
+            }
+
+            GovernanceStartupChecks.Verify(kernel);
+        }
+        catch
+        {
+            // A failed load or verification must not leak the kernel's metrics resources,
+            // especially when a file watcher retries a broken configuration repeatedly.
+            kernel.Dispose();
+            throw;
         }
 
-        GovernanceStartupChecks.Verify(kernel);
+        // Ownership transfers only after successful verification.
         return new GovernanceRuntime(kernel, PolicySet);
     }
 
@@ -1156,7 +1168,7 @@ public sealed class GovernanceRuntimeHolder(GovernanceRuntime initial) : IDispos
 }
 ```
 
-At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation leases one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. The replaced runtime is retired rather than disposed: new evaluations can no longer lease it, and its kernel, with its metrics resources, is disposed when the last in-flight evaluation releases its lease. Evaluation is synchronous here, so a lease lasts only as long as one `EvaluateToolCall`. Each `Replace` call takes a generation number when it starts, and a build that finishes after a newer one has been published is retired instead of published, so concurrent replacements take effect in the order they were requested, not the order their builds happened to finish. A snapshot identical to the running one is not published at all. The kernel holds rate-limit windows and circuit-breaker state in memory, so republishing an unchanged configuration, for example on every file-watcher event, would reset those controls and let repeated reloads bypass a `1/hour` limit. A genuine policy change does start the new kernel with fresh windows; if a limit must survive policy changes, enforce it in the host or in a store outside the kernel as well. `Replace` and `Dispose` are serialized, so a replacement can never be published after the holder is disposed; one that loses that race is retired immediately, and once the holder is disposed, `Acquire` and `Replace` throw `ObjectDisposedException` instead of spinning on a retired runtime. The options file must not list `PolicyPaths`, because the package would load those files itself, outside the snapshot; `CreateOptions` rejects them. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
+At startup, load the snapshot, call `CreateRuntime`, which builds the kernel from the snapshot's bytes and runs `GovernanceStartupChecks.Verify` on it, and register a `GovernanceRuntimeHolder` around the result. Nothing else in the application ever receives the `GovernanceKernel`, so nothing can load or clear policies, add a backend, or change the conflict strategy behind the policy set ID's back. If loading or verification fails, `CreateRuntime` disposes the half-built kernel before rethrowing, so a broken configuration retried by a file watcher does not leak a kernel on every attempt. A configuration change is a new snapshot and a new runtime, published as a single reference swap: every evaluation leases one runtime, so a decision's policy set ID always describes the kernel that made it, and approvals and acknowledgments granted under the old ID stop counting. The replaced runtime is retired rather than disposed: new evaluations can no longer lease it, and its kernel, with its metrics resources, is disposed when the last in-flight evaluation releases its lease. Evaluation is synchronous here, so a lease lasts only as long as one `EvaluateToolCall`. Each `Replace` call takes a generation number when it starts, and a build that finishes after a newer one has been published is retired instead of published, so concurrent replacements take effect in the order they were requested, not the order their builds happened to finish. A snapshot identical to the running one is not published at all. The kernel holds rate-limit windows and circuit-breaker state in memory, so republishing an unchanged configuration, for example on every file-watcher event, would reset those controls and let repeated reloads bypass a `1/hour` limit. A genuine policy change does start the new kernel with fresh windows; if a limit must survive policy changes, enforce it in the host or in a store outside the kernel as well. `Replace` and `Dispose` are serialized, so a replacement can never be published after the holder is disposed; one that loses that race is retired immediately, and once the holder is disposed, `Acquire` and `Replace` throw `ObjectDisposedException` instead of spinning on a retired runtime. The options file must not list `PolicyPaths`, because the package would load those files itself, outside the snapshot; `CreateOptions` rejects them. Hashing raw bytes is deliberately conservative: reformatting a file changes the identifier and asks for fresh approvals and acknowledgments, but two configurations that can decide differently can never share one. Before relying on the options file, confirm in an adapter test that your pinned version's `GovernanceOptions` round-trips through `System.Text.Json` with every setting you use.
 
 Keep secrets and raw model text out of the decision record, and never read the record back as permission. Evidence explains what happened; it does not authorize what happens next. [Your Audit Log Records the Story, Not the Decision](your-audit-log-is-not-evidence.md) covers the difference between a log line and evidence that can be trusted later.
 
@@ -1170,7 +1182,7 @@ Keep secrets and raw model text out of the decision record, and never read the r
 | Human oversight | Express that approval is required; where an SDK implements ADR-0030, bind approvals to the exact action | Own workflow state, reviewer eligibility, revision binding, and expiry for the application's resources |
 | Execution | Constrain governed action paths | Own the protected side effect and guarantee that non-allowed paths do not execute |
 | Evidence | Governance events and audit records of attempts | Correlate policy, workflow, and execution evidence, including outcomes |
-| Failure | Fail closed on evaluation errors and surface the failure | Decide outcomes, retries, degradation, and what users and the model are told |
+| Failure | Describe a fail-closed posture; some evaluation errors surface as exceptions rather than decisions | Map every exception or missing decision to a non-executing outcome; decide retries, degradation, and what users and the model are told |
 
 The two columns are complementary. Neither replaces the other, and neither is complete alone: a governance library without host boundaries evaluates claims it cannot verify, and a host without runtime governance has no consistent, deterministic place to express which actions agents may take.
 
