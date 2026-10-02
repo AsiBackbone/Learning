@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: How Application Architecture Complements Microsoft.AgentGovernance
+  href: 2026/application-architecture-complements-microsoft-agent-governance.md
 - name: Policy as Code in ASP.NET Core Without Overengineering
   href: 2026/policy-as-code-aspnet-core-without-overengineering.md
 - name: "Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?"
