@@ -190,9 +190,9 @@ flowchart TD
     subgraph F["Friday: payout worker"]
         W["Authenticates with<br/>its own workload identity"]
     end
-    subgraph H["Friday: payments service (protected host)"]
+    subgraph H["Friday: payments service"]
         direction TB
-        V["Bindings, current payout,<br/>current policy"] -->|Allowed| K["Atomic consume + claim"]
+        V["Protected host checks:<br/>bindings, current payout,<br/>current policy"] -->|Allowed| K["Atomic consume + claim"]
         K -->|Claimed| X["Bank call with<br/>host-owned credentials"]
         V -->|Rejected| N["Stop: this request<br/>does not call the bank"]
         K -->|Spent, cancelled, expired, or changed| N
