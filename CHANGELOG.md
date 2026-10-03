@@ -6,6 +6,8 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-03
+
 ### Added
 
 - Published [How Application Architecture Complements Microsoft.AgentGovernance](docs/articles/2026/application-architecture-complements-microsoft-agent-governance.md), a practitioner guide that follows one AI-proposed refund through a host-owned control flow around `Microsoft.AgentGovernance`, covering authoritative context, verdict translation without Boolean collapse, workflow state, execution-time revalidation, proportional execution authority, failure semantics, evidence, and tests proving that non-allowed paths never reach the executor (#391).
@@ -79,7 +81,8 @@ Learning releases are archival and citation snapshots of educational material. T
 
 - Obsolete dependency-check suppressions for packages not used by Learning.
 
-[Unreleased]: https://github.com/AsiBackbone/Learning/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/AsiBackbone/Learning/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/AsiBackbone/Learning/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/AsiBackbone/Learning/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/AsiBackbone/Learning/compare/v0.15.0...v1.0.0
 [0.15.0]: https://github.com/AsiBackbone/Learning/releases/tag/v0.15.0
