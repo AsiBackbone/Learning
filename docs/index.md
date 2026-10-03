@@ -155,9 +155,9 @@ The goal is to make the reasoning visible—not to prove that one framework or a
 
 Learning 1.2 is the current documentation baseline aligned with released AsiBackbone 7.0.0. The [current compatibility and API boundary](getting-started/asibackbone-7-api-boundary.md) pins implementation references to the `v7.0.0` release tag; earlier Learning snapshots remain available as historical guidance. Recent publications include:
 
+- [How Short-Lived Execution Authority Differs from User Authorization](articles/2026/short-lived-execution-authority-vs-user-authorization.md)
 - [How Application Architecture Complements Microsoft.AgentGovernance](articles/2026/application-architecture-complements-microsoft-agent-governance.md)
 - [Policy as Code in ASP.NET Core Without Overengineering](articles/2026/policy-as-code-aspnet-core-without-overengineering.md)
-- [Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?](articles/2026/authorization-vs-approval-vs-acknowledgment.md)
 
 <details class="home-details">
   <summary>Scope, terminology, and important limitations</summary>
