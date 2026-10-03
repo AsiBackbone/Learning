@@ -34,7 +34,7 @@ Job message { payoutId, userAccessToken }
 Worker calls the payments service with the user's token
 ```
 
-This works in a demo. It also hands the worker everything the user could do, for as long as the token lasts, even though the worker needs to do one thing, once, at one service.
+This works in a demo. It also hands the worker whatever authority that token carries, for as long as the token or anything derived from it stays usable, even though the worker needs to do one thing, once, at one service.
 
 The distinction this article is about is:
 
@@ -52,6 +52,8 @@ The rest of the article uses one operation.
 
 On Tuesday, a finance operator schedules payout `P-1042`: **18,400.00 EUR** to vendor `V-311`, sent to that vendor's verified bank account, to run on Friday at 09:00 UTC.
 
+In this example, scheduling is the commitment: the operator's permission to schedule a payout means permission to commit this exact payout for later execution, with no further review. If scheduling only created a proposal that someone else must approve, that approval, not the scheduling request, would be the decision that justifies an executable grant.
+
 The system has three parts:
 
 - The **Finance API**, where the operator signs in and schedules the payout.
@@ -64,7 +66,7 @@ A lot can change between Tuesday and Friday:
 
 - The operator can change roles or leave the company.
 - Someone can edit the payout amount.
-- Someone can change the vendor's bank account. Changing a beneficiary's bank details shortly before a payment is a common payment-fraud technique.
+- Someone can change the vendor's bank account. Redirecting a payment by changing the recipient's account details is a recognized business email compromise technique, and the FBI's [business email compromise advisory](https://www.ic3.gov/PSA/2022/PSA220504) recommends verifying requests to change account information through a separate channel.
 - The vendor can be placed on hold.
 - The organization's payout limits can change.
 
@@ -100,19 +102,23 @@ None of these should silently become another. In particular, the operator's iden
 
 Forwarding the operator's access token to the worker merges the actor and the executor into one credential. Each problem below follows from that.
 
-**The scope is the user's, not the operation's.** An access token typically represents what the user may do across an API or a set of APIs. A token that can schedule payouts can usually also list vendors, read invoices, and perhaps approve or schedule other payouts. The worker needs to execute one payout.
+How much authority the forwarded token carries depends on how it was issued. A well-designed token may already be restricted by audience, scope, and resource, as [OAuth 2.0 Security Best Current Practice (RFC 9700)](https://www.rfc-editor.org/rfc/rfc9700.html) recommends. The problems below are sharpest with the coarse tokens many applications issue in practice, but most of them remain even when the token is well scoped, because it was scoped for the user's request, not for Friday's execution.
 
-**The audience is wrong.** The token was issued for the Finance API. If the payments service accepts it, the payments service is trusting a credential that was never intended for it. If it rejects it, the design does not work.
+**The scope is the user's, not the operation's.** An access token represents what the user's client may do at one or more APIs. Coarse-grained tokens are common: a token issued for the Finance UI may also allow listing vendors, reading invoices, and scheduling other payouts. Even a token limited to `payouts:schedule` describes a kind of action, not this payout. The worker needs to execute one payout.
 
-**The lifetime is wrong in both directions.** Access tokens are often short-lived, measured in minutes. A token issued on Tuesday is useless on Friday. Teams then extend token lifetimes or store refresh tokens in job messages so the worker can obtain new user tokens. Each of those choices makes the stored credential more valuable to anyone who obtains it.
+**The audience is wrong.** In this example, the token was issued for the Finance API. If the payments service accepts it, the payments service is trusting a credential that was never intended for it. If it rejects it, the design does not work.
+
+**The lifetime is wrong in both directions.** Access-token lifetime is set by the issuer and is separate from the user's session. Current guidance favors short lifetimes, often minutes, though longer ones still exist. A short-lived token issued on Tuesday is useless on Friday. Teams then extend token lifetimes or store refresh tokens in job messages so the worker can obtain new user tokens. A stored refresh token can extend usable authority well beyond the original access token's lifetime, subject to the issuer's expiration, revocation, rotation, and client-binding rules. Each of those choices makes the stored credential more valuable to anyone who can obtain and use it.
 
 **It describes a session, not a decision.** The token proves the operator authenticated and holds certain scopes or claims. It does not prove that this specific payout was requested, with this amount and this beneficiary.
 
 **It can be stale.** If the operator's role is revoked on Wednesday, a stored token or refresh token may still produce something the payments service accepts on Friday. Whether the payout should still run is a real policy question, discussed later. It should be answered deliberately, not by whatever a cached credential happens to allow.
 
-**It widens exposure.** Once a bearer token is in a queue message, everything that can read the queue can use it: other consumers, dead-letter queues, message inspection tools, diagnostic logs, retention, and backups.
+**It widens exposure.** Once a bearer token is in a queue message, anything that can read the queue may be able to use it: other consumers, dead-letter queues, message inspection tools, diagnostic logs, retention, and backups. Sender-constrained tokens reduce this risk, but they are bound to the client that obtained them, which is usually not the worker.
 
-A common variant forwards **claims** instead of the token: the API copies the operator's user ID and roles into the job message, and the worker trusts them. This is worse. A token at least carries an issuer's signature. Claims copied into a message are just data, and anyone who can write to the queue can write `"role": "FinanceAdmin"`.
+Forwarding the original credential is different from deliberately obtaining downstream authority. Delegation flows such as [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693.html) and Microsoft's [On-Behalf-Of flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-on-behalf-of-flow) issue a separate token for the downstream service instead of reusing the original. That is a better starting point. On its own, though, it does not bind the token to one payout, consume it after one use, or cancel it when the payout is cancelled. Those properties still have to be designed.
+
+A common variant forwards **claims** instead of the token: the API copies the operator's user ID and roles into the job message, and the worker trusts them. A properly validated token has an issuer-backed verification mechanism, such as a signature or introspection. Copied claims have whatever integrity the message itself provides. If the worker treats them as authoritative without a trusted origin and integrity check, anyone who can write to the queue can write `"role": "FinanceAdmin"`.
 
 Another variant treats **possession of the queued message as authority**: if a message saying "execute P-1042" arrived on the payouts queue, the worker executes it. The queue's access control then becomes the authorization model for moving money. Authenticated or signed messages help, because they prove where a message came from and that it was not altered. They do not, by themselves, say what the sender was allowed to ask for, or whether that permission still holds.
 
@@ -185,21 +191,25 @@ Notice what is **not** in the grant: the operator's roles, scopes, or access tok
 
 The window is short and specific, but it is not "a few seconds." Execution authority should live as long as the delayed operation reasonably needs and no longer. "Short-lived" means proportional to the operation, not a fixed number.
 
+A three-hour window is also three hours in which a leaked grant reference could be presented. That is acceptable here because the grant is useless without the worker's own authenticated identity and because the host holds its use state. A self-contained grant that any holder could present would justify a much shorter window.
+
 ---
 
 ## User Authorization Versus Execution Authority at a Glance
 
-| Dimension | User authorization | Short-lived execution authority |
+The left column describes the user's authorization decision and the credential that typically accompanies it. The right column describes a delegated grant and its execution lifecycle. They are not two versions of the same thing.
+
+| Dimension | User authorization and the user's credential | Short-lived execution authority |
 | --- | --- | --- |
 | **Subject** | The authenticated user or calling actor | The specific executor that will act, such as a worker or gateway |
-| **Audience** | The application or API the user is calling | The one host that performs the side effect |
+| **Audience** | The application or API the user's client is calling | The one host that performs the side effect |
 | **Resource scope** | Often a class of resources, filtered by claims, ownership, or rules | One resource, ideally bound to the exact accepted values |
 | **Operation scope** | Whatever the user's roles, scopes, or policies allow | One named operation |
-| **Issued and lifetime** | Evaluated per request; tokens last for a session or a few minutes | Issued after a specific decision; valid only for the execution window |
-| **Revocation** | Session or token revocation; role changes take effect on the next check | Grant-level cancellation, plus the host's own current checks |
-| **Use count** | Unlimited within the session | One use, or a small explicit bound |
-| **Delegation** | Not intended to be passed to other components | Exists specifically to delegate across a time or trust boundary |
-| **Replay protection** | Usually not needed; each request is authorized fresh | Required; the host must reject a grant that has already been used |
+| **Issued and lifetime** | Each decision is made per request; access-token lifetime is set by the issuer and is separate from the session | Issued after a specific decision; valid only for the execution window |
+| **Revocation** | Session or token revocation; role changes take effect when a check reads current authorization state, not while cached claims are still trusted | Grant-level cancellation, plus the host's own current checks |
+| **Use count** | Each operation can be authorized or denied on its own; a token can usually be presented repeatedly until it expires | One use, or a small explicit bound, tied to the accepted operation |
+| **Delegation** | The original credential is not meant to be forwarded; downstream authority should be obtained deliberately, for example through token exchange | Exists specifically to delegate across a time or trust boundary |
+| **Replay protection** | Bearer-token theft and replay remain concerns, addressed with short lifetimes, sender constraints, and audience restriction | Additionally, the host must refuse a grant whose permitted uses are already spent |
 | **Freshness at execution** | Answers about the moment of the request | Must be combined with current resource and policy checks at execution |
 | **Evidence** | Who was allowed to ask | Which decision authorized which executor to perform which side effect |
 
@@ -216,7 +226,9 @@ An execution grant can reasonably be:
 - a **server-side grant record** that the worker references by an unguessable ID, with all bindings and use state held by the issuer or the host;
 - a **signed, self-contained token** that the host verifies cryptographically, paired with server-side state for consumption and cancellation;
 - a **protected message envelope** in which the bindings travel with the work item and are verified by the host;
-- or a standards-based mechanism your platform already supports, such as a token exchange that produces a narrowly scoped, audience-restricted token for the worker.
+- or a standards-based mechanism your platform already supports, such as a token exchange that produces a narrowly scoped, audience-restricted token for the worker, combined with the one-time consumption, payout binding, and cancellation that the exchange itself does not provide.
+
+For a one-time operation, a server-side grant record is often the simplest choice. Consumption and cancellation need server-side state anyway, so a self-contained token adds key management without removing the store.
 
 What makes any of these an execution grant is its lifecycle:
 
@@ -229,7 +241,7 @@ What makes any of these an execution grant is its lifecycle:
 
 A signature and an expiry time cover only a small part of this. A signed token that is never consumed is reusable until it expires. A signed token that the host validates without checking the current payout will execute a payout that has since been altered.
 
-The grant also does not authenticate the worker. The worker proves who it is with its own workload identity: a managed identity, a client certificate, a platform-issued service token, or whatever your environment provides. The grant says what that authenticated worker may do with this one operation. Requiring both means a copied grant reference is useless to anyone who is not the worker, and a compromised worker can execute only the operations it holds grants for.
+The grant also does not authenticate the worker. The worker proves who it is with its own workload identity: a managed identity, a client certificate, a platform-issued service token, or whatever your environment provides. The grant says what that authenticated worker may do with this one operation. Bind the grant to a stable identifier for that workload, such as the identity provider's issuer, tenant, and subject or application ID, rather than a display name that another workload could share. The article writes `payout-worker` for readability. Requiring both means a copied grant reference is useless to anyone who is not the worker, and a compromised worker can execute only the operations it holds grants for.
 
 ---
 
@@ -244,13 +256,39 @@ public sealed record ExecutionGrant(
     string GrantId,
     string Operation,            // "payout.execute"
     string ResourceId,           // "P-1042"
-    string ResourceFingerprint,  // hash of the accepted amount, currency, vendor, beneficiary account, date
-    string Executor,             // "payout-worker"
+    string ResourceFingerprint,  // PayoutFingerprint.Compute of the accepted payout
+    string ExecutorId,           // stable workload identifier, such as issuer + subject
     string Audience,             // "payments-service"
     DateTimeOffset NotBefore,
     DateTimeOffset ExpiresAt,
     int MaxUses,                 // 1
     string DecisionId);          // Tuesday's authorization decision
+
+public enum ClaimResult { Claimed, GrantSpent, GrantCancelled, GrantOutsideWindow, PayoutChanged }
+
+public static class PayoutFingerprint
+{
+    // A versioned, canonical encoding of every value that affects execution. Every component
+    // that computes or compares the fingerprint must use exactly this encoding.
+    public static string Compute(Payout payout)
+    {
+        var canonical = new StringBuilder("payout-fingerprint/v1");
+        foreach (string field in new[]
+        {
+            payout.Id,
+            payout.VendorId,
+            payout.BeneficiaryAccountId,
+            payout.AmountMinorUnits.ToString(CultureInfo.InvariantCulture),
+            payout.Currency,
+            payout.ExecuteOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+        })
+        {
+            canonical.Append('|').Append(field.Length).Append(':').Append(field);  // length-prefixed
+        }
+
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(canonical.ToString())));
+    }
+}
 
 public sealed class PayoutExecutionHost(
     IGrantStore grants,
@@ -274,11 +312,12 @@ public sealed class PayoutExecutionHost(
         // Bindings: is this grant meant for this host, this caller, this operation, and this payout?
         if (grant.Audience != Audience)
             return ExecutionResult.Rejected("grant.wrong-audience");
-        if (grant.Executor != caller.Name)
+        if (grant.ExecutorId != caller.StableId)
             return ExecutionResult.Rejected("grant.wrong-executor");
         if (grant.Operation != "payout.execute" || grant.ResourceId != payoutId)
             return ExecutionResult.Rejected("grant.scope-mismatch");
 
+        // An early rejection only. The window is enforced again when the grant is consumed.
         DateTimeOffset now = clock.GetUtcNow();
         if (now < grant.NotBefore || now >= grant.ExpiresAt)
             return ExecutionResult.Rejected("grant.outside-window");
@@ -295,15 +334,25 @@ public sealed class PayoutExecutionHost(
         if (!current.Allowed)
             return ExecutionResult.Rejected(current.Reason);
 
-        // One transaction: consume a grant use (not cancelled, uses remaining, not expired)
-        // and move the payout from Scheduled to Executing if its version is unchanged.
+        // One transaction in a store that holds both grant and payout state: consume a grant use
+        // (not cancelled, uses remaining, inside the window by the store's own clock at commit),
+        // move the payout from Scheduled to Executing if its version is unchanged, and record a
+        // durable execution attempt. If the store is unavailable this throws, and nothing executes.
         ClaimResult claim = await grants.TryConsumeAndClaimAsync(
-            grant.GrantId, payout.Id, payout.Version, now, cancellationToken);
+            grant.GrantId, payout.Id, payout.Version, cancellationToken);
         if (claim != ClaimResult.Claimed)
-            return ExecutionResult.Rejected(claim.ToReasonCode());
+        {
+            return ExecutionResult.Rejected(claim switch
+            {
+                ClaimResult.GrantSpent => "grant.already-used",
+                ClaimResult.GrantCancelled => "grant.cancelled",
+                ClaimResult.GrantOutsideWindow => "grant.outside-window",
+                _ => "payout.changed-since-check",
+            });
+        }
 
         // The host's own credentials perform the side effect. The idempotency key is the
-        // operation's identity, not the grant's.
+        // accepted operation's identity, not the grant's.
         try
         {
             BankResult result = await bank.SendAsync(payout, idempotencyKey: payout.Id, cancellationToken);
@@ -313,7 +362,9 @@ public sealed class PayoutExecutionHost(
         catch (Exception)
         {
             // Timeout, cancellation, lost response, or a failed outcome write after the bank call:
-            // the outcome is unknown, not failed, and goes to reconciliation.
+            // the outcome is unknown, not failed, and goes to reconciliation. A production adapter
+            // would separate definitive provider rejections from ambiguous failures and keep the
+            // diagnostic details.
             await payouts.MarkUnknownAsync(payout.Id, grant.GrantId, CancellationToken.None);
             return ExecutionResult.Unknown("payout.outcome-unknown");
         }
@@ -323,23 +374,36 @@ public sealed class PayoutExecutionHost(
 
 A few points in this sketch carry most of the weight.
 
-**The caller's identity comes from the connection, not from the message.** `WorkloadIdentity` is whatever mutual TLS, a platform identity, or a service token established. If the executor name came from the request body, the executor binding would mean nothing.
+**The caller's identity comes from the connection, not from the message.** `WorkloadIdentity` is whatever mutual TLS, a platform identity, or a service token established, and `StableId` is its stable identifier, not a display name. If the executor identity came from the request body, the executor binding would mean nothing.
 
 **Finding a genuine, in-date grant is the start of the decision, not the end.** With a server-side record, the lookup establishes that the grant is genuine. With a self-contained token, signature verification does. Either way, the binding and window checks only establish that the grant applies to this request. Everything after them establishes that acting on it is still correct.
 
-**Freshness is checked against the current payout, not the grant's copy of it.** The fingerprint lets the host detect that the amount, currency, vendor, beneficiary account, or date changed after Tuesday's decision.
+**Freshness is checked against the current payout, not the grant's copy of it.** The fingerprint lets the host detect that the amount, currency, vendor, beneficiary account, or date changed after Tuesday's decision. It is only as good as its encoding. It must include every value that affects execution, and the issuer and the host must serialize those values identically. Otherwise a legitimate payout is rejected because two components formatted an amount differently, or an omitted field changes without detection. The sketch uses a versioned, length-prefixed encoding with the amount in minor currency units.
 
-**The consume and the claim are one atomic step.** If the grant were consumed in one call and the payout status changed in another, two workers racing on the same payout, or an edit landing between the check and the update, could slip through. Making both conditional in one transaction means the state the host checked is the state it acts on. The [replay protection guide](../../security/replay-protection-and-bounded-use.md) covers atomic consumption, distributed races, and what to do when the grant store is unavailable.
+**The consume and the claim are one atomic step, and that step protects only what it checks.** If the grant were consumed in one call and the payout status changed in another, two workers racing on the same payout, or an edit landing between the check and the update, could slip through. Making both conditional in one transaction means the grant's use state and the payout's version are exactly what the host checked. It does not freeze facts held elsewhere. The vendor's hold status, the bank account's verification status, organizational limits, and the operator's current authority could all change between the policy evaluation and the claim. For each such fact, decide whether to include it in the transaction's conditions, take a lock or reservation, compare a version, or accept a documented freshness rule such as "evaluated within the same request." The [replay protection guide](../../security/replay-protection-and-bounded-use.md) covers atomic consumption, distributed races, and what to do when the grant store is unavailable.
 
-**Every rejection happens before the bank is called.** None of the rejection paths fall back to executing. An unavailable policy dependency or grant store should produce a rejection or a retryable deferral, never a payout.
+**The atomicity has to be real.** `TryConsumeAndClaimAsync` is atomic only if grant state and payout state live behind one transactional boundary, such as one database, or a coordination mechanism designed for the purpose. Calling one method does not make two separate stores atomic.
 
-**An unknown outcome is recorded as unknown.** If the banking call times out, the payout may or may not have been sent. The host marks it for reconciliation instead of treating it as failed. Finalization writes use `CancellationToken.None` so that a caller giving up does not leave the record behind the bank's actual state.
+**The window is enforced with the clock at consumption.** Loading the payout and evaluating policy take time, and the grant could expire in between. The early window check is a fast rejection only. The consume operation checks both `NotBefore` and `ExpiresAt` against the store's own current time when it commits. In this design, expiry limits *admission* to execution: the claim must commit inside the window, but the banking call that follows may finish after it. If the side effect itself must start or complete before a deadline, that is a different guarantee and needs its own enforcement.
+
+**Every pre-execution failure stops before the bank is called.** None of the rejection paths fall back to executing. An unavailable policy dependency or grant store should produce a rejection or a retryable deferral, never a payout. Failures after the banking call has started are different, because the side effect may already have happened.
+
+**An unknown outcome is recorded as unknown.** If the banking call times out, the payout may or may not have been sent. The host marks it for reconciliation instead of treating it as failed. Finalization writes use `CancellationToken.None` so that a caller giving up does not cancel them.
+
+That is not the same as guaranteeing they persist. A production design also needs recovery for the failures the `catch` block cannot see:
+
+- The process can crash after the claim, leaving the payout in `Executing` with no outcome.
+- The process can crash after the bank accepts the payment and before any outcome is written.
+- `MarkUnknownAsync` itself can fail.
+- The claim transaction's commit can be ambiguous, leaving the worker unsure whether the grant was consumed.
+
+The usual answer is a durable execution-attempt record written in the same transaction as the claim, the same principle as the [transactional outbox pattern](https://learn.microsoft.com/en-us/azure/architecture/databases/guide/transactional-outbox-cosmos). A recovery process then finds attempts stranded in `Executing`, reconciles them with the provider using the operation's identity, and retries failed finalization writes. The [replay protection guide's failure windows](../../security/replay-protection-and-bounded-use.md#replay-resistance-is-not-exactly-once-execution) walk through the same cases in more depth.
 
 ---
 
 ## Which Facts Must Still Be True on Friday?
 
-A grant records what was decided. It does not freeze the world. The host has to decide which facts it rechecks at execution and which it accepts from Tuesday.
+A grant records what was decided. It does not freeze the world. The host has to decide which facts it rechecks at execution and which it accepts from Tuesday. For each fact it rechecks, it also has to decide how fresh the check must be, as described in the previous section.
 
 | Fact | Established Tuesday | Rechecked Friday? |
 | --- | --- | --- |
@@ -369,14 +433,18 @@ The grant is single-use. The banking call uses an idempotency key. These solve d
 
 **Replay protection** answers: *should this authority be accepted again?* The key is the grant ID. The host rejects a second presentation of the same grant, whether it comes from a duplicated queue message, a retried worker, or someone who copied the reference.
 
-**Idempotency** answers: *if the same logical operation is attempted again, should the side effect happen again?* The key is the operation, here the payout ID. The banking provider, when it supports idempotency keys, returns the original result instead of sending a second payment.
+**Idempotency** answers: *if the same logical operation is attempted again, should the side effect happen again?* The key is the operation, here the payout ID. In this example two mechanisms provide it. The payout's own state transition from `Scheduled` to `Executing` is one barrier, because a payout that has left `Scheduled` cannot be claimed again. The banking provider's idempotency key is another, for repeated requests that reach the provider.
 
 Each covers a case the other does not:
 
-- If someone issues a **second valid grant** for the same payout, perhaps because a retry path re-issued authority, replay protection accepts it, because it is a different grant. Without idempotency on the payout, the vendor could be paid twice.
+- If someone issues a **second valid grant** for the same payout, perhaps because a retry path re-issued authority, replay protection accepts it, because it is a different grant. Whether the vendor could be paid twice then depends on the operation-level controls. Here, the payout state transition refuses a second claim. In a design without that barrier, or one where a recovery path returns the payout to an executable state, a second payment becomes possible unless the provider deduplicates it.
 - If the worker **re-presents the same grant** after the bank call timed out, replay protection rejects it, which is correct. The payout is now in the unknown state and needs reconciliation against the provider using the idempotency key. Re-presenting authority does not recover it.
 
-Neither gives exactly-once execution against an external system. They narrow the windows where duplication or loss can occur, and the unknown state makes the remaining window visible.
+Provider idempotency has limits of its own. It applies only within the provider's key namespace, it typically requires the repeated request's parameters to match the original, and keys are retained for a limited time. [Stripe's idempotency documentation](https://docs.stripe.com/api/idempotent_requests), for example, says keys may be pruned once they are at least 24 hours old, after which a reused key is treated as a new request. Do not treat a provider's idempotency key as indefinite deduplication.
+
+Using the payout ID as the idempotency key is right for "this accepted operation." It is wrong for "send a genuinely new payment after a confirmed failure." If the bank definitively rejects the payout and the organization decides to try again, that is a new operation that needs its own identity, its own decision, and its own grant. Reusing the old key would return the old rejection or be refused as a parameter mismatch.
+
+Neither replay protection nor idempotency gives exactly-once execution against an external system. They narrow the windows where duplication or loss can occur, and the unknown state makes the remaining window visible.
 
 Some operations legitimately need **bounded use** rather than single use. A grant to download a generated export might allow three retrievals within 24 hours. The same rules apply: the bound is explicit, consumption is atomic, and the count is enforced at the host, not by the presenter.
 
@@ -436,19 +504,21 @@ The [roles, claims, and capability token selection guide](roles-claims-or-capabi
 
 ## Failure Modes
 
-**1. Forwarding the user's bearer token to the worker.** The worker gains the user's full scope and audience for the token's lifetime, and stored refresh tokens extend that indefinitely.
+**1. Forwarding the user's bearer token to the worker.** The worker gains whatever scope and audience that token carries, for its lifetime, and stored refresh tokens can extend usable authority well beyond it.
 
 **2. Treating possession of a queued message as authority.** Anyone who can write to the queue can cause the side effect. Message authentication proves who sent it, not what they were allowed to ask for.
 
-**3. Issuing a reusable grant for a one-time operation.** A duplicated message or a retry can present it again. One-time operations need one-time grants, consumed atomically at the host.
+**3. Assuming the claim transaction freezes every policy fact.** An atomic consume-and-claim protects the states in its conditions. Vendor holds, account verification, limits, and the originating actor's authority need their own locking, versioning, reservation, or documented freshness rule.
 
-**4. Omitting a binding.** A grant without an audience can be replayed at another service. Without an operation, it can be used for a different action. Without a resource or fingerprint, it can execute a different or altered payout. Without an expiry, it remains usable indefinitely.
+**4. Issuing a reusable grant for a one-time operation.** A duplicated message or a retry can present it again. One-time operations need one-time grants, consumed atomically at the host.
 
-**5. Letting the worker expand the scope.** The worker should present the grant, not mint or widen one. If the worker can request "the same, but for P-1043," the issuer has become a service that hands out authority on demand.
+**5. Omitting a binding.** A grant without an audience can be replayed at another service. Without an operation, it can be used for a different action. Without a resource or fingerprint, it can execute a different or altered payout. Without an expiry, it remains usable indefinitely.
 
-**6. Validating the signature and expiry, and nothing else.** A genuine, unexpired grant can still be replayed, cancelled, or bound to a payout that has since changed. Replay state, cancellation, current resource state, and current policy are separate checks.
+**6. Letting the worker expand the scope.** The worker should present the grant, not mint or widen one. If the worker can request "the same, but for P-1043," the issuer has become a service that hands out authority on demand.
 
-**7. Minting a grant where immediate execution would do.** When the same trusted host can authorize and execute with current state, a grant adds infrastructure without reducing authority.
+**7. Validating the signature and expiry, and nothing else.** A genuine, unexpired grant can still be replayed, cancelled, or bound to a payout that has since changed. Replay state, cancellation, current resource state, and current policy are separate checks.
+
+**8. Minting a grant where immediate execution would do.** When the same trusted host can authorize and execute with current state, a grant adds infrastructure without reducing authority.
 
 ---
 
@@ -487,22 +557,26 @@ A single log line written after the payment is a description of what happened. T
 
 **The grant**
 
-4. Does it bind operation, resource (with a fingerprint of the accepted values), executor, audience, time window, and use count?
-5. Does it reference the decision that justified it, without carrying the user's standing authority?
-6. Is its lifetime proportional to the delayed operation, not to a session or an arbitrary default?
+4. Does it bind operation, resource, executor, audience, time window, and use count?
+5. Does the resource fingerprint use a versioned, canonical encoding of every execution-relevant value?
+6. Is the executor bound by a stable workload identifier rather than a display name?
+7. Does it reference the decision that justified it, without carrying the user's standing authority?
+8. Is its lifetime proportional to the delayed operation, not to a session or an arbitrary default?
 
 **At the host**
 
-7. Does the host take the executor's identity from transport authentication, never from the message?
-8. Does it check current resource state and current policy, not only the signature and expiry?
-9. Is the rule for an originating actor who lost authority written down and enforced?
-10. Are grant consumption and the resource state transition one atomic step?
-11. Does every failure path, including unavailable dependencies, stop before the side effect?
-12. Is the side effect idempotent on the operation's identity, and is an unknown outcome reconciled rather than retried with the same authority?
+9. Does the host take the executor's identity from transport authentication, never from the message?
+10. Does it check current resource state and current policy, not only the signature and expiry?
+11. Is the rule for an originating actor who lost authority written down and enforced?
+12. Are grant consumption and the resource state transition one atomic step behind a real transactional boundary, with the window checked at commit?
+13. For policy facts outside that transaction, is the freshness rule explicit?
+14. Does every pre-execution failure, including unavailable dependencies, stop before the side effect?
+15. Is the side effect idempotent on the operation's identity, within the provider's documented limits, and is an unknown outcome reconciled rather than retried with the same authority?
+16. Can stranded `Executing` attempts and failed finalization writes be recovered?
 
 **Afterward**
 
-13. Can you trace a side effect back through the host decision, the grant, and the original authorization decision?
+17. Can you trace a side effect back through the host decision, the grant, and the original authorization decision?
 
 ---
 
@@ -517,6 +591,17 @@ For atomic consumption, racing consumers, process restarts, replay store failure
 If the delayed operation originates from an AI agent or tool call rather than a person, [Agent and Tool Authorization Models and Host-Owned Execution](../../architecture/agent-and-tool-authorization-models-and-host-owned-execution.md) covers delayed execution, policy changes after a proposal, and where credentials should live.
 
 If the payout also needs a reviewer's approval before it runs, [Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?](authorization-vs-approval-vs-acknowledgment.md) separates those decisions from the permission to execute.
+
+### Related Work
+
+The same problem is being approached from several directions outside Learning. These are adjacent work, not the source of this article's design:
+
+- [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693.html) standardizes obtaining a separate, audience- and scope-targeted token for delegation and impersonation.
+- [OAuth 2.0 Security Best Current Practice (RFC 9700)](https://www.rfc-editor.org/rfc/rfc9700.html) covers audience restriction, sender-constrained tokens, and refresh-token protection.
+- The IETF OAuth working group's [Transaction Tokens](https://datatracker.ietf.org/doc/draft-ietf-oauth-transaction-tokens/) draft propagates user, workload, and authorization context through a call chain inside a trusted domain, using very short-lived tokens.
+- [Possession Is Not Authority: Execution Handle, Sink Verification, Atomic Consumption, and Finality Receipt](https://datatracker.ietf.org/doc/draft-das-execution-handle/) is an individual Internet-Draft that binds authority to a specific pending operation and consumes it at the point of effect. Individual drafts are not endorsed by the IETF.
+
+None of these, on its own, decides which policy facts the executing host must recheck, or what happens when the originating actor loses authority. Those remain application decisions.
 
 ---
 
