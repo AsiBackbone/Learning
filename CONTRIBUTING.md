@@ -479,6 +479,7 @@ The supported contract is:
 ```yaml
 ---
 title: When ASP.NET Core Authorization Is Enough
+description: Learn when built-in ASP.NET Core authorization is sufficient and when a separate execution decision is justified.
 author: Christopher D. Cavell
 published: "2026-08-14"
 updated: "2026-08-20"
@@ -493,6 +494,7 @@ x_hashtags:
 The fields mean:
 
 - `title` is the canonical article title.
+- `description` is the page's search and social-preview description. Keep it at or below 160 characters.
 - `author` is the displayed author and RSS creator attribution.
 - `published` is the original publication date in double-quoted `"YYYY-MM-DD"` format so YAML processors preserve it as a string.
 - `updated` is optional, uses the same double-quoted date format, must not be earlier than `published`, and should be changed only for a substantive revision, not routine formatting or link maintenance. When present, the feed emits the date as an Atom `atom:updated` timestamp at `00:00:00Z`; RSS `pubDate` continues to represent the original `published` date.
@@ -561,7 +563,8 @@ Do not maintain a second CMS or separately edited source-of-truth copy just to s
 Before publishing a new standalone article, normally confirm that:
 
 - [ ] The article has a visible byline.
-- [ ] `published` records the original publication date in `YYYY-MM-DD` format.
+- [ ] `description` gives search and social previews a useful summary in no more than 160 characters.
+- [ ] `published` records the original publication date in double-quoted `"YYYY-MM-DD"` format.
 - [ ] The article lives at a stable `docs/articles/<year>/<slug>.md` path.
 - [ ] The title and slug describe a recognizable developer problem rather than internal terminology.
 - [ ] `summary` is concise and useful when shown in the RSS feed or an external preview.

@@ -1,5 +1,5 @@
 ---
-description: Distinguish a user's present authorization from the narrow, short-lived authority a later worker or service needs to perform one delayed or delegated operation.
+description: Separate a user's present authorization from the narrow, short-lived authority a later worker or service needs to perform one delayed operation.
 title: How Short-Lived Execution Authority Differs from User Authorization
 author: Christopher D. Cavell
 published: "2026-10-03"
