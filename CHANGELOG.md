@@ -6,6 +6,10 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+### Added
+
+- Published [How Short-Lived Execution Authority Differs from User Authorization](docs/articles/2026/short-lived-execution-authority-vs-user-authorization.md), a practitioner guide that follows one scheduled vendor payout to separate the actor, the accepted operation, the later executor, the delegated grant, and the protected host, covering why forwarding a user's token or claims creates excessive or stale authority, the bindings that make delayed authority narrow, execution-time freshness checks, one-time use versus idempotency, and when immediate execution or ordinary workload identity is enough (#395).
+
 ## [1.2.0] - 2026-10-03
 
 ### Added

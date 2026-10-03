@@ -288,7 +288,8 @@ Lead to the workflow-engine comparison for detailed scenarios and to Human-in-th
 
 - **Priority:** P1
 - **Implementation issue:** [#395](https://github.com/AsiBackbone/Learning/issues/395)
-- **Candidate slug:** `short-lived-execution-authority-vs-user-authorization`
+- **Publication:** [Published October 3, 2026](../docs/articles/2026/short-lived-execution-authority-vs-user-authorization.md)
+- **Permanent slug:** `short-lived-execution-authority-vs-user-authorization`
 
 #### Reader / search problem
 
@@ -341,6 +342,48 @@ Candidate 4 establishes the authority model: a tool call is a proposal. This can
 #### Natural deeper path
 
 Lead to Typed AI Proposed Intent for the four-stage acceptance model and to the runnable gateway sample for end-to-end behavior.
+
+---
+
+### 11. Can One Worker Safely Execute Delayed Operations for Many Tenants?
+
+- **Priority:** P1
+- **Implementation issue:** Open separately when promoted
+- **Candidate slug:** `multi-tenant-worker-execution-authority`
+
+#### Reader / search problem
+
+A team runs one shared background worker, gateway, or executor that performs delayed operations for many tenants, and wants to know what actually keeps one tenant's authority from reaching another tenant's resources. Typical questions include:
+
+- Is checking that the grant's tenant matches the resource's tenant enough?
+- How should a workload identity be represented so that it is unambiguous across issuers and tenant directories?
+- When does tenant isolation require separate worker identities, credentials, or execution partitions rather than one shared worker?
+- Can token exchange produce a tenant-bound execution credential, and who must decide which tenant it is bound to?
+- How do claim mapping and identity normalization in ASP.NET Core affect execution-time identity checks?
+
+#### Existing Learning support
+
+- [How Short-Lived Execution Authority Differs from User Authorization](../docs/articles/2026/short-lived-execution-authority-vs-user-authorization.md)
+- [Capability-Scoped Background Operation](../docs/case-studies/capability-scoped-background-operation.md)
+- [Multi-Tenant and Regional Policy Overlay](../docs/case-studies/multi-tenant-and-regional-policy-overlay.md)
+- [Trust Boundaries and Least Privilege](../docs/security/trust-boundaries-and-least-privilege.md)
+- [Scoped Capability and Host-Owned Execution](../docs/tutorials/scoped-capability-and-host-owned-execution.md)
+
+#### Article / curriculum distinction
+
+The execution-authority article deliberately keeps its tenant caveat short. This candidate should take up the distinctions that review of that article surfaced:
+
+- Tenant equality between grant and resource prevents cross-tenant substitution, but does not isolate tenants from a compromised shared worker that is legitimately authorized for all of them. Compromise isolation requires separately enforced identities, credentials, permissions, or execution partitions, never a tenant value supplied by the worker.
+- Workload identity should be a validated, structured identity, such as issuer and subject, or issuer, tenant, and principal object ID, compared as fields or one canonical encoding. Application or client IDs and tenant-local service principals answer different questions, and the article should describe them accurately for the identity providers it names.
+- Regional or partition-specific worker identities create a boundary only when they have genuinely separate credentials and permissions. A different name on shared credentials does not, and regional identity alone does not establish data-sovereignty compliance.
+- Tenant-scoped token exchange is an optional additional control. The issuer, not the worker, must authorize the tenant binding, and the protected host still enforces the tenant boundary.
+- Execution-time identity comparison depends on deliberate claim mapping: derive one canonical identity after token validation, and reject missing or conflicting required claims rather than falling back silently.
+
+The article should remain representation- and vendor-neutral in its recommendations, using a specific identity provider only to illustrate identifier semantics, and should state when a single shared worker with ordinary tenant checks is sufficient.
+
+#### Natural deeper path
+
+Lead to Capability-Scoped Background Operation for the queue and worker lifecycle, Multi-Tenant and Regional Policy Overlay for tenant and regional policy composition, and Trust Boundaries and Least Privilege for credential and identity separation.
 
 ---
 
