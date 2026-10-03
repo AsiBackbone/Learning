@@ -192,13 +192,14 @@ flowchart LR
     subgraph H["Friday: payments service (protected host)"]
         V["Bindings, current payout,<br/>current policy"] -->|Allowed| K["Atomic consume + claim"]
         K -->|Claimed| X["Bank call with<br/>host-owned credentials"]
-        V -->|Rejected| N["No side effect"]
+        V -->|Rejected| N["Stop: this request<br/>does not call the bank"]
         K -->|Spent, cancelled, expired, or changed| N
+        K -->|Commit outcome ambiguous| R["Stop and reconcile<br/>the attempt record"]
     end
     C --> M --> W --> V
 ```
 
-In words: everything that depends on the operator happens inside the Finance API on Tuesday and ends with a recorded payout and a narrow grant. The queue carries only a payout ID and a grant reference, never the operator's credential. On Friday, the worker authenticates as itself and presents the reference. The payments service, the only component holding banking credentials, checks the bindings, the current payout, and the current policy, then consumes the grant and claims the payout atomically before calling the bank. Any failed check, or a lost claim, means no side effect.
+In words: everything that depends on the operator happens inside the Finance API on Tuesday and ends with a recorded payout and a narrow grant. The queue carries only a payout ID and a grant reference, never the operator's credential. On Friday, the worker authenticates as itself and presents the reference. The payments service, the only component holding banking credentials, checks the bindings, the current payout, and the current policy, then consumes the grant and claims the payout atomically before calling the bank. A failed check or a definitively rejected claim means this request stops without calling the bank. If the claim's commit outcome is ambiguous, the request also stops, but it cannot conclude that nothing happened; recovery inspects the durable attempt record and reconciles it.
 
 Each binding removes a specific kind of misuse:
 
@@ -266,7 +267,11 @@ What makes any of these an execution grant is its lifecycle:
 
 A signature and an expiry time cover only a small part of this. A signed token that is never consumed is reusable until it expires. A signed token that the host validates without checking the current payout will execute a payout that has since been altered.
 
-The grant also does not authenticate the worker. The worker proves who it is with its own workload identity: a managed identity, a client certificate, a platform-issued service token, or whatever your environment provides. The grant says what that authenticated worker may do with this one operation. Bind the grant to a stable identifier for that workload, such as the identity provider's issuer, tenant, and subject or application ID, rather than a display name that another workload could share. The article writes `payout-worker` for readability. If one worker executes payouts for several tenants, its identity alone does not separate them. The grant and the payout must both carry the tenant, and the host must confirm they match, so a grant issued in one tenant can never claim another tenant's payout. Requiring both identity and grant means a copied grant reference is useless to anyone who is not the worker, and a compromised worker can execute only the operations it holds grants for.
+The grant also does not authenticate the worker. The worker proves who it is with its own workload identity: a managed identity, a client certificate, a platform-issued service token, or whatever your environment provides. The grant says what that authenticated worker may do with this one operation. Bind the grant to a validated, structured identifier for that workload, such as issuer and subject, or issuer, tenant, and principal object ID, compared as structured fields or through one canonical, unambiguous encoding of them rather than an ad hoc concatenated string, and never a display name that another workload could share. Derive that identifier once, after token validation, with explicit claim mapping, and reject tokens that lack the required claims rather than falling back to other ones. The article writes `payout-worker` for readability.
+
+If one worker executes payouts for several tenants, carry the tenant on both the grant and the payout and have the host confirm they match. That stops one tenant's grant from claiming another tenant's payout. It does not isolate tenants from a worker that is legitimately authorized for all of them: a compromised shared worker presenting tenant B's grant for tenant B's payout passes that check. If tenants must be isolated from each other's compromise, they need separately enforced identities, credentials, or execution partitions, not a tenant value supplied by the worker.
+
+Requiring both identity and grant means a copied grant reference is useless to anyone who is not the worker, and a compromised worker can execute only the operations it holds grants for.
 
 ---
 
@@ -282,7 +287,7 @@ public sealed record ExecutionGrant(
     string Operation,            // "payout.execute"
     string ResourceId,           // "P-1042"
     string ResourceFingerprint,  // PayoutFingerprint.Compute of the accepted payout
-    string ExecutorId,           // stable workload identifier, such as issuer + subject
+    string ExecutorId,           // canonical form of a validated workload identity, such as issuer + subject
     string Audience,             // "payments-service"
     DateTimeOffset NotBefore,
     DateTimeOffset ExpiresAt,
@@ -374,7 +379,8 @@ public sealed class PayoutExecutionHost(
         // (not cancelled, uses remaining, inside the window by authoritative current time evaluated
         // in the conditional transition itself),
         // move the payout from Scheduled to Executing if its version is unchanged, and insert the
-        // durable execution-attempt record. If the store is unavailable this throws, and nothing executes.
+        // durable execution-attempt record. If the store is unavailable or the commit outcome is
+        // ambiguous, this throws and the bank is not called; recovery inspects the attempt record.
         var attempt = new ExecutionAttempt(
             AttemptId: Guid.NewGuid(), PayoutId: payout.Id, GrantId: grant.GrantId, ExecutorId: caller.StableId);
         ClaimResult claim = await grants.TryConsumeAndClaimAsync(
@@ -416,7 +422,7 @@ public sealed class PayoutExecutionHost(
 
 A few points in this sketch carry most of the weight.
 
-**The caller's identity comes from the connection, not from the message.** `WorkloadIdentity` is whatever mutual TLS, a platform identity, or a service token established, and `StableId` is its stable identifier, not a display name. If the executor identity came from the request body, the executor binding would mean nothing.
+**The caller's identity comes from the connection, not from the message.** `WorkloadIdentity` is whatever mutual TLS, a platform identity, or a service token established, and `StableId` is the canonical encoding of its validated, structured identity, not a display name. If the executor identity came from the request body, the executor binding would mean nothing.
 
 **Finding a genuine, in-date grant is the start of the decision, not the end.** With a server-side record, the lookup establishes that the grant is genuine. With a self-contained token, signature verification does. Either way, the binding and window checks only establish that the grant applies to this request. Everything after them establishes that acting on it is still correct.
 
