@@ -178,7 +178,7 @@ Payments service
 The same handoff, drawn across its trust boundaries:
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph T["Tuesday: Finance API"]
         A["Operator authenticated<br/>request authorized"] --> B["Exact payout recorded<br/>fingerprint computed"]
         B --> C["Grant issued<br/>operation, resource, executor,<br/>audience, window, 1 use"]
@@ -199,7 +199,7 @@ flowchart LR
     C --> M --> W --> V
 ```
 
-In words: everything that depends on the operator happens inside the Finance API on Tuesday and ends with a recorded payout and a narrow grant. The queue carries only a payout ID and a grant reference, never the operator's credential. On Friday, the worker authenticates as itself and presents the reference. The payments service, the only component holding banking credentials, checks the bindings, the current payout, and the current policy, then consumes the grant and claims the payout atomically before calling the bank. A failed check or a definitively rejected claim means this request stops without calling the bank. If the claim's commit outcome is ambiguous, the request also stops, but it cannot conclude that nothing happened; recovery inspects the durable attempt record and reconciles it.
+In words: the operator's original request is authenticated and authorized inside the Finance API on Tuesday, producing a recorded payout and a narrow grant. Friday's execution policy separately decides whether the originating operator's authority must still hold. The queue carries only a payout ID and a grant reference, never the operator's credential. On Friday, the worker authenticates as itself and presents the reference. The payments service, the only component holding banking credentials, checks the bindings, the current payout, and the current policy, then consumes the grant and claims the payout atomically before calling the bank. A failed check or a definitively rejected claim means this request stops without calling the bank. If the claim's commit outcome is ambiguous, the request also stops, but it cannot conclude that nothing happened; recovery inspects the durable attempt record and reconciles it.
 
 Each binding removes a specific kind of misuse:
 
@@ -411,8 +411,8 @@ public sealed class PayoutExecutionHost(
             // includes failures before the provider was contacted. A production adapter would
             // separate those, and definitive provider rejections, from ambiguous failures, and
             // keep the diagnostic details.
-            // If MarkUnknownAsync itself fails, the attempt stays in Executing and the recovery
-            // process described below must find and reconcile it.
+            // If MarkUnknownAsync fails, the persisted outcome may be uncertain;
+            // recovery must inspect the durable attempt and reconcile with the provider.
             await payouts.MarkUnknownAsync(attempt.AttemptId, CancellationToken.None);
             return ExecutionResult.Unknown("payout.outcome-unknown");
         }
