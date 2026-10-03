@@ -260,7 +260,7 @@ Send readers to the full policy-engine comparison only after the simpler applica
 ### 8. When Should a Workflow Engine Own the Decision?
 
 - **Priority:** P1
-- **Implementation issue:** Open separately when promoted
+- **Implementation issue:** [#394](https://github.com/AsiBackbone/Learning/issues/394)
 - **Candidate slug:** `when-workflow-engine-should-own-decision`
 
 #### Reader / search problem
@@ -287,7 +287,7 @@ Lead to the workflow-engine comparison for detailed scenarios and to Human-in-th
 ### 9. How Short-Lived Execution Authority Differs from User Authorization
 
 - **Priority:** P1
-- **Implementation issue:** Open separately when promoted
+- **Implementation issue:** [#395](https://github.com/AsiBackbone/Learning/issues/395)
 - **Candidate slug:** `short-lived-execution-authority-vs-user-authorization`
 
 #### Reader / search problem
@@ -382,13 +382,18 @@ A selected standalone article continues to use the existing frontmatter contract
 title:
 description:
 author:
-published:
+published: "YYYY-MM-DD"
 summary:
 feed: true
+x_hashtags:
+  - DotNet
+  - SoftwareArchitecture
 ---
 ```
 
-and the permanent source path:
+`x_hashtags` is optional and defaults to `#DotNet` when omitted. When present, it must include `DotNet` and may include one allowed topical value; see the canonical contract for the complete list.
+
+The permanent source path is:
 
 ```text
 docs/articles/<year>/<slug>.md
