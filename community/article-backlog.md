@@ -287,8 +287,9 @@ Lead to the workflow-engine comparison for detailed scenarios and to Human-in-th
 ### 9. How Short-Lived Execution Authority Differs from User Authorization
 
 - **Priority:** P1
-- **Implementation issue:** Open separately when promoted
-- **Candidate slug:** `short-lived-execution-authority-vs-user-authorization`
+- **Implementation issue:** [#395](https://github.com/AsiBackbone/Learning/issues/395)
+- **Publication:** [Published October 3, 2026](../docs/articles/2026/short-lived-execution-authority-vs-user-authorization.md)
+- **Permanent slug:** `short-lived-execution-authority-vs-user-authorization`
 
 #### Reader / search problem
 

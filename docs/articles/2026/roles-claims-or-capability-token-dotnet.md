@@ -1234,6 +1234,8 @@ If a bearer capability is placed directly in a queue message, the queue becomes 
 
 If the worker can independently reconstruct current identity and authorization safely, a separate capability may still be unnecessary.
 
+[How Short-Lived Execution Authority Differs from User Authorization](short-lived-execution-authority-vs-user-authorization.md) follows this handoff through one scheduled payout, including the checks the executing host must still make when the work finally runs.
+
 ---
 
 ## A Queue or Service Boundary Does Not Automatically Mean Capability
