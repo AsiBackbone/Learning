@@ -110,7 +110,7 @@ How much authority the forwarded token carries depends on how it was issued. A w
 
 **The lifetime is wrong in both directions.** Access-token lifetime is set by the issuer and is separate from the user's session. Current guidance favors short lifetimes, often minutes, though longer ones still exist. A short-lived token issued on Tuesday is useless on Friday. Teams then extend token lifetimes or store refresh tokens in job messages so the worker can obtain new user tokens. A stored refresh token can extend usable authority well beyond the original access token's lifetime, subject to the issuer's expiration, revocation, rotation, and client-binding rules. Each of those choices makes the stored credential more valuable to anyone who can obtain and use it.
 
-**It describes a session, not a decision.** The token proves the operator authenticated and holds certain scopes or claims. It does not prove that this specific payout was requested, with this amount and this beneficiary.
+**It ordinarily describes delegated access, not this accepted payout.** The token shows that the operator authenticated and that their client was granted certain scopes or claims. OAuth tokens can be restricted to particular resources and actions, but the token issued for the operator's Tuesday session was not issued to record that this specific payout was accepted, with this amount and this beneficiary.
 
 **It can be stale.** If the operator's role is revoked on Wednesday, a stored token or refresh token may still produce something the payments service accepts on Friday. Whether the payout should still run is a real policy question, discussed later. It should be answered deliberately, not by whatever a cached credential happens to allow.
 
@@ -191,7 +191,7 @@ Notice what is **not** in the grant: the operator's roles, scopes, or access tok
 
 The window is short and specific, but it is not "a few seconds." Execution authority should live as long as the delayed operation reasonably needs and no longer. "Short-lived" means proportional to the operation, not a fixed number.
 
-A three-hour window is also three hours in which a leaked grant reference could be presented. That is acceptable here because the grant is useless without the worker's own authenticated identity and because the host holds its use state. A self-contained grant that any holder could present would justify a much shorter window.
+Distinguish the executable window from the exposure period. The grant can only be used during Friday's three hours, but it exists from the moment it is issued on Tuesday, so a reference leaked on Tuesday stays sensitive until Friday's expiry. That is acceptable here because the grant is useless without the worker's own authenticated identity, can be cancelled, and has its use state held by the host. A self-contained grant that any holder could present would justify a much shorter lifetime, or issuance closer to execution.
 
 ---
 
@@ -232,7 +232,7 @@ For a one-time operation, a server-side grant record is often the simplest choic
 
 What makes any of these an execution grant is its lifecycle:
 
-1. **It is issued only after a decision.** The Finance API issues it after the operator was authorized and the exact payout was recorded. Nothing can obtain one by asking for it.
+1. **It is issued only after a decision.** The Finance API issues it after the operator was authorized and the exact payout was recorded. A request alone is not enough; issuance requires the recorded authorization decision.
 2. **It is derived from the accepted operation, not from the user's credential.** Its bindings come from the payout record, not from copying the operator's scopes.
 3. **It is validated at the host that performs the side effect.** A check in the worker is useful, but the payments service is the only place where validation and execution happen together.
 4. **It is consumed.** A one-time grant is spent when it is used, and the host must refuse to accept it again.
@@ -272,21 +272,27 @@ public static class PayoutFingerprint
     // that computes or compares the fingerprint must use exactly this encoding.
     public static string Compute(Payout payout)
     {
-        var canonical = new StringBuilder("payout-fingerprint/v1");
+        using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
         foreach (string field in new[]
         {
+            "payout-fingerprint/v1",
             payout.Id,
             payout.VendorId,
-            payout.BeneficiaryAccountId,
+            payout.BeneficiaryAccountVersionId,  // immutable record of the accepted bank destination
             payout.AmountMinorUnits.ToString(CultureInfo.InvariantCulture),
             payout.Currency,
-            payout.ExecuteOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            payout.ExecuteOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),  // date-only DateOnly value
         })
         {
-            canonical.Append('|').Append(field.Length).Append(':').Append(field);  // length-prefixed
+            // Each field is prefixed with its UTF-8 byte length as a 4-byte big-endian integer.
+            byte[] bytes = Encoding.UTF8.GetBytes(field);
+            Span<byte> length = stackalloc byte[4];
+            BinaryPrimitives.WriteInt32BigEndian(length, bytes.Length);
+            hash.AppendData(length);
+            hash.AppendData(bytes);
         }
 
-        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(canonical.ToString())));
+        return Convert.ToHexString(hash.GetHashAndReset());
     }
 }
 
@@ -336,10 +342,12 @@ public sealed class PayoutExecutionHost(
 
         // One transaction in a store that holds both grant and payout state: consume a grant use
         // (not cancelled, uses remaining, inside the window by the store's own clock at commit),
-        // move the payout from Scheduled to Executing if its version is unchanged, and record a
-        // durable execution attempt. If the store is unavailable this throws, and nothing executes.
+        // move the payout from Scheduled to Executing if its version is unchanged, and insert the
+        // durable execution-attempt record. If the store is unavailable this throws, and nothing executes.
+        var attempt = new ExecutionAttempt(
+            AttemptId: Guid.NewGuid(), PayoutId: payout.Id, GrantId: grant.GrantId, ExecutorId: caller.StableId);
         ClaimResult claim = await grants.TryConsumeAndClaimAsync(
-            grant.GrantId, payout.Id, payout.Version, cancellationToken);
+            attempt, expectedPayoutVersion: payout.Version, cancellationToken);
         if (claim != ClaimResult.Claimed)
         {
             return ExecutionResult.Rejected(claim switch
@@ -356,16 +364,17 @@ public sealed class PayoutExecutionHost(
         try
         {
             BankResult result = await bank.SendAsync(payout, idempotencyKey: payout.Id, cancellationToken);
-            await payouts.RecordOutcomeAsync(payout.Id, result, grant.GrantId, CancellationToken.None);
+            await payouts.RecordOutcomeAsync(attempt.AttemptId, result, CancellationToken.None);
             return ExecutionResult.FromBank(result);
         }
         catch (Exception)
         {
             // Timeout, cancellation, lost response, or a failed outcome write after the bank call:
-            // the outcome is unknown, not failed, and goes to reconciliation. A production adapter
-            // would separate definitive provider rejections from ambiguous failures and keep the
-            // diagnostic details.
-            await payouts.MarkUnknownAsync(payout.Id, grant.GrantId, CancellationToken.None);
+            // the outcome is unknown, not failed, and goes to reconciliation. This conservatively
+            // includes failures before the provider was contacted. A production adapter would
+            // separate those, and definitive provider rejections, from ambiguous failures, and
+            // keep the diagnostic details.
+            await payouts.MarkUnknownAsync(attempt.AttemptId, CancellationToken.None);
             return ExecutionResult.Unknown("payout.outcome-unknown");
         }
     }
@@ -378,13 +387,17 @@ A few points in this sketch carry most of the weight.
 
 **Finding a genuine, in-date grant is the start of the decision, not the end.** With a server-side record, the lookup establishes that the grant is genuine. With a self-contained token, signature verification does. Either way, the binding and window checks only establish that the grant applies to this request. Everything after them establishes that acting on it is still correct.
 
-**Freshness is checked against the current payout, not the grant's copy of it.** The fingerprint lets the host detect that the amount, currency, vendor, beneficiary account, or date changed after Tuesday's decision. It is only as good as its encoding. It must include every value that affects execution, and the issuer and the host must serialize those values identically. Otherwise a legitimate payout is rejected because two components formatted an amount differently, or an omitted field changes without detection. The sketch uses a versioned, length-prefixed encoding with the amount in minor currency units.
+**Freshness is checked against the current payout, not the grant's copy of it.** The fingerprint lets the host detect that the amount, currency, vendor, beneficiary account, or date changed after Tuesday's decision. It is only as good as its encoding. It must include every value that affects execution, and the issuer and the host must serialize those values identically. Otherwise a legitimate payout is rejected because two components formatted an amount differently, or an omitted field changes without detection. The sketch uses a versioned encoding with each field prefixed by its UTF-8 byte length and the amount in minor currency units.
+
+The sketch also makes two modeling assumptions explicit. `BeneficiaryAccountVersionId` identifies an immutable version of the accepted bank destination, so any change to the account details produces a new version and a different fingerprint. If your account IDs refer to records that can be edited in place, hash the destination details themselves, or an account version, instead of the ID. `ExecuteOn` is a date-only business value; the grant's window, not the fingerprint, controls the permitted execution time. If the scheduled time matters to the operation, include the full timestamp.
+
+The fingerprint detects a change to the payout. The Friday policy check covers the other direction: the vendor's *currently* verified destination must still be the account version the payout targets. Both checks are needed, and the policy check must compare account versions or details, not just the same stable ID.
 
 **The consume and the claim are one atomic step, and that step protects only what it checks.** If the grant were consumed in one call and the payout status changed in another, two workers racing on the same payout, or an edit landing between the check and the update, could slip through. Making both conditional in one transaction means the grant's use state and the payout's version are exactly what the host checked. It does not freeze facts held elsewhere. The vendor's hold status, the bank account's verification status, organizational limits, and the operator's current authority could all change between the policy evaluation and the claim. For each such fact, decide whether to include it in the transaction's conditions, take a lock or reservation, compare a version, or accept a documented freshness rule such as "evaluated within the same request." The [replay protection guide](../../security/replay-protection-and-bounded-use.md) covers atomic consumption, distributed races, and what to do when the grant store is unavailable.
 
 **The atomicity has to be real.** `TryConsumeAndClaimAsync` is atomic only if grant state and payout state live behind one transactional boundary, such as one database, or a coordination mechanism designed for the purpose. Calling one method does not make two separate stores atomic.
 
-**The window is enforced with the clock at consumption.** Loading the payout and evaluating policy take time, and the grant could expire in between. The early window check is a fast rejection only. The consume operation checks both `NotBefore` and `ExpiresAt` against the store's own current time when it commits. In this design, expiry limits *admission* to execution: the claim must commit inside the window, but the banking call that follows may finish after it. If the side effect itself must start or complete before a deadline, that is a different guarantee and needs its own enforcement.
+**The window is enforced with the clock at consumption.** Loading the payout and evaluating policy take time, and the grant could expire in between. The early window check is a fast rejection only. The consume operation checks both `NotBefore` and `ExpiresAt` against the store's own current time when it commits. The implementation has to make that true. For example, the conditional update can compare the window with the database's clock in the same statement that consumes the grant. A timestamp read earlier in the transaction does not by itself establish validity at commit. In this design, expiry limits *admission* to execution: the claim must commit inside the window, but the banking call that follows may finish after it. If the side effect itself must start or complete before a deadline, that is a different guarantee and needs its own enforcement.
 
 **Every pre-execution failure stops before the bank is called.** None of the rejection paths fall back to executing. An unavailable policy dependency or grant store should produce a rejection or a retryable deferral, never a payout. Failures after the banking call has started are different, because the side effect may already have happened.
 
@@ -408,7 +421,7 @@ A grant records what was decided. It does not freeze the world. The host has to 
 | Fact | Established Tuesday | Rechecked Friday? |
 | --- | --- | --- |
 | The payout's amount, currency, vendor, account, and date are as accepted | Yes, recorded and fingerprinted | **Yes.** Any change means the grant no longer describes the operation. |
-| The vendor's bank account is the currently verified account | Yes | **Yes.** A recent beneficiary change should stop execution or require re-verification. |
+| The vendor's currently verified bank destination is the account version the payout targets | Yes | **Yes.** A recent beneficiary change should stop execution or require re-verification. |
 | The vendor is not on hold or a restricted-party list | Yes | **Yes.** Holds are exactly the kind of fact that changes between scheduling and payment. |
 | The payout is within current organizational limits | Yes | **Usually yes.** If limits tightened, decide whether in-flight payouts are grandfathered or re-checked. |
 | The grant has not been cancelled | Not applicable | **Yes**, as part of the atomic consume. |
@@ -442,7 +455,7 @@ Each covers a case the other does not:
 
 Provider idempotency has limits of its own. It applies only within the provider's key namespace, it typically requires the repeated request's parameters to match the original, and keys are retained for a limited time. [Stripe's idempotency documentation](https://docs.stripe.com/api/idempotent_requests), for example, says keys may be pruned once they are at least 24 hours old, after which a reused key is treated as a new request. Do not treat a provider's idempotency key as indefinite deduplication.
 
-Using the payout ID as the idempotency key is right for "this accepted operation." It is wrong for "send a genuinely new payment after a confirmed failure." If the bank definitively rejects the payout and the organization decides to try again, that is a new operation that needs its own identity, its own decision, and its own grant. Reusing the old key would return the old rejection or be refused as a parameter mismatch.
+Using the payout ID as the idempotency key binds it to "this accepted operation." Distinguish retrying that operation from authorizing a genuinely new payment attempt. Whether a confirmed failure permits another attempt under the same identity depends on the provider's documented retry semantics and the application's recovery policy. Some providers, Stripe among them, allow a request to be retried under the original key when execution never began, for example after a validation failure. A genuinely new payment attempt needs an explicitly authorized operation or attempt identity, and in this design a new decision and grant. Never change the idempotency key merely to get past an earlier outcome that has not been resolved.
 
 Neither replay protection nor idempotency gives exactly-once execution against an external system. They narrow the windows where duplication or loss can occur, and the unknown state makes the remaining window visible.
 
@@ -541,7 +554,7 @@ Host decision      fingerprint matched, vendor not on hold, account verified,
 Side effect        bank reference B-99120, idempotency key P-1042, status Completed
 ```
 
-Each link points to the one before it. The operator's identity appears exactly once, in the decision. The worker's identity appears in the presentation. Neither is impersonating the other.
+Each link points to the one before it. The original decision anchors the operator's identity, and the presentation anchors the worker's. Later records refer back to them rather than having one identity stand in for the other.
 
 A single log line written after the payment is a description of what happened. The chain above is evidence of why it was allowed. [Your Audit Log Records the Story, Not the Decision](your-audit-log-is-not-evidence.md) explains the difference in more depth.
 
@@ -594,7 +607,7 @@ If the payout also needs a reviewer's approval before it runs, [Authorization vs
 
 ### Related Work
 
-The same problem is being approached from several directions outside Learning. These are adjacent work, not the source of this article's design:
+These references address related aspects of the problem:
 
 - [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693.html) standardizes obtaining a separate, audience- and scope-targeted token for delegation and impersonation.
 - [OAuth 2.0 Security Best Current Practice (RFC 9700)](https://www.rfc-editor.org/rfc/rfc9700.html) covers audience restriction, sender-constrained tokens, and refresh-token protection.
