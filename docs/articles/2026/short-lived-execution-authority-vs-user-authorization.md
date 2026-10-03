@@ -180,6 +180,7 @@ The same handoff, drawn across its trust boundaries:
 ```mermaid
 flowchart TD
     subgraph T["Tuesday: Finance API"]
+        direction TB
         A["Operator authenticated<br/>request authorized"] --> B["Exact payout recorded<br/>fingerprint computed"]
         B --> C["Grant issued<br/>operation, resource, executor,<br/>audience, window, 1 use"]
     end
@@ -190,13 +191,14 @@ flowchart TD
         W["Authenticates with<br/>its own workload identity"]
     end
     subgraph H["Friday: payments service (protected host)"]
+        direction TB
         V["Bindings, current payout,<br/>current policy"] -->|Allowed| K["Atomic consume + claim"]
         K -->|Claimed| X["Bank call with<br/>host-owned credentials"]
         V -->|Rejected| N["Stop: this request<br/>does not call the bank"]
         K -->|Spent, cancelled, expired, or changed| N
         K -->|Commit outcome ambiguous| R["Stop and reconcile<br/>the attempt record"]
     end
-    C --> M --> W --> V
+    T --> Q --> F --> H
 ```
 
 In words: the operator's original request is authenticated and authorized inside the Finance API on Tuesday, producing a recorded payout and a narrow grant. Friday's execution policy separately decides whether the originating operator's authority must still hold. The queue carries only a payout ID and a grant reference, never the operator's credential. On Friday, the worker authenticates as itself and presents the reference. The payments service, the only component holding banking credentials, checks the bindings, the current payout, and the current policy, then consumes the grant and claims the payout atomically before calling the bank. A failed check or a definitively rejected claim means this request stops without calling the bank. If the claim's commit outcome is ambiguous, the request also stops, but it cannot conclude that nothing happened; recovery inspects the durable attempt record and reconciles it.
