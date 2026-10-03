@@ -273,6 +273,8 @@ public static class PayoutFingerprint
     public static string Compute(Payout payout)
     {
         using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        Span<byte> length = stackalloc byte[4];  // reused for each field's length prefix
+
         foreach (string field in new[]
         {
             "payout-fingerprint/v1",
@@ -286,7 +288,6 @@ public static class PayoutFingerprint
         {
             // Each field is prefixed with its UTF-8 byte length as a 4-byte big-endian integer.
             byte[] bytes = Encoding.UTF8.GetBytes(field);
-            Span<byte> length = stackalloc byte[4];
             BinaryPrimitives.WriteInt32BigEndian(length, bytes.Length);
             hash.AppendData(length);
             hash.AppendData(bytes);
@@ -341,7 +342,8 @@ public sealed class PayoutExecutionHost(
             return ExecutionResult.Rejected(current.Reason);
 
         // One transaction in a store that holds both grant and payout state: consume a grant use
-        // (not cancelled, uses remaining, inside the window by the store's own clock at commit),
+        // (not cancelled, uses remaining, inside the window by authoritative current time evaluated
+        // in the conditional transition itself),
         // move the payout from Scheduled to Executing if its version is unchanged, and insert the
         // durable execution-attempt record. If the store is unavailable this throws, and nothing executes.
         var attempt = new ExecutionAttempt(
@@ -397,7 +399,9 @@ The fingerprint detects a change to the payout. The Friday policy check covers t
 
 **The atomicity has to be real.** `TryConsumeAndClaimAsync` is atomic only if grant state and payout state live behind one transactional boundary, such as one database, or a coordination mechanism designed for the purpose. Calling one method does not make two separate stores atomic.
 
-**The window is enforced with the clock at consumption.** Loading the payout and evaluating policy take time, and the grant could expire in between. The early window check is a fast rejection only. The consume operation checks both `NotBefore` and `ExpiresAt` against the store's own current time when it commits. The implementation has to make that true. For example, the conditional update can compare the window with the database's clock in the same statement that consumes the grant. A timestamp read earlier in the transaction does not by itself establish validity at commit. In this design, expiry limits *admission* to execution: the claim must commit inside the window, but the banking call that follows may finish after it. If the side effect itself must start or complete before a deadline, that is a different guarantee and needs its own enforcement.
+**The window is enforced with the clock at consumption.** Loading the payout and evaluating policy take time, and the grant could expire in between. The early window check is a fast rejection only. The consume operation checks both `NotBefore` and `ExpiresAt` using authoritative current time as part of the atomic conditional state transition, for example by comparing the window in the same conditional update that consumes the grant. Database clock functions differ: some return the transaction's start time, others the statement's start or the actual current time, so choose the one that means what you intend. A timestamp read earlier, by the application or at the start of the transaction, does not establish validity at the transition.
+
+In this design, expiry limits *admission* at that transition. The transaction may commit, and the banking call may happen, afterward. If the claim must commit before expiry, treat that as a stronger implementation requirement; the conditional update alone does not guarantee it. If the side effect itself must start or complete before a deadline, that is a different guarantee again and needs its own enforcement.
 
 **Every pre-execution failure stops before the bank is called.** None of the rejection paths fall back to executing. An unavailable policy dependency or grant store should produce a rejection or a retryable deferral, never a payout. Failures after the banking call has started are different, because the side effect may already have happened.
 
@@ -581,7 +585,7 @@ A single log line written after the payment is a description of what happened. T
 9. Does the host take the executor's identity from transport authentication, never from the message?
 10. Does it check current resource state and current policy, not only the signature and expiry?
 11. Is the rule for an originating actor who lost authority written down and enforced?
-12. Are grant consumption and the resource state transition one atomic step behind a real transactional boundary, with the window checked at commit?
+12. Are grant consumption and the resource state transition one atomic step behind a real transactional boundary, with the window checked against authoritative current time inside that transition?
 13. For policy facts outside that transaction, is the freshness rule explicit?
 14. Does every pre-execution failure, including unavailable dependencies, stop before the side effect?
 15. Is the side effect idempotent on the operation's identity, within the provider's documented limits, and is an unknown outcome reconciled rather than retried with the same authority?
