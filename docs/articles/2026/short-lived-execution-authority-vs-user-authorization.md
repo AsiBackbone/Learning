@@ -80,11 +80,11 @@ The forwarded-token design merges five separate responsibilities. Naming them ma
 
 | Responsibility | In the example | Question it answers |
 | --- | --- | --- |
-| **Actor** | The finance operator, authenticated by the Finance API | Who is asking, and are they allowed to request this operation now? |
+| **Actor** | The finance operator, authenticated by the Finance API | Who is asking, and are they allowed to request this operation **now**? |
 | **Accepted operation** | Payout `P-1042`: exact amount, currency, vendor, beneficiary account, and execution date | What exactly was requested and accepted? |
 | **Later executor** | The payout worker, authenticated by its own workload identity | Which component will carry the operation forward? |
 | **Delegated execution grant** | Authority to execute `P-1042` only, at the payments service only, by the payout worker only, during Friday's window only, once | What may the executor do with the accepted operation? |
-| **Protected host** | The payments service | Do the grant, the executor, the resource, and the current policy all still permit this side effect right now? |
+| **Protected host** | The payments service | Do the grant, the executor, the resource, and the current policy all still permit this side effect **at execution time**? |
 
 Each responsibility has its own identity and its own lifetime:
 
@@ -175,6 +175,31 @@ Payments service
     → Records evidence linking operator, decision, grant, worker, and side effect
 ```
 
+The same handoff, drawn across its trust boundaries:
+
+```mermaid
+flowchart LR
+    subgraph T["Tuesday: Finance API"]
+        A["Operator authenticated<br/>request authorized"] --> B["Exact payout recorded<br/>fingerprint computed"]
+        B --> C["Grant issued<br/>operation, resource, executor,<br/>audience, window, 1 use"]
+    end
+    subgraph Q["Queue"]
+        M["Job message<br/>payout ID + grant reference<br/>(no user credential)"]
+    end
+    subgraph F["Friday: payout worker"]
+        W["Authenticates with<br/>its own workload identity"]
+    end
+    subgraph H["Friday: payments service (protected host)"]
+        V["Bindings, current payout,<br/>current policy"] -->|Allowed| K["Atomic consume + claim"]
+        K -->|Claimed| X["Bank call with<br/>host-owned credentials"]
+        V -->|Rejected| N["No side effect"]
+        K -->|Spent, cancelled, expired, or changed| N
+    end
+    C --> M --> W --> V
+```
+
+In words: everything that depends on the operator happens inside the Finance API on Tuesday and ends with a recorded payout and a narrow grant. The queue carries only a payout ID and a grant reference, never the operator's credential. On Friday, the worker authenticates as itself and presents the reference. The payments service, the only component holding banking credentials, checks the bindings, the current payout, and the current policy, then consumes the grant and claims the payout atomically before calling the bank. Any failed check, or a lost claim, means no side effect.
+
 Each binding removes a specific kind of misuse:
 
 | Binding | What it prevents |
@@ -241,7 +266,7 @@ What makes any of these an execution grant is its lifecycle:
 
 A signature and an expiry time cover only a small part of this. A signed token that is never consumed is reusable until it expires. A signed token that the host validates without checking the current payout will execute a payout that has since been altered.
 
-The grant also does not authenticate the worker. The worker proves who it is with its own workload identity: a managed identity, a client certificate, a platform-issued service token, or whatever your environment provides. The grant says what that authenticated worker may do with this one operation. Bind the grant to a stable identifier for that workload, such as the identity provider's issuer, tenant, and subject or application ID, rather than a display name that another workload could share. The article writes `payout-worker` for readability. Requiring both means a copied grant reference is useless to anyone who is not the worker, and a compromised worker can execute only the operations it holds grants for.
+The grant also does not authenticate the worker. The worker proves who it is with its own workload identity: a managed identity, a client certificate, a platform-issued service token, or whatever your environment provides. The grant says what that authenticated worker may do with this one operation. Bind the grant to a stable identifier for that workload, such as the identity provider's issuer, tenant, and subject or application ID, rather than a display name that another workload could share. The article writes `payout-worker` for readability. If one worker executes payouts for several tenants, its identity alone does not separate them. The grant and the payout must both carry the tenant, and the host must confirm they match, so a grant issued in one tenant can never claim another tenant's payout. Requiring both identity and grant means a copied grant reference is useless to anyone who is not the worker, and a compromised worker can execute only the operations it holds grants for.
 
 ---
 
@@ -269,7 +294,11 @@ public enum ClaimResult { Claimed, GrantSpent, GrantCancelled, GrantOutsideWindo
 public static class PayoutFingerprint
 {
     // A versioned, canonical encoding of every value that affects execution. Every component
-    // that computes or compares the fingerprint must use exactly this encoding.
+    // that computes or compares the fingerprint must use exactly this encoding. Every field is a
+    // required, non-null value in the Payout model; an optional field would need an explicit
+    // presence marker, because mapping null to "" would make "missing" and "empty" hash the same.
+    // The per-field byte arrays keep the sketch readable; a high-throughput host could encode
+    // into a pooled buffer instead.
     public static string Compute(Payout payout)
     {
         using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
@@ -376,6 +405,8 @@ public sealed class PayoutExecutionHost(
             // includes failures before the provider was contacted. A production adapter would
             // separate those, and definitive provider rejections, from ambiguous failures, and
             // keep the diagnostic details.
+            // If MarkUnknownAsync itself fails, the attempt stays in Executing and the recovery
+            // process described below must find and reconcile it.
             await payouts.MarkUnknownAsync(attempt.AttemptId, CancellationToken.None);
             return ExecutionResult.Unknown("payout.outcome-unknown");
         }
