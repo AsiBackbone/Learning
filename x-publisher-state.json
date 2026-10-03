@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "account": "jackdaw-patio",
-  "cursorSha": "a87d88410d658c96b41cdeceda99dc6197701083",
+  "cursorSha": "616328bb7df27b555834f35e4d666c909c9b4365",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
@@ -22,6 +22,11 @@
       "sourceBlobSha": "6d24c7735cccfa765ee04d5eafee7675a0fecee5",
       "postId": "2106141504100315233",
       "postedAtUtc": "2026-10-02T21:57:19.5983297+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/short-lived-execution-authority-vs-user-authorization.html": {
+      "sourceBlobSha": "007956d0dfbf1763cac7f35e8ae1463b9ded0728",
+      "postId": "2106507527508861070",
+      "postedAtUtc": "2026-10-03T22:11:46.3922428+00:00"
     }
   }
 }
