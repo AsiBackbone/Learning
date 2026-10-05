@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Workflow engines, approval state, retries, and who owns the execution decision | [When Should a Workflow Engine Own the Decision?](2026/when-workflow-engine-should-own-decision.md) |
 | Delegated authority for background workers, queues, and delayed execution | [How Short-Lived Execution Authority Differs from User Authorization](2026/short-lived-execution-authority-vs-user-authorization.md) |
 | Microsoft.AgentGovernance and host application architecture | [How Application Architecture Complements Microsoft.AgentGovernance](2026/application-architecture-complements-microsoft-agent-governance.md) |
 | Policy-as-code, policy engines, and remote policy services in ASP.NET Core | [Policy as Code in ASP.NET Core Without Overengineering](2026/policy-as-code-aspnet-core-without-overengineering.md) |
@@ -42,6 +43,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [When Should a Workflow Engine Own the Decision?](2026/when-workflow-engine-should-own-decision.md)
+
+**Christopher D. Cavell** · **October 5, 2026**
+
+A workflow engine can own sequencing, timers, retries, and approval tasks without owning the permission to perform a side effect now. This guide follows one production deployment to show why `Approved` is not current permission, how to evaluate independently owned policy at the protected execution boundary when work is delayed or retried, and when a workflow that shares one cohesive boundary with the executor can simply own the decision.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/when-workflow-engine-should-own-decision.html`
 
 ### [How Short-Lived Execution Authority Differs from User Authorization](2026/short-lived-execution-authority-vs-user-authorization.md)
 

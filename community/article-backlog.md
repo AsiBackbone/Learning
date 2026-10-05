@@ -261,7 +261,8 @@ Send readers to the full policy-engine comparison only after the simpler applica
 
 - **Priority:** P1
 - **Implementation issue:** [#394](https://github.com/AsiBackbone/Learning/issues/394)
-- **Candidate slug:** `when-workflow-engine-should-own-decision`
+- **Publication:** [Published October 5, 2026](../docs/articles/2026/when-workflow-engine-should-own-decision.md)
+- **Permanent slug:** `when-workflow-engine-should-own-decision`
 
 #### Reader / search problem
 

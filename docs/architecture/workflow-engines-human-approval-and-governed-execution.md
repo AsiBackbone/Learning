@@ -811,6 +811,8 @@ Scenario 4 generalizes to a simple rule:
 
 The deciding question is not where the rule runs, but whether the implementation can explain and enforce those semantics without copying policy from another authority. If the engine would need to duplicate independently owned policy, rely on stale workflow state, or treat `Approved` as broad execution permission, workflow should coordinate the process while policy or authority remains a separate semantic boundary.
 
+[When Should a Workflow Engine Own the Decision?](../articles/2026/when-workflow-engine-should-own-decision.md) turns this rule into a practical selection guide, following one production deployment through approval, a change freeze, delayed retries, and the execution-time check, and showing when a cohesive same-boundary workflow can own the decision without extra infrastructure.
+
 ---
 
 ## When Separate Policy Evaluation Earns Its Place
