@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "account": "jackdaw-patio",
-  "cursorSha": "616328bb7df27b555834f35e4d666c909c9b4365",
+  "cursorSha": "a44bdf6d572a267fecfaef1d55b7c431d32aad0e",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
@@ -27,6 +27,11 @@
       "sourceBlobSha": "007956d0dfbf1763cac7f35e8ae1463b9ded0728",
       "postId": "2106507527508861070",
       "postedAtUtc": "2026-10-03T22:11:46.3922428+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/when-workflow-engine-should-own-decision.html": {
+      "sourceBlobSha": "688b0aa51fae0d521634d0c6a4c14200ec525045",
+      "postId": "2107111973171130747",
+      "postedAtUtc": "2026-10-05T14:13:37.4562424+00:00"
     }
   }
 }
