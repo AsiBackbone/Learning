@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "account": "jackdaw-patio",
-  "cursorSha": "a44bdf6d572a267fecfaef1d55b7c431d32aad0e",
+  "cursorSha": "a2bd39399aad4852a02b6a8aff0e73add26cd2e6",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
@@ -32,6 +32,11 @@
       "sourceBlobSha": "688b0aa51fae0d521634d0c6a4c14200ec525045",
       "postId": "2107111973171130747",
       "postedAtUtc": "2026-10-05T14:13:37.4562424+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/multi-tenant-worker-execution-authority.html": {
+      "sourceBlobSha": "b8d510250258109eed1d2d60027ec88e8d668e42",
+      "postId": "2107512460366504090",
+      "postedAtUtc": "2026-10-06T16:45:01.0678458+00:00"
     }
   }
 }
