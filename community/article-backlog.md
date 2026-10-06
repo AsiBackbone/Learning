@@ -349,8 +349,9 @@ Lead to Typed AI Proposed Intent for the four-stage acceptance model and to the 
 ### 11. Can One Worker Safely Execute Delayed Operations for Many Tenants?
 
 - **Priority:** P1
-- **Implementation issue:** Open separately when promoted
-- **Candidate slug:** `multi-tenant-worker-execution-authority`
+- **Implementation issue:** [#398](https://github.com/AsiBackbone/Learning/issues/398)
+- **Publication:** [Published October 6, 2026](../docs/articles/2026/multi-tenant-worker-execution-authority.md)
+- **Permanent slug:** `multi-tenant-worker-execution-authority`
 
 #### Reader / search problem
 

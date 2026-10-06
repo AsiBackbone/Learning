@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Shared background workers, tenant isolation, and workload identity | [Can One Worker Safely Execute Delayed Operations for Many Tenants?](2026/multi-tenant-worker-execution-authority.md) |
 | Workflow engines, approval state, retries, and who owns the execution decision | [When Should a Workflow Engine Own the Decision?](2026/when-workflow-engine-should-own-decision.md) |
 | Delegated authority for background workers, queues, and delayed execution | [How Short-Lived Execution Authority Differs from User Authorization](2026/short-lived-execution-authority-vs-user-authorization.md) |
 | Microsoft.AgentGovernance and host application architecture | [How Application Architecture Complements Microsoft.AgentGovernance](2026/application-architecture-complements-microsoft-agent-governance.md) |
@@ -43,6 +44,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Can One Worker Safely Execute Delayed Operations for Many Tenants?](2026/multi-tenant-worker-execution-authority.md)
+
+**Christopher D. Cavell** · **October 6, 2026**
+
+Checking that a grant's tenant matches the resource's tenant stops one tenant's delayed operation from being turned into another's, but it does not contain a compromised shared worker that is authorized for every tenant. This guide follows one overnight customer-data export to separate substitution prevention, workload identity, and compromise isolation, shows how the protected host resolves and re-enforces the tenant, explains how to identify a workload unambiguously and handle ASP.NET Core claim mapping, and compares a shared worker with partitioned identities, per-tenant execution, and tenant-bound token exchange, including when the shared worker is the right choice.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/multi-tenant-worker-execution-authority.html`
 
 ### [When Should a Workflow Engine Own the Decision?](2026/when-workflow-engine-should-own-decision.md)
 
