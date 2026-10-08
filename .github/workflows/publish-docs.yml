@@ -253,4 +253,3 @@ jobs:
     uses: ./.github/workflows/publish-x.yml
     with:
       deployed_revision: ${{ github.sha }}
-    secrets: inherit
