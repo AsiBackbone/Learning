@@ -13,6 +13,7 @@ on:
       - 'tools/publish-x.cs'
       - 'tools/validate-doc-metadata.cs'
       - 'tools/validate-docfx-template-baseline.cs'
+      - 'scripts/Ensure-PublishedHtmlMetadata.ps1'
       - '.config/dotnet-tools.json'
       - '.github/workflows/publish-docs.yml'
       - '.github/workflows/publish-x.yml'
@@ -62,6 +63,10 @@ jobs:
 
       - name: Build DocFX site
         run: dotnet tool run docfx docs/docfx.json --warningsAsErrors
+
+      - name: Ensure published HTML metadata
+        shell: pwsh
+        run: ./scripts/Ensure-PublishedHtmlMetadata.ps1 -SiteDirectory ./docs/_site
 
       - name: Validate XML sitemap generator contract
         run: dotnet run --file tools/generate-sitemap.cs -- --self-test

@@ -23,6 +23,7 @@ on:
       - 'tools/validate-asibackbone-api-references.cs'
       - 'tools/validate-doc-metadata.cs'
       - 'tools/validate-docfx-template-baseline.cs'
+      - 'scripts/Ensure-PublishedHtmlMetadata.ps1'
       - '.config/dotnet-tools.json'
       - '.github/workflows/docs-validation.yml'
       
@@ -75,6 +76,14 @@ jobs:
 
       - name: Build DocFX site
         run: dotnet tool run docfx docs/docfx.json --warningsAsErrors
+
+      - name: Test published HTML metadata tooling
+        shell: pwsh
+        run: ./scripts/Ensure-PublishedHtmlMetadata.ps1 -SelfTest
+
+      - name: Ensure published HTML metadata
+        shell: pwsh
+        run: ./scripts/Ensure-PublishedHtmlMetadata.ps1 -SiteDirectory ./docs/_site
 
       - name: Validate XML sitemap generator contract
         run: dotnet run --file tools/generate-sitemap.cs -- --self-test
