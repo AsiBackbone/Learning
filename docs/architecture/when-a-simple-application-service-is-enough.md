@@ -1095,6 +1095,8 @@ The sequence is not a mandatory architecture ladder.
 
 It is a way to identify the first point at which a smaller design stops expressing the requirements cleanly.
 
+To see that point in running code, the [Authorization-to-Governance Comparison sample](https://github.com/AsiBackbone/Learning/blob/main/samples/authorization-to-governance-comparison/README.md) sends the same account-disable request to endpoint authorization, resource authorization, and governed execution, and prints the outcomes and evidence each one produces.
+
 ---
 
 ## Review Checklist

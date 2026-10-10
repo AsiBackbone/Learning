@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <AssemblyName>AuthorizationToGovernanceComparison</AssemblyName>
+    <RootNamespace>AuthorizationToGovernanceComparison</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The default run hosts the application in memory so the comparison is deterministic
+         and opens no network port. -->
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" />
+  </ItemGroup>
+
+</Project>

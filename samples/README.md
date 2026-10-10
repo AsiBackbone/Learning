@@ -709,6 +709,32 @@ Problem Details when the transport needs one
 
 Focused integration tests prove that an unexpected failure becomes a safe `500`, a known dependency failure maps consistently to `503`, sensitive exception detail is not returned publicly, a response `traceId` can be correlated with the handler log, expected governance outcomes do not pass through the exception handler, and an ordinary missing route can use Problem Details without throwing.
 
+### Authorization-to-Governance Comparison
+
+Related architecture material:
+
+- [When ASP.NET Core Authorization Is Enough](../docs/architecture/when-aspnet-core-authorization-is-enough.md)
+- [When a Simple Application Service Is Enough](../docs/architecture/when-a-simple-application-service-is-enough.md)
+- [Build a Governed API Operation lab](../docs/labs/build-a-governed-api-operation.md)
+
+Executable companion:
+
+[Authorization-to-Governance Comparison sample](authorization-to-governance-comparison/README.md)
+
+The sample runs one `DisableAccount` operation through three alternatives in one ASP.NET Core application, sharing the same fixtures and recording side effect:
+
+```text
+1. Endpoint authorization    RequireAuthorization("AdministratorsOnly") + operational log
+2. Resource authorization    IAuthorizationService with the loaded account + structured audit
+3. Governed execution        authorization result → governance decision → host-owned execution boundary
+```
+
+The central invariant is:
+
+> **The variants are alternatives selected by requirements, not maturity levels; each prevents execution when its own rules refuse.**
+
+Focused tests prove that authorization denial prevents execution in the first two variants, that every non-allowed governance outcome prevents execution in the third, that an acknowledgment continuation executes once and cannot be reused, and that each variant records a different kind of evidence.
+
 ## Sample Design Principles
 
 Samples should optimize for **learning value**, not production completeness.

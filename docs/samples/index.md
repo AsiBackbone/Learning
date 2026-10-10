@@ -46,6 +46,7 @@ All executable sample projects currently under `samples/` are listed below, grou
 | Security and Trust Architecture | [Durable Decision Ledger and Audit Chain](#durable-decision-ledger-and-audit-chain) | Local chain verification and independently retained checkpoints provide different evidence properties. |
 | ASP.NET Core Architecture | [Middleware Ordering Changes Behavior](#middleware-ordering-changes-behavior) | Middleware order changes which components can observe and handle a request or failure. |
 | ASP.NET Core Architecture | [Centralized Error Handling and Problem Details](#centralized-error-handling-and-problem-details) | Expected governance outcomes remain distinct from unexpected application failures. |
+| ASP.NET Core Architecture | [Authorization-to-Governance Comparison](#authorization-to-governance-comparison) | Endpoint authorization, resource authorization, and governed execution are alternatives chosen by requirements. |
 
 ## Foundational Sample Set
 
@@ -443,6 +444,27 @@ dotnet test samples/centralized-error-handling-and-problem-details/Tests/Central
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/centralized-error-handling-and-problem-details/README.md)
 - [Read Centralized Error Handling and Problem Details](../aspnetcore/centralized-error-handling-and-problem-details.md)
+
+### Authorization-to-Governance Comparison
+
+**Learning objective:** Run the same `DisableAccount` operation through endpoint authorization, resource-based authorization through `IAuthorizationService`, and governed execution, and compare what each protects, which outcomes it can express, what evidence it records, and what code and state it adds.
+
+**Key invariant:**
+
+> **The three variants are alternatives selected by requirements, not maturity levels. Each prevents execution when its own rules refuse, and only the governed variant adds outcomes and evidence that outlive the request.**
+
+All three variants share the same actor and account fixtures and one recording side effect. Eight scenarios cover an ordinary disable, a non-administrator, a cross-tenant administrator, a protected account, an account with active sessions that needs acknowledgment, a privileged account that needs escalation, an account whose directory state is pending, and an anonymous caller. The run prints each variant's HTTP status, execution count, and evidence: operational logs, a structured audit entry, or separate decision and execution records.
+
+Run from the repository root:
+
+```bash
+dotnet run --project samples/authorization-to-governance-comparison/Sample/AuthorizationToGovernanceComparison.csproj
+```
+
+- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/authorization-to-governance-comparison/README.md)
+- [Read When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md)
+- [Read When a Simple Application Service Is Enough](../architecture/when-a-simple-application-service-is-enough.md)
+- [Continue with Build a Governed API Operation](../labs/build-a-governed-api-operation.md)
 
 ## Run the Complete Sample Suite
 

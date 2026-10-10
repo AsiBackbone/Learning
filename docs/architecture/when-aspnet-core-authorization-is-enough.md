@@ -675,6 +675,7 @@ For the framework behavior discussed in this comparison, see:
 * [Architecture](index.md) — return to the architecture learning area.
 * [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md) — compare the richer governance-decision model directly.
 * [Decision Before Execution](../tutorials/decision-before-execution.md) — revisit the separation between decision and host-owned execution.
+* [Authorization-to-Governance Comparison sample](https://github.com/AsiBackbone/Learning/blob/main/samples/authorization-to-governance-comparison/README.md) — run this page's account example as endpoint authorization, resource-based authorization, and governed execution, and compare the outcomes and evidence each produces.
 * [Build a Governed API Operation](../labs/build-a-governed-api-operation.md) — practice the hybrid boundary by keeping ASP.NET Core authorization while adding explicit governance, acknowledgment, scoped authority, host-owned execution, and invariant tests.
 * [Compare Competing Policy Architectures](../labs/compare-competing-policy-architectures.md) — practice deciding when framework-native authorization is sufficient and when another policy or governance boundary is justified by the lifecycle, trust model, or failure requirements.
 * [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) — see when authority becomes a separate, narrowly scoped artifact after approval.
