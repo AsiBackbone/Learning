@@ -17,6 +17,18 @@ static partial class AsiBackboneApiReferenceValidator
 
     private const string CurrentImplementationRef = "v7.0.0";
 
+    private const string ProductionHostBridgeRelativePath =
+        "docs/getting-started/from-learning-samples-to-production-host.md";
+
+    // Front-matter key for each repository the production-host bridge pins.
+    private static readonly IReadOnlyDictionary<string, string> BridgeBaselineKeys =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Learning"] = "learning_ref",
+            ["AsiBackbone"] = "asibackbone_ref",
+            ["NetCoreApplicationTemplate"] = "netcoreapplicationtemplate_ref"
+        };
+
     private const string ValidatorRelativePath =
         "tools/validate-asibackbone-api-references.cs";
 
@@ -202,6 +214,21 @@ static partial class AsiBackboneApiReferenceValidator
         RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
     private static partial Regex FullCommitShaRegex();
 
+    [GeneratedRegex(
+        @"https://github\.com/AsiBackbone/(?<repo>Learning|AsiBackbone|NetCoreApplicationTemplate)/(?:(?:blob|tree)|releases/tag)/(?<ref>[^/\s)\]'>#?]+)",
+        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+    private static partial Regex BridgeRepositoryLinkRegex();
+
+    [GeneratedRegex(
+        @"^(?<key>learning_ref|asibackbone_ref|netcoreapplicationtemplate_ref):\s*(?<value>\S+)\s*$",
+        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Multiline)]
+    private static partial Regex BridgeBaselineMetadataRegex();
+
+    [GeneratedRegex(
+        @"^v\d+\.\d+\.\d+$",
+        RegexOptions.CultureInvariant)]
+    private static partial Regex ReleaseTagRegex();
+
     // A "current" claim names an AsiBackbone version, for example "the current `AsiBackbone` 3.x default" or
     // "AsiBackbone 7.0 is the current line". Only the major version is compared with the current implementation ref.
     [GeneratedRegex(
@@ -234,6 +261,7 @@ static partial class AsiBackboneApiReferenceValidator
         ValidateCurrentSymbolsAndLinks(repositoryRoot, textFiles, errors);
         ValidateCurrentVersionClaims(repositoryRoot, textFiles, errors);
         ValidateVersionedCompatibilityPages(repositoryRoot, errors);
+        ValidateProductionHostBridge(repositoryRoot, errors);
         int packageReferenceCount = ValidatePackageReferences(repositoryRoot, errors);
         ValidateScopeNotices(repositoryRoot, errors);
 
@@ -348,6 +376,53 @@ static partial class AsiBackboneApiReferenceValidator
             "docs/getting-started/asibackbone-6-api-boundary.md",
             "https://github.com/AsiBackbone/AsiBackbone/blob/0123456789abcdef0123456789abcdef01234567",
             0,
+            failures);
+
+        const string bridgeFrontMatter =
+            "---\nlearning_ref: v1.3.0\nasibackbone_ref: v7.0.0\nnetcoreapplicationtemplate_ref: v2.11.2\n---\n";
+        const string bridgeLinks =
+            "[L](https://github.com/AsiBackbone/Learning/blob/v1.3.0/samples/x.cs) " +
+            "[A](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/x.cs) " +
+            "[N](https://github.com/AsiBackbone/NetCoreApplicationTemplate/releases/tag/v2.11.2)\n";
+        AssertProductionHostBridgeErrorCount(
+            "bridge links matching declared baselines are accepted",
+            bridgeFrontMatter + bridgeLinks,
+            0,
+            failures);
+        AssertProductionHostBridgeErrorCount(
+            "bridge link on a different tag is rejected",
+            bridgeFrontMatter + bridgeLinks +
+            "[N2](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.1/src/x.cs)\n",
+            1,
+            failures);
+        AssertProductionHostBridgeErrorCount(
+            "bridge link on a mutable branch is rejected",
+            bridgeFrontMatter + bridgeLinks +
+            "[L2](https://github.com/AsiBackbone/Learning/tree/main/docs)\n",
+            1,
+            failures);
+        AssertProductionHostBridgeErrorCount(
+            "bridge missing a baseline key is rejected",
+            "---\nlearning_ref: v1.3.0\nasibackbone_ref: v7.0.0\n---\n" + bridgeLinks,
+            1,
+            failures);
+        AssertProductionHostBridgeErrorCount(
+            "bridge pinned to a non-current AsiBackbone boundary is rejected",
+            bridgeFrontMatter.Replace("asibackbone_ref: v7.0.0", "asibackbone_ref: v6.0.0", StringComparison.Ordinal) +
+            bridgeLinks.Replace("blob/v7.0.0", "blob/v6.0.0", StringComparison.Ordinal),
+            1,
+            failures);
+        AssertProductionHostBridgeErrorCount(
+            "bridge baseline on a branch name is rejected",
+            bridgeFrontMatter.Replace("learning_ref: v1.3.0", "learning_ref: main", StringComparison.Ordinal) +
+            bridgeLinks.Replace("Learning/blob/v1.3.0", "Learning/blob/main", StringComparison.Ordinal),
+            1,
+            failures);
+        AssertProductionHostBridgeErrorCount(
+            "bridge declaring a baseline it never links is rejected",
+            bridgeFrontMatter +
+            "[A](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/x.cs)\n",
+            2,
             failures);
 
         if (failures.Count > 0)
@@ -753,6 +828,110 @@ static partial class AsiBackboneApiReferenceValidator
         if (errors.Count != expectedCount)
         {
             failures.Add($"{name}: expected {expectedCount} error(s), found {errors.Count}.");
+        }
+    }
+
+    private static void AssertProductionHostBridgeErrorCount(
+        string name,
+        string markdown,
+        int expectedCount,
+        List<string> failures)
+    {
+        var errors = new List<string>();
+        ValidateProductionHostBridgeText(ProductionHostBridgeRelativePath, markdown, errors);
+
+        if (errors.Count != expectedCount)
+        {
+            failures.Add(
+                $"{name}: expected {expectedCount} error(s), found {errors.Count}: {string.Join(" | ", errors)}");
+        }
+    }
+
+    private static void ValidateProductionHostBridge(
+        string repositoryRoot,
+        List<string> errors)
+    {
+        string path = Path.Combine(
+            repositoryRoot,
+            ProductionHostBridgeRelativePath.Replace('/', Path.DirectorySeparatorChar));
+
+        if (!File.Exists(path))
+        {
+            errors.Add($"{ProductionHostBridgeRelativePath} is missing; update the validator if the bridge moved.");
+            return;
+        }
+
+        ValidateProductionHostBridgeText(ProductionHostBridgeRelativePath, File.ReadAllText(path), errors);
+    }
+
+    // The production-host bridge pins one reviewed baseline per repository. Every link
+    // to those repositories must use the declared baseline, so changing a baseline is a
+    // deliberate front-matter edit that the whole page is then checked against.
+    private static void ValidateProductionHostBridgeText(
+        string relativePath,
+        string text,
+        List<string> errors)
+    {
+        if (!TryGetYamlFrontMatter(text.Split('\n'), out string frontMatter, out _))
+        {
+            errors.Add($"{relativePath} must begin with YAML front matter.");
+            return;
+        }
+
+        Dictionary<string, string> declared = BridgeBaselineMetadataRegex()
+            .Matches(frontMatter)
+            .ToDictionary(
+                match => match.Groups["key"].Value.ToLowerInvariant(),
+                match => match.Groups["value"].Value,
+                StringComparer.Ordinal);
+
+        var baselines = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach ((string repository, string key) in BridgeBaselineKeys)
+        {
+            if (!declared.TryGetValue(key, out string? baseline))
+            {
+                errors.Add($"{relativePath} must declare {key} for the reviewed {repository} baseline.");
+                continue;
+            }
+
+            if (!ReleaseTagRegex().IsMatch(baseline) && !FullCommitShaRegex().IsMatch(baseline))
+            {
+                errors.Add(
+                    $"{relativePath} declares {key}: {baseline}. Use a release tag such as v1.2.3 or a full 40-character commit SHA.");
+                continue;
+            }
+
+            baselines[repository] = baseline;
+        }
+
+        if (declared.TryGetValue("asibackbone_ref", out string? asiBackboneRef) &&
+            !asiBackboneRef.Equals(CurrentImplementationRef, StringComparison.OrdinalIgnoreCase))
+        {
+            errors.Add(
+                $"{relativePath} declares asibackbone_ref: {asiBackboneRef}, but the current implementation boundary is {CurrentImplementationRef}. Review the bridge against the new boundary and update both together.");
+        }
+
+        var linkedRepositories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (Match linkMatch in BridgeRepositoryLinkRegex().Matches(text))
+        {
+            string repository = linkMatch.Groups["repo"].Value;
+            string actualRef = linkMatch.Groups["ref"].Value;
+            linkedRepositories.Add(repository);
+
+            if (baselines.TryGetValue(repository, out string? expectedRef) &&
+                !actualRef.Equals(expectedRef, StringComparison.OrdinalIgnoreCase))
+            {
+                errors.Add(
+                    $"{relativePath}:{GetLineNumber(text, linkMatch.Index)} links {repository} at '{actualRef}' instead of the declared baseline '{expectedRef}'.");
+            }
+        }
+
+        foreach (string repository in baselines.Keys.Where(repository => !linkedRepositories.Contains(repository)))
+        {
+            errors.Add(
+                $"{relativePath} declares a {repository} baseline but never links to that repository at it.");
         }
     }
 

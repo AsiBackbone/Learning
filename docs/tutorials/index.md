@@ -123,6 +123,7 @@ After a tutorial:
 
 - [Browse Executable Samples](../samples/index.md) to run focused companion implementations and invariant tests.
 - [Browse Labs](../labs/index.md) to modify, break, repair, critique, or extend the architecture.
+- [Map the five Learning samples to a production host](../getting-started/from-learning-samples-to-production-host.md) when you need version-pinned AsiBackbone references and NetCoreApplicationTemplate integration seams.
 - [Explore AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) for fuller governance and policy-control implementations.
 - [Explore NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) for a fuller ASP.NET Core reference architecture.
 

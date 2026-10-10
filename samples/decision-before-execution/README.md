@@ -103,6 +103,7 @@ Useful experiments include:
 - [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) - inspect fuller policy and constraint evaluation.
 - [Host-Owned Execution Enforcement](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/host-owned-execution-enforcement.md) - follow the production-oriented execution-boundary guidance.
 - [Plain ASP.NET Core Host](https://github.com/AsiBackbone/AsiBackbone/tree/v7.0.0/samples/PlainAspNetCoreHost) - inspect a concrete host integration.
+- [From Learning Samples to a Production Host](../../docs/getting-started/from-learning-samples-to-production-host.md) - map this teaching workflow to version-pinned package and ASP.NET Core host responsibilities.
 
 ## License
 

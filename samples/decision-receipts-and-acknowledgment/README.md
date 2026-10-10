@@ -255,6 +255,7 @@ Useful experiments include:
 - [`DecisionReceiptLifecycleEvent`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Audit/DecisionReceiptLifecycleEvent.cs) - compare the sample's correlated lifecycle events with the framework's acknowledgment, capability, gateway, and emission stages.
 - [`Dynamic Liability Handshake`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/dynamic-liability-handshake.md) - review the fuller handshake lifecycle.
 - [`Durable Audit Outbox Persistence`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/durable-audit-outbox-persistence.md) - review production-oriented persistence and delivery concerns.
+- [From Learning Samples to a Production Host](../../docs/getting-started/from-learning-samples-to-production-host.md) - map teaching receipts and acknowledgment to version-pinned package, persistence, and host responsibilities.
 
 ## License
 

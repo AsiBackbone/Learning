@@ -163,6 +163,7 @@ Useful experiments include:
 - [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs) - inspect the fuller decision model, reason metadata, correlation, and policy identity.
 - [`IGovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Constraints/IGovernanceEvaluationContext.cs) - compare the sample snapshot with the framework's constraint-evaluation context surface.
 - [`DefaultGovernancePolicyEvaluator`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/Evaluation/DefaultGovernancePolicyEvaluator.cs) - inspect fuller constraint composition and decision evaluation.
+- [From Learning Samples to a Production Host](../../docs/getting-started/from-learning-samples-to-production-host.md) - map this teaching context and outcome model to version-pinned package and host responsibilities.
 
 ## License
 

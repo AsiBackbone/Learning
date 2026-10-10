@@ -516,6 +516,8 @@ Compare the small teaching implementation with the fuller working `AsiBackbone` 
 
 The Learning sample remains framework-neutral so the architectural pattern can be studied independently of package adoption.
 
+Use [From Learning Samples to a Production Host](../../docs/getting-started/from-learning-samples-to-production-host.md) to map the composed teaching gateway to version-pinned package primitives and explicit ASP.NET Core host responsibilities. The bridge marks the AI gateway itself as host-owned rather than implying that AsiBackbone or NetCoreApplicationTemplate supplies one.
+
 ## Continue with the Lab
 
 After the baseline behavior is clear, continue with the [Governed AI Tool Gateway advanced lab](../../docs/labs/governed-ai-tool-gateway.md).

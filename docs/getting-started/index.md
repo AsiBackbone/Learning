@@ -22,6 +22,7 @@ Choose the shortest path that matches how you want to learn:
 | Solve a specific architecture problem | [**Find Your Path**](find-your-path.md) |
 | See the complete curriculum visually | [**Learning Path Map**](learning-path-map.md) |
 | Learn by running code | [**Executable Samples**](../samples/index.md) |
+| Move from the five teaching samples into a released ASP.NET Core host | [**From Learning Samples to a Production Host**](from-learning-samples-to-production-host.md) |
 | Copy or prepare current AsiBackbone 7.0 API syntax | [**AsiBackbone 7.0 Compatibility and API Boundary**](asibackbone-7-api-boundary.md) |
 | Maintain the historical Learning 1.0 / 6.0 contract or translate older 5.x material | [**Learning 1.0 and AsiBackbone 6.0 Compatibility Guide**](learning-1-asibackbone-6-compatibility.md) |
 | Practice by changing or challenging the design | [**Hands-On Labs**](../labs/index.md) |
@@ -151,6 +152,8 @@ AsiBackbone Learning is the educational layer of the organization. The working r
 - [`AsiBackbone/NetCoreApplicationTemplate`](https://github.com/AsiBackbone/NetCoreApplicationTemplate) — an enterprise-oriented ASP.NET Core reference implementation demonstrating middleware organization, structured logging, security defaults, error handling, rate limiting, authentication-ready architecture, data access, and Architecture Decision Records.
 
 Learning uses these repositories as architectural specimens while keeping its teaching examples intentionally smaller and easier to study.
+
+When you are ready to translate the five foundational teaching models into package APIs and host-owned integration seams, use [**From Learning Samples to a Production Host**](from-learning-samples-to-production-host.md). It pins the reviewed Learning, AsiBackbone, and NetCoreApplicationTemplate baselines and marks partial or nonexistent type mappings explicitly.
 
 ## Adoption Is Optional
 
