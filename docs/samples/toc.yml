@@ -22,6 +22,8 @@
     href: index.md#decision-pipeline-refactoring
   - name: Minimal Policy Simulation Harness
     href: index.md#minimal-policy-simulation-harness
+  - name: Governed Failure-Injection Trace
+    href: index.md#governed-failure-injection-trace
   - name: Federated Governance and Independent Authority Coordination
     href: index.md#federated-governance-and-independent-authority-coordination
   - name: Distributed Acknowledgment and Continuation Workflows

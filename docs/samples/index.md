@@ -36,6 +36,7 @@ All executable sample projects currently under `samples/` are listed below, grou
 | Foundational | [Governed AI Tool Gateway](#governed-ai-tool-gateway) | The model may propose; the host retains execution authority. |
 | Governance and Policy Architecture | [Decision Pipeline Refactoring](#decision-pipeline-refactoring) | Explicit outcomes remain separate from protected execution. |
 | Governance and Policy Architecture | [Minimal Policy Simulation Harness](#minimal-policy-simulation-harness) | Simulation evaluates policy behavior without creating execution authority. |
+| Governance and Policy Architecture | [Governed Failure-Injection Trace](#governed-failure-injection-trace) | Every injected failure stops at a named stage and owner before the protected executor runs. |
 | Governance and Policy Architecture | [Federated Governance and Independent Authority Coordination](#federated-governance-and-independent-authority-coordination) | An outage cannot reclassify a federated operation as local-only. |
 | Governance and Policy Architecture | [Distributed Acknowledgment and Continuation Workflows](#distributed-acknowledgment-and-continuation-workflows) | Acknowledgment evidence is not portable execution authority. |
 | Governance and Policy Architecture | [Decision Explainability for Human Operators](#decision-explainability-for-human-operators) | Explanation projects governance evidence; it does not replace the evidence or create authority. |
@@ -202,6 +203,30 @@ dotnet run --project samples/policy-simulation-harness/Sample/PolicySimulationHa
 - [Read Practical Policy Testing and Decision-Table Strategies](../governance/practical-policy-testing-and-decision-table-strategies.md)
 - [Read Policy Versioning and Decision Provenance](../governance/policy-versioning-and-decision-provenance.md)
 - [Compare Regional and Tenant Policy Overlays](../advanced/regional-and-tenant-policy-overlays.md)
+- [Continue with the Governed Failure-Injection Trace](#governed-failure-injection-trace) to follow a decision through to the protected executor.
+
+### Governed Failure-Injection Trace
+
+**Learning objective:** Inject one failure at a time into a fictional governed operation and see which trust boundary stopped it, which component owned the refusal, whether execution authority was issued, and whether the protected executor ran.
+
+**Difficulty:** Intermediate
+
+**Key invariant:**
+
+> **Every way a governed operation can fail stops at a named stage, owned by a named component, before the protected executor runs. Only the valid path reaches the executor, and it does so exactly once.**
+
+Thirteen named scenarios cover policy denial, unavailable context, a missing acknowledgment, altered, expired, or mismatched receipts, expired, replayed, or misbound authority, and a caller that bypasses the governed entry point. Each run emits a text or JSON stage trace with the stopping stage, its owner, the outcome and reason code, whether authority was issued, the executor invocation count, and separate decision and execution evidence. Receipt sealing and authority registration are labeled simulated boundaries, not production cryptography.
+
+Run every scenario from the repository root, or select one with `--scenario`:
+
+```bash
+dotnet run --project samples/governed-failure-injection-trace/Sample/GovernedFailureInjectionTrace.csproj
+```
+
+- [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-failure-injection-trace/README.md)
+- [Compare the Minimal Policy Simulation Harness](#minimal-policy-simulation-harness), which deliberately stops at the policy decision
+- [Read Decision Receipts and Acknowledgment](../tutorials/decision-receipts-and-acknowledgment.md)
+- [Read Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 
 ### Federated Governance and Independent Authority Coordination
 

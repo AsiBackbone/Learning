@@ -357,6 +357,8 @@ There is no transition from the simulation report into a protected operation.
 
 A production system that later uses similar policy results must still enforce its real execution boundary separately.
 
+To see what happens after this boundary, run the [Governed Failure-Injection Trace sample](../governed-failure-injection-trace/README.md). It follows one decision through continuation verification, authority issuance, and host enforcement to a counting executor, and injects one failure per scenario.
+
 ## Why the Sample Does Not Reuse a Real Executor
 
 A simulator can become misleading if it is implemented as:

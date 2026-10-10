@@ -1413,6 +1413,7 @@ Learning does not require a particular simulation service, policy-management pro
 - [Safe Degraded Mode and Fail-Safe Governance](safe-degraded-mode-and-fail-safe-governance.md) — examine unavailable dependencies or escalation paths introduced by a candidate.
 - [Policy-Version Evidence in Governance Decisions](policy-version-evidence-in-governance-decisions.md) — practice decision-time policy identity and drift before comparing whole policy versions.
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) — keep simulation replay separate from execution-authority replay.
+- [Governed Failure-Injection Trace sample](https://github.com/AsiBackbone/Learning/blob/main/samples/governed-failure-injection-trace/README.md) — leave the simulator's boundary on purpose: inject one failure at a time between the decision and the protected executor, and see which stage and owner stopped it.
 
 ---
 
