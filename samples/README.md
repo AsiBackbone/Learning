@@ -354,6 +354,38 @@ The central invariant is:
 
 Focused tests verify deterministic decision comparisons, explicit policy-version behavior, constraint evidence, unavailable-policy handling, and the non-execution boundary.
 
+### Governed Failure-Injection Trace
+
+Related learning material:
+
+- [Decision Receipts and Acknowledgment](../docs/tutorials/decision-receipts-and-acknowledgment.md)
+- [Scoped Capability and Host-Owned Execution](../docs/tutorials/scoped-capability-and-host-owned-execution.md)
+- [Policy Simulation and Change-Impact Analysis lab](../docs/labs/policy-simulation-and-change-impact-analysis.md)
+
+Executable companion:
+
+[Governed Failure-Injection Trace sample](governed-failure-injection-trace/README.md)
+
+The sample picks up where the policy simulation harness deliberately stops. It runs a fictional `customer.export` through every trust boundary and injects one failure per named scenario:
+
+```text
+intent
+  -> authoritative context
+  -> policy decision
+  -> continuation verification
+  -> scoped execution authority
+  -> host enforcement
+  -> protected executor
+```
+
+Each run emits a text or JSON trace naming the first stage that stopped progress, the component that owned it, the outcome and reason code, whether execution authority was issued, the executor invocation count, and separate decision and execution evidence. Every scenario runs non-interactively with `--scenario <id>`.
+
+The central invariant is:
+
+> **Every injected failure stops at a named stage and owner before the protected executor runs; only the valid path executes, exactly once.**
+
+Focused tests verify zero executor invocations for every blocked, invalid, expired, replayed, and bypass path, exactly one for each valid path, distinct owners for policy refusal, verification failure, and host enforcement, and the non-interactive CLI. Receipt sealing and authority registration are labeled simulated boundaries, not production cryptography.
+
 ### Federated Governance and Independent Authority Coordination
 
 Related advanced learning material:

@@ -8,6 +8,7 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ### Added
 
+- Added the Governed Failure-Injection Trace sample, a companion to the policy simulation harness that runs a fictional export through intent, authoritative context, policy, continuation verification, scoped authority, host enforcement, and a counting executor. Thirteen named, non-interactive scenarios inject policy denial, unavailable context, missing acknowledgment, altered, expired, or mismatched receipts, expired, replayed, or misbound authority, and an entry-point bypass, and emit text or JSON traces naming the stopping stage and owner, authority issuance, executor invocation count, and separate decision and execution evidence. Tests prove zero executor invocations for every blocked path and exactly one for each valid path; receipt sealing is labeled a simulated boundary (#409).
 - Added a version-pinned bridge from the five foundational Learning samples to the reviewed AsiBackbone 7.0 API boundary and NetCoreApplicationTemplate 2.11.2 host integration seams, including explicit partial mappings, host-owned enforcement responsibilities, and persistence/evidence choices. The AsiBackbone API-reference validator now requires the bridge's three pinned baselines and checks every Learning, AsiBackbone, and NetCoreApplicationTemplate link on the page against them (#408).
 
 ### Fixed
