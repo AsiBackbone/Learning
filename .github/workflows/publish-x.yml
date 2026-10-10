@@ -7,6 +7,15 @@ on:
         description: Commit successfully deployed by the calling documentation workflow
         required: true
         type: string
+    secrets:
+      X_API_KEY:
+        required: true
+      X_API_KEY_SECRET:
+        required: true
+      X_ACCESS_TOKEN:
+        required: true
+      X_ACCESS_TOKEN_SECRET:
+        required: true
 
   workflow_dispatch:
     inputs:
