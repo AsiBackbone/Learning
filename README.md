@@ -184,9 +184,9 @@ Issues are best used for concrete repository work; Learning Discussions are bett
 
 ## Project Status
 
-**Learning 1.2 is the current documentation baseline aligned with the released AsiBackbone 7.0.0 boundary. Learning 1.0 / AsiBackbone 6.0 remains available as immutable history.**
+**Learning 1.3 is the current documentation baseline aligned with the released AsiBackbone 7.0.0 boundary. Learning 1.0 / AsiBackbone 6.0 remains available as immutable history.**
 
-The foundational tutorial, sample, test, and lab path is established. See the [AsiBackbone 7.0 Compatibility and API Boundary](docs/getting-started/asibackbone-7-api-boundary.md) for current implementation references, the [Learning 1.2.0 Release Readiness record](docs/getting-started/learning-1-2-release-readiness.md) for the current review, the [Learning 1.1.0 record](docs/getting-started/learning-1-1-release-readiness.md) for the preceding snapshot, and [ROADMAP.md](ROADMAP.md) for the maintained direction.
+The foundational tutorial, sample, test, and lab path is established. See the [AsiBackbone 7.0 Compatibility and API Boundary](docs/getting-started/asibackbone-7-api-boundary.md) for current implementation references, the [Learning 1.3.0 Release Readiness record](docs/getting-started/learning-1-3-release-readiness.md) for the current review, the [Learning 1.2.0 record](docs/getting-started/learning-1-2-release-readiness.md) for the preceding snapshot, and [ROADMAP.md](ROADMAP.md) for the maintained direction.
 
 ## Citing a Release
 
