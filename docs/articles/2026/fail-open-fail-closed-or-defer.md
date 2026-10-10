@@ -183,6 +183,13 @@ public sealed class RemotePolicyClient(HttpClient http) : IPolicyClient
                 return new AuthorizationResult.CannotDetermine($"pdp.http-{(int)response.StatusCode}");
             }
 
+            // ReadFromJsonAsync does not check the media type; it will parse a JSON-shaped
+            // body labeled text/html. The decision contract requires application/json.
+            if (response.Content.Headers.ContentType?.MediaType is not "application/json")
+            {
+                return new AuthorizationResult.CannotDetermine("pdp.unexpected-content-type");
+            }
+
             var body = await response.Content.ReadFromJsonAsync<PolicyResponse>(ct);
 
             // The policy service reports its own missing or stale inputs explicitly,
@@ -204,9 +211,9 @@ public sealed class RemotePolicyClient(HttpClient http) : IPolicyClient
             // The body was not valid JSON for the decision contract.
             return new AuthorizationResult.CannotDetermine("pdp.malformed-response");
         }
-        catch (NotSupportedException)
+        catch (InvalidOperationException)
         {
-            // The response did not declare a JSON content type.
+            // Among other causes, ReadFromJsonAsync throws this for an invalid charset.
             return new AuthorizationResult.CannotDetermine("pdp.malformed-response");
         }
         catch (BrokenCircuitException)
@@ -232,7 +239,7 @@ public sealed class RemotePolicyClient(HttpClient http) : IPolicyClient
 }
 ```
 
-`BrokenCircuitException` and `TimeoutRejectedException` come from Polly, which `Microsoft.Extensions.Http.Resilience` uses. The point of the list is not the exact exception types, which depend on your stack. It is that every way the call can fail ends in `CannotDetermine` with a stable cause, and nothing except a well-formed explicit answer ends in `Decided`. Malformed JSON is the case most often missed: `ReadFromJsonAsync` throws instead of returning `null`, so without its own `catch` it escapes the result model entirely.
+`BrokenCircuitException` and `TimeoutRejectedException` come from Polly, which `Microsoft.Extensions.Http.Resilience` uses. The point of the list is not the exact exception types, which depend on your stack. It is that every way the call can fail ends in `CannotDetermine` with a stable cause, and nothing except a well-formed explicit answer ends in `Decided`. Malformed responses are the cases most often missed. `ReadFromJsonAsync` throws `JsonException` for invalid JSON and `InvalidOperationException` for an invalid charset instead of returning `null`, so without their own `catch` blocks they escape the result model entirely. It also does not check the media type, which is why the client checks for `application/json` itself before reading.
 
 The policy service follows the same rule for its own inputs. When the consent store is down or its replica is older than the allowed bound, the policy service does not evaluate "consent: unknown" as "consent: present." It reports that it cannot determine the outcome, and the export API receives `CannotDetermine("input.consent.stale")`. The [OWASP Authorization Policy and Data Distribution Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Policy_And_Data_Distribution_Cheat_Sheet.html) makes the same point about missing, invalid, or stale attributes.
 
@@ -386,7 +393,7 @@ There is no universal rule here. A different organization might reject exports o
 
 ## When a Last-Known-Good Policy May Be Used
 
-Bounded local evaluation is the option most easily abused, because it looks like the system is still making decisions. It is safe only when degraded operation was designed and authorized in advance, and when every one of these bounds is explicit:
+Bounded local evaluation is the option most easily abused, because it looks like the system is still making decisions. It is never risk-free: the snapshot may miss a rule change or revocation that happened after it was last confirmed current. It is a defensible, accepted risk only when the policy owner designed and authorized degraded operation in advance, decided that this residual risk is acceptable for the listed operations, and made every one of these bounds explicit:
 
 - **Operation scope.** A fixed list of operations may use it. Here, one: `export-history.read`. The list is part of the outage rules, not something a caller requests.
 - **Version bound.** The local policy must be at or above a minimum revision. If an emergency change ships revision 42 to close a gap, the minimum moves to 42 and older snapshots stop qualifying.
@@ -564,7 +571,7 @@ public async Task Explicit_denial_is_reported_as_denied_and_is_not_queued()
 
 Cover at least these cases:
 
-- **Each failure cause maps to `CannotDetermine`:** timeout, open circuit, connection failure, non-success status, invalid JSON, a non-JSON content type, a well-formed body with an undefined or unrecognized result, an explicit indeterminate response from the policy service, and stale or missing required attributes. Exercise the real `HttpClient` pipeline with a fake message handler, so the resilience configuration is part of what is tested.
+- **Each failure cause maps to `CannotDetermine`:** timeout, open circuit, connection failure, non-success status, invalid JSON, a non-JSON content type even with a JSON-shaped body, an invalid charset, a well-formed body with an undefined or unrecognized result, an explicit indeterminate response from the policy service, and stale or missing required attributes. Exercise the real `HttpClient` pipeline with a fake message handler, so the resilience configuration is part of what is tested.
 - **No resilience path produces `Allowed`.** Include any fallback strategy in the pipeline under test.
 - **Explicit `Denied` and `CannotDetermine` produce different HTTP results:** `403` for one, `503` or `202` for the other.
 - **Every unavailable case records zero protected executions,** asserted on the component that performs the side effect, not on a status flag.
