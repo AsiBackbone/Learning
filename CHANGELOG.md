@@ -6,6 +6,10 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+### Fixed
+
+- Ensured every published HTML page has a page-specific search description and matching social-preview descriptions, deriving a bounded fallback from rendered article content only when authored metadata is absent.
+
 ## [1.3.0] - 2026-10-10
 
 ### Added
