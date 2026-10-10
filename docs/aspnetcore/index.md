@@ -28,6 +28,8 @@ Continue with the [Identify Middleware Ordering Problems lab](../labs/identify-m
 
 [Data-Access Boundaries and Transaction Reasoning with EF Core](data-access-boundaries-and-transaction-reasoning.md) continues from application behavior into durable state. It compares direct `DbContext` usage with meaningful persistence abstractions, explains default and explicit transaction boundaries, distinguishes generic database auditing from governance decision receipt, examines `SaveChanges` interceptors, and keeps local relational atomicity separate from external side effects, idempotency, outbox/inbox patterns, and recovery.
 
+[Retrofitting Governed Execution into an Existing ASP.NET Core Application](retrofit-governed-execution-into-an-existing-application.md) applies those boundaries to a live application. It is a phased playbook for introducing an explicit decision boundary into one consequential operation at a time: characterization tests first, one protected-execution seam for every route, shadow evaluation that cannot authorize anything, enforcement with zero-execution tests, deliberate handling of transactions, outbox, retries, and background jobs, and a rollback switch that cannot reopen an ungoverned path. It includes a stopping rule for when the simpler design should stay.
+
 [Architecture Decision Records Preserve Architectural Reasoning](architecture-decision-records-preserve-architectural-reasoning.md) then shifts from runtime structure to architectural memory. It explains when a decision deserves an ADR, what belongs in the record, how ADRs differ from other documentation, and how context, alternatives, consequences, and review conditions preserve reasoning that code alone cannot show.
 
 [Architecture Decision Record Lifecycle, Review, Deprecation, and Supersession](architecture-decision-record-lifecycle-review-deprecation-and-supersession.md) continues from recording a decision to revisiting one. It explains common ADR states, the difference between deprecation and supersession, evidence that should trigger review, preservation of historical reasoning, implementation drift, migration periods, and lightweight review without unnecessary ceremony.
@@ -52,6 +54,7 @@ This section will continue to expand into topics such as:
 - Rate limiting
 - Authentication-ready architecture
 - [Data-access boundaries and transaction reasoning](data-access-boundaries-and-transaction-reasoning.md)
+- [Retrofitting governed execution into an existing application](retrofit-governed-execution-into-an-existing-application.md)
 - [Architecture Decision Records and preserved reasoning](architecture-decision-records-preserve-architectural-reasoning.md)
 - [ADR lifecycle, review, deprecation, and supersession](architecture-decision-record-lifecycle-review-deprecation-and-supersession.md)
 - [Working repository ADR case study](netcoreapplicationtemplate-adr-case-study.md)
@@ -109,6 +112,8 @@ Before applying these ideas to an ASP.NET Core application, review:
 * [Decision Before Execution](../tutorials/decision-before-execution.md)
 * [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
 * [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
+
+To introduce these boundaries into an application that is already running, follow [Retrofitting Governed Execution into an Existing ASP.NET Core Application](retrofit-governed-execution-into-an-existing-application.md) one operation at a time.
 
 For AI-assisted application scenarios, continue with:
 

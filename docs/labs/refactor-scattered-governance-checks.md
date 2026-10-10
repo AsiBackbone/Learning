@@ -680,6 +680,7 @@ If the result is easier to understand, explain why the simpler shape is better f
 - [Identify and Remove a Hidden Execution Side Effect](hidden-execution-side-effect.md) — beginner diagnostic exercise focused on one concealed side effect.
 - [Build a Governed API Operation](build-a-governed-api-operation.md) — extend an ASP.NET Core operation through the broader governed lifecycle.
 - [Decision Pipeline Refactoring sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-pipeline-refactoring/README.md) — runnable starter, reference refactor, and invariant tests for this lab.
+- [Retrofitting Governed Execution into an Existing ASP.NET Core Application](../aspnetcore/retrofit-governed-execution-into-an-existing-application.md) — the next step after this lab: a phased playbook for moving a live application with controllers, EF Core transactions, background jobs, and an outbox toward this pipeline, one operation at a time, with safe rollback.
 - [When a Simple Application Service Is Enough](../architecture/when-a-simple-application-service-is-enough.md) — proportionality guidance for avoiding unnecessary governance machinery.
 - [Policy Engines, Rules Engines, and Distributed Policy Enforcement](../architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md) — compare local decision logic with externalized policy evaluation and enforcement placement.
 

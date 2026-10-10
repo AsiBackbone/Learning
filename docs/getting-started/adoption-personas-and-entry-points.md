@@ -58,6 +58,7 @@ The goal is to determine whether that separation improves your system enough to 
 2. [When a Simple Application Service Is Enough](../architecture/when-a-simple-application-service-is-enough.md)
 3. [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
 4. [Executable Samples](../samples/index.md)
+5. [Retrofitting Governed Execution into an Existing ASP.NET Core Application](../aspnetcore/retrofit-governed-execution-into-an-existing-application.md), when the application is already in production
 
 **Evaluate for:** clean seams, testability, understandable control flow, and whether the extra lifecycle earns its complexity.
 

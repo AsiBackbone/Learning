@@ -16,6 +16,9 @@
 - name: Data-Access Boundaries and Transaction Reasoning with EF Core
   href: data-access-boundaries-and-transaction-reasoning.md
 
+- name: Retrofitting Governed Execution into an Existing ASP.NET Core Application
+  href: retrofit-governed-execution-into-an-existing-application.md
+
 - name: Architecture Decision Records Preserve Architectural Reasoning
   href: architecture-decision-records-preserve-architectural-reasoning.md
 

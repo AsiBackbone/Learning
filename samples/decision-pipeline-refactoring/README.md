@@ -333,6 +333,7 @@ Those concerns can change the implementation shape without changing the central 
 - [Policy Context and Explicit Decision Outcomes](../../docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
 - [Build a Governed API Operation lab](../../docs/labs/build-a-governed-api-operation.md)
 - [When a Simple Application Service Is Enough](../../docs/architecture/when-a-simple-application-service-is-enough.md)
+- [Retrofitting Governed Execution into an Existing ASP.NET Core Application](../../docs/aspnetcore/retrofit-governed-execution-into-an-existing-application.md) - move a live application toward this pipeline one operation at a time.
 
 ## Working Implementation References
 
