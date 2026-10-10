@@ -76,6 +76,8 @@ Both prevent the export from running at 09:14. They differ in everything that fo
 | Operational signal | Normal; possibly a security signal if frequent | An incident; alert the dependency's owner and the team that owns the policy |
 | Evidence | Decision, reason, policy version | Cause of unavailability, outage treatment applied, no policy version |
 
+The two `CannotDetermine` responses mean different things to the caller. `202 Accepted` means the host has kept the request and taken responsibility for re-checking it later, so the caller should follow the status link rather than resubmit. `503 Service Unavailable` with `Retry-After` means the host kept nothing, and the caller must try again later. Choose one per operation, as described below, and never return `202` for work the host has not durably recorded.
+
 Collapsing them in either direction does damage. Converting `CannotDetermine` into `Allowed` executes protected work without authority. Converting it into `Denied` tells a legitimate user they lack a permission they hold, hides an outage behind ordinary security noise, teaches support staff to "fix" access that was never broken, and makes the audit trail claim that a policy evaluated something it never saw.
 
 Some policy services also return an explicit **deferred** outcome as a real answer, such as "allowed only after a second approval" or "not inside a change window." That is still a decision produced by the policy. This article uses *deferral* for something else: the host's choice of what to do with a decision it could not obtain. Keep the two apart in code, even if both end up as a waiting request.
@@ -185,12 +187,29 @@ public sealed class RemotePolicyClient(HttpClient http) : IPolicyClient
 
             // ReadFromJsonAsync does not check the media type; it will parse a JSON-shaped
             // body labeled text/html. The decision contract requires application/json.
-            if (response.Content.Headers.ContentType?.MediaType is not "application/json")
+            if (!string.Equals(
+                    response.Content.Headers.ContentType?.MediaType,
+                    "application/json",
+                    StringComparison.OrdinalIgnoreCase))
             {
                 return new AuthorizationResult.CannotDetermine("pdp.unexpected-content-type");
             }
 
-            var body = await response.Content.ReadFromJsonAsync<PolicyResponse>(ct);
+            PolicyResponse? body;
+            try
+            {
+                body = await response.Content.ReadFromJsonAsync<PolicyResponse>(ct);
+            }
+            catch (JsonException)
+            {
+                // The body was not valid JSON for the decision contract.
+                return new AuthorizationResult.CannotDetermine("pdp.malformed-response");
+            }
+            catch (InvalidOperationException)
+            {
+                // Among other causes, ReadFromJsonAsync throws this for an invalid charset.
+                return new AuthorizationResult.CannotDetermine("pdp.malformed-response");
+            }
 
             // The policy service reports its own missing or stale inputs explicitly,
             // with a stable cause such as "input.consent.stale".
@@ -205,16 +224,6 @@ public sealed class RemotePolicyClient(HttpClient http) : IPolicyClient
             return body?.TryToDecision() is { } decision
                 ? new AuthorizationResult.Decided(decision)
                 : new AuthorizationResult.CannotDetermine("pdp.malformed-response");
-        }
-        catch (JsonException)
-        {
-            // The body was not valid JSON for the decision contract.
-            return new AuthorizationResult.CannotDetermine("pdp.malformed-response");
-        }
-        catch (InvalidOperationException)
-        {
-            // Among other causes, ReadFromJsonAsync throws this for an invalid charset.
-            return new AuthorizationResult.CannotDetermine("pdp.malformed-response");
         }
         catch (BrokenCircuitException)
         {
@@ -407,8 +416,8 @@ public sealed record LocalPolicySnapshot(
     string PolicyId,
     long Revision,
     string Digest,
-    bool Verified,
-    DateTimeOffset LastConfirmedCurrentAt);
+    bool Verified,                          // digest and signature checked at activation
+    DateTimeOffset LastConfirmedCurrentAt); // advanced only by a successful, verified sync
 
 public static class LocalEvaluationGate
 {
@@ -571,7 +580,7 @@ public async Task Explicit_denial_is_reported_as_denied_and_is_not_queued()
 
 Cover at least these cases:
 
-- **Each failure cause maps to `CannotDetermine`:** timeout, open circuit, connection failure, non-success status, invalid JSON, a non-JSON content type even with a JSON-shaped body, an invalid charset, a well-formed body with an undefined or unrecognized result, an explicit indeterminate response from the policy service, and stale or missing required attributes. Exercise the real `HttpClient` pipeline with a fake message handler, so the resilience configuration is part of what is tested.
+- **Each failure cause maps to `CannotDetermine`:** timeout, open circuit, connection failure, non-success status, invalid JSON, a non-JSON content type even with a JSON-shaped body, an invalid charset, a well-formed body with an undefined or unrecognized result, an explicit indeterminate response from the policy service, and stale or missing required attributes. Also verify the opposite: a well-formed response labeled `Application/JSON` is still accepted, because media types are case-insensitive. Exercise the real `HttpClient` pipeline with a fake message handler, so the resilience configuration is part of what is tested.
 - **No resilience path produces `Allowed`.** Include any fallback strategy in the pipeline under test.
 - **Explicit `Denied` and `CannotDetermine` produce different HTTP results:** `403` for one, `503` or `202` for the other.
 - **Every unavailable case records zero protected executions,** asserted on the component that performs the side effect, not on a status flag.
