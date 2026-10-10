@@ -253,3 +253,8 @@ jobs:
     uses: ./.github/workflows/publish-x.yml
     with:
       deployed_revision: ${{ github.sha }}
+    secrets:
+      X_API_KEY: ${{ secrets.X_API_KEY }}
+      X_API_KEY_SECRET: ${{ secrets.X_API_KEY_SECRET }}
+      X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+      X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
