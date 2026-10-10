@@ -4,6 +4,8 @@
   href: learning-path-map.md
 - name: Find Your Path
   href: find-your-path.md
+- name: From Learning Samples to a Production Host
+  href: from-learning-samples-to-production-host.md
 - name: AsiBackbone 7.0 Compatibility and API Boundary
   href: asibackbone-7-api-boundary.md
 - name: Learning 1.3.0 Release Readiness

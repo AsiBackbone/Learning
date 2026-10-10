@@ -6,6 +6,10 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+### Added
+
+- Added a version-pinned bridge from the five foundational Learning samples to the reviewed AsiBackbone 7.0 API boundary and NetCoreApplicationTemplate 2.11.2 host integration seams, including explicit partial mappings, host-owned enforcement responsibilities, and persistence/evidence choices. The AsiBackbone API-reference validator now requires the bridge's three pinned baselines and checks every Learning, AsiBackbone, and NetCoreApplicationTemplate link on the page against them (#408).
+
 ### Fixed
 
 - Ensured every published HTML page has a page-specific search description and matching social-preview descriptions, deriving a bounded fallback from rendered article content only when authored metadata is absent.

@@ -246,6 +246,7 @@ Useful experiments include:
 - [`ICapabilityGrantUseStore`](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/src/AsiBackbone.Core/CapabilityGrants/ICapabilityGrantUseStore.cs) - review the working seam for bounded-use and replay-state enforcement.
 - [Capability Grant Hardening](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/capability-grant-hardening.md) - review production-oriented proof, binding, time, replay, and failure guidance.
 - [Intent to Execution Pattern](https://github.com/AsiBackbone/AsiBackbone/blob/v7.0.0/docs/articles/intent-to-execution-pattern.md) - place capability validation in the fuller governed flow.
+- [From Learning Samples to a Production Host](../../docs/getting-started/from-learning-samples-to-production-host.md) - map the teaching capability boundary to version-pinned package and host-owned enforcement seams.
 
 ## License
 
