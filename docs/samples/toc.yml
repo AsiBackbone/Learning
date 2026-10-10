@@ -50,6 +50,8 @@
     href: index.md#middleware-ordering-changes-behavior
   - name: Centralized Error Handling and Problem Details
     href: index.md#centralized-error-handling-and-problem-details
+  - name: Authorization-to-Governance Comparison
+    href: index.md#authorization-to-governance-comparison
 
 - name: Run the Complete Sample Suite
   href: index.md#run-the-complete-sample-suite

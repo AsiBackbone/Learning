@@ -11,6 +11,8 @@
   <Project Path="policy-simulation-harness/Tests/PolicySimulationHarness.Tests.csproj" />
   <Project Path="governed-failure-injection-trace/Sample/GovernedFailureInjectionTrace.csproj" />
   <Project Path="governed-failure-injection-trace/Tests/GovernedFailureInjectionTrace.Tests.csproj" />
+  <Project Path="authorization-to-governance-comparison/Sample/AuthorizationToGovernanceComparison.csproj" />
+  <Project Path="authorization-to-governance-comparison/Tests/AuthorizationToGovernanceComparison.Tests.csproj" />
   <Project Path="governed-ai-tool-gateway/Sample/GovernedAiToolGateway.csproj" />
   <Project Path="governed-ai-tool-gateway/Tests/GovernedAiToolGateway.Tests.csproj" />
   <Project Path="scoped-capability-and-host-owned-execution/Sample/ScopedCapabilityAndHostOwnedExecution.csproj" />
