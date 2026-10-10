@@ -389,6 +389,41 @@ Lead to Capability-Scoped Background Operation for the queue and worker lifecycl
 
 ---
 
+### 12. Should Authorization Fail Open, Fail Closed, or Defer?
+
+- **Priority:** P1
+- **Implementation issue:** [#403](https://github.com/AsiBackbone/Learning/issues/403)
+- **Publication:** [Published October 10, 2026](../docs/articles/2026/fail-open-fail-closed-or-defer.md)
+- **Permanent slug:** `fail-open-fail-closed-or-defer`
+
+#### Reader / search problem
+
+A protected operation depends on a remote policy decision point, risk service, attribute source, or other authorization dependency. When that dependency times out or returns incomplete evidence, the team must decide whether to fail open, fail closed, defer the operation, or use a bounded degraded mode. Typical questions include:
+
+- Does "deny by default" mean every dependency outage must look like a permanent authorization denial?
+- How should the system distinguish an explicit denial from a deferred, unavailable, or undeterminable decision?
+- Can a last-known-good policy or cached attribute set be used safely, and how fresh may it be?
+- Do retries, circuit breakers, or fallback handlers change who is authorized to perform the side effect?
+- What should happen when the system cannot tell whether an external side effect already occurred?
+
+#### Existing Learning support
+
+- [Safe Degraded Mode and Fail-Safe Governance](../docs/labs/safe-degraded-mode-and-fail-safe-governance.md)
+- [Policy Engines, Rules Engines, and Distributed Policy Enforcement](../docs/architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md)
+- [Policy Context and Explicit Decision Outcomes](../docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
+- [Escalation Patterns in Governed Systems](../docs/governance/escalation-patterns-in-governed-systems.md)
+- [Trust Boundaries and Least Privilege](../docs/security/trust-boundaries-and-least-privilege.md)
+
+#### Article / curriculum distinction
+
+The degraded-mode lab is a deep hands-on exercise, and the policy-engine architecture page treats partition behavior as one placement concern among many. This candidate is a concise, problem-first decision guide for teams facing the operational choice. It should reconcile OWASP's deny-by-default guidance with OPA's observation that the calling software owns fail-open versus fail-closed behavior, keep the invariant that no protected side effect executes without valid authority, keep explicit denial and unavailable evidence as different facts, separate transport resilience from authorization semantics, and require predetermined scope, freshness, version, and operation limits before any last-known-good policy is used. It should also state when a plain unavailable response is sufficient.
+
+#### Natural deeper path
+
+Lead to Safe Degraded Mode and Fail-Safe Governance for hands-on practice, Policy Engines, Rules Engines, and Distributed Policy Enforcement for placement, distribution, and staleness, and Escalation Patterns in Governed Systems for routing decisions to an independent authority.
+
+---
+
 ## Promotion and Publication Workflow
 
 Keep planning, implementation, and publication as separate states:
