@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "account": "jackdaw-patio",
-  "cursorSha": "bade487279cd3a7212680d42ba3852f7729df552",
+  "cursorSha": "6936947a8eac57924adad628ff0369f275a510c5",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
@@ -37,6 +37,11 @@
       "sourceBlobSha": "b8d510250258109eed1d2d60027ec88e8d668e42",
       "postId": "2107512460366504090",
       "postedAtUtc": "2026-10-06T16:45:01.0678458+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/fail-open-fail-closed-or-defer.html": {
+      "sourceBlobSha": "e6a70faf2d79af9cf90b4deb58ba335649d0ac6a",
+      "postId": "2108911741476429994",
+      "postedAtUtc": "2026-10-10T13:25:15.6535123+00:00"
     }
   }
 }
