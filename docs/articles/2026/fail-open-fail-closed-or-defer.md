@@ -73,7 +73,7 @@ Both prevent the export from running at 09:14. They differ in everything that fo
 | Retrying unchanged | Pointless; the answer will not change | Reasonable, later, through the same check |
 | Queue for later | No | Possibly, under a bounded deferral rule |
 | User-facing message | "You are not permitted to export this segment" | "Exports are temporarily unavailable; your request was not sent" |
-| Operational signal | Normal; possibly a security signal if frequent | An incident; alert whoever owns the dependency |
+| Operational signal | Normal; possibly a security signal if frequent | An incident; alert the dependency's owner and the team that owns the policy |
 | Evidence | Decision, reason, policy version | Cause of unavailability, outage treatment applied, no policy version |
 
 Collapsing them in either direction does damage. Converting `CannotDetermine` into `Allowed` executes protected work without authority. Converting it into `Denied` tells a legitimate user they lack a permission they hold, hides an outage behind ordinary security noise, teaches support staff to "fix" access that was never broken, and makes the audit trail claim that a policy evaluated something it never saw.
@@ -86,7 +86,7 @@ Some policy services also return an explicit **deferred** outcome as a real answ
 
 The [OWASP Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html) recommends denying access by default: when no rule explicitly grants access, the application must not proceed. The [OWASP Authorization Patterns Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Patterns_Cheat_Sheet.html) applies the same principle to remote decision points, recommending that errors and timeouts deny protected operations and that a previously loaded policy be used only within defined freshness requirements.
 
-NIST's glossary describes [fail secure](https://csrc.nist.gov/glossary/term/fail_secure) as a mode of termination that prevents loss of secure state when a failure occurs. The secure state is the point. It does not say the failure must be reported as a judgment about the subject.
+NIST's glossary defines [fail secure](https://csrc.nist.gov/glossary/term/fail_secure) as "a mode of termination of system functions that prevents loss of secure state when a failure occurs or is detected in the system." The secure state is the point. It does not say the failure must be reported as a judgment about the subject.
 
 Read together, those sources set an invariant, not a vocabulary:
 
@@ -118,12 +118,13 @@ builder.Services
     });
 ```
 
-That pipeline is a good idea. Each of its parts answers a transport question:
+That pipeline is a good idea. The standard handler combines rate limiting, timeouts, retries, and a circuit breaker, and each of those parts answers a transport question:
 
 - **Timeouts** answer *how long do we wait for this call?*
-- **Retries** answer *should we ask the same question again?* Asking a policy service a question has no side effect, so retrying the question is safe. That says nothing about retrying the protected operation.
+- **Retries** answer *should we ask the same question again?* Retrying the question is safe only when asking it has no side effect. Here, the policy service's decision endpoint is documented as side-effect free: it evaluates and returns an answer, without reserving, consuming, or changing anything. The standard handler retries every HTTP method by default, including this `POST`. If your decision endpoint is not side-effect free, for example because it consumes a one-time approval or counts against a quota, call `options.Retry.DisableForUnsafeHttpMethods()` or give each decision request an idempotency key the service honors. Either way, retrying the question says nothing about retrying the protected operation.
 - **Circuit breakers** answer *should we stop asking for a while because the dependency is unhealthy?*
-- **Fallbacks** answer *what value do we return to our own caller when the call fails?*
+
+The standard pipeline has no fallback strategy. Teams often add one, through a Polly fallback strategy or, more often, a `catch` block, and a **fallback** answers a fourth transport question: *what value do we return to our own caller when the call fails?*
 
 None of them answers *may this analyst export this segment?* A resilience pipeline can make the policy service's answer arrive more reliably. It cannot become the answer.
 
@@ -184,12 +185,29 @@ public sealed class RemotePolicyClient(HttpClient http) : IPolicyClient
 
             var body = await response.Content.ReadFromJsonAsync<PolicyResponse>(ct);
 
+            // The policy service reports its own missing or stale inputs explicitly,
+            // with a stable cause such as "input.consent.stale".
+            if (body?.IndeterminateCause is { Length: > 0 } cause)
+            {
+                return new AuthorizationResult.CannotDetermine(cause);
+            }
+
             // Only an explicit, well-formed "allow" or "deny" is a decision. A missing,
             // undefined, or unrecognized result is not permission, and it is not a
             // judgment about the subject either.
             return body?.TryToDecision() is { } decision
                 ? new AuthorizationResult.Decided(decision)
                 : new AuthorizationResult.CannotDetermine("pdp.malformed-response");
+        }
+        catch (JsonException)
+        {
+            // The body was not valid JSON for the decision contract.
+            return new AuthorizationResult.CannotDetermine("pdp.malformed-response");
+        }
+        catch (NotSupportedException)
+        {
+            // The response did not declare a JSON content type.
+            return new AuthorizationResult.CannotDetermine("pdp.malformed-response");
         }
         catch (BrokenCircuitException)
         {
@@ -199,19 +217,26 @@ public sealed class RemotePolicyClient(HttpClient http) : IPolicyClient
         {
             return new AuthorizationResult.CannotDetermine("pdp.timeout");
         }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            // HttpClient.Timeout elapsed without the caller cancelling.
+            return new AuthorizationResult.CannotDetermine("pdp.timeout");
+        }
         catch (HttpRequestException)
         {
             return new AuthorizationResult.CannotDetermine("pdp.unreachable");
         }
-        // OperationCanceledException from the caller's own token propagates: the request
-        // was abandoned, which is neither a decision nor a dependency outage.
+        // Cancellation from the caller's own token propagates: the request was
+        // abandoned, which is neither a decision nor a dependency outage.
     }
 }
 ```
 
+`BrokenCircuitException` and `TimeoutRejectedException` come from Polly, which `Microsoft.Extensions.Http.Resilience` uses. The point of the list is not the exact exception types, which depend on your stack. It is that every way the call can fail ends in `CannotDetermine` with a stable cause, and nothing except a well-formed explicit answer ends in `Decided`. Malformed JSON is the case most often missed: `ReadFromJsonAsync` throws instead of returning `null`, so without its own `catch` it escapes the result model entirely.
+
 The policy service follows the same rule for its own inputs. When the consent store is down or its replica is older than the allowed bound, the policy service does not evaluate "consent: unknown" as "consent: present." It reports that it cannot determine the outcome, and the export API receives `CannotDetermine("input.consent.stale")`. The [OWASP Authorization Policy and Data Distribution Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Policy_And_Data_Distribution_Cheat_Sheet.html) makes the same point about missing, invalid, or stale attributes.
 
-If you implement the remote check as an ASP.NET Core [authorization handler](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/policies?view=aspnetcore-10.0), the same discipline applies: a non-decision must never call `context.Succeed`. By default, a failed requirement for an authenticated user becomes `403 Forbidden`, which collapses the distinction this article is about. Either attach an `AuthorizationFailureReason` and map it in a custom `IAuthorizationMiddlewareResultHandler`, or, as in this example, keep coarse checks such as "authenticated tenant member" in ASP.NET Core policies and make the operation-specific remote decision in the handler that already loads the segment and destination.
+If you implement the remote check as an ASP.NET Core [authorization handler](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/policies?view=aspnetcore-10.0), the same discipline applies: a non-decision must never call `context.Succeed`. By default, when an authenticated user fails a requirement, the authorization middleware calls `ForbidAsync`, and the authentication handler decides what that looks like: `403 Forbidden` for JWT bearer authentication, or a redirect to the access-denied page for cookie authentication. Either way the caller sees "forbidden," which collapses the distinction this article is about. Either attach an `AuthorizationFailureReason` and map it in a custom `IAuthorizationMiddlewareResultHandler`, or, as in this example, keep coarse checks such as "authenticated tenant member" in ASP.NET Core policies and make the operation-specific remote decision in the handler that already loads the segment and destination.
 
 ---
 
@@ -352,7 +377,7 @@ Applied to the example:
 
 - **`customer-segment.export` → Defer.** An incorrect allow is an irreversible disclosure that may include people who withdrew consent, which is exactly the fact that is unavailable. An incorrect deny costs a few hours. The request is kept so the analyst does not have to resubmit, but only for four hours, after which it expires.
 - **`export-destination.register` → Reject.** Registering a new external destination is high impact and never urgent. Keeping the request adds state nobody needs; the administrator can retry after recovery.
-- **`data-subject-access.export` → Escalate.** A person's request for their own data has a statutory deadline. Waiting indefinitely is itself a harm, but the normal policy path cannot answer. The request goes to the designated privacy officer, who has their own authority and records their own decision. Escalation is not a way to skip the check; it routes the decision to a different, deliberately designed authority. [Escalation Patterns in Governed Systems](../../governance/escalation-patterns-in-governed-systems.md) covers how to design that path.
+- **`data-subject-access.export` → Escalate.** A person's request for their own data can have a legal deadline; for this EU tenant, Article 12(3) of the GDPR requires a response without undue delay and generally within one month. Waiting indefinitely is itself a harm, but the normal policy path cannot answer. The request goes to the designated privacy officer, who has their own authority and records their own decision. Escalation is not a way to skip the check; it routes the decision to a different, deliberately designed authority. That authority needs written decision rules of its own, such as what the officer must verify about the requester and the data before approving, and its decisions go into the same evidence trail as the policy service's. Without both, escalation becomes an ad hoc approval that nobody can review afterward. [Escalation Patterns in Governed Systems](../../governance/escalation-patterns-in-governed-systems.md) covers how to design that path.
 - **`export-history.read` → Evaluate locally.** Viewing a list of past exports is read-only, discloses only metadata, depends on rules that change rarely, and needs no attribute from the consent store. It may continue under a local policy snapshot, within the bounds below.
 
 There is no universal rule here. A different organization might reject exports outright instead of deferring them, or decide that history pages simply show "temporarily unavailable." What matters is that the treatment was chosen per operation, written down, and reviewed, rather than produced by whichever exception handler ran first.
@@ -481,6 +506,8 @@ Every request handled during the outage should leave a record that explains what
 
 Leave out the sensitive attributes themselves. A reason code such as `consent.withdrawn-members` is useful evidence; the list of members is not. [Your Audit Log Records the Story, Not the Decision](your-audit-log-is-not-evidence.md) explains why an ordinary log line rarely carries enough to reconstruct a decision.
 
+Records explain an outage afterward; alerts make it visible while it is happening. Alert on the rate of `CannotDetermine` results, on entry into degraded mode, on deferred requests nearing expiry, and on indeterminate executions. Route those alerts to the team that operates the policy service and to the team that owns the policy, because an authorization outage is both an availability problem and a security-relevant change in how decisions are being made.
+
 ---
 
 ## Recovery and Reconciliation
@@ -537,7 +564,7 @@ public async Task Explicit_denial_is_reported_as_denied_and_is_not_queued()
 
 Cover at least these cases:
 
-- **Each failure cause maps to `CannotDetermine`:** timeout, open circuit, connection failure, non-success status, malformed body, an undefined or unrecognized result, and stale or missing required attributes. Exercise the real `HttpClient` pipeline with a fake message handler, so the resilience configuration is part of what is tested.
+- **Each failure cause maps to `CannotDetermine`:** timeout, open circuit, connection failure, non-success status, invalid JSON, a non-JSON content type, a well-formed body with an undefined or unrecognized result, an explicit indeterminate response from the policy service, and stale or missing required attributes. Exercise the real `HttpClient` pipeline with a fake message handler, so the resilience configuration is part of what is tested.
 - **No resilience path produces `Allowed`.** Include any fallback strategy in the pipeline under test.
 - **Explicit `Denied` and `CannotDetermine` produce different HTTP results:** `403` for one, `503` or `202` for the other.
 - **Every unavailable case records zero protected executions,** asserted on the component that performs the side effect, not on a status flag.
