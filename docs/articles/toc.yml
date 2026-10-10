@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: Should Authorization Fail Open, Fail Closed, or Defer?
+  href: 2026/fail-open-fail-closed-or-defer.md
 - name: Can One Worker Safely Execute Delayed Operations for Many Tenants?
   href: 2026/multi-tenant-worker-execution-authority.md
 - name: When Should a Workflow Engine Own the Decision?

@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Authorization outages, fail-open versus fail-closed, deferral, and degraded mode | [Should Authorization Fail Open, Fail Closed, or Defer?](2026/fail-open-fail-closed-or-defer.md) |
 | Shared background workers, tenant isolation, and workload identity | [Can One Worker Safely Execute Delayed Operations for Many Tenants?](2026/multi-tenant-worker-execution-authority.md) |
 | Workflow engines, approval state, retries, and who owns the execution decision | [When Should a Workflow Engine Own the Decision?](2026/when-workflow-engine-should-own-decision.md) |
 | Delegated authority for background workers, queues, and delayed execution | [How Short-Lived Execution Authority Differs from User Authorization](2026/short-lived-execution-authority-vs-user-authorization.md) |
@@ -44,6 +45,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Should Authorization Fail Open, Fail Closed, or Defer?](2026/fail-open-fail-closed-or-defer.md)
+
+**Christopher D. Cavell** · **October 10, 2026**
+
+When a remote policy service times out, the code that called it makes an authorization decision whether anyone designed one or not. This guide follows one ASP.NET Core export endpoint through a policy outage to separate an explicit denial from an unavailable decision, keep timeouts, retries, circuit breakers, and fallbacks from manufacturing authority, choose a per-operation outage treatment of rejection, bounded deferral, escalation, or tightly bounded local evaluation, stop and reconcile when an external side effect may already have happened, and test that nothing protected executes while authority is unavailable, including when a plain "unavailable, try again later" is the whole answer.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/fail-open-fail-closed-or-defer.html`
 
 ### [Can One Worker Safely Execute Delayed Operations for Many Tenants?](2026/multi-tenant-worker-execution-authority.md)
 

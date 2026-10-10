@@ -416,6 +416,8 @@ Two related points:
 - **Fail-closed is a default, not a complete plan.** Decide how long the workflow waits, who is told, and what happens when the window closes while the dependency is down.
 - **Emergency access is a separate path, not a fallback.** If production must change while a policy source is down, use a deliberately designed break-glass procedure with its own authorization and evidence, not a branch in the normal deployment path that skips the check when a call fails.
 
+[Should Authorization Fail Open, Fail Closed, or Defer?](fail-open-fail-closed-or-defer.md) takes this question further: how to report an unavailable decision differently from a denial, choose an outage treatment per operation, bound a last-known-good policy, and reconcile after recovery.
+
 ---
 
 ## Choosing Where the Decision Lives
