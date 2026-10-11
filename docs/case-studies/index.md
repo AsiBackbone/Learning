@@ -47,6 +47,12 @@ Compare application deployment and infrastructure-change variants where build or
 
 The case demonstrates artifact- and plan-bound approvals, separation of duties, expiry and freshness checks, plan-versus-apply, synthetic executors, rollback responsibility, and zero-executor blocked paths without connecting to a real deployment target or cloud provider.
 
+### [Emergency Production Access and Break-Glass](emergency-production-access-and-break-glass.md)
+
+Follow a fictional `production.access.elevate` request from a declared incident through authoritative incident and on-call validation, pre-reviewed emergency profiles, independent approval, a short-lived bounded-use grant, a host-owned access broker that re-validates every use, expiry and revocation, evidence, and mandatory post-incident review.
+
+The case shows emergency access as a separately designed authority path rather than a fallback when policy is down. It defines behavior when the incident system, approval service, evidence store, or revocation channel is unavailable, and includes a single-operator alternative and a decision/execution matrix with zero dry-run operations for every blocked path. It also explains when an existing privileged-access platform or runbook should own the workflow instead.
+
 ### [AI-Assisted API and Governed Tool Gateway](ai-assisted-api-and-governed-tool-gateway.md)
 
 Compare a conventional human API request with a deterministic fake-model proposal when both ultimately target the same fictional `case.add-note` operation and the same host-owned governance and execution boundary.

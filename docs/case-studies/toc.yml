@@ -10,6 +10,9 @@
 - name: Deployment Approval and Infrastructure Change Gates
   href: deployment-approval-and-infrastructure-change-gates.md
 
+- name: Emergency Production Access and Break-Glass
+  href: emergency-production-access-and-break-glass.md
+
 - name: AI-Assisted API and Governed Tool Gateway
   href: ai-assisted-api-and-governed-tool-gateway.md
 
