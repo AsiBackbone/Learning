@@ -10,6 +10,8 @@ If a topic repeatedly appears in Issues or Discussions, that is a strong signal 
 
 The presence of a topic here does not, by itself, mean that it is highly community-requested. Issues, Discussions, concrete use cases, and contributor interest are stronger signals of demand.
 
+This tracker is reconciled after meaningful curriculum milestones and before a Learning release that materially changes topic coverage. During that review, compare it with `ROADMAP.md` and the documentation, sample, lab, case-study, and diagram indexes. Mark a topic **Published** only when the requested learner outcome is available, link the most direct material, and describe any narrower unsatisfied follow-up explicitly instead of leaving the original request ambiguously open.
+
 Standalone article candidates are curated separately in the [Problem-Oriented Standalone Article Backlog](article-backlog.md). That backlog starts from externally recognizable reader/search problems and synthesizes existing Learning material; it does not replace this curriculum-topic intake surface.
 
 ## How to Request a Topic
@@ -291,7 +293,9 @@ Possible areas:
 
 ### Secure-by-Default Configuration
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [Secure-by-Default ASP.NET Core Configuration](../docs/aspnetcore/secure-by-default-configuration.md)
 
 Explain how application defaults can reduce accidental exposure.
 
@@ -308,7 +312,12 @@ Possible areas:
 
 ### Structured Logging
 
-**Status:** Requested
+**Status:** Published
+
+Published material:
+
+- [Structured Logging Without Sensitive-Data Sprawl](../docs/aspnetcore/structured-logging-without-sensitive-data-sprawl.md)
+- [Secure Logging Across Trust Boundaries](../docs/security/secure-logging-across-trust-boundaries.md)
 
 Explain how to design useful structured events rather than treating logs as formatted strings.
 
@@ -326,7 +335,9 @@ Possible areas:
 
 ### Centralized Error Handling
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [Centralized Error Handling and Problem Details](../docs/aspnetcore/centralized-error-handling-and-problem-details.md)
 
 Explore centralized exception handling and consistent client-facing error behavior.
 
@@ -362,7 +373,14 @@ Possible areas:
 
 ### Architecture Decision Records
 
-**Status:** Requested
+**Status:** Published
+
+Published material:
+
+- [Architecture Decision Records Preserve Architectural Reasoning](../docs/aspnetcore/architecture-decision-records-preserve-architectural-reasoning.md)
+- [ADR Lifecycle: Review, Deprecation, and Supersession](../docs/aspnetcore/architecture-decision-record-lifecycle-review-deprecation-and-supersession.md)
+- [NetCoreApplicationTemplate ADR Case Study](../docs/aspnetcore/netcoreapplicationtemplate-adr-case-study.md)
+- [Write and Revisit an Architecture Decision Record lab](../docs/labs/write-and-revisit-an-architecture-decision-record.md)
 
 Teach how to write and maintain ADRs using real decisions from the organization repositories as references.
 
@@ -380,7 +398,12 @@ Questions to address:
 
 ### Authentication vs Authorization vs Governance
 
-**Status:** Requested
+**Status:** Published
+
+Published material:
+
+- [Terminology and Established Concepts](../docs/architecture/terminology-and-established-concepts.md)
+- [When ASP.NET Core Authorization Is Enough](../docs/architecture/when-aspnet-core-authorization-is-enough.md)
 
 Clarify the boundaries among:
 
@@ -400,7 +423,12 @@ Suggested format:
 
 ### Capability-Based Security
 
-**Status:** Requested
+**Status:** Published
+
+Published material:
+
+- [Role-Based, Claims-Based, and Capability-Based Authorization](../docs/architecture/role-based-claims-based-and-capability-based-authorization.md)
+- [Scoped Capability and Host-Owned Execution](../docs/tutorials/scoped-capability-and-host-owned-execution.md)
 
 Compare capability-scoped authority with traditional role- and claims-based authorization.
 
@@ -435,7 +463,9 @@ Possible examples:
 
 ### Signing and Verification
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [Signing, Verification, Key Custody, and Tamper Evidence](../docs/security/signing-verification-key-custody-and-tamper-evidence.md)
 
 Introduce signing concepts without implying that signing alone creates trust.
 
@@ -451,7 +481,12 @@ Questions to address:
 
 ### Tamper-Evident Audit Records
 
-**Status:** Requested
+**Status:** Published
+
+Published material:
+
+- [Signing, Verification, Key Custody, and Tamper Evidence](../docs/security/signing-verification-key-custody-and-tamper-evidence.md)
+- [Durable Decision Ledgers and Cryptographic Audit Chains](../docs/advanced/durable-decision-ledgers-and-cryptographic-audit-chains.md)
 
 Explore the difference between ordinary durable storage and tamper-evident evidence.
 
@@ -522,7 +557,9 @@ Suggested format:
 
 ### AI Proposed Intent
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [Typed AI Proposed Intent and Schema-Validation Boundaries](../docs/ai-integration/typed-ai-proposed-intent-and-schema-validation-boundaries.md)
 
 Explain how to translate model output into structured proposed intent before policy evaluation.
 
@@ -538,7 +575,9 @@ Possible areas:
 
 ### Human-in-the-Loop Governance
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [Human-in-the-Loop Governance Workflows](../docs/governance/human-in-the-loop-governance-workflows.md)
 
 Explore when human review is useful and when it becomes security theater.
 
@@ -553,7 +592,12 @@ Questions to address:
 
 ### Tool Allowlists and Argument Constraints
 
-**Status:** Requested
+**Status:** Published
+
+Published material:
+
+- [Governed AI Tool Gateway](../docs/tutorials/governed-ai-tool-gateway.md)
+- [What Should an AI Tool Gateway Validate Before Execution?](../docs/articles/2026/validate-ai-tool-call-before-execution.md)
 
 Show how tool-level authorization can remain narrow even when a model has access to many capabilities.
 
@@ -567,7 +611,11 @@ Suggested format:
 
 ### Agent-to-Agent Requests
 
-**Status:** Experimental
+**Status:** Published
+
+Published material: [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](../docs/advanced/governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md)
+
+The material remains explicitly experimental: it exposes assumptions, trust boundaries, and unresolved operational questions rather than presenting agent-to-agent delegation as settled production guidance.
 
 Explore governance when one automated system proposes an operation to another automated system.
 
@@ -583,7 +631,9 @@ Potential questions:
 
 ### AI Decision Explainability
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [Decision Explainability for Human Operators](../docs/advanced/decision-explainability-for-human-operators.md)
 
 Distinguish:
 
@@ -600,7 +650,9 @@ The tutorial should avoid treating generated explanations as authoritative evide
 
 ### Policy Composition
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [Constraint Composition and Policy Precedence](../docs/governance/constraint-composition-and-policy-precedence.md)
 
 Explore how multiple constraints combine into one decision.
 
@@ -635,7 +687,12 @@ Possible areas:
 
 ### Regional and Tenant Policy Overlays
 
-**Status:** Requested
+**Status:** Published
+
+Published material:
+
+- [Regional and Tenant Policy Overlays](../docs/advanced/regional-and-tenant-policy-overlays.md)
+- [Multi-Tenant and Regional Policy Overlay case study](../docs/case-studies/multi-tenant-and-regional-policy-overlay.md)
 
 Explore how global policy can coexist with regional, tenant, or organizational constraints.
 
@@ -657,7 +714,12 @@ Decision
 
 ### Degraded-Mode Governance
 
-**Status:** Requested
+**Status:** Published
+
+Published material:
+
+- [Should Authorization Fail Open, Fail Closed, or Defer?](../docs/articles/2026/fail-open-fail-closed-or-defer.md)
+- [Safe Degraded Mode and Fail-Safe Governance lab](../docs/labs/safe-degraded-mode-and-fail-safe-governance.md)
 
 Explore what should happen when a policy provider, storage dependency, risk service, or external governance component is unavailable.
 
@@ -672,7 +734,12 @@ Questions to address:
 
 ### Policy Testing
 
-**Status:** Requested
+**Status:** Published
+
+Published material:
+
+- [Practical Policy Testing and Decision-Table Strategies](../docs/governance/practical-policy-testing-and-decision-table-strategies.md)
+- [Policy Simulation and Change-Impact Analysis lab](../docs/labs/policy-simulation-and-change-impact-analysis.md)
 
 Show practical strategies for testing governance rules.
 
@@ -691,7 +758,9 @@ Potential areas:
 
 ### Boolean Authorization vs Explicit Decision Models
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [When ASP.NET Core Authorization Is Enough](../docs/architecture/when-aspnet-core-authorization-is-enough.md)
 
 Compare simple authorization checks with structured governance decision results.
 
@@ -699,7 +768,9 @@ Compare simple authorization checks with structured governance decision results.
 
 ### RBAC vs Claims vs Policy vs Capability
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [Role-Based, Claims-Based, and Capability-Based Authorization](../docs/architecture/role-based-claims-based-and-capability-based-authorization.md)
 
 Explain where each model is useful and where the concepts overlap.
 
@@ -709,7 +780,9 @@ The goal should be comparison, not declaring one approach universally superior.
 
 ### Policy Engines and Governance Pipelines
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [Policy Engines, Rules Engines, and Distributed Policy Enforcement](../docs/architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md)
 
 Compare policy evaluation engines with the broader lifecycle around a consequential decision.
 
@@ -725,7 +798,9 @@ Intent → Context → Decision → Acknowledgment → Authority → Execution �
 
 ### API Gateway vs Governance Gateway
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [API Gateways, Service Meshes, Zero Trust, and Governed Execution](../docs/architecture/api-gateways-service-meshes-zero-trust-and-governed-execution.md)
 
 Explore how network/API routing concerns differ from consequential-operation governance.
 
@@ -733,7 +808,9 @@ Explore how network/API routing concerns differ from consequential-operation gov
 
 ### Workflow Engine vs Governance Pipeline
 
-**Status:** Requested
+**Status:** Published
+
+Published material: [Workflow Engines, Human Approval Systems, and Governed Execution](../docs/architecture/workflow-engines-human-approval-and-governed-execution.md)
 
 Clarify when orchestration and governance overlap and when they should remain separate.
 
@@ -741,96 +818,92 @@ Clarify when orchestration and governance overlap and when they should remain se
 
 ## Lab Requests
 
+All originally requested lab outcomes are now represented in the published lab path. The links below identify the most direct exercise; several labs satisfy more than one original request.
+
 ### Beginner
 
-- [ ] Convert direct execution into decision-before-execution.
-- [ ] Replace boolean policy results with explicit outcomes.
-- [ ] Build a typed policy context.
-- [ ] Identify missing reason codes in a sample system.
-- [ ] Correct an unsafe middleware order.
+- [x] Convert direct execution into decision-before-execution — [Decision Before Execution](../docs/labs/decision-before-execution.md).
+- [x] Replace boolean policy results with explicit outcomes — [Policy Context and Explicit Decision Outcomes](../docs/labs/policy-context-and-explicit-decision-outcomes.md).
+- [x] Build a typed policy context — [Policy Context and Explicit Decision Outcomes](../docs/labs/policy-context-and-explicit-decision-outcomes.md).
+- [x] Identify missing reason codes in a sample system — [Policy Context and Explicit Decision Outcomes](../docs/labs/policy-context-and-explicit-decision-outcomes.md).
+- [x] Correct an unsafe middleware order — [Identify Middleware Ordering Problems](../docs/labs/identify-middleware-ordering-problems.md).
 
 ### Intermediate
 
-- [ ] Add acknowledgment to a sensitive operation.
-- [ ] Generate an decision receipt.
-- [ ] Add a scoped capability.
-- [ ] Refactor scattered policy checks into a governance pipeline.
-- [ ] Add tests for policy edge cases.
+- [x] Add acknowledgment to a sensitive operation — [Decision Receipts and Acknowledgment](../docs/labs/decision-receipts-and-acknowledgment.md).
+- [x] Generate a decision receipt — [Acknowledgment and Audit Residue](../docs/labs/acknowledgment-and-audit-residue.md).
+- [x] Add a scoped capability — [Scoped Capability and Host-Owned Execution](../docs/labs/scoped-capability-and-host-owned-execution.md).
+- [x] Refactor scattered policy checks into a governance pipeline — [Refactor Scattered Governance Checks](../docs/labs/refactor-scattered-governance-checks.md).
+- [x] Add tests for policy edge cases — [Policy Simulation and Change-Impact Analysis](../docs/labs/policy-simulation-and-change-impact-analysis.md).
 
 ### Advanced
 
-- [ ] Build a governed AI tool gateway.
-- [ ] Threat-model a capability-based workflow.
-- [ ] Design replay protection for a distributed executor.
-- [ ] Compare two competing policy-composition strategies.
-- [ ] Design a multi-region policy overlay.
-- [ ] Review a deliberately flawed governance architecture.
+- [x] Build a governed AI tool gateway — [Governed AI Tool Gateway](../docs/labs/governed-ai-tool-gateway.md).
+- [x] Threat-model a capability-based workflow — [Replay Protection and Bounded Use](../docs/labs/replay-protection-and-bounded-use.md).
+- [x] Design replay protection for a distributed executor — [Replay Protection and Bounded Use](../docs/labs/replay-protection-and-bounded-use.md).
+- [x] Compare two competing policy-composition strategies — [Compare Competing Policy Architectures](../docs/labs/compare-competing-policy-architectures.md).
+- [x] Design a multi-region policy overlay — [Design a Regional and Tenant Policy Layer](../docs/labs/design-regional-and-tenant-policy-layer.md).
+- [x] Review a deliberately flawed governance architecture — [Analyze a Flawed High-Consequence Workflow](../docs/labs/analyze-flawed-high-consequence-workflow.md).
 
 ---
 
 ## Diagram Requests
 
-Diagrams are especially useful for concepts where boundaries matter.
+The original diagram requests are represented by the published architecture diagrams or by focused visual explanations embedded in the linked material.
 
-Requested diagrams include:
-
-- [ ] Intent-to-execution lifecycle.
-- [ ] Decision pipeline.
-- [ ] Acknowledgment sequence.
-- [ ] Capability issuance and validation.
-- [ ] Host-owned execution boundary.
-- [ ] AI tool gateway.
-- [ ] Logging versus decision receipt.
-- [ ] Authentication/authorization/governance comparison.
-- [ ] Policy composition.
-- [ ] Regional policy overlay.
-- [ ] Supply-chain validation flow.
-- [ ] ASP.NET Core middleware pipeline.
+- [x] Intent-to-execution lifecycle — [Governance Spine](../docs/architecture/governance-spine-and-capability-validation-diagrams.md).
+- [x] Decision pipeline — [Governance Spine](../docs/architecture/governance-spine-and-capability-validation-diagrams.md).
+- [x] Acknowledgment sequence — [Decision Receipts and Acknowledgment](../docs/tutorials/decision-receipts-and-acknowledgment.md).
+- [x] Capability issuance and validation — [Capability Validation Profiles](../docs/architecture/governance-spine-and-capability-validation-diagrams.md).
+- [x] Host-owned execution boundary — [Governance Spine](../docs/architecture/governance-spine-and-capability-validation-diagrams.md).
+- [x] AI tool gateway — [Governed AI Tool Execution](../docs/architecture/governance-spine-and-capability-validation-diagrams.md).
+- [x] Logging versus decision receipt — [Decision Receipts and Acknowledgment](../docs/tutorials/decision-receipts-and-acknowledgment.md).
+- [x] Authentication/authorization/governance comparison — [Terminology and Established Concepts](../docs/architecture/terminology-and-established-concepts.md).
+- [x] Policy composition — [Constraint Composition and Policy Precedence](../docs/governance/constraint-composition-and-policy-precedence.md).
+- [x] Regional policy overlay — [Regional and Tenant Policy Overlays](../docs/advanced/regional-and-tenant-policy-overlays.md).
+- [x] Supply-chain validation flow — [Software Supply-Chain Integrity for .NET Repositories](../docs/security/software-supply-chain-integrity-for-dotnet-repositories.md).
+- [x] ASP.NET Core middleware pipeline — [Middleware Ordering Changes Behavior](../docs/aspnetcore/middleware-ordering-changes-behavior.md).
 
 Mermaid is preferred when it can express the concept clearly because text-based diagrams are easier to review and maintain.
 
 ---
 
-## Topics That Need Real-World Examples
+## Published Real-World Examples
 
-Some concepts are easier to understand with realistic but non-domain-sensitive scenarios.
+The original example domains now have realistic but non-domain-sensitive case studies:
 
-Useful example domains include:
+- Administrative configuration changes — [Governed Administrative Operation](../docs/case-studies/governed-administrative-operation.md).
+- Deployment approvals and infrastructure changes — [Deployment Approval and Infrastructure Change Gates](../docs/case-studies/deployment-approval-and-infrastructure-change-gates.md).
+- Sensitive data access — [Sensitive-Data Access Decision](../docs/case-studies/sensitive-data-access-decision.md).
+- API tool invocation — [AI-Assisted API and Governed Tool Gateway](../docs/case-studies/ai-assisted-api-and-governed-tool-gateway.md).
+- Background operations and capability-scoped jobs — [Capability-Scoped Background Operation](../docs/case-studies/capability-scoped-background-operation.md).
+- Multi-tenant applications — [Multi-Tenant and Regional Policy Overlay](../docs/case-studies/multi-tenant-and-regional-policy-overlay.md).
+- Human acknowledgment — [Human Acknowledgment Workflow](../docs/case-studies/human-acknowledgment-workflow.md).
 
-- Administrative configuration changes
-- Deployment approvals
-- Infrastructure changes
-- Sensitive data access
-- API tool invocation
-- Background operations
-- Multi-tenant applications
-- Human acknowledgment
-- Capability-scoped jobs
-
-Contributors are welcome to propose examples that demonstrate consequential decisions without introducing unnecessary legal, medical, financial, or regulatory complexity.
+Future examples should demonstrate a distinct learner outcome rather than repeat these domains only to add volume. They should continue to avoid unnecessary legal, medical, financial, or regulatory complexity.
 
 ---
 
-## Experimental Topic Candidates
+## Experimental and Advanced Topic Status
 
-These topics may be valuable but should remain clearly labeled until the project has enough implementation experience to teach them responsibly.
+Most original experimental candidates now have published treatments. A published page may remain classified **Experimental** where implementation experience or unresolved questions do not justify presenting it as established guidance.
 
-- Distributed governance coordination
-- Cross-system capability exchange
-- Cryptographic decision ledgers
-- External policy providers
-- Adaptive risk context
-- Governance telemetry
-- Policy simulation
-- Agent-to-agent authority delegation
-- Regional AI governance layers
-- Robotics command gateways
-- Multi-node replay protection
-- Governance evidence anchoring
+| Topic | Status | Published material or remaining gap |
+| --- | --- | --- |
+| Distributed governance coordination | Published | [Federated Governance and Independent-Authority Coordination](../docs/advanced/federated-governance-and-independent-authority-coordination.md) |
+| Cross-system capability exchange | Published | [Cross-System Capability Exchange and Delegated Authority](../docs/advanced/cross-system-capability-exchange-and-delegated-authority.md) |
+| Cryptographic decision ledgers | Published | [Durable Decision Ledgers and Cryptographic Audit Chains](../docs/advanced/durable-decision-ledgers-and-cryptographic-audit-chains.md) |
+| External policy providers | Published | [Policy Engines, Rules Engines, and Distributed Policy Enforcement](../docs/architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md) teaches remote and distributed provider boundaries without prescribing a product. |
+| Adaptive risk context | Published | [Adaptive Risk Context, Freshness, and Drift](../docs/advanced/adaptive-risk-context-freshness-and-drift.md) |
+| Governance telemetry | Published | [AI Governance Observability and End-to-End Decision Tracing](../docs/ai-integration/ai-governance-observability-and-end-to-end-decision-tracing.md) |
+| Policy simulation | Published | [Policy Simulation and Change-Impact Analysis lab](../docs/labs/policy-simulation-and-change-impact-analysis.md) and its runnable sample. |
+| Agent-to-agent authority delegation | Published — experimental classification retained | [Governed Agent-to-Agent Requests and Multi-Agent Execution Boundaries](../docs/advanced/governed-agent-to-agent-requests-and-multi-agent-execution-boundaries.md) |
+| Regional AI governance layers | Experimental — narrower gap remains | A future treatment would need to show how region-specific model and tool constraints compose with authoritative tenant/region context without presenting jurisdictional interpretation as application policy truth. Existing [Regional and Tenant Policy Overlays](../docs/advanced/regional-and-tenant-policy-overlays.md) covers the general composition model. |
+| Robotics command gateways | Published — simulated scope | [Simulated Robotics-Command Governance Boundary](../docs/case-studies/simulated-robotics-command-governance-boundary.md) |
+| Multi-node replay protection | Published | [Replay Protection and Bounded-Use Authority](../docs/security/replay-protection-and-bounded-use.md) |
+| Governance evidence anchoring | Published | [Durable Decision Ledgers and Cryptographic Audit Chains](../docs/advanced/durable-decision-ledgers-and-cryptographic-audit-chains.md) covers anchoring boundaries without claiming immutable storage. |
 
-Experimental status is not a rejection.
-
-It is a signal that assumptions and unresolved questions should remain visible.
+Experimental status is not a rejection. It signals that assumptions and unresolved questions should remain visible even after educational material is published.
 
 ---
 

@@ -424,6 +424,8 @@ Publication metadata does not by itself make a curriculum page part of the perma
 
 Use the [Problem-Oriented Standalone Article Backlog](community/article-backlog.md) when selecting future standalone publications. The backlog prioritizes recognizable developer/search problems that already have substantial Learning material behind them; it is not a quota, publishing calendar, or substitute for the curriculum roadmap.
 
+When a contribution materially completes a requested curriculum topic, lab, diagram, or real-world example, update [Requested Topics](community/requested-topics.md) in the same pull request. Reconcile that tracker against `ROADMAP.md` and the relevant published indexes before each Learning release that materially changes topic coverage. Preserve the original question as historical context, mark the item **Published** with the most direct learner-facing link when its outcome is satisfied, and keep a narrower follow-up open only when the remaining gap is stated explicitly.
+
 A backlog candidate should become implementation work only after a dedicated issue is opened for that specific article. Use that issue to refine the reader problem, working title, permanent slug, supporting Learning sources, and the article's distinct contribution before drafting under `docs/articles/<year>/`. This keeps editorial prioritization separate from implementation tracking and avoids converting curriculum pages into articles merely to increase page count.
 
 ### Articles vs. Curriculum Material
