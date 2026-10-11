@@ -10,7 +10,7 @@ This repository teaches governance and controlled-execution architecture through
 
 > **Read it. Run it. Question it. Improve it.**
 
-> **Version boundary:** Learning 1.0 remains the historical AsiBackbone 6.0 baseline. Use the [AsiBackbone 7.0 Compatibility and API Boundary](asibackbone-7-api-boundary.md) for current implementation syntax; use the [Learning 1.0 and AsiBackbone 6.0 Compatibility Guide](learning-1-asibackbone-6-compatibility.md) for the versioned 6.0 record.
+> **Version boundary:** Learning 1.0 remains the historical AsiBackbone 6.0 baseline. Learning 1.3 retains a reviewed AsiBackbone 7.0.0 boundary even though AsiBackbone 7.1.0 is now the owning repository's newer stable release. Use the [7.0 Compatibility and API Boundary](asibackbone-7-api-boundary.md) for the selected package syntax, the [7.1.0 Currentness Review](asibackbone-7-1-currentness-review.md) for the dated retain decision, and the [Learning 1.0 and AsiBackbone 6.0 Compatibility Guide](learning-1-asibackbone-6-compatibility.md) for the versioned 6.0 record.
 
 ## Start Here
 
@@ -23,7 +23,7 @@ Choose the shortest path that matches how you want to learn:
 | See the complete curriculum visually | [**Learning Path Map**](learning-path-map.md) |
 | Learn by running code | [**Executable Samples**](../samples/index.md) |
 | Move from the five teaching samples into a released ASP.NET Core host | [**From Learning Samples to a Production Host**](from-learning-samples-to-production-host.md) |
-| Copy or prepare current AsiBackbone 7.0 API syntax | [**AsiBackbone 7.0 Compatibility and API Boundary**](asibackbone-7-api-boundary.md) |
+| Copy or prepare package syntax against Learning 1.3's reviewed AsiBackbone 7.0 baseline | [**AsiBackbone 7.0 Compatibility and API Boundary**](asibackbone-7-api-boundary.md) |
 | Maintain the historical Learning 1.0 / 6.0 contract or translate older 5.x material | [**Learning 1.0 and AsiBackbone 6.0 Compatibility Guide**](learning-1-asibackbone-6-compatibility.md) |
 | Practice by changing or challenging the design | [**Hands-On Labs**](../labs/index.md) |
 | Compare a simpler alternative | [**When ASP.NET Core Authorization Is Enough**](../architecture/when-aspnet-core-authorization-is-enough.md) |
@@ -111,7 +111,7 @@ The [`samples/`](../samples/index.md) area contains intentionally small .NET tea
 
 They are teaching artifacts rather than production frameworks.
 
-Their local types are not package API signatures. Use the [AsiBackbone 7.0 Compatibility and API Boundary](asibackbone-7-api-boundary.md) when you need exact current namespaces, supported construction paths, security changes, or migration guidance.
+Their local types are not package API signatures. Use the [AsiBackbone 7.0 Compatibility and API Boundary](asibackbone-7-api-boundary.md) when you need the exact namespaces, supported construction paths, security changes, or migration guidance for Learning 1.3's reviewed implementation baseline. Package consumers moving to the newer 7.1.0 release should also read the [7.1.0 Currentness Review](asibackbone-7-1-currentness-review.md) and the owning repository's migration guidance.
 
 ### Tests
 

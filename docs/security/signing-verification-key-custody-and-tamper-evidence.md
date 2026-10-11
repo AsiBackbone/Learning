@@ -1624,6 +1624,9 @@ The cryptographic provider can remain outside application-domain code.
 
 A small teaching boundary might look like:
 
+> [!IMPORTANT]
+> `SigningRequest` below is a Learning-owned teaching type, not `AsiBackbone.Core.Signing.SigningRequest`. It models the responsibility boundary between domain code and a signing provider; it does not reproduce the package's versioned signature-input contract. Package code creating signing or verification requests should follow the [AsiBackbone 7.1.0 currentness review](../getting-started/asibackbone-7-1-currentness-review.md) and supply the version 1 `SignatureInput` produced by `GovernanceSignatureInput.CreateV1(...)`.
+
 ```csharp
 public sealed record SigningRequest(
     string ArtifactType,

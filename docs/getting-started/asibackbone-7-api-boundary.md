@@ -1,12 +1,12 @@
 ---
-description: Use the current AsiBackbone 7.0 names and understand the security, serialization, and persistence changes from 6.0.
+description: Use Learning 1.3's reviewed AsiBackbone 7.0 names and understand the security, serialization, and persistence changes from 6.0.
 asibackbone_ref: v7.0.0
 asibackbone_status: current
 ---
 
 # AsiBackbone 7.0 Compatibility and API Boundary
 
-> **Release status:** AsiBackbone 7.0.0 was published on September 26, 2026. Implementation links on this page are pinned to the [`v7.0.0`](https://github.com/AsiBackbone/AsiBackbone/releases/tag/v7.0.0) release tag. A Git tag can be moved or deleted unless repository rules prevent it, so resolve the tag to its commit SHA when you need a reference that cannot change.
+> **Reviewed baseline:** AsiBackbone 7.0.0 was published on September 26, 2026. Implementation links on this page are pinned to the [`v7.0.0`](https://github.com/AsiBackbone/AsiBackbone/releases/tag/v7.0.0) release tag. AsiBackbone 7.1.0 is the owning repository's newer stable release; the dated [7.1.0 currentness review](asibackbone-7-1-currentness-review.md) explains why Learning 1.3 retains this reviewed 7.0.0 boundary. A Git tag can be moved or deleted unless repository rules prevent it, so resolve the tag to its commit SHA when you need a reference that cannot change.
 
 Learning teaches governed-execution architecture. AsiBackbone owns exact package names, runtime behavior, wire contracts, and migrations. Learning samples remain framework-neutral teaching models and do not depend on `AsiBackbone.*` packages.
 

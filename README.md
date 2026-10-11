@@ -83,7 +83,7 @@ Want to understand why this boundary exists or experiment with it?
 | Learn the foundational governed-execution boundary | [Decision Before Execution](docs/tutorials/decision-before-execution.md) |
 | Route from a problem you already recognize | [Find Your Path](docs/getting-started/find-your-path.md) |
 | See the curriculum and prerequisites at a glance | [Learning Path Map](docs/getting-started/learning-path-map.md) |
-| Copy or prepare current AsiBackbone 7.0 API syntax | [AsiBackbone 7.0 Compatibility and API Boundary](docs/getting-started/asibackbone-7-api-boundary.md) |
+| Copy or prepare package syntax against Learning 1.3's reviewed AsiBackbone 7.0 baseline | [AsiBackbone 7.0 Compatibility and API Boundary](docs/getting-started/asibackbone-7-api-boundary.md) |
 | Maintain the historical Learning 1.0 / AsiBackbone 6.0 contract or interpret 5.x material | [Learning 1.0 and AsiBackbone 6.0 Compatibility Guide](docs/getting-started/learning-1-asibackbone-6-compatibility.md) |
 | Decide whether ASP.NET Core authorization is already enough | [When ASP.NET Core Authorization Is Enough](docs/architecture/when-aspnet-core-authorization-is-enough.md) |
 
@@ -184,9 +184,9 @@ Issues are best used for concrete repository work; Learning Discussions are bett
 
 ## Project Status
 
-**Learning 1.3 is the current documentation baseline aligned with the released AsiBackbone 7.0.0 boundary. Learning 1.0 / AsiBackbone 6.0 remains available as immutable history.**
+**Learning 1.3 is the current documentation baseline aligned with the reviewed AsiBackbone 7.0.0 boundary. AsiBackbone 7.1.0 is the owning repository's newer stable release; Learning's dated review retains 7.0.0 for this archival baseline. Learning 1.0 / AsiBackbone 6.0 remains available as immutable history.**
 
-The foundational tutorial, sample, test, and lab path is established. See the [AsiBackbone 7.0 Compatibility and API Boundary](docs/getting-started/asibackbone-7-api-boundary.md) for current implementation references, the [Learning 1.3.0 Release Readiness record](docs/getting-started/learning-1-3-release-readiness.md) for the current review, the [Learning 1.2.0 record](docs/getting-started/learning-1-2-release-readiness.md) for the preceding snapshot, and [ROADMAP.md](ROADMAP.md) for the maintained direction.
+The foundational tutorial, sample, test, and lab path is established. See the [AsiBackbone 7.0 Compatibility and API Boundary](docs/getting-started/asibackbone-7-api-boundary.md) for the selected implementation references, the [AsiBackbone 7.1.0 Currentness Review](docs/getting-started/asibackbone-7-1-currentness-review.md) for the retain decision, the [Learning 1.3.0 Release Readiness record](docs/getting-started/learning-1-3-release-readiness.md) for the archived release review, and [ROADMAP.md](ROADMAP.md) for the maintained direction.
 
 ## Citing a Release
 
