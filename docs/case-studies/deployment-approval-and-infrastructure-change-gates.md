@@ -890,7 +890,7 @@ This case therefore assigns:
 - **security** — protect recovery credentials and privileged target access;
 - **executor** — perform the approved rollback or recovery action.
 
-Emergency or break-glass procedures can exist, but they should be explicit, narrowly authorized, observable, and reviewed afterward rather than being hidden inside ordinary deployment credentials.
+Emergency or break-glass procedures can exist, but they should be explicit, narrowly authorized, observable, and reviewed afterward rather than being hidden inside ordinary deployment credentials. [Emergency Production Access and Break-Glass](emergency-production-access-and-break-glass.md) follows one such path end to end.
 
 ---
 
