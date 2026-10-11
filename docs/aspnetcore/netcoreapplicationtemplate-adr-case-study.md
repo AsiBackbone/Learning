@@ -107,7 +107,7 @@ Another application may prefer a shorter inline pipeline because it has only a f
 
 ### Read the ADR
 
-Now inspect [ADR-0002: Use Centralized Application Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/0002-use-centralized-application-middleware-pipeline.md).
+Now inspect [ADR-0002: Use Centralized Application Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/0002-use-centralized-application-middleware-pipeline.md).
 
 The ADR records the repository-specific decision to centralize the template-owned HTTP pipeline in `UseApplicationPipeline()` rather than scattering the ordering across startup code or relying primarily on implicit framework placement.
 
@@ -123,7 +123,7 @@ The ADR explains why they were not selected **under this repository's constraint
 
 ### Trace the Decision into the Implementation
 
-Start with [`Program.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Program.cs).
+Start with [`Program.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Program.cs).
 
 The startup path delegates the template-owned pipeline to one call:
 
@@ -131,7 +131,7 @@ The startup path delegates the template-owned pipeline to one call:
 app.UseApplicationPipeline();
 ```
 
-Then inspect [`PipelineExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/PipelineExtensions.cs).
+Then inspect [`PipelineExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Extensions/PipelineExtensions.cs).
 
 That file is where the ADR becomes concrete. The current implementation keeps the order together and explicitly warns maintainers to keep the sequence aligned with ADR-0002 and the middleware documentation.
 
@@ -159,7 +159,7 @@ Authorization
 Endpoints
 ```
 
-The repository's [Middleware Pipeline documentation](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/articles/middleware.md) provides the implementation-facing explanation beside the code.
+The repository's [Middleware Pipeline documentation](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/articles/middleware.md) provides the implementation-facing explanation beside the code.
 
 Notice the division of responsibility:
 
@@ -235,7 +235,7 @@ Those requirements narrow the local choice without turning the selected provider
 
 ### Read the ADR
 
-Inspect [ADR-0001: Use Structured Serilog Logging](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/0001-use-structured-serilog-logging.md).
+Inspect [ADR-0001: Use Structured Serilog Logging](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/0001-use-structured-serilog-logging.md).
 
 The ADR chooses Serilog through the Microsoft logging integration while preserving `ILogger<T>` as the application-facing abstraction.
 
@@ -253,17 +253,17 @@ It preserves why one choice fit the repository at the time of the decision.
 
 Three implementation surfaces show the decision at different levels.
 
-First, [`Program.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Program.cs) creates a bootstrap logger for startup diagnostics and then calls:
+First, [`Program.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Program.cs) creates a bootstrap logger for startup diagnostics and then calls:
 
 ```csharp
 builder.AddApplicationSerilog();
 ```
 
-Second, [`SerilogExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/SerilogExtensions.cs) configures Serilog from host configuration and registered services while enriching from the log context.
+Second, [`SerilogExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Extensions/SerilogExtensions.cs) configures Serilog from host configuration and registered services while enriching from the log context.
 
-Third, [`appsettings.json`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/appsettings.json) contains the current provider configuration: level overrides, enrichers, console output, rolling file output, and the fields rendered for request, correlation, trace, and span context.
+Third, [`appsettings.json`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/appsettings.json) contains the current provider configuration: level overrides, enrichers, console output, rolling file output, and the fields rendered for request, correlation, trace, and span context.
 
-The repository's [Logging documentation](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/articles/logging.md) explains the implementation-facing logging model.
+The repository's [Logging documentation](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/articles/logging.md) explains the implementation-facing logging model.
 
 The chain is therefore visible:
 
@@ -406,15 +406,15 @@ That is the durable connection between Learning material and an implementation r
 
 ## Working Repository References
 
-- [`NetCoreApplicationTemplate` ADR index](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/index.md)
-- [ADR-0001: Use Structured Serilog Logging](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/0001-use-structured-serilog-logging.md)
-- [ADR-0002: Use Centralized Application Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/0002-use-centralized-application-middleware-pipeline.md)
-- [`Program.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Program.cs)
-- [`PipelineExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/PipelineExtensions.cs)
-- [`SerilogExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/SerilogExtensions.cs)
-- [`appsettings.json`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/appsettings.json)
-- [Middleware Pipeline documentation](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/articles/middleware.md)
-- [Logging documentation](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/articles/logging.md)
+- [`NetCoreApplicationTemplate` ADR index](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/index.md)
+- [ADR-0001: Use Structured Serilog Logging](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/0001-use-structured-serilog-logging.md)
+- [ADR-0002: Use Centralized Application Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/0002-use-centralized-application-middleware-pipeline.md)
+- [`Program.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Program.cs)
+- [`PipelineExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Extensions/PipelineExtensions.cs)
+- [`SerilogExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Extensions/SerilogExtensions.cs)
+- [`appsettings.json`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/appsettings.json)
+- [Middleware Pipeline documentation](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/articles/middleware.md)
+- [Logging documentation](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/articles/logging.md)
 
 The working repository will continue to evolve.
 

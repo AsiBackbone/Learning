@@ -1077,9 +1077,9 @@ Learning keeps the tutorial intentionally smaller than a production application.
 
 | Learning concept | Working reference | What to inspect |
 | --- | --- | --- |
-| Central `IExceptionHandler` mapping | [`ProblemDetailsExceptionHandler.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/ErrorHandling/ProblemDetailsExceptionHandler.cs) | Known status mapping, generic `500` fallback, response-started checks, Problem Details writing, trace/request identifiers, and logging at the handler boundary. |
-| Problem Details registration and status-code behavior | [`ProblemDetailsExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/ErrorHandling/ProblemDetailsExtensions.cs) | `AddProblemDetails`, custom response enrichment, environment behavior, exception-handler registration, and status-code pages. |
-| Error-contract tests | [`ProjectTemplate.Web.Tests`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/tree/main/tests/ProjectTemplate.Web.Tests) | Integration and customization tests around the working application's Problem Details behavior. |
+| Central `IExceptionHandler` mapping | [`ProblemDetailsExceptionHandler.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/ErrorHandling/ProblemDetailsExceptionHandler.cs) | Known status mapping, generic `500` fallback, response-started checks, Problem Details writing, trace/request identifiers, and logging at the handler boundary. |
+| Problem Details registration and status-code behavior | [`ProblemDetailsExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/ErrorHandling/ProblemDetailsExtensions.cs) | `AddProblemDetails`, custom response enrichment, environment behavior, exception-handler registration, and status-code pages. |
+| Error-contract tests | [`ProjectTemplate.Web.Tests`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/tree/v2.11.2/tests/ProjectTemplate.Web.Tests) | Integration and customization tests around the working application's Problem Details behavior. |
 | Operational telemetry boundary | [Structured Logging Without Sensitive-Data Sprawl](structured-logging-without-sensitive-data-sprawl.md) | Why exception diagnostics and public error responses should carry different information even when they share correlation. |
 
 Use the implementation repository as a specimen, not as a requirement to reproduce every mapping or middleware choice.

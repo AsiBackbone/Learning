@@ -420,7 +420,7 @@ Restart with `--PipelineMode=incorrect` to move the fault-producing middleware o
 
 - [Open the canonical sample README](https://github.com/AsiBackbone/Learning/blob/main/samples/middleware-ordering-changes-behavior/README.md)
 - [Read Middleware Ordering Changes Behavior](../aspnetcore/middleware-ordering-changes-behavior.md)
-- [Inspect the fuller NetCoreApplicationTemplate pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/PipelineExtensions.cs)
+- [Inspect the fuller NetCoreApplicationTemplate pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Extensions/PipelineExtensions.cs)
 
 ### Centralized Error Handling and Problem Details
 

@@ -2106,8 +2106,8 @@ Narrower release-job authority
 ### NetCoreApplicationTemplate
 
 - [NetCoreApplicationTemplate repository](https://github.com/AsiBackbone/NetCoreApplicationTemplate)
-- [NetCoreApplicationTemplate workflow directory](https://github.com/AsiBackbone/NetCoreApplicationTemplate/tree/main/.github/workflows)
-- [Dependabot configuration](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/.github/dependabot.yml)
+- [NetCoreApplicationTemplate workflow directory](https://github.com/AsiBackbone/NetCoreApplicationTemplate/tree/v2.11.2/.github/workflows)
+- [Dependabot configuration](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/.github/dependabot.yml)
 
 Use it as a second specimen for application-oriented CI and dependency-update practices rather than assuming a package-producing repository and an ASP.NET Core application should have identical release controls.
 

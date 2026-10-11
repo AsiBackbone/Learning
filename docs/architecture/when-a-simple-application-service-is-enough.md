@@ -1057,7 +1057,7 @@ It adds lifecycle control around the operations that require it.
 
 ## Working Reference: NetCoreApplicationTemplate
 
-The [NetCoreApplicationTemplate optional application/domain layers guidance](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/articles/optional-application-domain-layers.md) deliberately starts from a compact ASP.NET Core structure and recommends adding layers only when they solve real complexity.
+The [NetCoreApplicationTemplate optional application/domain layers guidance](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/articles/optional-application-domain-layers.md) deliberately starts from a compact ASP.NET Core structure and recommends adding layers only when they solve real complexity.
 
 Its guidance is useful here because it treats application services as an incremental architectural tool rather than a mandatory ceremony.
 

@@ -203,9 +203,9 @@ The sample isolates the mechanics so the learner can see the ordering invariant 
 
 The fuller `NetCoreApplicationTemplate` specimen centralizes its order-sensitive middleware in:
 
-- [`PipelineExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/PipelineExtensions.cs)
-- [ADR-0002: Use Centralized Application Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/0002-use-centralized-application-middleware-pipeline.md)
-- [Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/articles/middleware.md)
+- [`PipelineExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Extensions/PipelineExtensions.cs)
+- [ADR-0002: Use Centralized Application Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/0002-use-centralized-application-middleware-pipeline.md)
+- [Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/articles/middleware.md)
 
 The working template includes proxy correction, logging, error handling, security headers, HTTPS redirection, static files, routing, CORS, rate limiting, authentication, authorization, endpoint mapping, and separate health-check mapping.
 

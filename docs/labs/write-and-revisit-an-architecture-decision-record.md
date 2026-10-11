@@ -724,9 +724,9 @@ That is intentional.
 
 After completing your own ADR and lifecycle review, inspect the ADR material in `AsiBackbone/NetCoreApplicationTemplate`:
 
-- [`docs/adr/index.md`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/index.md)
-- [`docs/adr/template.md`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/template.md)
-- [ADR-0001: Use Structured Serilog Logging](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/0001-use-structured-serilog-logging.md)
+- [`docs/adr/index.md`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/index.md)
+- [`docs/adr/template.md`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/template.md)
+- [ADR-0001: Use Structured Serilog Logging](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/0001-use-structured-serilog-logging.md)
 
 Then compare your work with the [Working Repository ADR Case Study: NetCoreApplicationTemplate](../aspnetcore/netcoreapplicationtemplate-adr-case-study.md).
 
