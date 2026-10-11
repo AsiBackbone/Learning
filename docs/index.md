@@ -153,7 +153,7 @@ The goal is to make the reasoning visible—not to prove that one framework or a
 
 ## Recently added
 
-Learning 1.3 is the current documentation baseline aligned with released AsiBackbone 7.0.0. The [current compatibility and API boundary](getting-started/asibackbone-7-api-boundary.md) pins implementation references to the `v7.0.0` release tag; earlier Learning snapshots remain available as historical guidance. Recent publications include:
+Learning 1.3 is the current documentation baseline aligned with its reviewed AsiBackbone 7.0.0 boundary. AsiBackbone 7.1.0 is the owning repository's newer stable release; the dated [7.1.0 currentness review](getting-started/asibackbone-7-1-currentness-review.md) records why Learning retains `v7.0.0` for this archival baseline. The [compatibility and API boundary](getting-started/asibackbone-7-api-boundary.md) pins the selected implementation references; earlier Learning snapshots remain available as historical guidance. Recent publications include:
 
 - [Should Authorization Fail Open, Fail Closed, or Defer?](articles/2026/fail-open-fail-closed-or-defer.md)
 - [Can One Worker Safely Execute Delayed Operations for Many Tenants?](articles/2026/multi-tenant-worker-execution-authority.md)

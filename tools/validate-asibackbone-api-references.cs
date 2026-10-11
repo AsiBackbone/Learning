@@ -15,6 +15,9 @@ static partial class AsiBackboneApiReferenceValidator
     private const string CurrentApiBoundaryRelativePath =
         "docs/getting-started/asibackbone-7-api-boundary.md";
 
+    // Learning 1.3 retains this reviewed boundary after the dated AsiBackbone 7.1.0
+    // currentness review. It is the current Learning baseline, not a claim that 7.0.0
+    // is the newest release in the implementation repository.
     private const string CurrentImplementationRef = "v7.0.0";
 
     private const string ProductionHostBridgeRelativePath =
@@ -48,7 +51,8 @@ static partial class AsiBackboneApiReferenceValidator
     private static readonly HashSet<string> ReleasedImplementationRefs = new(StringComparer.OrdinalIgnoreCase)
     {
         "v6.0.0",
-        CurrentImplementationRef
+        CurrentImplementationRef,
+        "v7.1.0"
     };
 
     private static readonly HashSet<string> ImmutableHistoricalReleaseRecordPaths = new(StringComparer.Ordinal)
@@ -285,7 +289,7 @@ static partial class AsiBackboneApiReferenceValidator
             : $"{packageReferenceCount} AsiBackbone 7.x package reference(s)";
 
         Console.WriteLine(
-            $"Validated current AsiBackbone 7.0 references and version-pinned historical compatibility pages across {textFiles.Length} instructional file(s): {packageSummary}.");
+            $"Validated Learning's reviewed AsiBackbone 7.0 references and version-pinned historical compatibility pages across {textFiles.Length} instructional file(s): {packageSummary}.");
         return 0;
     }
 
@@ -336,6 +340,11 @@ static partial class AsiBackboneApiReferenceValidator
         AssertPinnedImplementationRef(
             "released implementation tags are pinned",
             "v6.0.0",
+            true,
+            failures);
+        AssertPinnedImplementationRef(
+            "reviewed newer implementation tags are pinned without changing the Learning baseline",
+            "v7.1.0",
             true,
             failures);
         AssertPinnedImplementationRef(

@@ -29,7 +29,7 @@ This bridge was reviewed against these released snapshots:
 | AsiBackbone | [`v7.0.0`](https://github.com/AsiBackbone/AsiBackbone/releases/tag/v7.0.0) | Package names, public types, host adapters, persistence contracts, and runtime behavior |
 | NetCoreApplicationTemplate | [`v2.11.2`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/releases/tag/v2.11.2) | ASP.NET Core composition, middleware, authentication, authorization, EF Core, and audit integration seams |
 
-Learning 1.3 intentionally retains the reviewed AsiBackbone 7.0.0 boundary. AsiBackbone 7.1.0 is backward compatible, but its analyzer and deprecation additions are outside the Learning 1.3 validation claim. Use the [AsiBackbone 7.0 Compatibility and API Boundary](asibackbone-7-api-boundary.md) for the version rationale and migration-sensitive names.
+Learning 1.3 intentionally retains the reviewed AsiBackbone 7.0.0 boundary. The dated [AsiBackbone 7.1.0 currentness review](asibackbone-7-1-currentness-review.md) confirms that the newer release's analyzer and deprecation additions do not change these five mappings, and records the one signing-model clarification prompted by the review. Use the [AsiBackbone 7.0 Compatibility and API Boundary](asibackbone-7-api-boundary.md) for the selected baseline and migration-sensitive names.
 
 NetCoreApplicationTemplate 2.11.2 does **not** include an `AsiBackbone.*` package reference or generated governance integration. It is an application-host specimen. A consuming application must deliberately select packages, registrations, policy, persistence, middleware placement, and execution behavior.
 
