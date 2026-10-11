@@ -1473,13 +1473,13 @@ Use the smallest persistence model that makes the real transaction and recovery 
 
 Relevant references include:
 
-- [`Data Access`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/articles/data-access.md) — provider selection, SQLite local development, migrations, auditing, and disabled data-access mode.
-- [`EF Core Save Pipeline`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/articles/ef-core-save-pipeline.md) — composite save interceptor and explicit ordering of cross-cutting persistence behavior.
-- [ADR 0004: Keep the Composite EF Core SaveChanges Interceptor](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/0004-keep-composite-savechanges-interceptor.md) — records why the template currently keeps ordered save concerns behind one composite interceptor and which concrete extension or maintenance needs would justify revisiting that repository-specific choice.
-- [`ApplicationDbContext`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Infrastructure/Data/ApplicationDbContext.cs) — the fuller EF Core context.
-- [`ApplicationSaveChangesInterceptor`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Infrastructure/Data/ApplicationSaveChangesInterceptor.cs) — the save-lifecycle interception boundary.
-- [`ApplicationAuditedTransaction`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Infrastructure/Data/Auditing/ApplicationAuditedTransaction.cs) — explicit relational transaction coordination for a local application mutation and audit/completion state.
-- [`Audit Completion Outbox`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/articles/audit-completion-outbox.md) — a fuller example of durable local handoff toward asynchronous delivery.
+- [`Data Access`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/articles/data-access.md) — provider selection, SQLite local development, migrations, auditing, and disabled data-access mode.
+- [`EF Core Save Pipeline`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/articles/ef-core-save-pipeline.md) — composite save interceptor and explicit ordering of cross-cutting persistence behavior.
+- [ADR 0004: Keep the Composite EF Core SaveChanges Interceptor](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/0004-keep-composite-savechanges-interceptor.md) — records why the template currently keeps ordered save concerns behind one composite interceptor and which concrete extension or maintenance needs would justify revisiting that repository-specific choice.
+- [`ApplicationDbContext`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Infrastructure/Data/ApplicationDbContext.cs) — the fuller EF Core context.
+- [`ApplicationSaveChangesInterceptor`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Infrastructure/Data/ApplicationSaveChangesInterceptor.cs) — the save-lifecycle interception boundary.
+- [`ApplicationAuditedTransaction`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Infrastructure/Data/Auditing/ApplicationAuditedTransaction.cs) — explicit relational transaction coordination for a local application mutation and audit/completion state.
+- [`Audit Completion Outbox`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/articles/audit-completion-outbox.md) — a fuller example of durable local handoff toward asynchronous delivery.
 
 These references demonstrate one production-oriented architecture.
 

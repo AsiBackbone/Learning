@@ -502,10 +502,10 @@ The current `NetCoreApplicationTemplate` repository provides a fuller ASP.NET Co
 
 | Learning concept | Working reference | What to inspect |
 | --- | --- | --- |
-| Startup delegates pipeline construction | [`Program.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Program.cs) | `Program.cs` keeps startup readable and delegates the template-owned HTTP sequence to `UseApplicationPipeline()`. |
-| Centralized order-sensitive pipeline | [`PipelineExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/PipelineExtensions.cs) | Inspect the current order for forwarded headers, request logging, error handling, security headers, HTTPS, static files, routing, CORS, rate limiting, authentication, authorization, and endpoint mapping. |
-| Architectural rationale | [ADR-0002: Use Centralized Application Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/0002-use-centralized-application-middleware-pipeline.md) | Review the order-sensitive invariants and the questions maintainers should ask before moving middleware. |
-| Implementation documentation | [Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/articles/middleware.md) | Compare the Learning explanation with the template's current baseline order and custom-middleware guidance. |
+| Startup delegates pipeline construction | [`Program.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Program.cs) | `Program.cs` keeps startup readable and delegates the template-owned HTTP sequence to `UseApplicationPipeline()`. |
+| Centralized order-sensitive pipeline | [`PipelineExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Extensions/PipelineExtensions.cs) | Inspect the current order for forwarded headers, request logging, error handling, security headers, HTTPS, static files, routing, CORS, rate limiting, authentication, authorization, and endpoint mapping. |
+| Architectural rationale | [ADR-0002: Use Centralized Application Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/0002-use-centralized-application-middleware-pipeline.md) | Review the order-sensitive invariants and the questions maintainers should ask before moving middleware. |
+| Implementation documentation | [Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/articles/middleware.md) | Compare the Learning explanation with the template's current baseline order and custom-middleware guidance. |
 
 Use the working repository as a specimen, not as proof that every application needs the same sequence.
 

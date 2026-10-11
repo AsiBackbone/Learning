@@ -830,7 +830,7 @@ Keeping those roles separate makes each artifact easier to maintain.
 
 `AsiBackbone/NetCoreApplicationTemplate` provides a working repository convention for ADR lifecycle state.
 
-Its [ADR index](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/index.md) defines:
+Its [ADR index](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/index.md) defines:
 
 ```text
 Proposed

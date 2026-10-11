@@ -20,6 +20,8 @@ static partial class AsiBackboneApiReferenceValidator
     // is the newest release in the implementation repository.
     private const string CurrentImplementationRef = "v7.0.0";
 
+    private const string CurrentNetCoreApplicationTemplateRef = "v2.11.2";
+
     private const string ProductionHostBridgeRelativePath =
         "docs/getting-started/from-learning-samples-to-production-host.md";
 
@@ -53,6 +55,11 @@ static partial class AsiBackboneApiReferenceValidator
         "v6.0.0",
         CurrentImplementationRef,
         "v7.1.0"
+    };
+
+    private static readonly HashSet<string> ReleasedNetCoreApplicationTemplateRefs = new(StringComparer.OrdinalIgnoreCase)
+    {
+        CurrentNetCoreApplicationTemplateRef
     };
 
     private static readonly HashSet<string> ImmutableHistoricalReleaseRecordPaths = new(StringComparer.Ordinal)
@@ -199,7 +206,7 @@ static partial class AsiBackboneApiReferenceValidator
     private static partial Regex IdentifierRegex();
 
     [GeneratedRegex(
-        @"https://github\.com/AsiBackbone/AsiBackbone/(?:blob|tree)/(?<ref>[^/\s)\]'>]+)(?:/[^\s)\]'>]*)?",
+        @"https://github\.com/AsiBackbone/(?<repo>AsiBackbone|NetCoreApplicationTemplate)/(?:blob|tree)/(?<ref>[^/\s)\]'>]+)(?:/[^\s)\]'>]*)?",
         RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
     private static partial Regex ImplementationLinkRegex();
 
@@ -289,7 +296,7 @@ static partial class AsiBackboneApiReferenceValidator
             : $"{packageReferenceCount} AsiBackbone 7.x package reference(s)";
 
         Console.WriteLine(
-            $"Validated Learning's reviewed AsiBackbone 7.0 references and version-pinned historical compatibility pages across {textFiles.Length} instructional file(s): {packageSummary}.");
+            $"Validated Learning's reviewed AsiBackbone 7.0 references, version-pinned historical compatibility pages, and NetCoreApplicationTemplate {CurrentNetCoreApplicationTemplateRef} source links across {textFiles.Length} instructional file(s): {packageSummary}.");
         return 0;
     }
 
@@ -386,6 +393,42 @@ static partial class AsiBackboneApiReferenceValidator
             "https://github.com/AsiBackbone/AsiBackbone/blob/0123456789abcdef0123456789abcdef01234567",
             0,
             failures);
+        AssertImplementationLinkErrorCount(
+            "nested NetCoreApplicationTemplate release tag links are accepted",
+            "docs/aspnetcore/example.md",
+            "https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/Example.cs",
+            0,
+            failures);
+        AssertImplementationLinkErrorCount(
+            "root-level NetCoreApplicationTemplate release tag links are accepted",
+            "docs/aspnetcore/example.md",
+            "https://github.com/AsiBackbone/NetCoreApplicationTemplate/tree/v2.11.2",
+            0,
+            failures);
+        AssertImplementationLinkErrorCount(
+            "nested NetCoreApplicationTemplate full commit SHA links are accepted",
+            "docs/aspnetcore/example.md",
+            "https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/0123456789abcdef0123456789abcdef01234567/src/Example.cs",
+            0,
+            failures);
+        AssertImplementationLinkErrorCount(
+            "root-level NetCoreApplicationTemplate full commit SHA links are accepted",
+            "docs/aspnetcore/example.md",
+            "https://github.com/AsiBackbone/NetCoreApplicationTemplate/tree/0123456789abcdef0123456789abcdef01234567",
+            0,
+            failures);
+        AssertImplementationLinkErrorCount(
+            "nested NetCoreApplicationTemplate mutable branch links are rejected",
+            "docs/aspnetcore/example.md",
+            "https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/Example.cs",
+            1,
+            failures);
+        AssertImplementationLinkErrorCount(
+            "root-level NetCoreApplicationTemplate mutable branch links are rejected",
+            "docs/aspnetcore/example.md",
+            "https://github.com/AsiBackbone/NetCoreApplicationTemplate/tree/main",
+            1,
+            failures);
 
         const string bridgeFrontMatter =
             "---\nlearning_ref: v1.3.0\nasibackbone_ref: v7.0.0\nnetcoreapplicationtemplate_ref: v2.11.2\n---\n";
@@ -419,6 +462,12 @@ static partial class AsiBackboneApiReferenceValidator
             "bridge pinned to a non-current AsiBackbone boundary is rejected",
             bridgeFrontMatter.Replace("asibackbone_ref: v7.0.0", "asibackbone_ref: v6.0.0", StringComparison.Ordinal) +
             bridgeLinks.Replace("blob/v7.0.0", "blob/v6.0.0", StringComparison.Ordinal),
+            1,
+            failures);
+        AssertProductionHostBridgeErrorCount(
+            "bridge pinned to a non-current NetCoreApplicationTemplate boundary is rejected",
+            bridgeFrontMatter.Replace("netcoreapplicationtemplate_ref: v2.11.2", "netcoreapplicationtemplate_ref: v2.11.1", StringComparison.Ordinal) +
+            bridgeLinks.Replace("releases/tag/v2.11.2", "releases/tag/v2.11.1", StringComparison.Ordinal),
             1,
             failures);
         AssertProductionHostBridgeErrorCount(
@@ -495,6 +544,7 @@ static partial class AsiBackboneApiReferenceValidator
                 ValidateImplementationLinkRef(
                     relativePath,
                     GetLineNumber(text, linkMatch.Index),
+                    linkMatch.Groups["repo"].Value,
                     linkMatch.Groups["ref"].Value,
                     linkMatch.Value,
                     errors);
@@ -505,21 +555,23 @@ static partial class AsiBackboneApiReferenceValidator
     private static void ValidateImplementationLinkRef(
         string relativePath,
         int lineNumber,
+        string repository,
         string implementationRef,
         string link,
         List<string> errors)
     {
-        if (implementationRef.Equals("v6.0.0", StringComparison.OrdinalIgnoreCase) &&
+        if (repository.Equals("AsiBackbone", StringComparison.OrdinalIgnoreCase) &&
+            implementationRef.Equals("v6.0.0", StringComparison.OrdinalIgnoreCase) &&
             !HistoricalCompatibilityReferencePaths.Contains(relativePath))
         {
             errors.Add(
                 $"{relativePath}:{lineNumber} uses the historical v6.0.0 implementation ref outside an approved historical compatibility page: {link}");
         }
 
-        if (!IsPinnedImplementationRef(implementationRef))
+        if (!IsPinnedImplementationRef(repository, implementationRef))
         {
             errors.Add(
-                $"{relativePath}:{lineNumber} links implementation source through unpinned ref '{implementationRef}': {link}");
+                $"{relativePath}:{lineNumber} links {repository} implementation source through unpinned ref '{implementationRef}': {link}");
         }
     }
 
@@ -830,6 +882,7 @@ static partial class AsiBackboneApiReferenceValidator
         ValidateImplementationLinkRef(
             relativePath,
             1,
+            linkMatch.Groups["repo"].Value,
             linkMatch.Groups["ref"].Value,
             linkMatch.Value,
             errors);
@@ -921,6 +974,13 @@ static partial class AsiBackboneApiReferenceValidator
                 $"{relativePath} declares asibackbone_ref: {asiBackboneRef}, but the current implementation boundary is {CurrentImplementationRef}. Review the bridge against the new boundary and update both together.");
         }
 
+        if (declared.TryGetValue("netcoreapplicationtemplate_ref", out string? netCoreApplicationTemplateRef) &&
+            !netCoreApplicationTemplateRef.Equals(CurrentNetCoreApplicationTemplateRef, StringComparison.OrdinalIgnoreCase))
+        {
+            errors.Add(
+                $"{relativePath} declares netcoreapplicationtemplate_ref: {netCoreApplicationTemplateRef}, but the current implementation boundary is {CurrentNetCoreApplicationTemplateRef}. Review the bridge against the new boundary and update both together.");
+        }
+
         var linkedRepositories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (Match linkMatch in BridgeRepositoryLinkRegex().Matches(text))
@@ -947,6 +1007,16 @@ static partial class AsiBackboneApiReferenceValidator
     private static bool IsPinnedImplementationRef(string implementationRef)
     {
         return ReleasedImplementationRefs.Contains(implementationRef) ||
+               FullCommitShaRegex().IsMatch(implementationRef);
+    }
+
+    private static bool IsPinnedImplementationRef(string repository, string implementationRef)
+    {
+        IReadOnlySet<string> releasedRefs = repository.Equals("NetCoreApplicationTemplate", StringComparison.OrdinalIgnoreCase)
+            ? ReleasedNetCoreApplicationTemplateRefs
+            : ReleasedImplementationRefs;
+
+        return releasedRefs.Contains(implementationRef) ||
                FullCommitShaRegex().IsMatch(implementationRef);
     }
 

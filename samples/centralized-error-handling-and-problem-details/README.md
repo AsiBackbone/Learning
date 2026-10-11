@@ -294,8 +294,8 @@ Use the smallest mapping that accurately represents the host's actual contract.
 
 For a fuller production-oriented ASP.NET Core specimen, compare the sample with:
 
-- [`ProblemDetailsExceptionHandler.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/ErrorHandling/ProblemDetailsExceptionHandler.cs)
-- [`ProblemDetailsExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/ErrorHandling/ProblemDetailsExtensions.cs)
+- [`ProblemDetailsExceptionHandler.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/ErrorHandling/ProblemDetailsExceptionHandler.cs)
+- [`ProblemDetailsExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/ErrorHandling/ProblemDetailsExtensions.cs)
 - [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)
 
 The Learning sample stays smaller so the exception boundary, public response, governance mapping, and correlation invariant remain visible.

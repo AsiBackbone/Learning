@@ -700,10 +700,10 @@ The current `NetCoreApplicationTemplate` repository provides a fuller ASP.NET Co
 
 | Learning concept | Working reference | What to inspect |
 | --- | --- | --- |
-| Configuration strategy and precedence | [Configuration](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/articles/configuration.md) | Review shared defaults, environment overrides, environment variables, secrets guidance, provider-specific configuration, and the production review checklist. |
-| Startup validation for security-sensitive options | [`SecurityHeadersExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/SecurityHeadersExtensions.cs) | Observe conditional validation such as requiring CSP text when CSP is enabled, followed by `ValidateOnStart()`. |
-| Trust-boundary configuration | [`ForwardedHeadersExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/ForwardedHeadersExtensions.cs) | Inspect validation for proxy addresses, networks, forwarded-header values, and allowed hosts before forwarded-header behavior is enabled. |
-| Option defaults | [`ApplicationSecurityHeadersOptions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Options/ApplicationSecurityHeadersOptions.cs) | Compare a protection that defaults to enabled with consequential capabilities that may be safer as explicit opt-in. |
+| Configuration strategy and precedence | [Configuration](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/articles/configuration.md) | Review shared defaults, environment overrides, environment variables, secrets guidance, provider-specific configuration, and the production review checklist. |
+| Startup validation for security-sensitive options | [`SecurityHeadersExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Extensions/SecurityHeadersExtensions.cs) | Observe conditional validation such as requiring CSP text when CSP is enabled, followed by `ValidateOnStart()`. |
+| Trust-boundary configuration | [`ForwardedHeadersExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Extensions/ForwardedHeadersExtensions.cs) | Inspect validation for proxy addresses, networks, forwarded-header values, and allowed hosts before forwarded-header behavior is enabled. |
+| Option defaults | [`ApplicationSecurityHeadersOptions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Options/ApplicationSecurityHeadersOptions.cs) | Compare a protection that defaults to enabled with consequential capabilities that may be safer as explicit opt-in. |
 
 Use the implementation repository as a specimen, not as a universal configuration schema.
 

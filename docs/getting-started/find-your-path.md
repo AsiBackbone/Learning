@@ -157,7 +157,7 @@ Host-owned tool execution
 
 **Stop here when:** The choice is a local implementation detail, routine refactor, or behavior whose reasoning is already obvious from the code. A code comment, pull-request explanation, or implementation guide is often a better fit than an ADR.
 
-**Go deeper when:** You want more ASP.NET Core architecture material or a working repository specimen. Browse [ASP.NET Core](../aspnetcore/index.md) and inspect the [NetCoreApplicationTemplate ADRs](https://github.com/AsiBackbone/NetCoreApplicationTemplate/tree/main/docs/adr).
+**Go deeper when:** You want more ASP.NET Core architecture material or a working repository specimen. Browse [ASP.NET Core](../aspnetcore/index.md) and inspect the [NetCoreApplicationTemplate ADRs](https://github.com/AsiBackbone/NetCoreApplicationTemplate/tree/v2.11.2/docs/adr).
 
 ## If None of These Paths Match
 

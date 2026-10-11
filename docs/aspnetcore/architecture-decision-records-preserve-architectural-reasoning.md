@@ -452,9 +452,9 @@ The goal is **concise architectural evidence**.
 
 `AsiBackbone/NetCoreApplicationTemplate` provides a real repository specimen for ADR organization.
 
-Its [ADR index](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/index.md) describes ADRs as records of long-term architectural decisions, identifies examples of decisions worth recording, and distinguishes ADRs from code comments, API documentation, and implementation guides.
+Its [ADR index](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/index.md) describes ADRs as records of long-term architectural decisions, identifies examples of decisions worth recording, and distinguishes ADRs from code comments, API documentation, and implementation guides.
 
-Its [ADR template](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/template.md) uses a compact structure built around:
+Its [ADR template](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/template.md) uses a compact structure built around:
 
 ```text
 Status

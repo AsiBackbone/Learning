@@ -499,9 +499,9 @@ That question is more durable than memorizing a framework-specific list.
 
 After completing the repair, inspect the fuller `NetCoreApplicationTemplate` pipeline:
 
-- [`PipelineExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/src/ProjectTemplate.Web/Extensions/PipelineExtensions.cs)
-- [ADR-0002: Use Centralized Application Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/adr/0002-use-centralized-application-middleware-pipeline.md)
-- [Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/docs/articles/middleware.md)
+- [`PipelineExtensions.cs`](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/src/ProjectTemplate.Web/Extensions/PipelineExtensions.cs)
+- [ADR-0002: Use Centralized Application Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/adr/0002-use-centralized-application-middleware-pipeline.md)
+- [Middleware Pipeline](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.2/docs/articles/middleware.md)
 
 Do not treat the working template's sequence as a universal answer key.
 
