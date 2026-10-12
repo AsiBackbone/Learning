@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Idempotency keys, duplicate delivery, capability replay, and ambiguous retries | [Idempotency Does Not Prevent Authority Replay](2026/idempotency-does-not-prevent-authority-replay.md) |
 | Authorization outages, fail-open versus fail-closed, deferral, and degraded mode | [Should Authorization Fail Open, Fail Closed, or Defer?](2026/fail-open-fail-closed-or-defer.md) |
 | Shared background workers, tenant isolation, and workload identity | [Can One Worker Safely Execute Delayed Operations for Many Tenants?](2026/multi-tenant-worker-execution-authority.md) |
 | Workflow engines, approval state, retries, and who owns the execution decision | [When Should a Workflow Engine Own the Decision?](2026/when-workflow-engine-should-own-decision.md) |
@@ -45,6 +46,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Idempotency Does Not Prevent Authority Replay](2026/idempotency-does-not-prevent-authority-replay.md)
+
+**Christopher D. Cavell** · **October 12, 2026**
+
+A queued refund is delivered twice, and the payment provider times out after accepting the first request. This guide uses that one .NET scenario to separate authority replay, duplicate transport delivery, atomic capability consumption, operation identity and idempotency keys, and inbox/outbox deduplication; explains why reused authority must be rejected even when the operation underneath is idempotent, and why one-use authority does not justify retrying an ambiguously completed side effect; and shows how to record an unknown outcome, reconcile it, and decide when a later attempt is materially new, including when ordinary idempotency is the whole answer.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/idempotency-does-not-prevent-authority-replay.html`
 
 ### [Should Authorization Fail Open, Fail Closed, or Defer?](2026/fail-open-fail-closed-or-defer.md)
 
