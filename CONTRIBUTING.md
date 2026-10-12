@@ -89,7 +89,7 @@ Use **Issues** for concrete work such as:
 - DocFX problems
 - Clearly scoped enhancements
 
-Use [**Learning Discussions**](https://github.com/AsiBackbone/Learning/discussions) for broader or exploratory topics such as:
+Use [**AsiBackbone Organization Discussions**](https://github.com/orgs/AsiBackbone/discussions) for broader or exploratory topics such as:
 
 - Architecture questions
 - Tutorial proposals
@@ -102,11 +102,11 @@ Use [**Learning Discussions**](https://github.com/AsiBackbone/Learning/discussio
 Choose the category that best matches the conversation:
 
 - **Q&A** — questions about .NET architecture, governed execution, security, AI integration, tutorials, samples, and other Learning topics.
-- **Architecture & Patterns** — architectural approaches, design tradeoffs, alternative patterns, governance models, and implementation debates.
-- **Tutorial Ideas** — proposals for tutorials, labs, examples, learning paths, or future educational material.
+- **Architecture & Integration** — architectural approaches, design tradeoffs, alternative patterns, governance models, and implementation debates.
+- **Ideas** — proposals for tutorials, labs, examples, learning paths, or future educational material.
 - **Show and tell** — projects, experiments, adaptations, diagrams, or implementations inspired by Learning concepts and patterns.
 
-Use [**AsiBackbone Organization Discussions**](https://github.com/orgs/AsiBackbone/discussions) when a topic genuinely spans multiple AsiBackbone repositories or concerns the organization as a whole.
+Name `AsiBackbone/Learning` in the title or opening paragraph so project-specific conversations remain easy to find on the shared surface.
 
 A useful flow is:
 

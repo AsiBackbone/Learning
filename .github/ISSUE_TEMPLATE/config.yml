@@ -2,5 +2,5 @@ blank_issues_enabled: true
 
 contact_links:
   - name: AsiBackbone Organization Discussions
-    url: https://github.com/orgs/AsiBackbone/discussions
-    about: Ask architecture questions, propose learning topics, compare patterns, and discuss broader ideas across the AsiBackbone organization.
+    url: https://github.com/orgs/AsiBackbone/discussions/categories/q-a
+    about: Ask Learning questions on the shared organization discussion surface and identify this repository in the post.
