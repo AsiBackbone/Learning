@@ -33,6 +33,8 @@ Administration permission.
 - stale approvals: dismissed on new reviewable pushes;
 - eight documentation, sample, CodeQL, workflow-security, and dependency GitHub
   Actions checks: required and strict;
+- CodeQL results: new error-or-warning alerts and medium-or-higher security
+  alerts block merging through the ruleset's code-scanning gate;
 - review-thread resolution: required;
 - required approvals / Code Owner approval / last-push approval: disabled while
   the repository has only one active maintainer;

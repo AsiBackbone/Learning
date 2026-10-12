@@ -80,6 +80,18 @@
         ],
         "strict_required_status_checks_policy": true
       }
+    },
+    {
+      "type": "code_scanning",
+      "parameters": {
+        "code_scanning_tools": [
+          {
+            "tool": "CodeQL",
+            "security_alerts_threshold": "medium_or_higher",
+            "alerts_threshold": "errors_and_warnings"
+          }
+        ]
+      }
     }
   ]
 }
