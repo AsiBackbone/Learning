@@ -58,5 +58,7 @@ jobs:
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
 
-# CodeQL findings are review signals. A successful scan is not evidence that the
-# repository or any consuming application is secure, compliant, or vulnerability-free.
+# The workflow reports on every pull request targeting main so the repository
+# ruleset can block new error-or-warning alerts and medium-or-higher security
+# alerts. A successful scan is not evidence that the repository or any consuming
+# application is secure, compliant, or vulnerability-free.
