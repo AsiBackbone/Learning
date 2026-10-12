@@ -502,6 +502,8 @@ Using the payout ID as the idempotency key binds it to "this accepted operation.
 
 Neither replay protection nor idempotency gives exactly-once execution against an external system. They narrow the windows where duplication or loss can occur, and the unknown state makes the remaining window visible.
 
+[Idempotency Does Not Prevent Authority Replay](idempotency-does-not-prevent-authority-replay.md) takes this distinction further: it separates both protections from duplicate queue delivery and inbox/outbox deduplication, and follows an ambiguous provider timeout through reconciliation to a materially new attempt.
+
 Some operations legitimately need **bounded use** rather than single use. A grant to download a generated export might allow three retrievals within 24 hours. The same rules apply: the bound is explicit, consumption is atomic, and the count is enforced at the host, not by the presenter.
 
 ---

@@ -424,6 +424,42 @@ Lead to Safe Degraded Mode and Fail-Safe Governance for hands-on practice, Polic
 
 ---
 
+### 13. Idempotency Does Not Prevent Authority Replay
+
+- **Priority:** P1
+- **Implementation issue:** [#417](https://github.com/AsiBackbone/Learning/issues/417)
+- **Publication:** [Published October 12, 2026](../docs/articles/2026/idempotency-does-not-prevent-authority-replay.md)
+- **Permanent slug:** `idempotency-does-not-prevent-authority-replay`
+
+#### Reader / search problem
+
+A team running queued work, background workers, or external API calls treats idempotency keys, duplicate-message handling, capability replay protection, and "exactly once" execution as interchangeable. A request can be idempotent while still accepting reused authority, and a one-use capability can still lead to a duplicated external effect after an ambiguous timeout. Typical questions include:
+
+- If the downstream API accepts an idempotency key, is single-use authority redundant?
+- If a capability can be used only once, is it safe to retry after a timeout?
+- Does an inbox table or broker duplicate detection stop a resubmitted message from reusing authority?
+- Which identifier should key replay state, operation deduplication, and the provider request?
+- What should happen when the system cannot tell whether an external side effect already occurred?
+
+#### Existing Learning support
+
+- [Replay Protection and Bounded-Use Authority](../docs/security/replay-protection-and-bounded-use.md)
+- [Cross-System Capability Exchange and Delegated Authority](../docs/advanced/cross-system-capability-exchange-and-delegated-authority.md)
+- [Governed AI Tool Gateway](../docs/tutorials/governed-ai-tool-gateway.md)
+- [Capability-Scoped Background Operation](../docs/case-studies/capability-scoped-background-operation.md)
+- [When Should a Workflow Engine Own the Decision?](../docs/articles/2026/when-workflow-engine-should-own-decision.md)
+- [Should Authorization Fail Open, Fail Closed, or Defer?](../docs/articles/2026/fail-open-fail-closed-or-defer.md)
+
+#### Article / curriculum distinction
+
+The replay-protection security page, lab ([#52](https://github.com/AsiBackbone/Learning/issues/52)), and executable sample ([#65](https://github.com/AsiBackbone/Learning/issues/65)) provide the deep distributed-state treatment, and the case study and cross-system page each distinguish replay from idempotency inside a larger design. This candidate is a concise, problem-first article a reader can find before learning the repository's terminology. It should start from one recognizable .NET scenario, define replay protection and idempotency separately in plain language, distinguish duplicate transport delivery, atomic capability consumption, operation identity, provider idempotency keys, and inbox/outbox deduplication, show both directions of the distinction with invariant tests, keep unknown execution outcomes separate from failures, and explain when ordinary idempotency is sufficient. It must not claim exactly-once effects or that an idempotency key is sufficient without authoritative storage and downstream semantics.
+
+#### Natural deeper path
+
+Lead to Replay Protection and Bounded-Use Authority for atomic consumption and failure windows, its lab and sample for hands-on practice, Capability-Scoped Background Operation for redelivery, execution identity, and ambiguous publication, and Cross-System Capability Exchange and Delegated Authority when authority crosses an independent boundary.
+
+---
+
 ## Promotion and Publication Workflow
 
 Keep planning, implementation, and publication as separate states:
