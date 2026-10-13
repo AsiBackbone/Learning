@@ -11,7 +11,8 @@ _disableToc: true
 <div class="home-hero">
   <p class="home-kicker">Practical .NET architecture for accountable systems</p>
   <p class="home-summary">Learn governed execution, secure application design, policy-driven systems, and safe AI integration through focused tutorials, hands-on labs, and runnable examples.</p>
-  <div class="home-actions" aria-label="Start learning">
+  <p class="home-why">Learning makes the reasoning visible: why an operation was permitted, under which policy, with what evidence, and when a simpler design is enough. Use it before you adopt any implementation, or when a .NET system you design or review needs explicit decisions and audit evidence.</p>
+  <div class="home-actions" role="group" aria-label="Start learning">
     <a class="btn btn-primary" href="getting-started/index.md">Get Started</a>
     <a class="btn btn-outline-primary" href="getting-started/find-your-path.md">Find Your Path</a>
     <a class="btn btn-outline-primary" href="articles/index.md">Browse Articles</a>
@@ -19,11 +20,7 @@ _disableToc: true
   <p class="home-principle">A proposed action should become a governed decision before it becomes real-world execution.</p>
 </div>
 
-AsiBackbone Learning explains architectural ideas, demonstrates them with focused examples, examines their tradeoffs, and connects the lessons to fuller working implementations. `AsiBackbone` is the product name; no acronym expansion is required to follow the material.
-
-> **Read it. Run it. Question it. Improve it.**
-
-## Start with what describes you
+## Start here
 
 <div class="entry-point-grid">
   <a class="entry-point" href="getting-started/index.md">
@@ -48,7 +45,26 @@ AsiBackbone Learning explains architectural ideas, demonstrates them with focuse
   </a>
 </div>
 
-Learning does not require installing an `AsiBackbone` package. Use it as independent .NET architecture education or connect it to the working repositories.
+## Is Learning a fit?
+
+<div class="fit-grid">
+  <section class="fit-panel" aria-labelledby="fit-use">
+    <h3 id="fit-use">Use Learning when</h3>
+    <ul>
+      <li>you need to explain why an operation was permitted, under which policy, and with what evidence;</li>
+      <li>you are comparing governed execution with familiar .NET patterns before choosing an implementation; or</li>
+      <li>you want runnable examples and labs rather than a package to install.</li>
+    </ul>
+    <p>Learning does not require installing an <code>AsiBackbone</code> package. Use it as independent .NET architecture education or connect it to the working repositories.</p>
+  </section>
+  <section class="fit-panel" aria-labelledby="fit-simpler">
+    <h3 id="fit-simpler">A simpler design may be enough when</h3>
+    <ul>
+      <li>a role or policy check on the endpoint fully answers who may act: see <a href="architecture/when-aspnet-core-authorization-is-enough.md">When ASP.NET Core Authorization Is Enough</a>;</li>
+      <li>one service call, one transaction, and ordinary logs describe the whole operation: see <a href="architecture/when-a-simple-application-service-is-enough.md">When a Simple Application Service Is Enough</a>.</li>
+    </ul>
+  </section>
+</div>
 
 ## The core model
 
@@ -146,11 +162,6 @@ Tutorials use a problem-first progression:
 
 The goal is to make the reasoning visible—not to prove that one framework or architecture is always correct. Study a pattern, reimplement it, compare alternatives, identify when a simpler design is better, and treat working repositories as specimens rather than unquestioned templates.
 
-## Working repositories
-
-- [AsiBackbone/AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) — a .NET governance and policy-control framework for explicit, auditable decision pipelines.
-- [AsiBackbone/NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) — an enterprise-oriented ASP.NET Core reference application with secure defaults and operational patterns.
-
 ## Recently added
 
 Learning 1.3 is the current documentation baseline aligned with its reviewed AsiBackbone 7.0.0 boundary. AsiBackbone 7.1.0 is the owning repository's newer stable release; the dated [7.1.0 currentness review](getting-started/asibackbone-7-1-currentness-review.md) records why Learning retains `v7.0.0` for this archival baseline. The [compatibility and API boundary](getting-started/asibackbone-7-api-boundary.md) pins the selected implementation references; earlier Learning snapshots remain available as historical guidance. Recent publications include:
@@ -159,6 +170,8 @@ Learning 1.3 is the current documentation baseline aligned with its reviewed Asi
 - [Idempotency Does Not Prevent Authority Replay](articles/2026/idempotency-does-not-prevent-authority-replay.md)
 - [Should Authorization Fail Open, Fail Closed, or Defer?](articles/2026/fail-open-fail-closed-or-defer.md)
 
+New publications are announced in the [RSS feed](https://asibackbone.github.io/Learning/feed.xml).
+
 <details class="home-details">
   <summary>Scope, terminology, and important limitations</summary>
 
@@ -166,9 +179,50 @@ Learning 1.3 is the current documentation baseline aligned with its reviewed Asi
 
   <p>AsiBackbone Learning is an educational architecture resource—not a compliance certification, legal standard, security guarantee, AI model, AGI or ASI implementation, robotics controller, replacement for application-specific security review, or requirement to use the AsiBackbone package. Examples are teaching artifacts; production systems remain responsible for their own security, infrastructure, persistence, regulatory requirements, safety controls, and execution.</p>
 
-  <p>AsiBackbone Learning is not affiliated with the Artificial Superintelligence Alliance.</p>
+  <p><code>AsiBackbone</code> is the product name; no acronym expansion is required to follow the material. AsiBackbone Learning is not affiliated with the Artificial Superintelligence Alliance.</p>
 </details>
 
----
+## Related projects
 
-**Start with [Getting Started](getting-started/index.md), then follow the path that best matches the problem you want to understand.**
+<div class="project-grid">
+  <article class="project-card" aria-current="page">
+    <span class="project-role">Learn the patterns</span>
+    <h3>AsiBackbone Learning <span class="current-site">Current site</span></h3>
+    <p>Practical .NET architecture tutorials, labs, runnable samples, and reference patterns for governed execution, secure applications, AI integration, and policy-driven systems, including comparisons that show when these patterns are unnecessary.</p>
+    <p class="project-links">
+      <a href="https://github.com/AsiBackbone/Learning" aria-label="AsiBackbone Learning repository">Repository</a>
+      <a href="https://doi.org/10.5281/zenodo.21938556" aria-label="AsiBackbone Learning archive (DOI)">Archive (DOI)</a>
+    </p>
+  </article>
+  <article class="project-card">
+    <span class="project-role">Add governed decisions</span>
+    <h3><a href="https://asibackbone.github.io/AsiBackbone/">AsiBackbone</a></h3>
+    <p>A .NET governance and policy-control framework for auditable decision flows: policy evaluation, auditable decision records, acknowledgment workflows, capability-based authorization, host-owned execution boundaries, and ASP.NET Core integration.</p>
+    <p class="project-links">
+      <a href="https://asibackbone.github.io/AsiBackbone/" aria-label="AsiBackbone documentation">Documentation</a>
+      <a href="https://github.com/AsiBackbone/AsiBackbone" aria-label="AsiBackbone repository">Repository</a>
+      <a href="https://doi.org/10.5281/zenodo.20546032" aria-label="AsiBackbone archive (DOI)">Archive (DOI)</a>
+    </p>
+  </article>
+  <article class="project-card">
+    <span class="project-role">Start a secure application</span>
+    <h3><a href="https://asibackbone.github.io/NetCoreApplicationTemplate/">.NET Core Application Template</a></h3>
+    <p>A secure-by-default ASP.NET Core application template with authentication and authorization, structured logging, security headers, rate limiting, EF Core data access, reverse proxy support, and Problem Details error handling.</p>
+    <p class="project-links">
+      <a href="https://asibackbone.github.io/NetCoreApplicationTemplate/" aria-label=".NET Core Application Template documentation">Documentation</a>
+      <a href="https://github.com/AsiBackbone/NetCoreApplicationTemplate" aria-label=".NET Core Application Template repository">Repository</a>
+      <a href="https://doi.org/10.5281/zenodo.20373042" aria-label=".NET Core Application Template archive (DOI)">Archive (DOI)</a>
+    </p>
+  </article>
+</div>
+
+Treat the working repositories as specimens to study, question, and compare rather than unquestioned templates.
+
+## Design philosophy
+
+<div class="philosophy-callout">
+  <p class="philosophy-statement">We favor architectures where consequential operations are explicit, constrained, reviewable, and auditable.</p>
+  <p>We also document when these patterns are unnecessary: see <a href="architecture/when-aspnet-core-authorization-is-enough.md">When ASP.NET Core Authorization Is Enough</a> and <a href="architecture/when-a-simple-application-service-is-enough.md">When a Simple Application Service Is Enough</a>.</p>
+  <p>The projects focus on practical .NET engineering. They do not claim regulatory certification or automatic compliance.</p>
+  <p class="philosophy-motto">Read it. Run it. Question it. Improve it.</p>
+</div>

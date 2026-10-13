@@ -23,6 +23,7 @@ on:
       - 'tools/validate-asibackbone-api-references.cs'
       - 'tools/validate-doc-metadata.cs'
       - 'tools/validate-docfx-template-baseline.cs'
+      - 'tools/validate-landing-page.cs'
       - 'scripts/Ensure-PublishedHtmlMetadata.ps1'
       - '.config/dotnet-tools.json'
       - '.github/workflows/docs-validation.yml'
@@ -65,6 +66,12 @@ jobs:
       - name: Validate DocFX template baseline
         run: dotnet run --file tools/validate-docfx-template-baseline.cs
 
+      - name: Validate landing-page validator contract
+        run: dotnet run --file tools/validate-landing-page.cs -- --self-test
+
+      - name: Validate landing-page source contract
+        run: dotnet run --file tools/validate-landing-page.cs
+
       - name: Validate AsiBackbone API-reference validator contract
         run: dotnet run --file tools/validate-asibackbone-api-references.cs -- --self-test
 
@@ -76,6 +83,9 @@ jobs:
 
       - name: Build DocFX site
         run: dotnet tool run docfx docs/docfx.json --warningsAsErrors
+
+      - name: Validate built landing page
+        run: dotnet run --file tools/validate-landing-page.cs -- --site
 
       - name: Test published HTML metadata tooling
         shell: pwsh

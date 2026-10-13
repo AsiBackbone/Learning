@@ -18,6 +18,7 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ### Changed
 
+- Aligned the Learning homepage with the organization [landing-page standard](https://github.com/AsiBackbone/.github/blob/main/LANDING-PAGE-STANDARD.md) v1.0.0 without flattening it. The hero now states why Learning exists and when to use it; Start with what describes you became Start here; a new Is Learning a fit? callout routes to the existing ASP.NET Core authorization and simple application service comparisons; Working repositories became Related projects cards that mark Learning as the current site; and a shared Design philosophy callout closes the page. The navbar AsiBackbone menu now exposes Organization, Learning, Community, Framework, Template, and GitHub, and the footer adds source, community, license, and archive links. Dark-mode outline hero buttons now meet WCAG AA contrast. The new `tools/validate-landing-page.cs` checks the homepage sections, navigation destinations, and footer in source and in the built site (AsiBackbone/.github#16).
 - Reconciled the community requested-topic tracker with the published Learning 1.3 curriculum, linking completed topics, labs, diagrams, advanced material, and case studies while preserving one narrower experimental gap. Contribution guidance now requires tracker reconciliation when a change materially completes a requested learner outcome (#415).
 
 ### Fixed
