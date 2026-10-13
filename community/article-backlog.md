@@ -460,6 +460,42 @@ Lead to Replay Protection and Bounded-Use Authority for atomic consumption and f
 
 ---
 
+### 14. An Allowed Decision Does Not Mean the Operation Succeeded
+
+- **Priority:** P1
+- **Implementation issue:** [#418](https://github.com/AsiBackbone/Learning/issues/418)
+- **Publication:** [Published October 13, 2026](../docs/articles/2026/allowed-decision-does-not-mean-execution-succeeded.md)
+- **Permanent slug:** `allowed-decision-does-not-mean-execution-succeeded`
+
+#### Reader / search problem
+
+A team treats an `Allowed` decision, a completed approval, or a valid capability as evidence that the protected operation completed. When execution later fails or times out, the decision is rewritten, the operation is retried blindly, or the decision is read as proof of an effect that may not exist. Typical questions include:
+
+- Why does the record say an operation was approved when it never happened?
+- Should a decision be changed to `Denied` when the operation fails?
+- How should a system record an operation whose outcome is unknown?
+- When is a retry the same operation, and when does it need a new decision?
+- Is undoing a completed operation part of the original operation, or a new one?
+
+#### Existing Learning support
+
+- [Deployment Approval and Infrastructure Change Gates](../docs/case-studies/deployment-approval-and-infrastructure-change-gates.md)
+- [Sensitive-Data Access Decision](../docs/case-studies/sensitive-data-access-decision.md)
+- [Replay Protection and Bounded-Use Authority](../docs/security/replay-protection-and-bounded-use.md)
+- [Authorization vs. Approval vs. Acknowledgment](../docs/articles/2026/authorization-vs-approval-vs-acknowledgment.md)
+- [Should Authorization Fail Open, Fail Closed, or Defer?](../docs/articles/2026/fail-open-fail-closed-or-defer.md)
+- [Your Audit Log Records the Story, Not the Decision](../docs/articles/2026/your-audit-log-is-not-evidence.md)
+
+#### Article / curriculum distinction
+
+The deployment and sensitive-data case studies, the replay-protection page, and the related articles each explain the decision/execution distinction inside a larger design, and [#191](https://github.com/AsiBackbone/Learning/issues/191) and [#409](https://github.com/AsiBackbone/Learning/issues/409) cover deeper case-study and sample material. This candidate is a short, problem-first entry point for a reader whose approved or authorized operation failed. It should follow one operation through each lifecycle stage, keep the historical decision unchanged, separate decision, attempt, outcome, and reconciliation evidence, cover deterministic failure, ambiguous completion, retry, reconciliation, and compensation boundaries, and state when a synchronous result and ordinary logs are enough. It must not prescribe one storage engine, workflow product, or universal execution-state enum, imply that decision receipts prove external effects, or claim exactly-once execution.
+
+#### Natural deeper path
+
+Lead to the deployment case study for rollback and re-planning, the sensitive-data case study for evidence-failure ordering, Replay Protection and Bounded-Use Authority for consume-before-execute failure windows, and Idempotency Does Not Prevent Authority Replay for execution leases and reconciliation after an ambiguous timeout.
+
+---
+
 ## Promotion and Publication Workflow
 
 Keep planning, implementation, and publication as separate states:
