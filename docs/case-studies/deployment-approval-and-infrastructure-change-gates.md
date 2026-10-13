@@ -853,6 +853,8 @@ Depending on the target, the host may:
 
 Never assume that network failure means no side effect happened.
 
+[An Allowed Decision Does Not Mean the Operation Succeeded](../articles/2026/allowed-decision-does-not-mean-execution-succeeded.md) is a short standalone introduction to this distinction, with a decision/execution matrix and tests for failed and unknown outcomes.
+
 ---
 
 ### 18. Rollback Is Its Own Consequential Operation

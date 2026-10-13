@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Allowed or approved operations that failed, unknown outcomes, retries, and compensation | [An Allowed Decision Does Not Mean the Operation Succeeded](2026/allowed-decision-does-not-mean-execution-succeeded.md) |
 | Idempotency keys, duplicate delivery, capability replay, and ambiguous retries | [Idempotency Does Not Prevent Authority Replay](2026/idempotency-does-not-prevent-authority-replay.md) |
 | Authorization outages, fail-open versus fail-closed, deferral, and degraded mode | [Should Authorization Fail Open, Fail Closed, or Defer?](2026/fail-open-fail-closed-or-defer.md) |
 | Shared background workers, tenant isolation, and workload identity | [Can One Worker Safely Execute Delayed Operations for Many Tenants?](2026/multi-tenant-worker-execution-authority.md) |
@@ -46,6 +47,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [An Allowed Decision Does Not Mean the Operation Succeeded](2026/allowed-decision-does-not-mean-execution-succeeded.md)
+
+**Christopher D. Cavell** · **October 13, 2026**
+
+A merchant-payout suspension is allowed, sent to the payment processor, and times out. This short guide follows that one operation from proposal through decision, authority, claim, attempt, observed outcome, and reconciliation to separate decision truth from execution truth; explains why the historical decision stays `Allowed` when execution fails; walks through failure before execution, deterministic rejection, a timeout after a possible effect, and a lost completion record; and covers retry versus a materially new attempt, compensation as its own governed operation, a decision/execution matrix, focused tests, and when a synchronous result and ordinary logs are enough.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/allowed-decision-does-not-mean-execution-succeeded.html`
 
 ### [Idempotency Does Not Prevent Authority Replay](2026/idempotency-does-not-prevent-authority-replay.md)
 
