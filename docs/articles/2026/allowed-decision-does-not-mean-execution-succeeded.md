@@ -166,7 +166,7 @@ One way to describe a single attempt is:
 | `Failed` | The target reported that the effect did not happen | Depends on why; see the matrix below |
 | `Unknown` | The request may have taken effect, and nobody can yet say | None; reconcile first |
 
-These names are not a standard, and your system does not need to use them. A workflow engine, a job scheduler, or a cloud control plane may already have its own states. What matters is that the vocabulary can say three things a two-state `Success`/`Failure` flag cannot: *nothing was sent*, *the target refused*, and *we do not know*.
+These names are not a standard; a workflow engine, job scheduler, or cloud control plane may already have its own. What matters is that the vocabulary can say three things a two-state `Success`/`Failure` flag cannot: *nothing was sent*, *the target refused*, and *we do not know*.
 
 Three rules keep the states honest. The first is a modeling choice; the other two follow from it:
 
@@ -196,7 +196,7 @@ Failure before execution also includes failing to record required decision evide
 
 The worker sends the request, and the processor answers `422` with `merchant_account_closed`: another team closed `M-2207` an hour earlier. The processor documents that this error code means no change was made; the `422` status alone would not establish that.
 
-Record `Failed` with the target's code. The decision stays `Allowed`; it was a correct answer to the question asked at 21:14:03, under facts that did not include a closure that had not reached the risk API. Do not retry: the same request will fail the same way. If someone still wants an outcome, for example blocking a reopening, that is a different operation that needs its own decision.
+Record `Failed` with the target's code. The decision stays `Allowed`: it answered correctly with the facts the risk API had. Do not retry: the same request will fail the same way. If someone still wants an outcome, for example blocking a reopening, that is a different operation that needs its own decision.
 
 ### 3. Timeout After a Possible External Effect
 
@@ -205,15 +205,17 @@ This is Tuesday's path. The request was sent; no response arrived. The processor
 Record `Unknown`. Do not mark the attempt `Failed`, do not start a new attempt, and do not ask for new authority to get past it. Two moves are safe:
 
 - **Look the effect up by your own reference**, here the `OP-6120` reference attached to the suspension. This is the default, because it reads without changing anything.
-- **Repeat the original request, with the original idempotency key and unchanged parameters,** but only where the processor's documented idempotency contract says a repeat after a connection failure cannot apply the effect twice. Some providers document exactly that. The repeat is part of the same attempt, `ATT-1`, not a new one.
+- **Replay the original request, with the original idempotency key and unchanged parameters,** but only where the processor's documented idempotency contract says a repeat after a connection failure cannot apply the effect twice, and only while the key is still within the processor's documented retention period. Some providers document exactly that. The replay is part of the same attempt, `ATT-1`, not a new one.
 
-Reconciliation also has limits. Finding no suspension does not by itself prove that none will exist: a lookup can lag behind writes, and a request still in flight may not be visible yet. Resolve the attempt as having had no effect only when the processor's documented consistency and processing rules make a "not found" answer decisive, for example after a stated processing window has passed. Otherwise it stays `Unknown`, and a person decides. [Idempotency Does Not Prevent Authority Replay](idempotency-does-not-prevent-authority-replay.md#reconciliation-and-what-makes-an-attempt-new) covers these provider-specific caveats in depth.
+A safe replay is a recovery action, not reconciliation by itself. It prevents a duplicate effect, but its response may not say what happened: a provider that saved a server error under the key will return that same error again. Resolve the attempt only when the replayed response, or a status lookup, actually establishes the outcome.
+
+Lookups have limits too. Finding no suspension does not by itself prove that none will exist: a lookup can lag behind writes, and a request still in flight may not be visible yet. Resolve the attempt as having had no effect only when the processor's documented consistency and processing rules make a "not found" answer decisive, for example after a stated processing window has passed. Otherwise it stays `Unknown`, and a person decides. [Idempotency Does Not Prevent Authority Replay](idempotency-does-not-prevent-authority-replay.md#reconciliation-and-what-makes-an-attempt-new) covers these provider-specific caveats in depth.
 
 ### 4. Failure to Persist Completion Evidence
 
 The processor answers `201 Created` with `SUS-881`. The worker tries to write `Succeeded` to its database, and the write fails during a failover.
 
-The effect happened; the evidence did not. The wrong fix is to run the operation again so that it produces evidence. Retry the **evidence write**, not the side effect: keep the observation in a durable pending record or outbox and deliver it when the store returns. If the worker dies before it can, `ATT-1` is left in `Started`. An execution lease that stops being renewed lets a sweeper move it to `Unknown`, and reconciliation then finds `SUS-881`. The record arrives late, and the effect still happened exactly as the processor reported.
+The effect happened; the evidence did not. The wrong fix is to run the operation again so that it produces evidence. Retry the **evidence write**, not the side effect: keep the observation in a durable pending record or outbox and deliver it when the store returns. If the worker dies before it can, `ATT-1` is left in `Started`. An execution lease that stops being renewed lets a sweeper move it to `Unknown`, and reconciliation then finds `SUS-881`. The record arrives late; the effect does not happen twice.
 
 ---
 
@@ -228,7 +230,7 @@ The effect happened; the evidence did not. The wrong fix is to run the operation
 | `Allowed` | Target rejected the request deterministically | 1 | `Failed` | No; it will fail again | Yes, for any different request |
 | `Allowed` | Target reported a transient rejection it documents as having no effect, such as rate limiting | 1 per send | `Failed` for that send; `ATT-1` stays open | Yes: bounded resends inside the same claimed attempt, same key and parameters, while the decision is current. No second claim, so no new authority | No, within those bounds |
 | `Allowed` | Target accepted the request for asynchronous processing | 1 | `Started` until a status check confirms completion | No; poll or wait for the target's notification | No |
-| `Allowed` | Timeout, reset, crash after sending, or an error the target does not document as no-effect | 1 | `Unknown` | No new attempt. Look up the effect, or repeat the same request only where the target's idempotency contract makes that safe | Only if reconciliation decisively proves no effect and the decision is no longer fresh |
+| `Allowed` | Timeout, reset, crash after sending, or an error the target does not document as no-effect | 1 | `Unknown` | No new attempt. Look up the effect, or replay the same request only where the target's idempotency contract makes that safe and the key is still retained | Only if reconciliation decisively proves no effect and the decision is no longer fresh |
 | `Allowed` | Target succeeded; completion write failed | 1 | `Succeeded` once the pending write lands; if the worker dies first, `Unknown` until reconciliation finds the effect | No | No |
 | `Allowed` | Target succeeded | 1 | `Succeeded` | Not applicable | Not applicable |
 
@@ -249,7 +251,7 @@ A **materially new attempt** is new work under the same `OperationId`. It needs 
 - The decision is older than the policy's freshness rule for this operation, or a fact it depended on has changed: the merchant's status, the analyst's role, a legal hold.
 - The request itself would differ: a different scope, amount, target, or key.
 
-A previous attempt that is `Unknown` blocks a materially new attempt until it is reconciled. It blocks ordinary operational retries too, with one exception: repeating the original request under the original key, where the target's idempotency contract makes that safe, is a form of reconciliation. A new idempotency key is never a way past an unknown outcome; it is only justified after reconciliation proves the previous attempt had no effect and a new decision authorizes another one.
+A previous attempt that is `Unknown` blocks a materially new attempt until it is reconciled. It blocks ordinary operational retries too, with one exception: a safe replay of the original request under the original key, where the target's idempotency contract allows it and the key is still retained. That replay is a recovery action; it resolves the attempt only if its response establishes the outcome. A new idempotency key is never a way past an unknown outcome; it is only justified after reconciliation proves the previous attempt had no effect and a new decision authorizes another one.
 
 `OperationId` stays the same across all of this. It identifies the logical suspension; decisions, authority, attempts, and reconciliation all hang beneath it.
 
@@ -431,14 +433,13 @@ The separation becomes worth its cost once an external call, a queue, a delayed 
 
 ## Failure Modes
 
-1. **Reading `Allowed` as `Succeeded`.** A dashboard or report shows the decision column as if it were the outcome.
+1. **Reading `Allowed` as `Succeeded`.** A dashboard shows the decision as if it were the outcome, or one status column holds both, and each update overwrites the history before it.
 2. **Rewriting the decision after an execution failure.** The record now claims a refusal nobody made, and may sit next to an effect that exists.
 3. **Recording a timeout as `Failed`.** A retry policy then resends, and the target may apply the effect twice.
 4. **Re-executing to recreate missing evidence.** The completion write failed, so the operation is run again to produce one.
 5. **Reissuing authority to get past an unknown outcome.** The new authority is valid, and the effect may happen twice.
 6. **Treating every retry as operational.** A later attempt runs under a stale decision because it reused the same `OperationId`.
 7. **Undoing instead of compensating.** A reversal with its own consequences runs under the original operation's authority, or with none.
-8. **One status column for everything.** Decision, attempt, outcome, and reconciliation overwrite one another, and history is lost with each update.
 
 ---
 
@@ -447,7 +448,7 @@ The separation becomes worth its cost once an external call, a queue, a delayed 
 1. Is the decision record written once and never changed by execution results?
 2. Can the system show, for each operation, whether an attempt was claimed, whether a request was sent, and what was observed, as separate facts?
 3. Are errors classified by the target's documented semantics, with timeouts, resets, crashes, and undocumented server errors recorded as an unknown outcome rather than a failure?
-4. Does an `Unknown` attempt block a materially new attempt until reconciliation resolves it, with same-key repeats allowed only where the target's idempotency contract makes them safe?
+4. Does an `Unknown` attempt block a materially new attempt until reconciliation resolves it, with same-key replays allowed only where the target's idempotency contract makes them safe and the key is still retained, and treated as resolving the attempt only when a response or lookup establishes the outcome?
 5. Does reconciliation look the effect up by your own reference, treat "not found" as decisive only under the target's documented consistency rules, and escalate when it cannot tell?
 6. Are consuming (or reserving) authority and recording the attempt a single atomic step?
 7. Is a lost completion record recovered by retrying the evidence write, never the side effect?
