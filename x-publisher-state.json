@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "account": "jackdaw-patio",
-  "cursorSha": "e711e8a513f6a66475c0643b3baa4b7b66959552",
+  "cursorSha": "7ff9b62b3c11d70f1f8a32448796b70ae0770069",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
@@ -47,6 +47,11 @@
       "sourceBlobSha": "8e7cbba3675c6a4fd4d83736a0ada7b1449765d1",
       "postId": "2109682804477051177",
       "postedAtUtc": "2026-10-12T16:29:11.3987227+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/allowed-decision-does-not-mean-execution-succeeded.html": {
+      "sourceBlobSha": "ce0759864ca4040dab4a45de5693c4b44b41bb49",
+      "postId": "2110072059237957955",
+      "postedAtUtc": "2026-10-13T18:15:57.3991217+00:00"
     }
   }
 }
