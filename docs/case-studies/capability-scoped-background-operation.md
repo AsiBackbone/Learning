@@ -2583,6 +2583,7 @@ Continue with:
 - [CQRS, Command/Query Separation, and Governed Execution](../architecture/cqrs-command-query-separation-and-governed-execution.md) for the simpler immediate-command and delayed-command alternatives.
 - [Human Acknowledgment Workflow](human-acknowledgment-workflow.md) when a person must satisfy a governance requirement before authority can be issued.
 - [Multi-Tenant and Regional Policy Overlay](multi-tenant-and-regional-policy-overlay.md) when several policy authorities determine the request-time decision.
+- [Delayed Financial Payout and Ambiguous External Commit](delayed-financial-payout-and-ambiguous-external-commit.md) when the delayed operation is an external side effect whose outcome can become ambiguous after the claim.
 
 ---
 
