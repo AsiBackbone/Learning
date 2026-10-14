@@ -61,11 +61,13 @@ Ambiguous provider timeout after execution began
     → reconcile first
 ```
 
-**Five-minute route:** read **At a Glance**, **The Scenario**, **Identifiers: One Per Question**, **Classify the Outcome by What the Provider Can Prove**, **Reconcile Before Any New Attempt**, the **Decision and Execution Matrix**, and **The Simpler Alternative**.
+**Five-minute route:** read **At a Glance**, **The Scenario**, **Reconcile Before Any New Attempt**, and **The Simpler Alternative**.
 
-**Ten-minute route:** add **Atomically Claim the Grant and the Payout**, **Four Kinds of Retry**, and **Idempotency Versus Authority Replay Protection**. This route suits reviewers who already know scoped capabilities and want the side-effect boundary.
+**Ten-minute route:** add **Identifiers: One Per Question**, **Classify the Outcome by What the Provider Can Prove**, and the **Decision and Execution Matrix**.
 
-**Twenty-minute route:** add **Issue Short-Lived Payout Execution Authority**, **The Worker Validation Pipeline**, **What Makes a Payout Attempt Materially New**, the invariant traces, and **What the Tests Should Prove**. The remaining sections cover evidence, production adaptation, failure modes, tradeoffs, and review.
+**Twenty-minute route:** add **Atomically Claim the Grant and the Payout**, **Four Kinds of Retry**, **Idempotency Versus Authority Replay Protection**, and **What Makes a Payout Attempt Materially New**. The remaining sections cover authority issuance, worker validation, evidence, traces, tests, production adaptation, failure modes, tradeoffs, and review.
+
+**About the code:** all C#, SQL, and pseudocode on this page is illustrative. Repositories, helpers, and some transitions are omitted, and none of it compiles as shown. The tests in **What the Tests Should Prove** describe the contract an implementation should meet; they are not a runnable companion.
 
 ## At a Glance
 
@@ -121,7 +123,7 @@ flowchart LR
 
 The case preserves two invariants:
 
-> **No provider call happens without a current, unconsumed grant that matches the current payout record and is atomically claimed by the worker making the call.**
+> **Every provider submission belongs to a durable attempt that was created by atomically consuming a matching grant, valid at claim time, and that the sending worker has confirmed as `Started` while it still owns the attempt.**
 
 > **No new provider attempt starts while an earlier attempt for the same payout is `Unknown`. Reconciliation resolves it first.**
 
@@ -158,7 +160,7 @@ purpose:        supplier-invoice INV-9031
 release:        16:00 UTC batch
 ```
 
-The decision is `Allowed`. The platform issues grant `GRT-19C`, valid from 15:55 to 16:25 UTC, and moves the payout to `Approved`, version 7. At 16:00:04 a worker receives the job, validates the grant, claims it, and sends the payout to the fictional provider under idempotency key `payout-PAY-3107-a1`. At 16:00:34 the call times out. The provider received the request and completed the payout, but the response never arrived.
+The decision is `Allowed`. The platform issues grant `GRT-19C`, valid from 15:55 to 16:25 UTC, reserves 4,250.00 EUR against the tenant's daily limit, and moves the payout to `Approved`, version 7. At 16:00:04 a worker receives the job, validates the grant, claims it, and sends the payout to the fictional provider under client reference `PAY-3107-a1` and idempotency key `payout-PAY-3107-a1`. At 16:00:34 the call times out. The provider received the request and completed the payout, but the response never arrived.
 
 The rest of the case explains why the platform does not send the payout again, and how it finds out that it already succeeded.
 
@@ -170,7 +172,7 @@ The rest of the case explains why the platform does not send the payout again, a
 | Beneficiary not verified or not active | `Denied` | `beneficiary.not-eligible` |
 | Destination not registered to the beneficiary | `Denied` | `destination.not-registered` |
 | Payout not in `Draft`, or version differs from the intent | `Denied` | `payout.not-submittable` |
-| Daily tenant limit would be exceeded | `Denied` | `tenant.daily-limit` |
+| Paid plus reserved amounts plus this payout would exceed the daily tenant limit | `Denied` | `tenant.daily-limit` |
 | Tenant, beneficiary, or payout record unavailable | `Deferred` | `context.unavailable` |
 | Destination changed in the last 7 days | `AcknowledgmentRequired` | `destination.recently-changed` |
 | Amount above the requester's approval limit | `EscalationRecommended` | `amount.above-requester-limit` |
@@ -199,16 +201,17 @@ One service may implement several rows. What matters is that no row silently tak
 
 | Identifier | Example | Question it answers | Created by | Changes when |
 | --- | --- | --- | --- | --- |
-| `PayoutId` (the `OperationId`) | `PAY-3107` | Which logical payout is this, across every decision, attempt, and reconciliation? | Payout service, when the draft is created | Never. A different payout is a different `PayoutId` |
+| `PayoutId` (the `OperationId`) | `PAY-3107` | Which logical payout is this, across every decision, attempt, and reconciliation? | Payout service, when the draft is created. Unique across every tenant that shares the platform's provider account | Never. A different payout is a different `PayoutId` |
 | `CorrelationId` | `COR-8812` | Which end-to-end story does this record belong to? | API gateway, at the request | Never within the story. It groups; it does not authorize |
 | `DecisionId` | `DEC-5530` | Which evaluation, under which facts and policy version, allowed this exact intent? | Policy evaluation | Every re-evaluation produces a new one |
 | `GrantId` | `GRT-19C` | Which single-use authority is being presented, and has it been consumed? | Grant issuer, after `Allowed` | A new decision issues a new grant. A consumed grant is never reset |
 | `JobId` / `MessageId` | `JOB-604` / `MSG-A71` | Which unit of queued work, and which delivery of it? | Outbox relay | A resubmission tool may create a new `MessageId`; that changes nothing about authority |
-| `AttemptId` | `ATT-1` | Which claimed attempt, under which grant, produced which outcome? | The atomic claim | Each claim creates one |
+| `AttemptId` and attempt number | `ATT-1`, attempt 1 | Which claimed attempt, under which grant, produced which outcome? | The atomic claim; the attempt number is allocated with the grant, in the same transaction as the decision | Each claim creates one |
+| Client reference | `PAY-3107-a1` | Which of *our* attempts does a provider record belong to? | Derived from `PayoutId` and attempt number, sent with the request | Per attempt, so a lookup can never confuse attempt 1 with attempt 2 |
 | Provider idempotency key | `payout-PAY-3107-a1` | Has the provider already seen this exact request? | Derived deterministically from `PayoutId` and attempt number | Only for a materially new, newly authorized attempt |
 | Provider reference | `PRV-TX-55021` | What does the provider call this payout? | The provider | Not ours to change |
 
-The idempotency key is derived from `PayoutId` and the attempt number, never from `CorrelationId`, `MessageId`, or `GrantId`. Each of those changes for reasons unrelated to whether the provider has already seen this request. [Idempotency Does Not Prevent Authority Replay](../articles/2026/idempotency-does-not-prevent-authority-replay.md#five-identifiers-five-questions) explains why one identifier doing several jobs is how a retry becomes a second payment.
+In this specimen the idempotency key is derived from `PayoutId` and the authoritative attempt number, never from `CorrelationId`, `MessageId`, or `GrantId`. Each of those changes for reasons unrelated to whether the provider has already seen this request. Deterministic derivation is a design choice, not a universal rule: some providers recommend random keys, and every provider sets its own uniqueness scope, format, and retention. A production integration follows the provider's requirements. What must hold either way is that the key is fixed for the life of an attempt and recorded with it before the first send. [Idempotency Does Not Prevent Authority Replay](../articles/2026/idempotency-does-not-prevent-authority-replay.md#five-identifiers-five-questions) explains why one identifier doing several jobs is how a retry becomes a second payment.
 
 ---
 
@@ -227,29 +230,34 @@ public sealed record PayoutIntent(
     decimal Amount,
     string Currency,
     string Purpose,
-    int PayoutVersion)
+    int PayoutVersion)                // the record version policy evaluates; not part of the fingerprint
 {
-    // Stable over every field that changes what money moves where.
-    public string Fingerprint => PayoutFingerprint.Compute(this);
+    // Covers the material terms only: tenant, beneficiary, destination and its version,
+    // amount, currency, and purpose. Excludes PayoutVersion, which changes when the
+    // payout moves from Draft to Approved without changing what money moves where.
+    public string TermsFingerprint => PayoutFingerprint.Compute(this);
 }
 ```
 
 If the request's beneficiary, destination, amount, or currency differs from the payout record, the request is rejected before policy runs. The client cannot propose one payout and have policy evaluate another.
 
-The `PayoutVersion` and `DestinationVersion` matter later. They let the worker detect that the payout or the destination changed after the decision, without comparing every field by hand.
+Two different things are bound here, and they are kept apart:
+
+- **The terms fingerprint** says *what* is being paid. It stays the same from request to claim unless the payout's terms change. It is computed over a canonical serialization: fixed field order, amounts as decimal strings at the currency's minor-unit scale, upper-case ISO currency codes, trimmed and normalized strings, and explicit markers for absent values. Two services that disagree about any of those produce different fingerprints for the same payout.
+- **The record versions** say *which state* of the payout and destination a step relied on. The decision evaluated payout version 6. Approval moves it to version 7, and the grant expects version 7 at claim time. Any later edit, cancellation, or destination change moves a version and is detected without comparing every field by hand.
 
 ---
 
 ## 5. Authoritative Context and the Governance Decision
 
-The policy is a pure function. It performs no writes, calls, or notifications.
+The policy rules are a pure function of the context. They perform no writes, calls, or notifications, and they do not read the clock or create identifiers; the observation time arrives in the context. The evaluator around them wraps the verdict in a decision record with its own `DecisionId` and evaluation time.
 
 ```csharp
 public static class PayoutPolicy
 {
     public const string Version = "payout-policy/2026.10";
 
-    public static PayoutDecision Evaluate(PayoutContext context)
+    public static PayoutVerdict Evaluate(PayoutContext context)
     {
         if (context.Unavailable)
         {
@@ -279,7 +287,8 @@ public static class PayoutPolicy
             return Deny("payout.not-submittable");
         }
 
-        if (context.Tenant.PaidToday + intent.Amount > context.Tenant.DailyLimit)
+        // Reserved = amounts held by issued grants and active attempts not yet resolved.
+        if (context.Tenant.PaidToday + context.Tenant.ReservedToday + intent.Amount > context.Tenant.DailyLimit)
         {
             return Deny("tenant.daily-limit");
         }
@@ -297,14 +306,17 @@ public static class PayoutPolicy
         return Allow("payout.allowed");
     }
 
-    // Each helper builds a PayoutDecision with a new DecisionId, the outcome,
-    // the reason code, Version, the intent fingerprint, and context observation times.
+    // Each helper returns a PayoutVerdict: the outcome, the reason code, and Version.
+    // The evaluator adds DecisionId, evaluation time, the terms fingerprint,
+    // the evaluated record versions, and the context observation times.
 }
 ```
 
-For `PAY-3107`, every check passes and the decision is `DEC-5530`, `Allowed`, reason `payout.allowed`, policy `payout-policy/2026.10`, intent fingerprint `fp-9b41`.
+For `PAY-3107`, every check passes and the decision is `DEC-5530`, `Allowed`, reason `payout.allowed`, policy `payout-policy/2026.10`, terms fingerprint `fp-9b41`, evaluated payout version 6.
 
-The decision is recorded durably before anything else happens. If that write fails, no grant is issued. Only `Allowed` continues. `Denied`, `Deferred`, `AcknowledgmentRequired`, and `EscalationRecommended` all stop here, with zero grants and zero provider calls. [Human Acknowledgment Workflow](human-acknowledgment-workflow.md) covers how an acknowledgment, once given, leads to a fresh decision rather than turning the pending one into `Allowed`.
+**One persistence sequence.** The decision is constructed first and then written in the **same local transaction** as everything an `Allowed` decision enables: the grant, the attempt-number allocation, the daily-limit reservation, the payout's move from `Draft` version 6 to `Approved` version 7, and the outbox row. The reservation is a conditional update on the tenant row that fails if paid plus reserved plus this amount would exceed the limit, so two payouts evaluated concurrently cannot both pass. If the transaction does not commit, none of those records exists, and the clerk sees a failure to retry. A non-allowed decision is written alone, in its own transaction. Either way, no grant exists without a durable decision behind it.
+
+Only `Allowed` continues. `Denied`, `Deferred`, `AcknowledgmentRequired`, and `EscalationRecommended` all stop here, with zero grants and zero provider calls. [Human Acknowledgment Workflow](human-acknowledgment-workflow.md) covers how an acknowledgment, once given, leads to a fresh decision rather than turning the pending one into `Allowed`.
 
 ---
 
@@ -320,8 +332,9 @@ public sealed record PayoutGrant(
     string TenantId,
     string Operation,                 // "payout.submit"
     string Audience,                  // "payout-executor"
-    string IntentFingerprint,
-    int PayoutVersion,                // the version the grant expects at claim time
+    string TermsFingerprint,
+    int ExecutablePayoutVersion,      // 7: the Approved version the grant expects at claim time
+    int AttemptNumber,                // 1: allocated in the decision transaction
     string PolicyVersion,
     DateTimeOffset NotBeforeUtc,
     DateTimeOffset ExpiresAtUtc,
@@ -330,15 +343,17 @@ public sealed record PayoutGrant(
 
 Every field comes from the decision and the intent, never from the request. The grant contains no provider credential, no destination token, and no user token. The clerk's session is not forwarded to the worker. [How Short-Lived Execution Authority Differs from User Authorization](../articles/2026/short-lived-execution-authority-vs-user-authorization.md#five-responsibilities-not-one-token) explains why.
 
-The grant is stored by the issuer and looked up by `GrantId`. In the same transaction, the payout moves from `Draft` version 6 to `Approved` version 7, and `GRT-19C` records `PayoutVersion = 7`.
+The grant is stored by the issuer and looked up by `GrantId`. It is written in the decision transaction described above, so `GRT-19C` records `ExecutablePayoutVersion = 7` in the same commit that moves the payout to version 7.
 
-The window, 15:55 to 16:25, covers the 16:00 batch and a short backlog. A payout that misses it does not run late on old authority; it waits for a fresh decision.
+The window, 15:55 to 16:25, covers the 16:00 batch and a short backlog. A payout that misses it does not run late on old authority; it waits for a fresh decision, and its daily-limit reservation is released when the grant expires.
+
+**The grant's window governs admission, not every send.** Expiry is checked when the worker claims the grant. Once the claim creates `ATT-1`, the attempt carries its own short send deadline, here five minutes after the claim, and bounded resends inside the attempt are allowed only before that deadline. After it, the attempt may only be reconciled. A consumed grant never admits a second attempt, whatever its window says.
 
 ---
 
 ## 7. The Queue Message Is Transport
 
-The decision record, grant, payout state change, and outbox row are written in one local transaction. A relay then publishes the job:
+The decision record, grant, reservation, payout state change, and outbox row are written in one local transaction. A relay then publishes the job:
 
 ```json
 {
@@ -352,7 +367,7 @@ The decision record, grant, payout state change, and outbox row are written in o
 
 The message carries references, not facts. It does not carry the amount, destination, or beneficiary, because the worker must not trust them from the queue. If someone alters the message to point at a different payout, the grant lookup fails the binding check. If someone copies the message, the second copy meets a consumed grant.
 
-The broker may deliver the message more than once, and an operator's resubmission tool may republish it under a new `MessageId`. Neither changes what the worker is allowed to do.
+The relay may publish the message more than once, the broker may deliver it more than once, and an operator's resubmission tool may republish it under a new `MessageId`. None of that changes what the worker is allowed to do. A new `MessageId` or `JobId` on its own is not evidence of misuse; it is what at-least-once delivery looks like.
 
 > **A queue message tells a worker where to look. It never tells the worker what it may do.**
 
@@ -382,40 +397,62 @@ public async Task<ValidationResult> ValidateAsync(PayoutJob job, WorkloadIdentit
     if (grant.Operation != "payout.submit" || !audiences.Accepts(grant.Audience, presenter))
                                                                                       return Refuse("presenter.not-audience");
     if (grant.State == GrantState.Revoked)                                            return Refuse("grant.revoked");
-    if (grant.State == GrantState.Consumed)                                           return await ClassifyConsumedAsync(grant, job, ct);
+    if (grant.State == GrantState.Consumed)                                           return Refuse("grant.consumed");
     if (now < grant.NotBeforeUtc || now >= grant.ExpiresAtUtc)                        return Refuse("grant.expired");
 
     // Current state, not the state at decision time.
     PayoutContext current = await contexts.BuildCurrentAsync(grant.PayoutId, ct);
 
+    // Checked before any field is read. Not a refusal of the grant: the job is
+    // redelivered later and validated again while the grant is still in its window.
+    if (current.Unavailable)                                                          return Postpone("context.unavailable");
+
     if (current.Payout.State != PayoutState.Approved ||
-        current.Payout.Version != grant.PayoutVersion)                                return Refuse("payout.not-executable");
-    if (PayoutFingerprint.Compute(current.Intent) != grant.IntentFingerprint)        return Refuse("binding.mismatch");
+        current.Payout.Version != grant.ExecutablePayoutVersion)                      return Refuse("payout.not-executable");
+    if (PayoutFingerprint.Compute(current.Intent) != grant.TermsFingerprint)         return Refuse("binding.mismatch");
 
     // Current policy: would this exact payout still be allowed now?
-    PayoutDecision recheck = PayoutPolicy.EvaluateForExecution(current);
+    // Same rules as Evaluate, except the payout is expected to be Approved, and this
+    // payout's own reservation is not counted twice against the daily limit.
+    PayoutVerdict recheck = PayoutPolicy.EvaluateForExecution(current);
     if (recheck.Outcome != PayoutOutcome.Allowed)                                    return Refuse("policy.no-longer-allows", recheck);
 
-    return ValidationResult.Valid(grant, current);
+    // The versions this validation relied on. The claim transaction fences on them.
+    return ValidationResult.Valid(grant, current.Versions);
 }
 ```
 
-Three points matter:
+Four points matter:
 
-- **A consumed grant is not automatically a replay attack.** `ClassifyConsumedAsync` checks whether the payout already has an attempt claimed under this grant. If so, this delivery is a duplicate of work that is in progress or done, and is acknowledged with no state change. If not, the grant was consumed elsewhere, and the presentation is recorded as a replay. Either way, the provider is not called.
-- **Current state is rebuilt, not trusted from the decision.** Between 09:58 and 16:00 the payout might have been cancelled, the beneficiary suspended, or the destination changed. Each one changes the payout's or destination's version or state, and each one is refused.
-- **Current policy is rechecked for this exact intent.** `EvaluateForExecution` runs the same rules against current facts, except that it expects `Approved` rather than `Draft`. A rule that would now deny, such as a tenant suspended at 14:00, refuses the grant. A rule that would now require acknowledgment or escalation also refuses it, because the original decision no longer reflects current facts.
+- **A consumed grant is refused, and then classified for evidence.** The provider is never called. If the grant's consuming attempt belongs to this same payout and binding, the delivery is recorded as a duplicate and acknowledged with no state change, whatever its `JobId` or `MessageId`. A consumed grant presented by a service outside its audience, or bound to a different payout, is already refused earlier and is the security signal worth alerting on.
+- **Current state is rebuilt, not trusted from the decision.** Between 09:58 and 16:00 the payout might have been cancelled, the beneficiary suspended, or the destination changed. Each one changes a version or a state, and each one is refused.
+- **Current policy is rechecked for these exact terms.** A rule that would now deny, such as a tenant suspended at 14:00, refuses the grant. A rule that would now require acknowledgment or escalation also refuses it, because the original decision no longer reflects current facts.
+- **Unavailable context postpones; it never allows.** The grant is not consumed, so a later delivery inside the window can still validate it. If the window closes first, the grant expires unused.
 
-None of these refusals asks for new authority automatically. A refused grant stays refused, and the payout waits for a fresh request and decision. [Capability-Scoped Background Operation](capability-scoped-background-operation.md#17-freshness-model-rebuild-current-context-before-claim) discusses the freshness model and its availability cost in more depth.
+None of these refusals asks for new authority automatically. A refused grant stays refused, and the payout waits for a fresh decision.
+
+Validation is a read, and reads go stale. The next section makes the claim fence on what validation read, so a change that lands between the two is caught. [Capability-Scoped Background Operation](capability-scoped-background-operation.md#17-freshness-model-rebuild-current-context-before-claim) discusses the freshness model and its availability cost in more depth.
 
 ---
 
 ## 10. Atomically Claim the Grant and the Payout
 
-Validation is a read. Two workers can both pass it for the same grant. The claim is the write that only one of them can win:
+Validation is a read. Two workers can both pass it for the same grant, and the facts it read can change before either acts. The claim is the write that only one worker can win, and it re-asserts everything validation relied on:
 
 ```sql
+-- SERIALIZABLE, or REPEATABLE READ plus shared locks on the context rows
+-- (for example SELECT ... FOR SHARE), so a concurrent change to any fenced row
+-- either commits first and fails a check below, or waits until this commits.
 BEGIN TRANSACTION;
+
+-- Context fence: every mutable input the policy recheck used, at the version it read.
+-- SettingsVersion changes with policy-relevant tenant settings, not with the
+-- paid/reserved counters, so other payouts' reservations do not roll this claim back.
+SELECT 1 FROM Tenants        WHERE TenantId      = @tenantId      AND SettingsVersion = @tenantSettingsVersion AND PayoutsSuspended = 0;
+SELECT 1 FROM Beneficiaries  WHERE BeneficiaryId = @beneficiaryId AND Version = @beneficiaryVersion AND Status = 'Active';
+SELECT 1 FROM Destinations   WHERE DestinationId = @destinationId AND Version = @destinationVersion;
+SELECT 1 FROM PolicyReleases WHERE Operation = 'payout.submit' AND CurrentVersion = @policyVersion;
+-- each must return exactly 1 row
 
 UPDATE PayoutGrants
 SET    State = 'Consumed', ConsumedAtUtc = @now, ConsumedBy = @workerId
@@ -425,33 +462,47 @@ WHERE  GrantId = @grantId AND State = 'Issued' AND ExpiresAtUtc > @now;
 UPDATE Payouts
 SET    State = 'Executing', Version = Version + 1, ActiveAttemptId = @attemptId,
        LeaseEpoch = LeaseEpoch + 1, LeaseExpiresAtUtc = @leaseExpiry
-WHERE  PayoutId = @payoutId AND State = 'Approved' AND Version = @expectedVersion;
+WHERE  PayoutId = @payoutId AND State = 'Approved' AND Version = @executablePayoutVersion;
 -- must affect exactly 1 row
 
 INSERT INTO PayoutAttempts (AttemptId, PayoutId, GrantId, DecisionId, AttemptNumber,
-                            IdempotencyKey, State, ClaimedAtUtc, LeaseEpoch)
-VALUES (@attemptId, @payoutId, @grantId, @decisionId, 1,
-        'payout-PAY-3107-a1', 'Claimed', @now, @leaseEpoch);
+                            ClientReference, IdempotencyKey, State, ClaimedAtUtc,
+                            SendDeadlineUtc, LeaseEpoch)
+VALUES (@attemptId, @payoutId, @grantId, @decisionId, @attemptNumber,
+        'PAY-3107-a1', 'payout-PAY-3107-a1', 'Claimed', @now,
+        @sendDeadline, @leaseEpoch);
 
-COMMIT;  -- or ROLLBACK if either update affected 0 rows
+COMMIT;  -- ROLLBACK if any check returned 0 rows or any update affected 0 rows
 ```
 
-If either update affects zero rows, the whole transaction rolls back and the worker makes no provider call. The loser of a race sees `claim.lost` and, on inspection, a duplicate delivery of work that the other worker owns.
+If any check fails, the whole transaction rolls back and the worker makes no provider call. The loser of a race sees `claim.lost`; on inspection, its delivery is a duplicate of work the winner owns. The daily limit needs no check here, because this payout's amount was already reserved when the grant was issued.
 
-The grant, the payout state, and the attempt record live in one database, so one local transaction covers them. That is the only boundary where atomicity is available. The provider is outside it.
+**What the fence guarantees, and where it stops.** The claim's commit is the point at which the platform decides. Every fenced fact was current at that instant. A beneficiary suspension or policy release that commits *after* the claim does not recall a payout already in `Executing`; stopping an in-flight payout is a separate operation. That boundary is deliberate and stated, not accidental.
 
-The lease is longer than the provider call's timeout, so a slow but live worker is not swept while it waits. If the lease lapses, a recovery sweeper takes ownership by incrementing `LeaseEpoch`, and every later write from the original worker is conditional on the epoch it held. [Idempotency Does Not Prevent Authority Replay](../articles/2026/idempotency-does-not-prevent-authority-replay.md#reconciliation-and-what-makes-an-attempt-new) explains why a lease must fence writes, and why it cannot fence a request already on the network.
+The fence covers only facts held in the same store. If a fact comes from an external system, such as a sanctions list or a separate risk service, the claim cannot lock it. For those, state the permitted staleness instead, for example "observed no more than 60 seconds before the claim", record the observation time with the attempt, and accept that changes inside that window are outside the guarantee. Promising "current" for a fact the transaction cannot see would overstate the design.
+
+**A lost commit acknowledgment is not a lost claim.** The connection can fail while `COMMIT` is in flight, so the worker sees an exception even though the claim committed. The rule is simple: if the worker cannot confirm that its claim committed, it does not send. It acknowledges nothing, lets the job be redelivered or swept, and recovery reads the durable state. If the grant shows `Consumed` by this worker's attempt, that attempt is still `Claimed`, which provably sent nothing, and the sweeper handles it as below. A confirmed `claim.lost` and an unknown claim outcome lead to the same action, which is not to send, but they are recorded differently. [Connection resiliency in EF Core](https://learn.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency#transaction-commit-failure-and-the-idempotency-issue) describes this commit-failure window.
+
+**Leases reduce overlap; they do not prevent it.** The lease is longer than the provider call's timeout, so a slow but live worker is usually not swept while it waits. A worker paused by the scheduler or a long garbage collection can still outlive its lease. When a lease lapses, a recovery sweeper takes ownership by incrementing `LeaseEpoch`, and every later write from the original worker is conditional on the epoch it held. The epoch fences writes. It cannot fence a request the paused worker already sent, or one it sends after waking, because the provider never sees the epoch. [Idempotency Does Not Prevent Authority Replay](../articles/2026/idempotency-does-not-prevent-authority-replay.md#reconciliation-and-what-makes-an-attempt-new) and Martin Kleppmann's [How to do distributed locking](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html) explain both limits.
 
 ---
 
 ## 11. Classify the Outcome by What the Provider Can Prove
 
-Before sending, the executor moves the attempt from `Claimed` to `Started` in a durable write. That ordering gives the platform one fact it would otherwise lack: an attempt still in `Claimed` provably never reached the provider.
+Before sending, the executor moves the attempt from `Claimed` to `Started` in a durable write. That ordering gives the platform one fact it would otherwise lack: an attempt still in `Claimed` never reached the provider. That fact holds only under four conditions, and each is part of the design:
+
+- the executor sends only after the `Started` write is **confirmed** committed;
+- the `Started` write is conditional on the attempt being `Claimed`, the lease epoch the worker holds, and the lease not having expired;
+- a worker whose `Started` write fails, or whose outcome it cannot confirm, does not send;
+- the sweeper fences the old worker by incrementing the epoch **before** it treats a `Claimed` attempt as `NotStarted`, so the old worker's `Started` write can no longer succeed.
+
+An attempt found in `Started` is different. The worker may have sent, may be paused and about to send, or may never have sent. Local state cannot tell, so a `Started` attempt whose lease lapsed becomes `Unknown`, never `NotStarted` or `NotApplied`.
 
 ```csharp
 if (!await attempts.TryMarkStartedAsync(attempt.AttemptId, attempt.LeaseEpoch, ct))
 {
-    return AttemptResult.NotStarted("lease.lost");
+    // Write refused, or its commit could not be confirmed: do not send.
+    return AttemptResult.NotSent("start.unconfirmed");
 }
 
 ProviderResponse response;
@@ -459,8 +510,8 @@ try
 {
     response = await provider.SubmitPayoutAsync(
         new ProviderPayoutRequest(
-            ClientReference: attempt.PayoutId,
-            IdempotencyKey: attempt.IdempotencyKey,
+            ClientReference: attempt.ClientReference,          // PAY-3107-a1
+            IdempotencyKey: attempt.IdempotencyKey,            // payout-PAY-3107-a1
             DestinationToken: current.Destination.ProviderToken,
             Amount: current.Intent.Amount,
             Currency: current.Intent.Currency),
@@ -468,7 +519,10 @@ try
 }
 catch (Exception ex) when (ex is TimeoutException or HttpRequestException or TaskCanceledException)
 {
-    return await attempts.RecordAsync(attempt, AttemptState.Unknown, "provider.no-response", ct);
+    // The caller's token may already be cancelled. Record with a separate, bounded token;
+    // if this write also fails, the lease lapses and the sweeper records Unknown.
+    using CancellationTokenSource recordTimeout = new(TimeSpan.FromSeconds(10));
+    return await attempts.RecordAsync(attempt, AttemptState.Unknown, "provider.no-response", recordTimeout.Token);
 }
 
 return await attempts.RecordAsync(attempt, OutcomeClassifier.Classify(response), ct);
@@ -478,12 +532,14 @@ The classifier uses the provider's documented semantics, not the HTTP status alo
 
 | Observation | Attempt state | Payout state | Why |
 | --- | --- | --- | --- |
-| Failure before `Started` was written: credential unavailable, request invalid, lease lost | `NotStarted` | `Approved`, awaiting fresh authority | Affirmative evidence nothing was sent. The grant is consumed, so a new attempt needs a new grant |
+| Failure before a confirmed `Started` write: credential unavailable, request invalid, lease lost | `NotStarted` | Back to `Approved`, with a new version, awaiting fresh authority | Affirmative evidence nothing was sent, under the conditions above. The grant is consumed, so a new attempt needs a new grant |
 | Provider reports a rejection it documents as no-effect, for example `destination_closed` | `Failed` | `Failed` | The provider said the payout did not happen. Resending fails the same way |
-| Provider reports a transient rejection it documents as no-effect, for example rate limiting | `Started`, with a recorded send failure | `Executing` | A bounded resend inside the same attempt, same key and parameters, is allowed |
+| Provider reports a transient rejection it documents as no-effect, for example rate limiting | `Started`, with a recorded send failure | `Executing` | A bounded resend inside the same attempt, same key and parameters, is allowed before the attempt's send deadline |
 | Provider accepted the request for asynchronous processing | `Started` | `Executing` | Accepted is not completed. Wait for a status check or notification |
 | Provider reports completion | `Succeeded` | `Paid` | The provider's contract establishes the effect |
 | Timeout, reset, crash after `Started`, or an error not documented as no-effect | `Unknown` | `Unknown` | The provider may have completed the payout. Nobody can yet say |
+
+The daily-limit reservation follows the outcome: it becomes part of the paid total on `Succeeded`, is released on `NotStarted` or `Failed`, and stays held while the attempt is `Started` or `Unknown`.
 
 `Failed` here means the provider affirmatively reported that the payout did not happen. A system that uses `Failed` more broadly must still represent "we do not know" separately. [An Allowed Decision Does Not Mean the Operation Succeeded](../articles/2026/allowed-decision-does-not-mean-execution-succeeded.md#illustrative-execution-states) explains these states, which are illustrative rather than a required enum.
 
@@ -504,6 +560,8 @@ The classifier uses the provider's documented semantics, not the HTTP status alo
 
 Evidence records identifiers, amounts, currency, and provider reason codes. It does not record destination tokens, account details, provider credentials, or raw provider payloads. [Secure Logging Across Trust Boundaries](../security/secure-logging-across-trust-boundaries.md) covers keeping evidence useful without making it a store of sensitive data.
 
+Evidence also needs an owner and rules: how long each record is kept, who may read it, and that nobody can edit or delete it within that period, including the services that wrote it. Those periods and access rules come from the organization's finance, audit, and legal owners. This case only requires that they exist and that they are enforced by the store rather than by convention.
+
 ---
 
 ## 13. Reconcile Before Any New Attempt
@@ -521,38 +579,47 @@ sequenceDiagram
 
     Q->>W1: 16:00:04 deliver MSG-A71
     W1->>S: validate, claim GRT-19C, ATT-1 Claimed then Started
-    W1->>P: submit PAY-3107, key payout-PAY-3107-a1
+    W1->>P: submit PAY-3107-a1, key payout-PAY-3107-a1
     P--xW1: payout completed, response lost
     W1->>S: 16:00:34 ATT-1 Unknown, payout Unknown
     Q->>W2: 16:00:35 redeliver MSG-A71
     W2->>S: validate
     S-->>W2: GRT-19C consumed by ATT-1 (duplicate delivery)
     Note over W2: acknowledge, no state change, no provider call
-    R->>P: 16:05 look up by client reference PAY-3107
+    R->>P: 16:05 look up by client reference PAY-3107-a1
     P-->>R: PRV-TX-55021, completed
     R->>S: ATT-1 Succeeded, payout Paid, reconciliation record
 ```
 
-The reconciler does not hold a grant and does not need one, because it never submits a payout. It only asks the provider what happened:
+The reconciler does not hold a grant and does not need one, because it never submits a payout. It only asks the provider what happened to this exact attempt:
 
 ```text
 for each attempt in Unknown, oldest first, at a controlled rate:
-    look up the provider by client reference (PayoutId)
+    query the provider with the strongest non-mutating lookup it supports for this attempt
+    (here: client reference PAY-3107-a1)
+        found → first verify provider account, tenant mapping, destination, amount, and currency
+                match the attempt; on any mismatch, escalate
         found, completed          → Succeeded; record provider reference
-        found, rejected/returned  → Failed; record provider reason
+        found, rejected           → Failed; record provider reason
         found, still processing   → leave Unknown; check again later
-        not found                 → NotApplied only if the provider documents that a payout
-                                    not visible after its stated processing window was never
-                                    accepted, and that window has passed; otherwise leave Unknown
-    cannot tell, or too old       → escalate to payments operations; never resend
+        not found                 → leave Unknown, unless the provider explicitly guarantees that
+                                    a payout not visible after its stated processing window was
+                                    never accepted, and that window has passed; then NotApplied
+    cannot tell, or past the escalation deadline → escalate to payments operations; never resend
 ```
 
-Two cautions shape that loop:
+Four cautions shape that loop:
 
-- **Prefer a non-mutating lookup.** Replaying the original request with the original key can be safe where the provider documents that a repeat cannot pay twice, and only while the key is within the provider's retention period. Even then it is a recovery action, not a read, and its response may not establish the outcome. The fictional provider in this case offers lookup by client reference, so the reconciler reads.
-- **"Not found" is decisive only when the provider says so.** A lookup can lag behind writes, and a request still in flight may not be visible. Without documented processing rules, "not found" stays `Unknown` and a person decides.
+- **Look up the attempt, not the payout.** Once a payout has two attempts, the provider may hold a rejection for one and a completion for the other. A lookup by `PayoutId` alone could resolve attempt 2 with attempt 1's record. The client reference, provider reference, or idempotency key ties the provider's record to one attempt, and the amount, currency, destination, and account checks confirm it is the right one.
+- **Use what the provider actually offers.** Lookup by client reference is convenient but not universal. Depending on the provider, the strongest non-mutating evidence may be a provider reference, a merchant reference, an idempotency-result query, a settlement record, or a verified asynchronous notification. The fictional provider here supports client-reference lookup; a real integration uses whatever its provider documents.
+- **"Not found" stays `Unknown` by default.** A lookup can lag behind writes, and a request still in flight may not be visible. Unless the provider explicitly guarantees otherwise, absence is not evidence, and a person decides.
+- **A return is not a rejection.** A payout the provider completed and the beneficiary's bank later returned *was* submitted and *did* complete. The attempt is `Succeeded`, and the return is a separate, later lifecycle event recorded on the payout, with its own handling. Recording it as `Failed` would erase the fact that money moved.
 
-At 16:05 the reconciler finds `PRV-TX-55021`, completed. `ATT-1` becomes `Succeeded`, `PAY-3107` becomes `Paid`, and the redelivery at 16:00:35 is explained: it was a duplicate of work that had already succeeded. Nothing was sent twice.
+Lookup-first is the conservative choice made in this case, not the only legitimate one. Some providers document that repeating the original request, with the original key and identical parameters, is safe after a network error and returns the original result while the key is retained. Where that contract exists, a same-key replay is a valid recovery action. It is not a read: if the original request never arrived, the replay *is* the payout. So it belongs to a recovery component with explicit permission to resend within the original attempt, before the key's retention ends, and never to the read-only reconciler. Its response resolves the attempt only if it actually establishes the outcome.
+
+**Schedule and backlog.** The reconciler runs on a timer, here every minute, with each `Unknown` attempt checked on an increasing backoff, for example 1, 2, 5, and 15 minutes, at a rate the provider's limits allow. Each attempt also has an escalation deadline, here 60 minutes or the end of the provider's documented processing window, whichever is later. When the backlog grows faster than the reconciler drains it, the rate stays bounded and the oldest attempts are escalated first; the backlog is an operations signal, not a reason to start resending.
+
+At 16:05 the reconciler finds `PRV-TX-55021` under `PAY-3107-a1`, completed, with the expected account, amount, currency, and destination. `ATT-1` becomes `Succeeded`, `PAY-3107` becomes `Paid`, and the redelivery at 16:00:35 is explained: it was a duplicate of work that had already succeeded. Nothing was sent twice.
 
 If the provider's late response or notification reaches the platform first, it may resolve `ATT-1` through the same narrow evidence write, conditional on the attempt still being `Unknown`. It records what happened to a request already sent; it does not restore any worker's ownership.
 
@@ -560,13 +627,14 @@ If the provider's late response or notification reaches the platform first, it m
 
 ## 14. Four Kinds of Retry
 
-"Retry" names four different actions here. Each has its own permission.
+"Retry" names four different actions here, and a fifth action looks like one. Each has its own permission.
 
-| Retry | What repeats | Needs new authority? | Allowed while an attempt is `Unknown`? |
+| Action | What repeats | Needs new authority? | Allowed while an attempt is `Unknown`? |
 | --- | --- | --- | --- |
 | Delivery retry | The broker redelivers, or an operator resubmits, the same job | No. The worker validates; a consumed grant makes it a duplicate | Yes. It makes no provider call |
-| Execution retry | A resend inside the same claimed attempt, with the same key and parameters, after a documented no-effect rejection | No. It is part of `ATT-1` | No. The attempt must not be `Unknown` |
-| Reconciliation | A provider lookup, or a documented-safe replay of the original request | No. It does not submit a new payout | Yes. This is how `Unknown` is resolved |
+| Execution retry | A resend inside the same claimed attempt, with the same key and parameters, after a documented no-effect rejection and before the send deadline | No. It is part of `ATT-1` | No. The attempt must not be `Unknown` |
+| Reconciliation | A non-mutating provider lookup | No. It cannot move money | Yes. This is how `Unknown` is resolved |
+| Recovery replay | The original request, same key and parameters, where the provider documents that a repeat is safe and the key is still retained | No new grant, but an explicit recovery permission held by a separate component. If the original never arrived, the replay *is* the payout | Yes, only under those conditions, and only for the original attempt |
 | Authorization retry | A new decision and a new grant, for a materially new attempt | Yes. Fresh context, fresh decision, fresh grant | No. Reconciliation first |
 
 The common bug is letting a generic resilience policy perform an execution retry after a timeout. A timeout is not a documented no-effect rejection. [Capability-Scoped Background Operation](capability-scoped-background-operation.md#27-operational-retry-versus-authorization-retry) separates operational and authorization retries in a longer worked case.
@@ -592,11 +660,12 @@ Even together they do not make the payout exactly once. No transaction spans the
 
 ## 16. What Makes a Payout Attempt Materially New
 
-Suppose reconciliation had proven `NotApplied`: the provider's processing window passed and the payout does not exist. The invoice is still unpaid. Sending it again is a **materially new attempt**, not a retry of `ATT-1`. It needs:
+Suppose reconciliation had proven `NotApplied`: the provider explicitly guarantees that a payout not visible after its processing window was never accepted, the window has passed, and the payout does not exist. The invoice is still unpaid, and `PAY-3107` is back in `Approved` with no active attempt. Sending it again is a **materially new attempt**, not a retry of `ATT-1`. It needs:
 
-- **A current decision.** `PAY-3107` is re-evaluated under current facts, producing `DEC-5544`. The beneficiary may have been suspended, the tenant's daily limit may be used up, or the invoice may have been paid another way.
-- **New authority.** `GRT-1A2`, bound to the new decision and attempt 2. `GRT-19C` stays consumed forever.
-- **A new attempt.** `ATT-2`, permitted only because `ATT-1` reached a terminal state.
+- **A current decision.** A reauthorization request re-evaluates `PAY-3107` under current facts, producing `DEC-5544`. The policy's state precondition differs from a first submission: instead of `Draft`, it requires `Approved` with no active attempt and no attempt in `Started` or `Unknown`. The beneficiary may have been suspended, the tenant's daily limit may be used up, or the invoice may have been paid another way.
+- **New authority.** `GRT-1A2`, bound to the new decision, the payout's new version, and attempt 2. `GRT-19C` stays consumed forever.
+- **An attempt number allocated atomically.** The decision transaction increments the payout's attempt counter, so two concurrent reauthorizations cannot both obtain attempt 2.
+- **A new attempt.** `ATT-2`, with client reference `PAY-3107-a2`, permitted only because `ATT-1` reached a terminal state.
 - **A key chosen from the provider's documented semantics.** If the provider returns the saved result of the first request under a key, attempt 2 needs `payout-PAY-3107-a2`. The attempt number comes from the new decision, not from the worker.
 
 An attempt is also materially new when the amount, currency, beneficiary, destination, or purpose would differ, when the earlier attempt `Failed` and someone wants to try again anyway, or when the grant behind it is consumed, expired, or revoked.
@@ -623,24 +692,29 @@ The original payout's records stay as they are. The recall links to them. [An Al
 | Tenant payouts suspended | `Denied` | none | — | 0 | none | `Draft` |
 | Beneficiary not verified | `Denied` | none | — | 0 | none | `Draft` |
 | Context unavailable | `Deferred` | none | — | 0 | none | `Draft` |
+| Second payout would exceed the daily limit once the first one's reservation is counted | `Denied` (`tenant.daily-limit`) | none | — | 0 | none | `Draft` |
 | Destination recently changed | `AcknowledgmentRequired` | none | — | 0 | none | `Draft` |
 | Amount above requester's limit | `EscalationRecommended` | none | — | 0 | none | `Draft` |
 | Job delivered after grant expiry | historical `Allowed` | refused `grant.expired` | — | 0 | none | `Approved`, awaiting fresh decision |
 | Grant revoked by a finance hold | historical `Allowed` | refused `grant.revoked` | — | 0 | none | `Approved`, on hold |
-| Consumed grant presented by a different job | historical `Allowed` | refused, recorded as replay | — | 0 | none | unchanged |
+| Consumed grant presented again under a new job or message ID | historical `Allowed` | refused `grant.consumed`, recorded as duplicate | — | 0 | none | unchanged |
+| Context unavailable at the worker | historical `Allowed` | postponed `context.unavailable` | not attempted | 0 | none | `Approved`; revalidated on redelivery while the grant is valid |
 | Message altered to point at another payout | historical `Allowed` | refused `binding.mismatch` | — | 0 | none | unchanged |
 | Grant presented by a different service | historical `Allowed` | refused `presenter.not-audience` | — | 0 | none | unchanged |
 | Payout cancelled after the decision | historical `Allowed` | refused `payout.not-executable` | — | 0 | none | `Cancelled` |
 | Destination changed after the decision | historical `Allowed` | refused `payout.not-executable` | — | 0 | none | `Approved`, version changed |
 | Tenant suspended after the decision | historical `Allowed` | refused `policy.no-longer-allows` | — | 0 | none | `Approved` |
+| Beneficiary suspended between validation and claim | historical `Allowed` | valid when read | context fence fails, rolled back | 0 | none | `Approved` |
 | Two workers race for one grant | `Allowed` | both valid | one wins, one `claim.lost` | 1 in total | winner's outcome | winner's outcome |
+| Claim commits but its acknowledgment is lost | `Allowed` | valid | committed, unconfirmed; worker does not send | 0 | `Claimed`, then `NotStarted` after the sweeper fences | Back to `Approved`, awaiting fresh authority |
 | Redelivery after the claim | `Allowed` | duplicate delivery | — | 0 additional | unchanged | unchanged |
-| Provider credential unavailable before send | `Allowed` | valid | won | 0 | `NotStarted` | `Approved`, awaiting fresh authority |
+| Provider credential unavailable before send | `Allowed` | valid | won | 0 | `NotStarted` | Back to `Approved`, awaiting fresh authority |
 | Provider rejects: destination closed | `Allowed`, unchanged | valid | won | 1 | `Failed` | `Failed` |
 | Provider rate-limits, documented no-effect | `Allowed` | valid | won | 1 per send, bounded | outcome of the final send | per that outcome |
 | Provider times out after accepting | `Allowed` | valid | won | 1 | `Unknown` | `Unknown` |
 | Reconciliation finds the payout completed | `Allowed` | — | — | 0 additional | `Succeeded` | `Paid` |
-| Reconciliation proves not applied | `Allowed` | — | — | 0 additional | `NotApplied` | `Approved`, awaiting fresh decision |
+| Reconciliation finds a record whose amount or destination does not match the attempt | `Allowed` | — | — | 0 additional | `Unknown`, escalated | `Unknown` |
+| Reconciliation proves not applied, under an explicit provider guarantee | `Allowed` | — | — | 0 additional | `NotApplied` | `Approved`, awaiting fresh decision |
 | Reconciliation cannot tell | `Allowed` | — | — | 0 additional | `Unknown`, escalated | `Unknown` |
 
 The decision column never changes after it is written. Many rows have a historical `Allowed` decision and still make no provider call: a past decision is not current permission, and the worker decides at the moment of claim.
@@ -671,7 +745,7 @@ The same trace holds for `Denied`, `Deferred`, and `AcknowledgmentRequired`.
           payout:         Approved, awaiting a fresh decision
 ```
 
-A revoked grant, a consumed grant presented by another job, a message pointing at another payout, and a grant presented by another service follow the same shape with their own reason codes.
+A revoked grant, a consumed grant presented again, a message pointing at another payout, and a grant presented by another service follow the same shape with their own reason codes.
 
 ### Trace C: Payout no longer executable
 
@@ -688,10 +762,19 @@ A revoked grant, a consumed grant presented by another job, a message pointing a
 ```text
 16:00:04.120  worker A validates GRT-19C: valid
 16:00:04.125  worker B validates GRT-19C: valid
-16:00:04.131  worker A claims: grant row 1, payout row 1 → commit, ATT-1
-16:00:04.133  worker B claims: grant row 0 → rollback, claim.lost
+16:00:04.131  worker A claims: context fence 4/4, grant row 1, payout row 1 → commit, ATT-1
+16:00:04.133  worker B claims: context fence 4/4, grant row 0 → rollback, claim.lost
               worker B provider calls: 0
               total provider calls:    1
+```
+
+The same shape holds when the context changed between validation and claim:
+
+```text
+16:00:04.120  worker A validates GRT-19C: valid (beneficiary version 4)
+16:00:04.126  risk team suspends BEN-2208 → beneficiary version 5, commits
+16:00:04.131  worker A claims: beneficiary fence 0 rows → rollback, claim.context-changed
+              provider calls: 0
 ```
 
 ### Trace E: Deterministic provider rejection
@@ -719,8 +802,9 @@ A revoked grant, a consumed grant presented by another job, a message pointing a
 ### Trace G: Reconciliation confirms success
 
 ```text
-16:05:00  reconciler looks up client reference PAY-3107
+16:05:00  reconciler looks up client reference PAY-3107-a1
           provider: PRV-TX-55021, completed
+          account, amount, currency, destination: match ATT-1
           ATT-1:    Succeeded
           PAY-3107: Paid
           provider submit calls in total: 1
@@ -792,10 +876,17 @@ public async Task Reconciliation_confirms_success_without_a_duplicate_payout()
 Additional tests should prove that:
 
 - concurrent claims on one grant produce exactly one attempt and one provider call;
-- an attempt left in `Claimed` is classified `NotStarted`, and one left in `Started` is classified `Unknown`;
-- a generic resilience policy does not resend after a timeout;
+- a beneficiary, destination, tenant, or policy change committed between validation and claim rolls the claim back with zero provider calls;
+- two payouts evaluated concurrently cannot together exceed the tenant's daily limit;
+- a claim whose commit acknowledgment is lost produces no send, and recovery resolves the attempt from durable state;
+- an attempt left in `Claimed` is classified `NotStarted` only after the sweeper fences the old worker, and one left in `Started` is classified `Unknown`;
+- a worker whose `Started` write is refused or unconfirmed does not send;
+- a generic resilience policy does not resend after a timeout, and no resend happens after the attempt's send deadline;
 - a worker that lost its lease cannot write a state transition;
-- a materially new attempt needs a new decision and grant, and is refused while an earlier attempt is `Unknown`;
+- with two attempts on one payout, reconciliation resolves each from its own provider record, and a record whose amount or destination does not match escalates;
+- a provider return after completion is recorded as a separate event, not as a `Failed` attempt;
+- a materially new attempt needs a new decision and grant, and is refused while an earlier attempt is `Started` or `Unknown`;
+- the provider-outcome classifier maps each documented provider response, from a table of recorded test vectors, to the expected attempt state;
 - no grant, message, or evidence record contains a destination token or provider credential.
 
 [How to Test That a Denied Operation Never Executes](../articles/2026/test-denied-operation-never-executes.md) covers the zero-execution assertion in depth. [Idempotency Does Not Prevent Authority Replay](../articles/2026/idempotency-does-not-prevent-authority-replay.md#testing-both-directions) shows tests for both replay and ambiguous-retry directions.
@@ -810,8 +901,9 @@ Signals worth watching:
 
 - **`Unknown` attempts by age.** The most important payout metric in this design. An attempt that stays `Unknown` past the provider's processing window needs a person.
 - **Reconciliation outcomes.** How often `Unknown` resolves to `Succeeded`, `Failed`, `NotApplied`, or escalation. A rise in `Succeeded` after timeouts points at provider latency or a timeout set too short.
-- **Validation refusals by reason code.** A spike in `grant.expired` points at queue backlog. A spike in `binding.mismatch` or recorded replays is a security signal.
-- **Claims lost and duplicate deliveries.** Expected at a low rate; a high rate points at broker or worker misconfiguration.
+- **Validation refusals by reason code.** A spike in `grant.expired` points at queue backlog. A spike in `binding.mismatch` or `presenter.not-audience` is a security signal.
+- **Claims lost, context-fence rollbacks, and duplicate deliveries.** Expected at a low rate; a high rate points at broker or worker misconfiguration, or at context that changes faster than the batch runs.
+- **Unconfirmed commits and fenced `Claimed` attempts.** Each one is a payout that needs fresh authority, and a rising count points at database or network instability.
 - **Grants issued but never consumed.** Payouts that missed their window and are waiting for a fresh decision.
 
 Every log line carries `CorrelationId` and `PayoutId`, and where present `DecisionId`, `GrantId`, and `AttemptId`. A correlation identifier groups records. It is never used to authorize or deduplicate anything.
@@ -823,8 +915,8 @@ Every log line carries `CorrelationId` and `PayoutId`, and where present `Decisi
 This specimen leaves the following to the host and its owners:
 
 - **Grant representation.** A database row referenced by identifier is the simplest. A signed portable grant needs key custody and verification; [Capability-Scoped Background Operation](capability-scoped-background-operation.md#8-protect-portable-capability-integrity) covers that choice.
-- **Freshness rule.** Rechecking current policy at claim time is conservative. A policy deployment between 09:58 and 16:00 can refuse many queued payouts. Choose and test that tradeoff explicitly.
-- **Provider semantics.** Retention of idempotency keys, which errors are documented as no-effect, whether lookup by client reference exists, how long processing can take, and whether recall is supported all come from the provider's current documentation. Each row of the outcome table depends on them.
+- **Freshness rule and consistency model.** Rechecking current policy and fencing context versions at claim time is conservative. A policy release between 09:58 and 16:00 can refuse many queued payouts. Choose and test that tradeoff explicitly, and for every fact the claim cannot fence, write down its permitted staleness.
+- **Provider semantics.** Key format and retention, which responses are documented as no-effect, accepted, or completed, which non-mutating lookups exist, whether "not found" is ever decisive, how long processing can take, how returns are reported, and whether recall is supported all come from the provider's current documentation. Record them as an explicit, versioned classification table per provider, with recorded test vectors for each row, and revisit it when the provider changes its API.
 - **Batch and cut-off rules.** Payment windows, value dates, and holidays belong to finance operations.
 - **Multi-instance claim.** The claim works only if every worker and the sweeper use the same durable store and conditional writes.
 - **Approval workflows.** Escalation and acknowledgment produce fresh decisions; they do not upgrade the original one.
@@ -846,7 +938,19 @@ The worker records `Failed` on timeout, and the next batch submits the payout ag
 
 ### A new idempotency key is generated per send
 
-The resend after a timeout uses a fresh key, so the provider treats it as a new payout. The key is fixed per attempt and derived from `PayoutId` and attempt number.
+The resend after a timeout uses a fresh key, so the provider treats it as a new payout. The key is fixed per attempt and recorded before the first send.
+
+### Validation and claim read different worlds
+
+The worker checks the beneficiary, then claims a few milliseconds later without rechecking. A suspension that lands in between is missed. The claim fences every fact validation relied on, or the design states the staleness it accepts.
+
+### Reconciliation looks up the payout instead of the attempt
+
+With two attempts on one payout, a lookup by `PayoutId` finds attempt 1's rejection and resolves attempt 2 with it. Lookups use an attempt-specific reference and check the amount, currency, destination, and account.
+
+### A lost commit is treated as a lost claim, or as a won one
+
+The claim's `COMMIT` times out. One worker assumes it lost and moves on, leaving a consumed grant nobody owns; another assumes it won and sends without a confirmed `Started`. Neither sends without confirmation, and recovery reads durable state.
 
 ### The queue message carries the payout details
 
@@ -866,7 +970,7 @@ To retry, someone sets `GRT-19C` back to `Issued`. A consumed grant is never res
 
 ### Reconciliation resends instead of reading
 
-The reconciler "fixes" `Unknown` by submitting again. Reconciliation reads first, and resends only where the provider documents that a repeat is safe.
+The reconciler "fixes" `Unknown` by submitting again. Reconciliation only reads. A same-key replay is a separate recovery action, used only where the provider documents that a repeat is safe.
 
 ### Exactly-once is claimed
 
@@ -881,7 +985,9 @@ The design document promises each payout happens exactly once. It cannot. It pre
 | Delayed execution with a grant | Batch release without forwarding user credentials | A grant store, expiry handling, and payouts that miss their window |
 | Current-state and current-policy check at claim | Cancelled, changed, or newly disallowed payouts do not run | Policy changes can refuse queued payouts; the worker depends on context sources |
 | Atomic claim in one local transaction | One attempt per grant, even under races | Grant, payout, and attempt state must share a store |
-| `Started` written before the send | Proof that `Claimed` attempts sent nothing | One more durable write per payout |
+| Context versions fenced in the claim | Changes between validation and claim are caught | Serializable isolation or shared locks; more claim rollbacks when context changes often |
+| Daily-limit reservation at grant issuance | Concurrent payouts cannot jointly exceed the limit | Reservations must be released on expiry, `NotStarted`, and `Failed`, and held while `Unknown` |
+| Confirmed `Started` write before the send | Proof, under stated conditions, that `Claimed` attempts sent nothing | One more durable write per payout; an unconfirmed write costs the attempt |
 | `Unknown` as a first-class state | No blind second payout | Payouts can sit unresolved; operations must own the backlog |
 | Lookup-first reconciliation | Resolution without mutation | Depends on the provider offering a lookup and documenting its consistency |
 
@@ -889,7 +995,7 @@ The design document promises each payout happens exactly once. It cannot. It pre
 
 ## 25. The Simpler Alternative
 
-Most payouts do not need this architecture. If the payout is submitted **immediately, inside the authenticated request, by the same trusted host**, much of it disappears:
+Immediate payouts in the same trusted host may need far fewer components. If the payout is submitted **immediately, inside the authenticated request, by the same trusted host**, much of this architecture disappears:
 
 ```text
 Authenticated request
@@ -898,7 +1004,7 @@ Ordinary authorization: role, tenant, approval limit
     ↓
 Load and check the payout record
     ↓
-Provider call with a stable idempotency key derived from PayoutId
+Provider call with an idempotency key fixed for the attempt
     ↓
 Synchronous result, recorded
 ```
@@ -919,33 +1025,37 @@ If payouts run immediately in the requesting host, ordinary authorization plus i
 
 **Decision**
 
-1. Is the intent bound to the authoritative payout record, including amount, currency, beneficiary, destination, purpose, and version?
+1. Is the intent bound to the authoritative payout record, with a canonical terms fingerprint kept separate from the record versions?
 2. Do `Denied`, `Deferred`, `AcknowledgmentRequired`, and `EscalationRecommended` all stop before any grant is issued?
-3. Is the decision recorded before the grant, and never rewritten afterward?
+3. Are the decision, grant, reservation, payout transition, and outbox row written in one commit, and is the decision never rewritten afterward?
+4. Are concurrent payouts prevented from jointly exceeding shared limits?
 
 **Authority and delivery**
 
-4. Is the grant single-use, short-lived, bound to one payout and version, and free of credentials?
-5. Does the queue message carry only references?
-6. Is the worker's identity a presenter identity rather than payout authority?
+5. Is the grant single-use, short-lived, bound to one payout, version, and attempt number, and free of credentials?
+6. Does the grant's window govern admission only, with resends bounded by the attempt's own deadline?
+7. Does the queue message carry only references?
+8. Is the worker's identity a presenter identity rather than payout authority?
 
 **Claim and execution**
 
-7. Does the worker rebuild current payout state and recheck current policy before claiming?
-8. Is the claim one atomic transition across grant, payout, and attempt, with zero provider calls on failure?
-9. Is `Started` written before the provider call?
-10. Are outcomes classified by the provider's documented semantics, with timeouts recorded as `Unknown`?
+9. Does the worker rebuild current state and recheck current policy, postponing rather than allowing when context is unavailable?
+10. Does the claim fence every mutable fact validation relied on, and is the staleness of every unfenced fact stated?
+11. Is the claim one atomic transition across grant, payout, and attempt, with zero provider calls on failure?
+12. Does the worker refuse to send when its claim or `Started` write cannot be confirmed?
+13. Are outcomes classified from an explicit per-provider table, with timeouts recorded as `Unknown` and returns kept separate from rejections?
 
 **Reconciliation and retry**
 
-11. Does an `Unknown` attempt block every new attempt until reconciled?
-12. Does reconciliation read before it resends?
-13. Are delivery, execution, reconciliation, and authorization retries distinguished, each with its own permission?
-14. Does a materially new attempt need a new decision and grant?
+14. Does a `Started` or `Unknown` attempt block every new attempt until reconciled?
+15. Does reconciliation look up the exact attempt, verify the provider record's terms, and only read?
+16. Is "not found" left `Unknown` unless the provider explicitly guarantees otherwise?
+17. Are delivery retry, execution retry, reconciliation, recovery replay, and authorization retry distinguished, each with its own permission?
+18. Does a materially new attempt need a new decision, a new grant, and an atomically allocated attempt number?
 
 **Proportionality**
 
-15. Has the team checked whether immediate execution with ordinary authorization, idempotency, and reconciliation meets the stopping rule?
+19. Has the team checked whether immediate execution with ordinary authorization, idempotency, and reconciliation meets the stopping rule?
 
 ---
 
@@ -969,6 +1079,17 @@ If payouts run immediately in the requesting host, ordinary authorization plus i
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md) covers atomic consumption and the consume-before-execute failure windows.
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md) introduces narrow authority validated at the execution boundary.
 - [Should Authorization Fail Open, Fail Closed, or Defer?](../articles/2026/fail-open-fail-closed-or-defer.md) covers what happens when the decision itself cannot be made.
+
+### Related Work
+
+These external references address the boundaries this case depends on. Provider documentation describes one provider's contract at the time of writing; check your own provider's current documentation before relying on any of it.
+
+- [RFC 9110, section 9.2.2](https://www.rfc-editor.org/rfc/rfc9110#section-9.2.2) defines idempotent methods and cautions against automatically retrying a non-idempotent request unless the client knows it is safe.
+- Stripe's [idempotent requests](https://docs.stripe.com/api/idempotent_requests) and [low-level error handling](https://docs.stripe.com/error-low-level) documentation are one provider's statement of key retention, saved results, and when a same-key retry after a network error is safe.
+- Adyen's [API idempotency](https://docs.adyen.com/development-resources/api-idempotency/) documentation describes missing responses after a timeout and combining idempotency with asynchronous notifications.
+- The Azure Architecture Center's [Transactional Outbox pattern](https://learn.microsoft.com/en-us/azure/architecture/databases/guide/transactional-outbox-cosmos) and AWS Prescriptive Guidance's [transactional outbox pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html) describe committing state and an outbox record together, and why consumers must still handle duplicates.
+- [Connection resiliency in EF Core](https://learn.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency#transaction-commit-failure-and-the-idempotency-issue) describes a transaction that commits while the client sees a failure.
+- Martin Kleppmann's [How to do distributed locking](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html) explains why a lease alone cannot stop a paused process from acting, and why fencing tokens must be checked by the resource itself.
 
 The case should leave one rule visible:
 
