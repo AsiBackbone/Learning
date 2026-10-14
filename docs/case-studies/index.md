@@ -77,6 +77,12 @@ Follow a fictional `report.generate` request from an allowed request-time decisi
 
 The case demonstrates that a queue message is not authority, a worker identity is not broad operation authority, altered scope is rejected, delayed execution remains freshness-bound, and operational retry stays distinct from fresh governance.
 
+### [Delayed Financial Payout and Ambiguous External Commit](delayed-financial-payout-and-ambiguous-external-commit.md)
+
+Follow a fictional `payout.submit` request from a bound payout intent through a governance decision, single-use execution authority, durable job delivery, worker validation against current payout state and policy, an atomic claim, a synthetic provider call, and reconciliation.
+
+The case separates the historical decision, the grant, the claim, the provider attempt, the execution outcome, and reconciliation evidence. It shows zero provider calls for every blocked pre-execution path, a deterministic rejection that leaves the decision `Allowed`, and a provider timeout recorded as `Unknown` and reconciled before any new attempt. It distinguishes idempotency from authority replay protection without claiming exactly-once execution, and includes a simpler synchronous alternative and a stopping rule.
+
 ### [Simulated Robotics-Command Governance Boundary](simulated-robotics-command-governance-boundary.md)
 
 Follow a deterministic fake robot command from planner or AI proposal through semantic command validation, authoritative device and regional context, governance, narrow one-use command authority, simulated gateway enforcement, current local safety checks, and fake physical execution.
