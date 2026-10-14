@@ -36,7 +36,9 @@
     background: var(--bs-body-bg);
     color: var(--bs-link-color);
     font-weight: 600;
-    box-shadow: 0 0 0 3px var(--bs-focus-ring-color);
+    /* The link color reaches the standard's 3:1 non-text contrast in both themes; Bootstrap's translucent
+       --bs-focus-ring-color does not (about 1.4:1 light, 1.3:1 dark). */
+    box-shadow: 0 0 0 3px var(--bs-link-color);
     transform: translateY(-150%);
     transition: transform 120ms ease-in-out;
 }
@@ -114,6 +116,9 @@
     font-weight: 600;
 }
 
+/* Start here uses two columns at every width above the small breakpoint, by design: Learning's routes carry
+   longer descriptions than the sibling sites, and two columns keeps them readable. The standard allows up to
+   three columns on large screens (LANDING-PAGE-STANDARD.md, Responsive breakpoints). */
 .entry-point-grid,
 .learning-path-grid {
     display: grid;
@@ -241,7 +246,7 @@
     margin-bottom: 1rem;
 }
 
-/* Shared organization landing-page components: AsiBackbone/.github LANDING-PAGE-STANDARD.md v1.0.0 */
+/* Shared organization landing-page components: AsiBackbone/.github LANDING-PAGE-STANDARD.md v1.1.0 */
 
 .fit-grid,
 .project-grid {
@@ -380,18 +385,6 @@
     .process-flow-short {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
-    .process-flow li:nth-child(4)::after {
-        right: -1.15rem;
-        bottom: auto;
-        transform: none;
-    }
-
-    .process-flow li:nth-child(even):not(:last-child)::after {
-        right: 50%;
-        bottom: -1.45rem;
-        transform: translateX(50%) rotate(90deg);
-    }
 }
 
 @media (max-width: 575.98px) {
@@ -412,19 +405,16 @@
     .process-flow-short {
         grid-template-columns: 1fr;
     }
-
-    .process-flow li:not(:last-child)::after,
-    .process-flow li:nth-child(4)::after,
-    .process-flow-short li:nth-child(4)::after {
-        right: 50%;
-        bottom: -1.45rem;
-        transform: translateX(50%) rotate(90deg);
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .skip-link,
     .entry-point {
         transition: none;
+    }
+
+    .entry-point:hover,
+    .entry-point:focus-visible {
+        transform: none;
     }
 }

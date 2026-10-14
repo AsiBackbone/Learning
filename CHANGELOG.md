@@ -23,6 +23,7 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ### Fixed
 
+- Closed the remaining landing-page accessibility gaps in the custom stylesheet. Start here cards no longer lift on hover or focus when reduced motion is requested. The skip link's focus ring now uses the theme link color, which reaches the standard's 3:1 non-text contrast in both themes (4.5:1 light, 6.4:1 dark); Bootstrap's translucent focus-ring color measured about 1.4:1 and 1.3:1. Removed the process-flow arrow rules, which never rendered because no base rule set their content; the numbered steps are unchanged. The stylesheet now records that Start here keeps two columns above the small breakpoint by design, and that its shared components follow [landing-page standard](https://github.com/AsiBackbone/.github/blob/main/LANDING-PAGE-STANDARD.md) v1.1.0 (#433).
 - Fixed the published-HTML metadata script inserting a literal `\n` instead of a line break before `</head>` when the document's line endings differ from the platform's (LF DocFX output processed on Windows). Browsers treated that text as body content, so the injected description meta tags moved into `<body>` and `\n` appeared at the top of the page. The script now matches the document's own line endings, and its self-test covers LF and CRLF documents and rejects any literal `\n`.
 - Ensured every published HTML page has a page-specific search description and matching social-preview descriptions, deriving a bounded fallback from rendered article content only when authored metadata is absent.
 
