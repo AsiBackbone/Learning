@@ -188,7 +188,7 @@ The rules are illustrative. Real payout controls belong to the organization's fi
 | --- | --- | --- |
 | Architecture | Platform architecture | Where the decision, grant, queue, claim, provider call, and reconciliation boundaries sit; which records are authoritative |
 | Implementation | Payments engineering | Intent binding, the side-effect-free policy, grant issuance, the worker's validation pipeline, the atomic claim, outcome classification, the reconciler |
-| Operations | Payments operations | Batch schedules, queue health, the `Unknown` backlog, escalations that reconciliation cannot resolve |
+| Operations | Payments operations | Batch schedules and queue health; owns the queue of `Unknown` attempts, the reconciliation service level, and escalations that reconciliation cannot resolve |
 | Security | Security engineering | Worker identity, custody of the provider credential, grant integrity, keeping account data out of messages and logs |
 | Governance | Finance and risk policy owners | Payout policy, approval limits, acknowledgment and escalation rules, and when compensation is permitted |
 | Execution | Payout executor | The only component that calls the provider, and only after a successful claim |
@@ -208,7 +208,7 @@ One service may implement several rows. What matters is that no row silently tak
 | `JobId` / `MessageId` | `JOB-604` / `MSG-A71` | Which unit of queued work, and which delivery of it? | Outbox relay | A resubmission tool may create a new `MessageId`; that changes nothing about authority |
 | `AttemptId` and attempt number | `ATT-1`, attempt 1 | Which claimed attempt, under which grant, produced which outcome? | The atomic claim creates the attempt. Its number is allocated atomically by the decision transaction and bound into the grant | Each claim creates one |
 | Client reference | `PAY-3107-a1` | Which of *our* attempts does a provider record belong to? | Derived from `PayoutId` and attempt number, sent with the request | Per attempt, so a lookup can never confuse attempt 1 with attempt 2 |
-| Provider idempotency key | `payout-PAY-3107-a1` | Has the provider already seen this exact request? | Derived deterministically from `PayoutId` and attempt number | Only for a materially new, newly authorized attempt |
+| Provider idempotency key | `payout-PAY-3107-a1` | Has the provider already seen this exact request? | Derived deterministically from `PayoutId` and attempt number | Only for a materially new, newly authorized attempt (see **What Makes a Payout Attempt Materially New**) |
 | Provider reference | `PRV-TX-55021` | What does the provider call this payout? | The provider | Not ours to change |
 
 In this specimen the idempotency key is derived from `PayoutId` and the authoritative attempt number, never from `CorrelationId`, `MessageId`, or `GrantId`. Each of those changes for reasons unrelated to whether the provider has already seen this request. Deterministic derivation is a design choice, not a universal rule: some providers recommend random keys, and every provider sets its own uniqueness scope, format, and retention. A production integration follows the provider's requirements. What must hold either way is that the key is fixed for the life of an attempt and recorded with it before the first send. [Idempotency Does Not Prevent Authority Replay](../articles/2026/idempotency-does-not-prevent-authority-replay.md#five-identifiers-five-questions) explains why one identifier doing several jobs is how a retry becomes a second payment.
@@ -349,7 +349,7 @@ The window, 15:55 to 16:25, covers the 16:00 batch and a short backlog. A payout
 
 **The grant's window governs admission, not every send.** The grant's window is checked when the worker claims it. Once the claim creates `ATT-1`, the attempt carries its own short send deadline, here five minutes after the claim. Every send for the attempt, including bounded resends and any recovery replay, happens before that deadline. After it, the attempt may only be reconciled. A consumed grant never admits a second attempt, whatever its window says.
 
-**The provider enforces the deadline too.** A local deadline check cannot stop a worker that pauses after the check and sends later. So every request for the attempt carries the send deadline as an expiry, and the fictional provider documents that it rejects, with no effect, any request it receives after that expiry by its own clock, allowing a stated skew of 30 seconds. Once the deadline plus that skew has passed, no request for `ATT-1`, from a paused worker or a delayed network path, can still take effect. Reconciliation relies on that in **Reconcile Before Any New Attempt**. Where a real provider offers no request expiry and no durable cancellation, absence of a payout can never become final, and the payout stays `Unknown` until a person resolves it.
+**The provider enforces the deadline too.** A local deadline check cannot stop a worker that pauses after the check and sends later. So every request for the attempt carries the send deadline as an expiry, and the fictional provider documents that it rejects, with no effect, any request it receives after that expiry by its own clock, allowing a stated skew of 30 seconds. Once the deadline plus that skew has passed, no request for `ATT-1`, from a paused worker or a delayed network path, can still take effect. Reconciliation relies on that in **Reconcile Before Any New Attempt**. Where a real provider offers no request expiry and no durable cancellation, absence alone cannot establish final non-execution while an outstanding sender or request may still act, and the payout stays `Unknown` until a person resolves it.
 
 ---
 
@@ -616,7 +616,7 @@ for each attempt in Unknown, oldest first, at a controlled rate:
         found, completed          → Succeeded; record provider reference
         found, rejected           → Failed; record provider reason
         found, still processing   → leave Unknown; check again later
-        not found                 → leave Unknown, unless BOTH:
+        not found                 → leave Unknown, unless ALL THREE hold:
                                     (1) the provider explicitly guarantees that a payout not visible
                                         after its stated processing window was never accepted, and
                                         that window has passed; and
@@ -676,13 +676,13 @@ Each one fails without the other:
 - With only idempotency, a replayed grant presented after the provider's key retention expires can produce a second payout, and nothing in the platform notices the reused authority.
 - With only authority replay protection, several sends can still happen inside one already claimed attempt: a resilience-policy retry after the timeout, or a recovery replay. The single-use grant stops a second attempt from being admitted; it does not deduplicate the provider requests the first attempt makes. Provider idempotency protects that separate boundary.
 
-Even together they do not make the payout exactly once. No transaction spans the platform's database and the provider's ledger. The moment between "the provider completed the payout" and "the platform recorded it" always exists, and a lost response inside it produces `Unknown`. What this design can honestly claim is narrower: duplicate payouts are prevented within these stated boundaries, and every case outside them surfaces as `Unknown` and is reconciled before anything else is sent. [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md#replay-resistance-is-not-exactly-once-execution) describes the same limit for consumed authority.
+Even together they do not make the payout exactly once. No transaction spans the platform's database and the provider's ledger. The moment between "the provider completed the payout" and "the platform recorded it" always exists, and a lost response inside it produces `Unknown`. What this design can honestly claim is narrower: duplicate payouts are prevented within these stated boundaries, and every case outside them surfaces as `Unknown` and is reconciled before any new attempt is authorized. [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md#replay-resistance-is-not-exactly-once-execution) describes the same limit for consumed authority.
 
 ---
 
 ## 16. What Makes a Payout Attempt Materially New
 
-Suppose reconciliation had proven `NotApplied`: the provider explicitly guarantees that a payout not visible after its processing window was never accepted, the window has passed, the payout does not exist, and `ATT-1`'s request expiry has passed, so no late request for it can still be accepted. The invoice is still unpaid, and `PAY-3107` is back in `Approved` with no active attempt. Sending it again is a **materially new attempt**, not a retry of `ATT-1`. It needs:
+Suppose reconciliation had proven `NotApplied` under the full conditions in **Reconcile Before Any New Attempt**: the provider's acceptance window and `ATT-1`'s request-expiry boundary have both closed, and a sufficiently late authoritative lookup establishes that the payout was never accepted. The invoice is still unpaid, and `PAY-3107` is back in `Approved` with no active attempt. Sending it again is a **materially new attempt**, not a retry of `ATT-1`. It needs:
 
 - **A current decision.** A reauthorization request re-evaluates `PAY-3107` under current facts, producing `DEC-5544`. The policy's state precondition differs from a first submission: instead of `Draft`, it requires `Approved` with no active attempt and no attempt in `Started` or `Unknown`. The beneficiary may have been suspended, the tenant's daily limit may be used up, or the invoice may have been paid another way.
 - **New authority.** `GRT-1A2`, bound to the new decision, the payout's new version, and attempt 2. `GRT-19C` stays consumed forever.
@@ -736,7 +736,7 @@ The original payout's records stay as they are. The recall links to them. [An Al
 | Provider times out after accepting | `Allowed` | valid | won | 1 | `Unknown` | `Unknown` |
 | Reconciliation finds the payout completed | `Allowed` | — | — | 0 additional | `Succeeded` | `Paid` |
 | Reconciliation finds a record whose amount or destination does not match the attempt | `Allowed` | — | — | 0 additional | `Unknown`, escalated | `Unknown` |
-| Reconciliation proves not applied, under an explicit provider guarantee, after the attempt's request expiry | `Allowed` | — | — | 0 additional | `NotApplied` | `Approved`, awaiting fresh decision |
+| Reconciliation proves not applied, under all three conditions in **Reconcile Before Any New Attempt** | `Allowed` | — | — | 0 additional | `NotApplied` | `Approved`, awaiting fresh decision |
 | Reconciliation cannot tell | `Allowed` | — | — | 0 additional | `Unknown`, escalated | `Unknown` |
 
 The decision column never changes after it is written. Many rows have a historical `Allowed` decision and still make no provider call: a past decision is not current execution permission, and the claim succeeds only if the grant and the current execution conditions still hold.
