@@ -83,6 +83,12 @@ Follow a fictional `payout.submit` request from a bound payout intent through a 
 
 The case separates the historical decision, the grant, the claim, the provider attempt, the execution outcome, and reconciliation evidence. It shows zero provider calls for every blocked pre-execution path, a deterministic rejection that leaves the decision `Allowed`, and a provider timeout recorded as `Unknown` and reconciled before any new attempt. It distinguishes idempotency from authority replay protection without claiming exactly-once execution, and includes a simpler synchronous alternative and a stopping rule.
 
+### [Shared Multi-Tenant Worker and Delayed Execution Isolation](shared-multi-tenant-worker-and-delayed-execution-isolation.md)
+
+Follow a fictional delayed `records.export` through authoritative tenant context, a tenant-bound execution grant, durable job delivery, one shared worker that authenticates as itself, and a protected host that resolves the tenant from its own records before a host-owned executor runs.
+
+The case separates actor identity, application tenant, directory tenant, workload identity, and client ID; rejects missing or conflicting workload identity claims; and shows zero executor calls for tenant, identity, audience, scope, freshness, revocation, and replay failures. It distinguishes cross-tenant substitution prevention from worker-compromise isolation, compares the shared baseline with separately enforced partition identities and credentials, treats tenant-scoped token exchange as optional, and explains when one shared worker with ordinary tenant checks is the proportionate design.
+
 ### [Simulated Robotics-Command Governance Boundary](simulated-robotics-command-governance-boundary.md)
 
 Follow a deterministic fake robot command from planner or AI proposal through semantic command validation, authoritative device and regional context, governance, narrow one-use command authority, simulated gateway enforcement, current local safety checks, and fake physical execution.
