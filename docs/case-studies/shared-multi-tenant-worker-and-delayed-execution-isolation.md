@@ -90,7 +90,7 @@ Current resource / destination / policy evaluation
     ↓
 Allowed
     ↓
-Tenant-bound short-lived execution grant
+Tenant-bound, time-bounded, single-use execution grant
     ↓
 Durable job delivery
     ↓
@@ -320,7 +320,7 @@ public sealed record ExportGrant(
     string TenantId,              // "tenant-alder": the application tenant that owns the export
     WorkloadIdentity Executor,    // the placement-assigned identity for tenant-alder
     string Audience,              // "export-host"
-    string PlacementVersion,      // "placement/12": the map the issuer consulted
+    string PlacementVersion,      // "placement/12": evidence of the map the issuer consulted; not enforced (§9)
     DateTimeOffset NotBeforeUtc,  // Tuesday 01:55
     DateTimeOffset ExpiresAtUtc,  // Tuesday 06:00
     GrantState State);            // Issued, Consumed, Revoked, Expired
@@ -349,7 +349,7 @@ The grant is stored by the issuer and looked up by `GrantId`. A signed portable 
 A stored grant referenced by `GrantId` is not a bearer token: presenting `GRT-2E8` without `svc-export-worker`'s authenticated identity fails the executor binding. Grant references still deserve care, because they reveal which exports exist and when they run, and because a defect in the executor binding would turn them into bearer authority.
 
 - Generate grant identifiers from a cryptographically random source with enough entropy that they cannot be guessed or enumerated. `GRT-2E8` is shortened for readability.
-- Authorize the grant lookup itself: the host returns the same `grant.unknown` for a grant that does not exist and for one bound to a different executor's host path, so a caller cannot probe which grants exist.
+- Give callers one uniform public refusal. Every grant-binding failure, whether the grant is missing, bound to another executor, or bound to another audience, operation, or resource, returns `grant.unknown` to the caller, so nobody can probe which grants exist. The specific reason, such as `grant.wrong-executor`, goes only to protected evidence and security telemetry. **Public Responses and Internal Reasons** in §9 lists the mapping.
 - Carry grant references only over authenticated, encrypted transport, and keep them out of URLs and client-visible logs.
 - Rate-limit and alert on `grant.unknown` by caller; a burst is an enumeration attempt or a broken worker.
 
@@ -419,7 +419,7 @@ The rules that matter more than the exact code:
 - **A user token is not a workload token.** The token-type check, or a separate transport such as mutual TLS for workloads, keeps an administrator's token from reaching the workload endpoint. With Entra, how a user token fails depends on configuration: `idtyp` is emitted for user tokens only when the optional claim's `include_user_token` property is set, so a user token is rejected either as `identity.not-app-only` or as `identity.missing-claim:idtyp`. Both reject; the reason differs. Microsoft's [optional claims reference](https://learn.microsoft.com/entra/identity-platform/optional-claims-reference) describes the configuration.
 - **The identity is derived before transformations.** This is a rule of this pattern, not a requirement imposed by ASP.NET Core. It exists because a claims transformation that adds a `tid` for convenience can create exactly the duplicate value the reader is trying to detect, and because transformations may run more than once.
 
-None of these rules comes from Entra, ASP.NET Core, or SPIFFE themselves. They are this case's recommended contract built on those products' documented behavior.
+The combined validation contract is this case's design choice, built on each provider's documented identity semantics. The semantics of `iss`, `tid`, `oid`, and SPIFFE IDs come from those providers; the decision to require, combine, and fail closed on them comes from this case.
 
 [Can One Worker Safely Execute Delayed Operations for Many Tenants?](../articles/2026/multi-tenant-worker-execution-authority.md#claim-mapping-in-aspnet-core) explains ASP.NET Core's default inbound claim mapping, why `FindFirst` hides conflicts, and why `idtyp` must be configured explicitly before a reader can require it.
 
@@ -447,6 +447,8 @@ public sealed class ExportExecutionHost(
         string? callerTenantHint,         // optional label from the worker; compared, never used
         CancellationToken ct)
     {
+        // Reject(reason) records the internal reason in protected evidence and returns the coarse
+        // public refusal mapped in "Public Responses and Internal Reasons" below.
         if (await grants.FindAsync(grantId, ct) is not { } grant)            return Reject("grant.unknown");
 
         // Is this grant meant for this host, this caller, this operation, and this export?
@@ -512,6 +514,20 @@ The points that carry most of the weight:
 
 **String comparisons are ordinal.** C#'s `==` and `!=` on `string` are ordinal and case-sensitive, which is what every comparison above needs. Do not replace them with culture-aware or case-insensitive comparisons for convenience.
 
+**The grant's placement version is evidence, not enforcement.** `ExportGrant.PlacementVersion` records which map the issuer consulted on Monday. The host does not compare it with anything. Authorization at 02:00 always uses a placement snapshot resolved at execution time, and the claim fences that snapshot's version. A tenant that moved partitions after issuance is therefore judged by its current placement. The grant's executor binding then fails, or the placement check does, and the export needs a fresh grant for the new partition.
+
+### Public Responses and Internal Reasons
+
+Every reason code in this case, including those in the matrix, traces, and tests, is an **internal reason**, recorded in protected evidence and security telemetry. The caller receives one of three coarse public responses:
+
+| Public response | Internal reasons | Why coarse |
+| --- | --- | --- |
+| `grant.unknown` | `grant.unknown`, `grant.wrong-audience`, `grant.wrong-executor`, `grant.wrong-operation`, `grant.wrong-resource` | Until every binding to the caller matches, the caller learns nothing about whether the grant exists |
+| `execution.refused` | Grant state and window, export state and fingerprint, tenant and caller-label conflicts, placement, current policy, claim fences | The caller is the grant's legitimate executor, but the reason can still reveal tenant configuration it has no need to see |
+| `execution.postponed` | `context.unavailable` | The worker needs to know to retry later, not why |
+
+A worker that needs more detail to be debugged gets it from operators reading the evidence, not from the response.
+
 ---
 
 ## 10. Atomic Consume and Claim
@@ -520,8 +536,21 @@ The consume-and-claim step is the same as in a single-tenant design, with two ad
 
 ```text
 BEGIN   -- one database, one transaction
-  @now := store_clock_utc()    -- the store's clock at claim time, not the host's earlier reading
 
+  -- 1. Acquire every lock first, in a fixed order.
+  SELECT state, not_before, expires_at FROM grants
+   WHERE grant_id = @grant FOR UPDATE;
+  SELECT status, version FROM exports
+   WHERE export_id = @export FOR UPDATE;
+  SELECT version FROM placement_meta
+   WHERE id = 1 FOR SHARE;                     -- the single authoritative placement version row
+  SELECT version FROM tenant_export_config
+   WHERE tenant_id = @tenant_from_export_record FOR SHARE;
+
+  -- 2. Only now read the clock. This is the admission instant.
+  @now := clock_timestamp()    -- PostgreSQL: not now() / CURRENT_TIMESTAMP, which are transaction-start time
+
+  -- 3. Validate and write while every lock is held.
   UPDATE grants
      SET state = 'Consumed', consumed_at = @now, consumed_by = @caller
    WHERE grant_id = @grant AND state = 'Issued'
@@ -533,22 +562,17 @@ BEGIN   -- one database, one transaction
    WHERE export_id = @export AND status = 'Scheduled' AND version = @expected_version;
   -- 0 rows → ROLLBACK, claim.export-changed
 
-  SELECT 1 FROM placement_meta
-   WHERE version = @expected_placement_version
-   FOR SHARE;                  -- holds a shared lock until COMMIT
-  -- 0 rows → ROLLBACK, claim.placement-changed
-
-  SELECT 1 FROM tenant_export_config
-   WHERE tenant_id = @tenant_from_export_record AND version = @expected_config_version
-   FOR SHARE;
-  -- 0 rows → ROLLBACK, claim.tenant-config-changed
+  -- placement_meta.version != @expected_placement_version  → ROLLBACK, claim.placement-changed
+  -- tenant_export_config.version != @expected_config_version → ROLLBACK, claim.tenant-config-changed
 
   INSERT INTO export_attempts (attempt_id, export_id, grant_id, tenant_id, executor, started_at)
   VALUES (@attempt, @export, @grant, @tenant_from_export_record, @caller, @now);
 COMMIT
 ```
 
-`FOR SHARE` is PostgreSQL syntax; SQL Server reaches the same effect with a `HOLDLOCK` table hint or `SERIALIZABLE` isolation. The point is that a plain `SELECT` under `READ COMMITTED` takes no lock that lasts to the end of the transaction, so a placement or configuration change could commit between the check and the `COMMIT`. Placement and configuration writers update those rows and increment their versions. With the shared locks, a writer either commits first, and the claim sees the new version and rolls back, or waits until the claim commits.
+**Locks before the clock.** Reading the clock at the start of the transaction would reintroduce the bug it is meant to fix. A claim that waits on a lock until after 06:00 would then still carry a timestamp from before 06:00. Taking every lock first and reading the clock afterward makes the admission instant the moment validation actually happens, with nothing able to change underneath it. In PostgreSQL that means `clock_timestamp()`, because `now()` and `CURRENT_TIMESTAMP` return the transaction's start time.
+
+**Shared locks, and which rows they must cover.** `FOR SHARE` is PostgreSQL syntax; SQL Server reaches the same effect with a `HOLDLOCK` table hint, which is equivalent to `SERIALIZABLE` for that table. A plain `SELECT` under `READ COMMITTED` takes no lock that lasts to the end of the transaction, so a change could commit between the check and the `COMMIT`. The fence works only if the locked rows are the ones every writer must touch. In this case's storage contract, every placement change updates the single `placement_meta` row and increments its version in the same transaction as the assignment change. Every change to a tenant's exports-enabled flag, suspension, or registered destinations updates that tenant's `tenant_export_config` row and increments its version. A writer that changed tenant-specific assignment rows without touching the version row would slip past the fence. With the contract in place, a writer either commits first, and the claim sees the new version and rolls back, or waits until the claim commits. A single global placement row serializes placement changes against every claim. That is acceptable at this case's change rate. A busier system would version placement per tenant and lock that row instead.
 
 **What the claim guarantees, and under which assumptions.** Grant, export, placement, configuration, and attempt state live in one database. The conditional updates and shared locks run in one transaction. The executor starts only after the host has confirmed the commit. Under those assumptions, concurrent presentations of `GRT-2E8` produce **at most one successful claim**. In a failure-free run, that claim produces one executor invocation. A crash after the commit and before or during execution leaves a committed attempt that recovery must resolve. Nothing re-arms the grant. A cancellation of `EXP-4410`, a placement change, or a tenant-configuration change committed before the claim rolls it back with zero executor calls. The tenant written to the attempt is the export record's, not the grant's.
 
@@ -599,7 +623,7 @@ Ten hours and forty minutes pass between the decision and the execution. The hos
 | `tenant-alder` disabled exports at 23:00 | Current execution policy, or the configuration-version fence if it lands after the check | `tenant.exports-disabled` / `claim.tenant-config-changed` |
 | The dataset's classification was raised above the tenant's ceiling | Current execution policy | `dataset.above-ceiling` |
 | `tenant-alder` moved to another partition (partitioned variant) | Placement check and placement-version fence | `executor.not-assigned-to-tenant` / `claim.placement-changed` |
-| Tenant membership or policy store unavailable | Current execution policy | `context.unavailable`: postpone, never allow |
+| Tenant configuration, destination, classification, or policy context unavailable | Current execution policy | `context.unavailable`: postpone, never allow |
 
 Two questions stay separate. **Was the export allowed when it was requested?** `DEC-7731` answers that, and it stays `Allowed` forever. **Is it still allowed now?** The execution-time policy check answers that. A refusal at 02:00 is execution evidence; it does not rewrite the decision.
 
@@ -610,10 +634,10 @@ Each fact the export relies on falls into one of three classes. The case states 
 | Class | Facts in this case | Guarantee |
 | --- | --- | --- |
 | **Fenced** in the claim transaction | Grant state and window, export status, version, and fingerprint, placement version, tenant export-configuration version (exports enabled, suspension, registered destinations) | A change committed before the claim rolls it back. A change after the claim takes effect for the next export, not this one |
-| **Rechecked, not fenced** | Dataset classification against the tenant's ceiling | Checked at execution. A change between that check and the claim, a window of milliseconds, is accepted as stale for this export |
+| **Rechecked, not fenced** | Dataset classification against the tenant's ceiling | Rechecked before the claim but not fenced. A change after that check may not affect this export. This specimen enforces no maximum age for the check; a design that needs a bound must enforce it at claim time |
 | **Not rechecked** | `admin-14`'s role and membership | Fixed at request time, by design (below) |
 
-Once the claim commits, the export runs to completion under the facts it was claimed against. A cancellation or tenant disablement that arrives during the write does not interrupt it. A design that needs mid-execution cancellation must give the executor a cancellation check and state what a partly written export means.
+After the claim commits, a later cancellation or tenant disablement does not revoke the admitted attempt. Execution may still fail or be interrupted for other reasons, which is what recovery (§10) handles. A design that needs mid-execution cancellation must give the executor a cancellation check and state what a partly written export means.
 
 Whether `admin-14`'s own entitlement is rechecked at 02:00 is a design choice to make explicitly. This case rechecks tenant and destination state but not the actor's role, on the grounds that the export was the tenant's request. A design that must stop exports when the requester leaves the tenant adds that recheck and accepts more refused exports. [Capability-Scoped Background Operation](capability-scoped-background-operation.md#17-freshness-model-rebuild-current-context-before-claim) works through the same choice for a report.
 
@@ -652,7 +676,7 @@ The consequences separate cleanly by security property:
 
 | Property | Compromised shared worker, baseline design |
 | --- | --- |
-| **Integrity** | Protected: it cannot retarget a grant, change an export's tenant, dataset, or destination, or invent an operation. It can trigger legitimate grants at a time it chooses within their windows |
+| **Integrity** | Protected against substitution and parameter tampering; not protected against malicious scheduling of otherwise valid grants. It cannot retarget a grant, change an export's tenant, dataset, or destination, or invent an operation. It can trigger legitimate grants at a time it chooses within their windows |
 | **Confidentiality** | Protected for content the worker never receives: the host writes the file into the tenant's own store. Exposed for metadata that passes through the worker: export and grant identifiers, schedules, and completion statuses for every tenant |
 | **Availability** | **Not protected.** It can delay, drop, or exhaust the window of any tenant's export, and no control in this case prevents that |
 
@@ -767,7 +791,7 @@ In this case, partition names deliberately avoid regions. If a real design parti
 
 ## 19. Decision and Execution Matrix
 
-Every row below makes **zero executor calls** except the three marked otherwise (rows 1, 20, and 28). "Grant" refers to `GRT-2E8` for `tenant-alder`'s `EXP-4410` unless stated.
+Every row below makes **zero executor calls** except the three marked otherwise (rows 1, 20, and 28). "Grant" refers to `GRT-2E8` for `tenant-alder`'s `EXP-4410` unless stated. Reason codes are internal reasons recorded in evidence; the caller sees only the coarse public response mapped in §9.
 
 | # | Situation | Stops at | Reason code | Grant consumed | Executor calls |
 | --- | --- | --- | --- | --- | --- |
@@ -794,7 +818,7 @@ Every row below makes **zero executor calls** except the three marked otherwise 
 | 21 | Field set widened after authorization | Fingerprint / version | `export.changed-since-authorization` | No | 0 |
 | 22 | Tenant disabled exports at 23:00 | Current execution policy | `tenant.exports-disabled` | No | 0 |
 | 23 | `DST-A3` deregistered | Current execution policy | `destination.not-registered` | No | 0 |
-| 24 | Policy or membership store unavailable | Current execution policy | `context.unavailable` (postpone) | No | 0 |
+| 24 | Tenant configuration, classification, or policy context unavailable | Current execution policy | `context.unavailable` (postpone) | No | 0 |
 | 25 | Partitioned: `export-p2` presents a grant naming itself for a `tenant-alder` export | Placement | `executor.not-assigned-to-tenant` | No | 0 |
 | 26 | Partitioned: placement changes between validation and claim | Claim fence | `claim.placement-changed` | No (rolled back) | 0 |
 | 27 | Tenant disables exports between the policy check and the claim | Claim fence | `claim.tenant-config-changed` | No (rolled back) | 0 |
@@ -904,7 +928,7 @@ Conclusion: tenant binding prevents substitution. It does not contain this compr
 
 ## 21. What the Tests Should Prove
 
-The tests drive the host with a counting fake executor and in-memory stores:
+The tests drive the host with a counting fake executor and in-memory stores. `result.Reason` is the internal reason the host recorded in evidence, which the test harness can read. The caller-facing response is the coarse public refusal from §9, and the first rejection test asserts both:
 
 ```csharp
 public sealed class CountingExportExecutor : IExportExecutor
@@ -941,7 +965,8 @@ public sealed class SharedWorkerIsolationTests
 
         var result = await host.ExecuteAsync(Fixture.SharedWorker, "GRT-91", "EXP-4410", null, default);
 
-        Assert.Equal("grant.tenant-mismatch", result.Reason);
+        Assert.Equal("grant.tenant-mismatch", result.Reason);          // internal, from evidence
+        Assert.Equal("execution.refused", result.PublicResponse);      // what the worker sees
         Assert.Equal(0, executor.Calls);
         Assert.Equal(GrantState.Issued, Fixture.GrantState("GRT-91"));
     }
@@ -1015,7 +1040,7 @@ Beyond those, a complete suite should show that:
 - a claim evaluated against a store clock past the window is refused even when the host's earlier reading was inside it;
 - a cancellation, field-set change, placement change, or tenant-configuration change committed between validation and claim rolls the claim back with zero executor calls;
 - tenant disablement, destination deregistration, or a raised classification after the decision refuses execution while the decision stays `Allowed`;
-- an unavailable policy or membership store postpones rather than allows;
+- unavailable tenant configuration, classification, or policy context postpones rather than allows;
 - the executor opens only the tenant recorded on the export, and writes only to a destination registered to that tenant;
 - in the partitioned variant, a partition identity is rejected for every tenant placed elsewhere, and a credential from one partition's vault cannot authenticate as another partition;
 - no queue message, grant, log line, or evidence record contains a tenant data credential or export content.
@@ -1031,10 +1056,18 @@ Evidence answers *what happened to this export*. Observability answers *is the b
 Signals worth watching:
 
 - **`grant.tenant-mismatch` and `caller.tenant-conflict`.** Near zero in a healthy system. Any occurrence is a defect in an issuer or a worker, or an attack, and pages security.
-- **Identity rejections by reason.** A rise in `identity.ambiguous-claim` usually means a claims transformation or an identity-provider change. A rise in `identity.not-app-only` means user tokens are reaching the workload endpoint.
+- **Identity rejections by reason.** A rise in `identity.ambiguous-claim` indicates a malformed or unexpectedly shaped validated token, an issuer or token-validation configuration change, or identity extraction moved to the wrong point in the pipeline. A rise in `identity.not-app-only` means user tokens are reaching the workload endpoint.
 - **`grant.wrong-executor` and `executor.not-assigned-to-tenant`.** In the partitioned variant, a partition presenting another partition's work is a placement-map, routing, or credential-custody problem.
 - **Refusals by freshness reason.** `grant.outside-window` points at queue backlog; `tenant.exports-disabled` and `destination.not-registered` at expected policy drift.
 - **Executions per workload identity per tenant.** In the partitioned variant, this should match the placement map exactly. In the baseline, a sudden rise in one worker's executions across many tenants is worth a look.
+
+Each security property from §13 has its own question to ask of the evidence:
+
+| Property | Evidence question |
+| --- | --- |
+| Integrity | Did any execution's attempt record name a tenant, destination, or executor different from its export record and placement snapshot? Expected answer: never |
+| Confidentiality | Which workload identities read which grant and export identifiers, and did any read reach tenants outside its placement? |
+| Availability | Which tenants' exports were claimed late, refused as `grant.outside-window`, or never presented, grouped by worker identity? |
 
 Evidence for each execution links `CorrelationId`, `ExportId`, `DecisionId`, `GrantId`, attempt, the authoritative tenant, the caller's structured workload identity, and the placement version. It contains no tenant data and no credential.
 
@@ -1247,6 +1280,7 @@ If that reach is accepted, one shared worker is the answer. If it is not, add th
 These external references address the identity and exchange boundaries this case depends on. Identity-provider documentation describes one provider's contract at the time of writing; check your own provider's current documentation before relying on it.
 
 - Microsoft's [access token claims reference](https://learn.microsoft.com/entra/identity-platform/access-token-claims-reference) and [application and service principal objects](https://learn.microsoft.com/entra/identity-platform/app-objects-and-service-principals) describe the issuer, directory, object, client, and subject identifiers used as an illustration here.
+- Microsoft's [optional claims reference](https://learn.microsoft.com/entra/identity-platform/optional-claims-reference) describes `idtyp` as an optional claim, including the `include_user_token` property that controls whether user tokens carry it.
 - Microsoft's guide to [mapping, customizing, and transforming claims in ASP.NET Core](https://learn.microsoft.com/aspnet/core/security/authentication/claims) describes default inbound claim mapping.
 - [SPIFFE concepts](https://spiffe.io/docs/latest/spiffe-about/spiffe-concepts/) define a vendor-neutral workload identity within a trust domain.
 - [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693.html) standardizes exchanging one token for another targeted at an audience, resource, or scope, leaving the issuance decision to the token service.
