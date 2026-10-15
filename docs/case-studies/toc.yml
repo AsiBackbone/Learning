@@ -28,5 +28,8 @@
 - name: Delayed Financial Payout and Ambiguous External Commit
   href: delayed-financial-payout-and-ambiguous-external-commit.md
 
+- name: Shared Multi-Tenant Worker and Delayed Execution Isolation
+  href: shared-multi-tenant-worker-and-delayed-execution-isolation.md
+
 - name: Simulated Robotics-Command Governance Boundary
   href: simulated-robotics-command-governance-boundary.md

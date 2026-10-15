@@ -601,6 +601,8 @@ For the delayed-authority handoff this article builds on, including grant bindin
 
 For the full queue-and-worker lifecycle behind a delayed operation, including why queue delivery and worker identity are not operation authority, threat models such as a stolen worker credential, and invariant tests, work through [Capability-Scoped Background Operation](../../case-studies/capability-scoped-background-operation.md).
 
+To see these distinctions composed into one reference architecture, with a delayed `records.export`, a decision/execution matrix, invariant traces, and a shared-versus-partitioned comparison, work through [Shared Multi-Tenant Worker and Delayed Execution Isolation](../../case-studies/shared-multi-tenant-worker-and-delayed-execution-isolation.md).
+
 When the harder problem is which tenant and regional policies apply and how they compose, including resolving tenant and region from authoritative context and keeping tenant isolation ahead of permissive composition, continue with [Multi-Tenant and Regional Policy Overlay](../../case-studies/multi-tenant-and-regional-policy-overlay.md).
 
 For caller-supplied versus authoritative context, credential ownership, and why broad credentials create authority tunnels across boundaries, read [Trust Boundaries and Least Privilege](../../security/trust-boundaries-and-least-privilege.md).

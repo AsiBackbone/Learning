@@ -1389,6 +1389,7 @@ If several answers are implicit, the architecture is not yet as explainable as t
 - [Policy Context and Explicit Decision Outcomes](../tutorials/policy-context-and-explicit-decision-outcomes.md)
 - [Minimal Policy Simulation Harness](../samples/index.md#minimal-policy-simulation-harness)
 - [Sensitive-Data Access Decision](sensitive-data-access-decision.md)
+- [Shared Multi-Tenant Worker and Delayed Execution Isolation](shared-multi-tenant-worker-and-delayed-execution-isolation.md)
 - [Scoped Capability and Host-Owned Execution](../tutorials/scoped-capability-and-host-owned-execution.md)
 - [Policy Engines, Rules Engines, and Distributed Policy Enforcement](../architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md)
 - [Replay Protection and Bounded-Use Authority](../security/replay-protection-and-bounded-use.md)
