@@ -31,5 +31,8 @@
 - name: Shared Multi-Tenant Worker and Delayed Execution Isolation
   href: shared-multi-tenant-worker-and-delayed-execution-isolation.md
 
+- name: Cross-System Delegated Execution and Recipient-Local Trust
+  href: cross-system-delegated-execution-and-recipient-local-trust.md
+
 - name: Simulated Robotics-Command Governance Boundary
   href: simulated-robotics-command-governance-boundary.md
