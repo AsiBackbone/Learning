@@ -147,7 +147,7 @@ Every guarantee in this case holds only under these assumptions. State your own 
 | Component | Assumed | Consequence if the assumption fails |
 | --- | --- | --- |
 | Client and request body | Untrusted | Nothing, by design: the tenant comes from membership |
-| Queue and broker | Untrusted transport; may duplicate, delay, reorder, drop, or alter messages | Nothing beyond availability: messages carry references only |
+| Queue and broker | Untrusted transport; may observe, duplicate, delay, reorder, drop, alter, or inject messages | Substitution remains blocked because messages carry references only. A party that can observe and replay a valid export-and-grant pair may cause the legitimate operation to be presented at a time of its choosing within the grant window. It can also delay, duplicate, reorder, or drop work. If end-to-end protection stops the broker from reading message content, or from injecting messages the worker will consume, that is an additional assumption to state |
 | Shared worker | May be compromised | Substitution is still blocked; every tenant whose grants reach the worker is in scope (§13) |
 | Export host, its stores, and its executor | Trusted, and hardened accordingly | Every guarantee fails; the host is the enforcement boundary |
 | Identity issuer and grant issuer | Trusted to issue only what their policy allows | A defective issuer can mint misbound grants; host checks catch tenant and placement mismatches (Traces A and G) but not a grant that is wrong in every field consistently |
@@ -346,7 +346,7 @@ The grant is stored by the issuer and looked up by `GrantId`. A signed portable 
 
 ### Grant references are not secrets, and are not harmless either
 
-A stored grant referenced by `GrantId` is not a bearer token: presenting `GRT-2E8` without `svc-export-worker`'s authenticated identity fails the executor binding. Grant references still deserve care, because they reveal which exports exist and when they run, and because a defect in the executor binding would turn them into bearer authority.
+A stored grant referenced by `GrantId` is not a bearer token: presenting `GRT-2E8` without `svc-export-worker`'s authenticated identity fails the executor binding. Grant references still deserve care because, when associated with queue, trace, or scheduling records, they expose operational metadata about which exports exist and when they run, and because a defect in the executor binding would turn them into bearer authority.
 
 - Generate grant identifiers from a cryptographically random source with enough entropy that they cannot be guessed or enumerated. `GRT-2E8` is shortened for readability.
 - Give callers one uniform public refusal. Every grant-binding failure, whether the grant is missing, bound to another executor, or bound to another audience, operation, or resource, returns `grant.unknown` to the caller, so nobody can probe which grants exist. The specific reason, such as `grant.wrong-executor`, goes only to protected evidence and security telemetry. **Public Responses and Internal Reasons** in §9 lists the mapping.
@@ -472,7 +472,8 @@ public sealed class ExportExecutionHost(
                                                                               return Reject("caller.tenant-conflict");
 
         // Substitution prevention: the grant was issued for this tenant's export, unchanged.
-        if (grant.TenantId != export.TenantId)                                return Reject("grant.tenant-mismatch");
+        if (!string.Equals(grant.TenantId, export.TenantId, StringComparison.Ordinal))
+                                                                              return Reject("grant.tenant-mismatch");
         if (ExportFingerprint.Compute(export) != grant.ExportFingerprint ||
             export.Version != grant.ExecutableExportVersion)                  return Reject("export.changed-since-authorization");
 
@@ -512,7 +513,7 @@ The points that carry most of the weight:
 
 **The checks run before any tenant data is read.** Every rejection above happens before the executor is called and before any tenant data session is opened.
 
-**String comparisons are ordinal.** C#'s `==` and `!=` on `string` are ordinal and case-sensitive, which is what every comparison above needs. Do not replace them with culture-aware or case-insensitive comparisons for convenience.
+**String comparisons are ordinal.** The tenant check spells this out with `StringComparison.Ordinal` to make the contract visible. The other comparisons use C#'s `==` and `!=` on `string`, which are also ordinal and case-sensitive. A production host would use the explicit form throughout. Do not replace them with culture-aware or case-insensitive comparisons for convenience.
 
 **The grant's placement version is evidence, not enforcement.** `ExportGrant.PlacementVersion` records which map the issuer consulted on Monday. The host does not compare it with anything. Authorization at 02:00 always uses a placement snapshot resolved at execution time, and the claim fences that snapshot's version. A tenant that moved partitions after issuance is therefore judged by its current placement. The grant's executor binding then fails, or the placement check does, and the export needs a fresh grant for the new partition.
 
@@ -522,7 +523,7 @@ Every reason code in this case, including those in the matrix, traces, and tests
 
 | Public response | Internal reasons | Why coarse |
 | --- | --- | --- |
-| `grant.unknown` | `grant.unknown`, `grant.wrong-audience`, `grant.wrong-executor`, `grant.wrong-operation`, `grant.wrong-resource` | Until every binding to the caller matches, the caller learns nothing about whether the grant exists |
+| `grant.unknown` | `grant.unknown`, `grant.wrong-audience`, `grant.wrong-executor`, `grant.wrong-operation`, `grant.wrong-resource` | The public response does not distinguish a missing grant from a grant whose audience, executor, operation, or resource binding fails. Uniform codes reduce disclosure; they do not by themselves remove timing or other observable differences |
 | `execution.refused` | Grant state and window, export state and fingerprint, tenant and caller-label conflicts, placement, current policy, claim fences | The caller is the grant's legitimate executor, but the reason can still reveal tenant configuration it has no need to see |
 | `execution.postponed` | `context.unavailable` | The worker needs to know to retry later, not why |
 
@@ -537,7 +538,9 @@ The consume-and-claim step is the same as in a single-tenant design, with two ad
 ```text
 BEGIN   -- one database, one transaction
 
-  -- 1. Acquire every lock first, in a fixed order.
+  -- 1. Acquire every lock first, in a fixed order: grant, export, placement, tenant config.
+  --    Every transaction that touches more than one of these records, including cancellation
+  --    and placement or configuration writers, follows the same order, or deadlocks can occur.
   SELECT state, not_before, expires_at FROM grants
    WHERE grant_id = @grant FOR UPDATE;
   SELECT status, version FROM exports
