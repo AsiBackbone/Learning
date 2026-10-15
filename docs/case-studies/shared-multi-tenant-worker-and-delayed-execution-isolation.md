@@ -18,11 +18,7 @@ description: Follow one delayed records export through a shared multi-tenant wor
 
 ## Before You Begin
 
-This case study uses one fictional operation:
-
-```text
-records.export
-```
+This case study uses one fictional operation: `records.export`.
 
 A fictional software-as-a-service platform stores customer records for a few hundred business tenants. A tenant administrator asks for an encrypted export of their tenant's customer records. Exports are heavy, so the platform does not run them inside the request. It schedules them overnight, and **one shared export worker** processes due exports for every tenant.
 
@@ -349,7 +345,7 @@ The grant is stored by the issuer and looked up by `GrantId`. A signed portable 
 A stored grant referenced by `GrantId` is not a bearer token: presenting `GRT-2E8` without `svc-export-worker`'s authenticated identity fails the executor binding. Grant references still deserve care because, when associated with queue, trace, or scheduling records, they expose operational metadata about which exports exist and when they run, and because a defect in the executor binding would turn them into bearer authority.
 
 - Generate grant identifiers from a cryptographically random source with enough entropy that they cannot be guessed or enumerated. `GRT-2E8` is shortened for readability.
-- Give callers one uniform public refusal. Every grant-binding failure, whether the grant is missing, bound to another executor, or bound to another audience, operation, or resource, returns `grant.unknown` to the caller, so nobody can probe which grants exist. The specific reason, such as `grant.wrong-executor`, goes only to protected evidence and security telemetry. **Public Responses and Internal Reasons** in §9 lists the mapping.
+- Give callers one uniform public refusal. Every grant-binding failure, whether the grant is missing, bound to another executor, or bound to another audience, operation, or resource, returns `grant.unknown` to the caller, reducing the information available when probing candidate grant identifiers. It does not make grants non-enumerable: a caller holding the legitimate worker identity can still tell `grant.unknown` from the `execution.refused` returned for a correctly bound but consumed, revoked, or expired grant, and timing can differ. High-entropy identifiers, authorization, rate limiting, and monitoring remain necessary. The specific reason, such as `grant.wrong-executor`, goes only to protected evidence and security telemetry. **Public Responses and Internal Reasons** in §9 lists the mapping.
 - Carry grant references only over authenticated, encrypted transport, and keep them out of URLs and client-visible logs.
 - Rate-limit and alert on `grant.unknown` by caller; a burst is an enumeration attempt or a broken worker.
 
