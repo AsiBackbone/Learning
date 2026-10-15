@@ -2585,6 +2585,7 @@ Continue with:
 - [Multi-Tenant and Regional Policy Overlay](multi-tenant-and-regional-policy-overlay.md) when several policy authorities determine the request-time decision.
 - [Delayed Financial Payout and Ambiguous External Commit](delayed-financial-payout-and-ambiguous-external-commit.md) when the delayed operation is an external side effect whose outcome can become ambiguous after the claim.
 - [Shared Multi-Tenant Worker and Delayed Execution Isolation](shared-multi-tenant-worker-and-delayed-execution-isolation.md) when one shared worker executes delayed operations for many tenants and the question is what tenant isolation requires at execution time.
+- [Cross-System Delegated Execution and Recipient-Local Trust](cross-system-delegated-execution-and-recipient-local-trust.md) when the authority handoff crosses into an independently operated system with its own trust anchors, policy, clock, and replay state.
 
 ---
 

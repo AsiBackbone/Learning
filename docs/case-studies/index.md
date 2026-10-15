@@ -89,6 +89,12 @@ Follow a fictional delayed `records.export` through authoritative tenant context
 
 The case separates actor identity, application tenant, directory tenant, workload identity, and client ID; rejects missing or conflicting workload identity claims; and shows zero executor calls for tenant, identity, audience, scope, freshness, revocation, and replay failures. It distinguishes cross-tenant substitution prevention from worker-compromise isolation, compares the shared baseline with separately enforced partition identities and credentials, treats tenant-scoped token exchange as optional, and explains when one shared worker with ordinary tenant checks is the proportionate design.
 
+### [Cross-System Delegated Execution and Recipient-Local Trust](cross-system-delegated-execution-and-recipient-local-trust.md)
+
+Follow a fictional `records.export` from a governance decision in one independently operated system, through a narrow, signed, sender-constrained delegated grant, to a second system that verifies it against its own trust registry, applies its own policy to its own records, atomically claims a single use, and runs a host-owned synthetic export.
+
+The case keeps possession, signature validity, delegation, authorization, and execution distinct. It shows zero executor calls for an untrusted issuer behind a correct signature, a wrong audience, expired authority, a replayed grant, a recipient-local policy denial, resource drift, and a delegation chain the recipient never accepted, and covers key rotation, revocation, degraded verification, evidence across both systems, and when same-system or conventional service authorization is the proportionate design.
+
 ### [Simulated Robotics-Command Governance Boundary](simulated-robotics-command-governance-boundary.md)
 
 Follow a deterministic fake robot command from planner or AI proposal through semantic command validation, authoritative device and regional context, governance, narrow one-use command authority, simulated gateway enforcement, current local safety checks, and fake physical execution.
