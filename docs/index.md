@@ -214,6 +214,15 @@ New publications are announced in the [RSS feed](https://asibackbone.github.io/L
       <a href="https://doi.org/10.5281/zenodo.20373042" aria-label=".NET Core Application Template archive (DOI)">Archive (DOI)</a>
     </p>
   </article>
+  <article class="project-card">
+    <span class="project-role">Follow the integration</span>
+    <h3><a href="https://asibackbone.github.io/ReferenceApplication/">AsiBackbone Reference Application</a></h3>
+    <p>An NCAT-generated ASP.NET Core host that records the step-by-step integration of AsiBackbone, with host-specific API documentation and runnable governance examples added as the walkthrough progresses.</p>
+    <p class="project-links">
+      <a href="https://asibackbone.github.io/ReferenceApplication/" aria-label="AsiBackbone Reference Application documentation">Documentation</a>
+      <a href="https://github.com/AsiBackbone/ReferenceApplication" aria-label="AsiBackbone Reference Application repository">Repository</a>
+    </p>
+  </article>
 </div>
 
 Treat the working repositories as specimens to study, question, and compare rather than unquestioned templates.
