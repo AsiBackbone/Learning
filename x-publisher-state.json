@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "account": "jackdaw-patio",
-  "cursorSha": "f6da3fcbdb8a16cbe5fcda9146114116864d0e9b",
+  "cursorSha": "48823bd6d58e6366c685f641e3eb097bbbfbc777",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
