@@ -496,6 +496,39 @@ Lead to the deployment case study for rollback and re-planning, the sensitive-da
 
 ---
 
+### 15. You Don't Need to Roll Back What You Never Merged
+
+- **Priority:** P1
+- **Implementation issue:** [#445](https://github.com/AsiBackbone/Learning/issues/445)
+- **Publication:** [Published October 23, 2026](../docs/articles/2026/you-dont-need-to-roll-back-what-you-never-merged.md)
+- **Permanent slug:** `you-dont-need-to-roll-back-what-you-never-merged`
+
+#### Reader / search problem
+
+A team maintains a long-lived .NET application derived from an upstream template, reference architecture, or framework baseline. The next .NET LTS generation changes the runtime, SDK, ASP.NET Core, EF Core, dependencies, and possibly the generated structure at once. The usual plan edits `main` and repairs it until CI is green, so an unfinished platform experiment becomes entangled with feature, maintenance, and security work, and the team ends up discussing rollback. Typical questions include:
+
+- How can we evaluate a new .NET LTS without destabilizing the branch we support production from?
+- When an upgraded build fails, how do we tell whether the template, the platform, or our own changes caused it?
+- How do we keep shipping security fixes while a migration is in progress?
+- What evidence should decide that a migration is ready to merge?
+- Do we need a permanent baseline branch, or is a tag or a reproducible generator enough?
+
+#### Existing Learning support
+
+- [Retrofitting Governed Execution into an Existing ASP.NET Core Application](../docs/aspnetcore/retrofit-governed-execution-into-an-existing-application.md)
+- [Architecture Decision Records Preserve Architectural Reasoning](../docs/aspnetcore/architecture-decision-records-preserve-architectural-reasoning.md)
+- [A Green CI Badge Does Not Prove Your .NET Package Is Trustworthy](../docs/articles/2026/ci-badge-does-not-prove-package-integrity.md)
+
+#### Article / curriculum distinction
+
+The retrofit playbook covers phased changes to application behavior, and the ADR page covers recording architectural reasoning. Neither addresses isolating a platform-generation experiment from the supported maintenance line. This article explains a preserved upstream baseline A, the application delta, a new baseline B generated with the same inputs, and an isolated integration candidate; distinguishes the three-way integration model from a literal Git merge; separates raw-baseline qualification from integrated-candidate qualification and "runs on the new LTS" from "ready to adopt it"; and covers maintenance on `main`, adoption evidence, discarding a failed candidate, post-adoption rollback, and the pattern's costs. It uses ReferenceApplication and NCAT as a bounded case study and must stay useful to readers who use neither. It must not present the pattern as a replacement for backups, deployment rollback, or recovery, claim that a baseline prevents breaking changes, or prescribe a universal branch name.
+
+#### Natural deeper path
+
+Lead to the retrofit playbook for phased change and stopping rules, the ADR page for recording why the baseline exists and when the strategy should change, and the ReferenceApplication refresh procedure for one concrete implementation.
+
+---
+
 ## Promotion and Publication Workflow
 
 Keep planning, implementation, and publication as separate states:
