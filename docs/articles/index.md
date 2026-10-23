@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| .NET LTS migrations, template-derived applications, upstream baselines, and isolated upgrade candidates | [You Don't Need to Roll Back What You Never Merged](2026/you-dont-need-to-roll-back-what-you-never-merged.md) |
 | Allowed or approved operations that failed, unknown outcomes, retries, and compensation | [An Allowed Decision Does Not Mean the Operation Succeeded](2026/allowed-decision-does-not-mean-execution-succeeded.md) |
 | Idempotency keys, duplicate delivery, capability replay, and ambiguous retries | [Idempotency Does Not Prevent Authority Replay](2026/idempotency-does-not-prevent-authority-replay.md) |
 | Authorization outages, fail-open versus fail-closed, deferral, and degraded mode | [Should Authorization Fail Open, Fail Closed, or Defer?](2026/fail-open-fail-closed-or-defer.md) |
@@ -47,6 +48,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [You Don't Need to Roll Back What You Never Merged](2026/you-dont-need-to-roll-back-what-you-never-merged.md)
+
+**Christopher D. Cavell** · **October 23, 2026**
+
+A team derived its service from an upstream template, and the next .NET LTS generation changes the runtime, frameworks, dependencies, and generated structure at once. This guide explains how a preserved upstream baseline, a new baseline generated with the same inputs, and an isolated integration candidate let the team evaluate that generation without disturbing the supported line. It covers the three-way integration model and the Git mechanisms that can carry it out, qualifying the raw baseline before the integrated candidate, separating "runs on the new LTS" from "ready to adopt it," continuing fixes and security updates on `main`, objective adoption evidence, discarding a failed candidate without reverting anything, what the pattern does not solve, choosing a baseline mechanism, and ReferenceApplication as a bounded case study.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/you-dont-need-to-roll-back-what-you-never-merged.html`
 
 ### [An Allowed Decision Does Not Mean the Operation Succeeded](2026/allowed-decision-does-not-mean-execution-succeeded.md)
 
