@@ -1,5 +1,8 @@
 ---
 description: Learn to make governance inputs explicit with policy-context snapshots and return structured outcomes instead of hiding important states behind booleans.
+asibackbone_reviewed_ref: v7.0.0
+asibackbone_reviewed_on: "2026-10-11"
+asibackbone_reference: conceptual
 ---
 
 # Policy Context and Explicit Decision Outcomes

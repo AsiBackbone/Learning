@@ -1,5 +1,8 @@
 ---
 description: Learn how operations pause for bound acknowledgment, re-evaluate current policy, and preserve distinct decision, acknowledgment, and execution evidence.
+asibackbone_reviewed_ref: v7.0.0
+asibackbone_reviewed_on: "2026-10-11"
+asibackbone_reference: conceptual
 ---
 
 # Decision Receipts and Acknowledgment

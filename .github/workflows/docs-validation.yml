@@ -22,8 +22,10 @@ on:
       - 'tools/publish-x.cs'
       - 'tools/validate-asibackbone-api-references.cs'
       - 'tools/validate-doc-metadata.cs'
+      - 'tools/validate-implementation-currentness.cs'
       - 'tools/validate-docfx-template-baseline.cs'
       - 'tools/validate-landing-page.cs'
+      - 'eng/implementation-baseline.json'
       - 'scripts/Ensure-PublishedHtmlMetadata.ps1'
       - '.config/dotnet-tools.json'
       - '.github/workflows/docs-validation.yml'
@@ -77,6 +79,14 @@ jobs:
 
       - name: Validate AsiBackbone API references
         run: dotnet run --file tools/validate-asibackbone-api-references.cs
+
+      - name: Validate implementation-currentness validator contract
+        run: dotnet run --file tools/validate-implementation-currentness.cs -- --self-test
+
+      # Reports reviews behind the selected baseline in the job summary without failing;
+      # invalid or missing review metadata fails. Releases run it with --require-current.
+      - name: Report implementation currentness
+        run: dotnet run --file tools/validate-implementation-currentness.cs
 
       - name: Restore .NET tools
         run: dotnet tool restore

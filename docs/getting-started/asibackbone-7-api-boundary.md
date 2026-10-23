@@ -2,6 +2,9 @@
 description: Use Learning 1.3's reviewed AsiBackbone 7.0 names and understand the security, serialization, and persistence changes from 6.0.
 asibackbone_ref: v7.0.0
 asibackbone_status: current
+asibackbone_reviewed_ref: v7.0.0
+asibackbone_reviewed_on: "2026-10-11"
+asibackbone_reference: api
 ---
 
 # AsiBackbone 7.0 Compatibility and API Boundary

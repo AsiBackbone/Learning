@@ -1,5 +1,8 @@
 ---
 description: Practice explicit policy context, structured decision outcomes, stable reason codes, and intentional precedence instead of scattered facts and booleans.
+asibackbone_reviewed_ref: v7.0.0
+asibackbone_reviewed_on: "2026-10-11"
+asibackbone_reference: conceptual
 ---
 
 # Lab — Policy Context and Explicit Decision Outcomes

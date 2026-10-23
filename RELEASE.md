@@ -6,6 +6,14 @@ Learning releases are archival and citation snapshots of educational material. T
 
 Publish a stable release only from a clean commit on protected `main`. Before publishing the GitHub Release, confirm the normal documentation and sample validation checks are green and that the release tag resolves to the intended commit.
 
+Also confirm that no implementation-dependent page has a stale review against the selected Learning baseline in `eng/implementation-baseline.json`:
+
+```powershell
+dotnet run --file tools/validate-implementation-currentness.cs -- --require-current
+```
+
+Normal documentation validation only reports stale reviews; this release check fails on them. Re-review each stale page against the selected baseline and update its review metadata, or keep the previous baseline selected for the release. Record the resulting report in the release-readiness record. See [Implementation Currentness Metadata](CONTRIBUTING.md#implementation-currentness-metadata).
+
 The `Publish Stable Release Evidence` workflow runs again when the GitHub Release is published. It checks out the exact tag and fails unless all of these operations succeed:
 
 The repository-level `global.json` makes `Microsoft.Testing.Platform` the canonical test runner for these commands, matching the runner posture used across the AsiBackbone repositories.
