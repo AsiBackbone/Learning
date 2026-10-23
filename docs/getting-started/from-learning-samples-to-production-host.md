@@ -3,6 +3,12 @@ description: Map five Learning samples to released AsiBackbone APIs and NetCoreA
 learning_ref: v1.3.0
 asibackbone_ref: v7.0.0
 netcoreapplicationtemplate_ref: v2.11.2
+asibackbone_reviewed_ref: v7.0.0
+asibackbone_reviewed_on: "2026-10-11"
+asibackbone_reference: api
+netcoreapplicationtemplate_reviewed_ref: v2.11.2
+netcoreapplicationtemplate_reviewed_on: "2026-10-10"
+netcoreapplicationtemplate_reference: generated-template
 ---
 
 # From Learning Samples to a Production Host

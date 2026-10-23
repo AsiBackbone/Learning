@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -15,12 +16,17 @@ static partial class AsiBackboneApiReferenceValidator
     private const string CurrentApiBoundaryRelativePath =
         "docs/getting-started/asibackbone-7-api-boundary.md";
 
-    // Learning 1.3 retains this reviewed boundary after the dated AsiBackbone 7.1.0
-    // currentness review. It is the current Learning baseline, not a claim that 7.0.0
-    // is the newest release in the implementation repository.
-    private const string CurrentImplementationRef = "v7.0.0";
+    private const string BaselineManifestRelativePath = "eng/implementation-baseline.json";
 
-    private const string CurrentNetCoreApplicationTemplateRef = "v2.11.2";
+    // The selected Learning baseline lives in eng/implementation-baseline.json, which
+    // tools/validate-implementation-currentness.cs also reads, so moving it is one deliberate
+    // edit. Learning 1.3 retains AsiBackbone v7.0.0 after the dated 7.1.0 currentness review: it
+    // is the reviewed Learning baseline, not a claim that 7.0.0 is the newest release in the
+    // implementation repository. The self-test sets its own baseline so its fixtures do not
+    // depend on the manifest.
+    private static string CurrentImplementationRef { get; set; } = string.Empty;
+
+    private static string CurrentNetCoreApplicationTemplateRef { get; set; } = string.Empty;
 
     private const string ProductionHostBridgeRelativePath =
         "docs/getting-started/from-learning-samples-to-production-host.md";
@@ -53,13 +59,13 @@ static partial class AsiBackboneApiReferenceValidator
     private static readonly HashSet<string> ReleasedImplementationRefs = new(StringComparer.OrdinalIgnoreCase)
     {
         "v6.0.0",
-        CurrentImplementationRef,
+        "v7.0.0",
         "v7.1.0"
     };
 
     private static readonly HashSet<string> ReleasedNetCoreApplicationTemplateRefs = new(StringComparer.OrdinalIgnoreCase)
     {
-        CurrentNetCoreApplicationTemplateRef
+        "v2.11.2"
     };
 
     private static readonly HashSet<string> ImmutableHistoricalReleaseRecordPaths = new(StringComparer.Ordinal)
@@ -266,6 +272,16 @@ static partial class AsiBackboneApiReferenceValidator
             return 1;
         }
 
+        try
+        {
+            LoadSelectedBaseline(repositoryRoot);
+        }
+        catch (InvalidDataException exception)
+        {
+            Console.Error.WriteLine(exception.Message);
+            return 1;
+        }
+
         var errors = new List<string>();
         string[] textFiles = EnumerateTextFiles(repositoryRoot).ToArray();
 
@@ -296,13 +312,33 @@ static partial class AsiBackboneApiReferenceValidator
             : $"{packageReferenceCount} AsiBackbone 7.x package reference(s)";
 
         Console.WriteLine(
-            $"Validated Learning's reviewed AsiBackbone 7.0 references, version-pinned historical compatibility pages, and NetCoreApplicationTemplate {CurrentNetCoreApplicationTemplateRef} source links across {textFiles.Length} instructional file(s): {packageSummary}.");
+            $"Validated Learning's reviewed AsiBackbone {CurrentImplementationRef} references, version-pinned historical compatibility pages, and NetCoreApplicationTemplate {CurrentNetCoreApplicationTemplateRef} source links across {textFiles.Length} instructional file(s): {packageSummary}.");
         return 0;
     }
 
     public static int RunSelfTest()
     {
         var failures = new List<string>();
+
+        AssertSelectedBaselineParse(
+            "approved manifest baselines are accepted",
+            "{\"selectedBaselines\":{\"AsiBackbone\":\"v7.0.0\",\"NetCoreApplicationTemplate\":\"v2.11.2\"}}",
+            true,
+            failures);
+        AssertSelectedBaselineParse(
+            "an unapproved AsiBackbone baseline is rejected",
+            "{\"selectedBaselines\":{\"AsiBackbone\":\"v8.0.0\",\"NetCoreApplicationTemplate\":\"v2.11.2\"}}",
+            false,
+            failures);
+        AssertSelectedBaselineParse(
+            "a missing NetCoreApplicationTemplate baseline is rejected",
+            "{\"selectedBaselines\":{\"AsiBackbone\":\"v7.0.0\"}}",
+            false,
+            failures);
+
+        // The fixtures below are written against this baseline, independent of the manifest.
+        CurrentImplementationRef = "v7.0.0";
+        CurrentNetCoreApplicationTemplateRef = "v2.11.2";
 
         AssertCurrentVersionClaimCount(
             "historical front matter exempts the page",
@@ -849,6 +885,101 @@ static partial class AsiBackboneApiReferenceValidator
         }
     }
 
+    private static void AssertSelectedBaselineParse(
+        string name,
+        string json,
+        bool expectedValid,
+        List<string> failures)
+    {
+        bool actualValid;
+
+        try
+        {
+            _ = ParseSelectedBaseline(json, "self-test.json");
+            actualValid = true;
+        }
+        catch (InvalidDataException)
+        {
+            actualValid = false;
+        }
+
+        if (actualValid != expectedValid)
+        {
+            failures.Add($"{name}: expected valid={expectedValid}, found valid={actualValid}.");
+        }
+    }
+
+    private static void LoadSelectedBaseline(string repositoryRoot)
+    {
+        string path = Path.Combine(
+            repositoryRoot,
+            BaselineManifestRelativePath.Replace('/', Path.DirectorySeparatorChar));
+
+        if (!File.Exists(path))
+        {
+            throw new InvalidDataException(
+                $"{BaselineManifestRelativePath} is missing; it records the selected Learning implementation baseline.");
+        }
+
+        (CurrentImplementationRef, CurrentNetCoreApplicationTemplateRef) =
+            ParseSelectedBaseline(File.ReadAllText(path), BaselineManifestRelativePath);
+    }
+
+    // Each selected baseline must already be an approved release tag, so moving the baseline
+    // also requires approving the new tag for pinned implementation links.
+    private static (string AsiBackbone, string NetCoreApplicationTemplate) ParseSelectedBaseline(
+        string json,
+        string source)
+    {
+        try
+        {
+            using JsonDocument document = JsonDocument.Parse(json);
+
+            if (!document.RootElement.TryGetProperty("selectedBaselines", out JsonElement baselines) ||
+                baselines.ValueKind != JsonValueKind.Object)
+            {
+                throw new InvalidDataException($"{source} must define a selectedBaselines object.");
+            }
+
+            string asiBackbone = ReadSelectedBaseline(baselines, "AsiBackbone", ReleasedImplementationRefs, source);
+            string netCoreApplicationTemplate = ReadSelectedBaseline(
+                baselines,
+                "NetCoreApplicationTemplate",
+                ReleasedNetCoreApplicationTemplateRefs,
+                source);
+
+            return (asiBackbone, netCoreApplicationTemplate);
+        }
+        catch (JsonException exception)
+        {
+            throw new InvalidDataException($"{source} is not valid JSON: {exception.Message}");
+        }
+    }
+
+    private static string ReadSelectedBaseline(
+        JsonElement baselines,
+        string repository,
+        HashSet<string> approvedRefs,
+        string source)
+    {
+        if (!baselines.TryGetProperty(repository, out JsonElement value) ||
+            value.ValueKind != JsonValueKind.String ||
+            value.GetString() is not { } selectedRef ||
+            !ReleaseTagRegex().IsMatch(selectedRef))
+        {
+            throw new InvalidDataException(
+                $"{source} must select a {repository} release tag such as v1.2.3 under selectedBaselines.");
+        }
+
+        if (!approvedRefs.Contains(selectedRef))
+        {
+            throw new InvalidDataException(
+                $"{source} selects {repository} {selectedRef}, which is not an approved release tag ({string.Join(", ", approvedRefs.Order())}). Approve the tag in {ValidatorRelativePath} when adopting it.");
+        }
+
+        return selectedRef;
+    }
+
     private static void AssertPinnedImplementationRef(
         string name,
         string implementationRef,
@@ -1012,7 +1143,7 @@ static partial class AsiBackboneApiReferenceValidator
 
     private static bool IsPinnedImplementationRef(string repository, string implementationRef)
     {
-        IReadOnlySet<string> releasedRefs = repository.Equals("NetCoreApplicationTemplate", StringComparison.OrdinalIgnoreCase)
+        HashSet<string> releasedRefs = repository.Equals("NetCoreApplicationTemplate", StringComparison.OrdinalIgnoreCase)
             ? ReleasedNetCoreApplicationTemplateRefs
             : ReleasedImplementationRefs;
 

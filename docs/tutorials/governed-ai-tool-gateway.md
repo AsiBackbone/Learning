@@ -1,5 +1,8 @@
 ---
 description: Learn an AI tool gateway pattern where models propose actions while the host owns context, governance, acknowledgment, authority, execution, and evidence.
+asibackbone_reviewed_ref: v7.0.0
+asibackbone_reviewed_on: "2026-10-11"
+asibackbone_reference: conceptual
 ---
 
 # Governed AI Tool Gateway

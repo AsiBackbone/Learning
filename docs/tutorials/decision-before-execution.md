@@ -1,5 +1,8 @@
 ---
 description: Learn why consequential operations should become explicit proposed intent and governance decisions before the host performs real-world side effects.
+asibackbone_reviewed_ref: v7.0.0
+asibackbone_reviewed_on: "2026-10-11"
+asibackbone_reference: conceptual
 ---
 
 # Decision Before Execution

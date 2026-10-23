@@ -777,6 +777,40 @@ Primary implementation repositories include:
 
 Avoid copying large implementation sections into Learning when a maintained source already exists elsewhere.
 
+### Implementation Currentness Metadata
+
+A page can stay syntactically valid while describing an older AsiBackbone or NetCoreApplicationTemplate release as current. Pages that depend materially on implementation behavior therefore declare which release they were last reviewed against, so drift becomes a visible maintenance signal instead of an editorial memory.
+
+The selected Learning baseline is recorded once, in `eng/implementation-baseline.json`. Its `selectedBaselines` are the releases Learning currently teaches against; both `tools/validate-asibackbone-api-references.cs` and `tools/validate-implementation-currentness.cs` read them. Its `requiredPages` must declare a review: currently the current API boundary, the production-host bridge, the five foundational tutorials and their labs, and the implementation-specific standalone article on package integrity. Any other current page may opt in by declaring the same metadata.
+
+Declare one review per implementation repository in the page's front matter. The prefix is `asibackbone_` or `netcoreapplicationtemplate_`:
+
+| Key | Required | Meaning |
+| --- | --- | --- |
+| `<prefix>_reviewed_ref` | Yes | The release tag the page was reviewed against, such as `v7.0.0`. It cannot be newer than the selected baseline, and it must equal the page's existing `<prefix>_ref` pin when the page has one. |
+| `<prefix>_reviewed_on` | Yes | The quoted review date, such as `"2026-10-11"`. |
+| `<prefix>_reference` | Yes | `conceptual` (a framework-neutral teaching model compared with the implementation), `api` (package types, members, or construction paths), `runtime` (implementation behavior, defaults, persistence, pipelines, or workflows), or `generated-template` (NetCoreApplicationTemplate generated output). |
+| `<prefix>_next_review` | No | `major`, `minor`, or `patch`: the smallest newer selected baseline that makes the review stale. Without it, any newer selected baseline does. |
+
+```yaml
+---
+description: ...
+asibackbone_reviewed_ref: v7.0.0
+asibackbone_reviewed_on: "2026-10-11"
+asibackbone_reference: conceptual
+---
+```
+
+On a page that declares a review, every implementation link to that repository must use the reviewed release tag or an exact commit SHA, and every implementation repository the page links must have its own review.
+
+`dotnet run --file tools/validate-implementation-currentness.cs` validates the metadata and prints a report, also written to the GitHub job summary, that groups each review as current, behind but within its trigger, or stale. Invalid or missing metadata fails documentation validation; stale reviews fail only the release check described in [RELEASE.md](RELEASE.md). Use `-- --self-test` after changing the tool.
+
+Reviewing a page records a human judgment, not a rewrite. A `conceptual` page keeps its Learning-owned teaching model; a review confirms that the model still maps to the implementation and that the page's comparisons and links are accurate. Do not replace framework-neutral types with package APIs to make a page look current.
+
+Historical material is exempt and keeps its original pins: release-readiness records and pages marked `asibackbone_status: historical` must not declare review metadata.
+
+To move the selected baseline, approve the new release tag in `tools/validate-asibackbone-api-references.cs`, update `selectedBaselines`, then use the report as the review backlog: re-review each stale page, update its links, pins, and review metadata together, or leave the previous baseline selected until the review is complete.
+
 ## Branches
 
 For contributed work, use a short descriptive branch name when practical.

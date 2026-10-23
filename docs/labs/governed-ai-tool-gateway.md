@@ -1,5 +1,8 @@
 ---
 description: Practice governing AI-proposed tool actions while preserving host-owned context, policy, acknowledgment, scoped authority, execution, and evidence boundaries.
+asibackbone_reviewed_ref: v7.0.0
+asibackbone_reviewed_on: "2026-10-11"
+asibackbone_reference: conceptual
 ---
 
 # Lab — Governed AI Tool Gateway

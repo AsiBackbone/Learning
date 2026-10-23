@@ -1,0 +1,21 @@
+{
+  "selectedBaselines": {
+    "AsiBackbone": "v7.0.0",
+    "NetCoreApplicationTemplate": "v2.11.2"
+  },
+  "requiredPages": [
+    "docs/getting-started/asibackbone-7-api-boundary.md",
+    "docs/getting-started/from-learning-samples-to-production-host.md",
+    "docs/tutorials/decision-before-execution.md",
+    "docs/tutorials/policy-context-and-explicit-decision-outcomes.md",
+    "docs/tutorials/decision-receipts-and-acknowledgment.md",
+    "docs/tutorials/scoped-capability-and-host-owned-execution.md",
+    "docs/tutorials/governed-ai-tool-gateway.md",
+    "docs/labs/decision-before-execution.md",
+    "docs/labs/policy-context-and-explicit-decision-outcomes.md",
+    "docs/labs/decision-receipts-and-acknowledgment.md",
+    "docs/labs/scoped-capability-and-host-owned-execution.md",
+    "docs/labs/governed-ai-tool-gateway.md",
+    "docs/articles/2026/ci-badge-does-not-prove-package-integrity.md"
+  ]
+}

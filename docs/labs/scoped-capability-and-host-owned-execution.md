@@ -1,5 +1,8 @@
 ---
 description: Practice carrying narrow, short-lived authority from an allowed decision to host-owned execution while detecting expired, mismatched, or stale capabilities.
+asibackbone_reviewed_ref: v7.0.0
+asibackbone_reviewed_on: "2026-10-11"
+asibackbone_reference: conceptual
 ---
 
 # Lab — Scoped Capability and Host-Owned Execution

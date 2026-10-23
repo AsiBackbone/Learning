@@ -1,5 +1,8 @@
 ---
 description: Practice enforcing an explicit decision boundary so denied or blocked operations cannot reach the host-owned executor or consequential side effects.
+asibackbone_reviewed_ref: v7.0.0
+asibackbone_reviewed_on: "2026-10-11"
+asibackbone_reference: conceptual
 ---
 
 # Lab — Decision Before Execution

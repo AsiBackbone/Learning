@@ -5,6 +5,9 @@ author: Christopher D. Cavell
 published: "2026-08-23"
 summary: A practical guide to tracing a NuGet package from reviewed source through build, publication, and verifiable release evidence.
 feed: true
+asibackbone_reviewed_ref: v7.0.0
+asibackbone_reviewed_on: "2026-09-26"
+asibackbone_reference: runtime
 ---
 
 # A Green CI Badge Does Not Prove Your .NET Package Is Trustworthy

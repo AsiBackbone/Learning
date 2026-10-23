@@ -1,5 +1,8 @@
 ---
 description: Practice acknowledgment as a narrowly bound governance event, re-evaluate policy afterward, and preserve correlated evidence across decisions and execution.
+asibackbone_reviewed_ref: v7.0.0
+asibackbone_reviewed_on: "2026-10-11"
+asibackbone_reference: conceptual
 ---
 
 # Lab — Decision Receipts and Acknowledgment
