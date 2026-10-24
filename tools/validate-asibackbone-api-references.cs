@@ -20,7 +20,7 @@ static partial class AsiBackboneApiReferenceValidator
 
     // The selected Learning baseline lives in eng/implementation-baseline.json, which
     // tools/validate-implementation-currentness.cs also reads, so moving it is one deliberate
-    // edit. Learning 1.3 retains AsiBackbone v7.0.0 after the dated 7.1.0 currentness review: it
+    // edit. Learning 1.4 retains AsiBackbone v7.0.0 after the dated 2026-10-24 currentness review: it
     // is the reviewed Learning baseline, not a claim that 7.0.0 is the newest release in the
     // implementation repository. The self-test sets its own baseline so its fixtures do not
     // depend on the manifest.

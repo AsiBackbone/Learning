@@ -176,7 +176,7 @@ For the released implementation types that correspond to these responsibilities,
 
 ## Runtime Failure Injection Is Not Compile-Time Analysis
 
-This sample injects failures at runtime and observes how the boundaries respond. It does not demonstrate compile-time analyzers, which find unsafe patterns in source code before anything runs. The two are complementary and neither substitutes for the other. AsiBackbone's analyzer additions are outside the reviewed implementation boundary for this Learning release; see [Learning 1.3.0 Release Readiness](../../docs/getting-started/learning-1-3-release-readiness.md) for that scope.
+This sample injects failures at runtime and observes how the boundaries respond. It does not demonstrate compile-time analyzers, which find unsafe patterns in source code before anything runs. The two are complementary and neither substitutes for the other. AsiBackbone's analyzer additions are outside the reviewed implementation boundary for this Learning release; see [Learning 1.4.0 Release Readiness](../../docs/getting-started/learning-1-4-release-readiness.md) for that scope.
 
 ## Run the Tests
 

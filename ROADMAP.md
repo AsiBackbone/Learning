@@ -104,7 +104,7 @@ area solely for breadth:
    synchronize citation metadata and verify the documentation/sample license boundary;
    only propose new automation if that review exposes a repeatable failure mode.
 
-The 2026-10-11 [AsiBackbone 7.1.0 Currentness Review](docs/getting-started/asibackbone-7-1-currentness-review.md) completed the implementation-reference checkpoint for the current maintenance cycle. It retained Learning 1.3's reviewed `v7.0.0` boundary, confirmed that the five foundational paths and production-host bridge remain accurate, and clarified the one provider-neutral signing type that could otherwise be confused with a package request covered by `ASIB004`. A later material implementation change or Learning archival release reopens the checkpoint.
+The 2026-10-24 [Implementation Currentness Review](docs/getting-started/implementation-currentness-review-2026-10-24.md) completed the implementation-reference checkpoint for Learning 1.4. It retained the reviewed AsiBackbone `v7.0.0` and NetCoreApplicationTemplate `v2.11.2` boundaries after checking the published 7.5.1 and 2.11.6 releases, and confirmed that the foundational paths and production-host bridge remain accurate within those explicit archival pins. A later material implementation change or Learning archival release reopens the checkpoint.
 
 ---
 

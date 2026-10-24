@@ -6,6 +6,8 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-24
+
 ### Added
 
 - Added implementation-currentness metadata and reporting for implementation-dependent pages. `eng/implementation-baseline.json` now records the selected Learning baseline (AsiBackbone `v7.0.0`, NetCoreApplicationTemplate `v2.11.2`) that `tools/validate-asibackbone-api-references.cs` previously held as constants, and lists the pages that must declare a review. Pages declare `asibackbone_` or `netcoreapplicationtemplate_` `reviewed_ref`, `reviewed_on`, `reference` (`conceptual`, `api`, `runtime`, or `generated-template`), and an optional `next_review` trigger in their front matter, without adding package dependencies. The new `tools/validate-implementation-currentness.cs` rejects malformed, future-dated, or ahead-of-baseline reviews, reviews that disagree with a page's existing pin, implementation links on a reviewed page that are not pinned to the reviewed release or an exact commit, and review metadata on release-readiness records or pages marked historical, which keep their original pins. It reports each review as current, behind but within its trigger, or stale in the job summary; documentation validation reports stale reviews without failing, and the release gate fails on them with `--require-current`. The current API boundary, the production-host bridge, the five foundational tutorials and labs, and the package-integrity article participate initially, with reviews dated from the AsiBackbone 7.0 adoption, the production-host bridge, and the 7.1.0 currentness review. The tool only reports: it never rewrites framework-neutral teaching models to package APIs (#447).
@@ -124,7 +126,8 @@ Learning releases are archival and citation snapshots of educational material. T
 
 - Obsolete dependency-check suppressions for packages not used by Learning.
 
-[Unreleased]: https://github.com/AsiBackbone/Learning/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/AsiBackbone/Learning/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/AsiBackbone/Learning/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/AsiBackbone/Learning/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/AsiBackbone/Learning/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/AsiBackbone/Learning/compare/v1.0.0...v1.1.0
