@@ -692,6 +692,71 @@ Lead to Trust Boundaries and Least Privilege for authoritative-context reconstru
 
 ---
 
+### 21. A Correlation ID Is Not a Distributed Audit Trail
+
+- **Priority:** P1
+- **Implementation issue:** Not opened
+- **Permanent slug:** `correlation-id-is-not-distributed-audit-trail`
+
+#### Reader / search problem
+
+A .NET system carries one correlation identifier through an API, message broker, background worker, and downstream service, and the team assumes that searching its logs reconstructs reliable evidence of the decision and its effect. Typical questions include:
+
+- Which identifier should remain stable across the workflow, and which identifiers belong to one message, decision, grant, attempt, or trace?
+- What must each service record before and after an asynchronous handoff?
+- Can sampled traces or ordinary application logs prove which policy allowed an operation or whether the final side effect occurred?
+- How can teams link lifecycle evidence without copying sensitive payloads, credentials, or internal policy data across every boundary?
+
+#### Existing Learning support
+
+- [Your Audit Log Records the Story, Not the Decision](../docs/articles/2026/your-audit-log-is-not-evidence.md)
+- [Event Sourcing, Audit Trails, and Governance Decision Provenance](../docs/architecture/event-sourcing-audit-trails-and-governance-decision-provenance.md)
+- [AI Governance Observability and End-to-End Decision Tracing](../docs/ai-integration/ai-governance-observability-and-end-to-end-decision-tracing.md)
+- [Distributed Acknowledgment and Continuation Workflows](../docs/advanced/distributed-acknowledgment-and-continuation-workflows.md)
+
+#### Article / curriculum distinction
+
+The existing audit comparison explains record models in depth, the observability page applies correlation to an AI governance pipeline, and the distributed-acknowledgment page covers a specialized continuation lifecycle. This article should use an ordinary API-to-queue-to-worker-to-service path to separate correlation from evidence. It should show how a stable workflow correlation identifier can connect records while decision, message, grant, attempt, trace, and outcome identities retain distinct meanings; distinguish sampled telemetry from durable decision and execution evidence; cover duplicate and out-of-order delivery; and explain when structured logs plus a database record are sufficient. It must not imply that a correlation identifier proves integrity, ordering, causality, authorization, exactly-once delivery, or execution; require event sourcing or a cryptographic ledger; or prescribe one universal schema, tracing product, or evidence store.
+
+#### Natural deeper path
+
+Lead to Your Audit Log Records the Story, Not the Decision for the evidence gap, the event-sourcing comparison for record-model selection, AI Governance Observability for trace and span relationships, and Distributed Acknowledgment and Continuation Workflows when a decision pauses and resumes across independent hosts.
+
+---
+
+### 22. An In-Memory Grant Store Is Not Distributed Replay Protection
+
+- **Priority:** P1
+- **Implementation issue:** Not opened
+- **Permanent slug:** `in-memory-grant-store-is-not-distributed-replay-protection`
+
+#### Reader / search problem
+
+A capability or one-time grant works correctly with a thread-safe in-memory dictionary during development, but production introduces restarts, multiple replicas, concurrent consumers, expiration, cancellation, and an unavailable state store. Typical questions include:
+
+- Why does a concurrent collection prevent process-local races without preventing two application instances from accepting the same grant?
+- Which state transition must be atomic when use limits, expiration, cancellation, resource version, or attempt ownership matter together?
+- How long must consumed, expired, or revoked grant state be retained?
+- What should the execution boundary do when authoritative replay or revocation state is slow or unavailable?
+- How can a team improve throughput without weakening the correctness rule that only one eligible claimant reaches the protected executor?
+
+#### Existing Learning support
+
+- [Replay Protection and Bounded-Use Authority](../docs/security/replay-protection-and-bounded-use.md)
+- [Do You Need a Capability Token, or Are Roles and Claims Enough?](../docs/articles/2026/roles-claims-or-capability-token-dotnet.md)
+- [Capability-Scoped Background Operation](../docs/case-studies/capability-scoped-background-operation.md)
+- [Should Authorization Fail Open, Fail Closed, or Defer?](../docs/articles/2026/fail-open-fail-closed-or-defer.md)
+
+#### Article / curriculum distinction
+
+The replay-protection page is the deep security and distributed-systems treatment, while the capability article and background-operation case study explain the larger authority lifecycle. This article should be a shorter operational selection guide for the moment an in-memory teaching store approaches production. It should start with a two-replica race, distinguish expiration, consumption, cancellation, revocation, retention, and operation idempotency, compare process-local state with an authoritative conditional update or transaction, describe explicit behavior during store latency and outage, and identify which concurrency and restart invariants a production design must prove. It may discuss partitioning, caches, and cleanup only as tradeoffs around authoritative state. It must not claim a `ConcurrentDictionary`, distributed cache, lease, or token expiration creates distributed single-use semantics by itself; promise exactly-once execution; prescribe one database; or present a benchmark or fixed throughput target without measured implementation evidence.
+
+#### Natural deeper path
+
+Lead to Replay Protection and Bounded-Use Authority for atomic consumption and failure windows, the capability-selection article for deciding whether the infrastructure is justified at all, Capability-Scoped Background Operation for the queue-and-worker lifecycle, and Should Authorization Fail Open, Fail Closed, or Defer for store-outage policy.
+
+---
+
 ## Promotion and Publication Workflow
 
 Keep planning, implementation, and publication as separate states:
