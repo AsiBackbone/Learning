@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "account": "jackdaw-patio",
-  "cursorSha": "94369472fdfc163b61545f48153df905c4f5ce35",
+  "cursorSha": "3644f1d341bb8325743a286f82579e1a029d306e",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
@@ -57,6 +57,11 @@
       "sourceBlobSha": "5a672c9b19f2ff53d2c13630ce018b46df4ac084",
       "postId": "2113580386022285507",
       "postedAtUtc": "2026-10-23T10:36:47.275082+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/retry-logic-may-replay-authorization-decision.html": {
+      "sourceBlobSha": "04ddd5cc6ff86b2d44c215a0954006df39edb543",
+      "postId": "2114352419479957616",
+      "postedAtUtc": "2026-10-25T13:44:34.4033938+00:00"
     }
   }
 }
