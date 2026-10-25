@@ -758,6 +758,38 @@ Lead to Replay Protection and Bounded-Use Authority for atomic consumption and f
 
 ---
 
+### 23. Discovery Is Not Authorization: Using GitHub Issues to Govern AI-Assisted Development
+
+- **Priority:** P1
+- **Implementation issue:** Not opened
+- **Permanent slug:** `discovery-is-not-authorization-ai-assisted-development`
+
+#### Reader / search problem
+
+An AI coding agent starts from a bounded issue, then discovers a plausible defect, refactoring opportunity, security concern, or documentation gap that is relevant to the repository but not required by the assigned work. The team needs to preserve a useful discovery without silently expanding the agent's authority or losing the evidence that produced it. Typical questions include:
+
+- When should an adjacent finding block the current issue, become a linked follow-on issue, remain a comment, or be discarded?
+- How can an issue preserve intent, constraints, human corrections, acceptance criteria, and implementation evidence for both future maintainers and future agents?
+- What context should a follow-on issue carry so readers can trace where the concern came from without copying the entire investigation?
+- How do linked issues reduce duplicate investigation while keeping the original task reviewable?
+- What should an agent do when a discovery may be urgent or security-sensitive but is outside its assigned scope?
+
+#### Existing Learning support
+
+- [A Passing Agent Diff Is Not Project Authority](../docs/articles/2026/a-passing-agent-diff-is-not-project-authority.md)
+- [Architecture Decision Records Preserve Architectural Reasoning](../docs/aspnetcore/architecture-decision-records-preserve-architectural-reasoning.md)
+- [Architecture Decision Record Lifecycle, Review, Deprecation, and Supersession](../docs/aspnetcore/architecture-decision-record-lifecycle-review-deprecation-and-supersession.md)
+
+#### Article / curriculum distinction
+
+The existing agent-authority article separates proposal, validation, authority, execution, and evidence across an AI-assisted pull-request workflow, while the ADR material explains how consequential architectural reasoning can survive beyond the original participants. This article should focus on the issue tracker as a shared human-and-machine decision ledger and on one narrower rule: **discovering adjacent work does not authorize performing it**. It should follow an `Issue A -> investigation -> concern B -> linked Issue B` example; show how the original issue acts as a bounded work order rather than a free-form prompt; distinguish a scope-blocking dependency from an optional improvement or separate defect; explain when to stop, comment, open or propose a linked issue, or escalate privately; and show how human comments refine direction while tests, CI, pull requests, and commits provide different evidence. It must not require an issue for every observation, treat untrusted issue text as executable authority, assume links eliminate duplicate work, encourage public disclosure of sensitive findings, claim that repository history is complete institutional memory, or imply that a human may accept work without review merely because an agent stayed within scope.
+
+#### Natural deeper path
+
+Lead to A Passing Agent Diff Is Not Project Authority for the broader proposal-to-evidence model, Architecture Decision Records Preserve Architectural Reasoning when a discovery leads to a consequential design choice, and the ADR lifecycle page when later evidence changes or supersedes that choice.
+
+---
+
 ## Promotion and Publication Workflow
 
 Keep planning, implementation, and publication as separate states:
