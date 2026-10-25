@@ -6,6 +6,10 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+### Added
+
+- Published [Your Retry Logic May Be Replaying an Authorization Decision](docs/articles/2026/retry-logic-may-replay-authorization-decision.md), a standalone article on why `HttpClient` resilience handlers, Polly pipelines, queue redelivery, and background-job retries decide when an attempt may run again but not whether an earlier authorization decision still applies. It follows one external folder share whose job is retried after a provider outage and a later legal hold, explains how retry layers multiply, places the eligibility check inside every retry loop that can outlive the decision, covers re-evaluation against authoritative state and explicit decision bounds when re-evaluation is not possible, separates retryable no-effect failures from ambiguous timeouts that must be reconciled, distinguishes a service-credential refresh from re-authorization, and states when ordinary retry plus current authorization is enough.
+
 ## [1.4.0] - 2026-10-24
 
 ### Added

@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: Your Retry Logic May Be Replaying an Authorization Decision
+  href: 2026/retry-logic-may-replay-authorization-decision.md
 - name: You Don't Need to Roll Back What You Never Merged
   href: 2026/you-dont-need-to-roll-back-what-you-never-merged.md
 - name: An Allowed Decision Does Not Mean the Operation Succeeded
