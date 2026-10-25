@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Polly, queue, and background-job retries that reuse an earlier authorization decision | [Your Retry Logic May Be Replaying an Authorization Decision](2026/retry-logic-may-replay-authorization-decision.md) |
 | .NET LTS migrations, template-derived applications, upstream baselines, and isolated upgrade candidates | [You Don't Need to Roll Back What You Never Merged](2026/you-dont-need-to-roll-back-what-you-never-merged.md) |
 | Allowed or approved operations that failed, unknown outcomes, retries, and compensation | [An Allowed Decision Does Not Mean the Operation Succeeded](2026/allowed-decision-does-not-mean-execution-succeeded.md) |
 | Idempotency keys, duplicate delivery, capability replay, and ambiguous retries | [Idempotency Does Not Prevent Authority Replay](2026/idempotency-does-not-prevent-authority-replay.md) |
@@ -48,6 +49,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Your Retry Logic May Be Replaying an Authorization Decision](2026/retry-logic-may-replay-authorization-decision.md)
+
+**Christopher D. Cavell** · **October 25, 2026**
+
+A background job that creates an external share fails during a provider outage, and its automatic retry succeeds hours later, after the project has been placed under legal hold. This guide explains why `HttpClient` resilience handlers, Polly pipelines, queue redelivery, and job-library retries decide when an attempt may run again but not whether the earlier authorization decision still applies. It covers how retry layers multiply, putting the eligibility check inside every loop that can outlive the decision, re-evaluating against authoritative state or enforcing explicit decision bounds when re-evaluation is not possible, resending only what is established as safe to repeat, reconciling ambiguous timeouts instead of resending them, keeping a service-credential refresh separate from re-authorization, tests that prove a retry cannot execute under stale authority, and when ordinary retry plus current authorization is enough.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/retry-logic-may-replay-authorization-decision.html`
 
 ### [You Don't Need to Roll Back What You Never Merged](2026/you-dont-need-to-roll-back-what-you-never-merged.md)
 

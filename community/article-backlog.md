@@ -534,7 +534,8 @@ Lead to the retrofit playbook for phased change and stopping rules, the ADR page
 ### 16. Your Retry Logic May Be Replaying an Authorization Decision
 
 - **Priority:** P0
-- **Implementation issue:** Not opened
+- **Implementation issue:** Not opened; published directly from this backlog entry
+- **Publication:** [Published October 25, 2026](../docs/articles/2026/retry-logic-may-replay-authorization-decision.md)
 - **Permanent slug:** `retry-logic-may-replay-authorization-decision`
 
 #### Reader / search problem
