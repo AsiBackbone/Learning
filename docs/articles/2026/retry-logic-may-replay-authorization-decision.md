@@ -138,7 +138,7 @@ The same shape appears without a job library. A Polly pipeline in a controller c
 
 None of the libraries above states this rule; it is this article's derived design principle:
 
-> **Put the eligibility check inside every retry loop whose possible span exceeds the validity the decision it relies on was given.**
+> **Re-establish eligibility inside every retry loop whose possible lifetime can exceed the validity boundary of the decision authorizing it.**
 
 That makes validity an explicit property of the decision, not an intuition about elapsed time. An inner loop that resends one request may reuse the decision of the attempt it belongs to when the policy treats that bounded resend window as part of one authorization event. A short window is usually a reasonable choice, but shortness alone does not make it safe: a legal hold or a revoked membership can land a second after evaluation. Operations that need revocation to take effect immediately need enforcement coordinated with dispatch, not just a short window.
 
@@ -198,21 +198,39 @@ public sealed class ShareFolderJob(
 
         // Atomic and durable: succeeds only if the operation is still Pending and the
         // versions this decision read are still current (see the store contract below).
-        AttemptClaim? attempt = await store.TryStartAttemptAsync(operationId, decision, ct);
-        if (attempt is null) return;
+        ClaimResult claim = await store.TryStartAttemptAsync(operationId, decision, ct);
+        switch (claim.Status)
+        {
+            case ClaimStatus.Claimed:
+                break;
 
-        InviteOutcome outcome = await storage.InviteAsync(operation.Request, ct);
+            case ClaimStatus.OwnedElsewhere or ClaimStatus.Terminal:
+                // Another run holds the operation, or it has already finished.
+                return;
+
+            case ClaimStatus.FactsChanged:
+                // Still Pending, but a fact this decision read changed before the claim.
+                // Schedule another run, which evaluates again from current facts.
+                throw new RetryableShareException(operationId, "claim.facts-changed");
+
+            default:
+                // The claim's commit outcome is uncertain. Nothing has been dispatched;
+                // the next run reads the operation's state before doing anything.
+                throw new RetryableShareException(operationId, "claim.uncertain");
+        }
+
+        InviteResult result = await storage.InviteAsync(operation.Request, ct);
 
         // If the process stops after the provider applies the effect but before this
         // outcome is committed, recovery classifies the attempt as Unknown and
         // reconciles it before another attempt can begin.
-        await store.RecordOutcomeAsync(attempt.AttemptId, outcome, ct);
+        await store.RecordOutcomeAsync(claim.AttemptId!, result, ct);
 
-        if (outcome == InviteOutcome.NotApplied)
+        if (result.Outcome == InviteOutcome.NotApplied)
         {
             // The provider documented that nothing happened, so a later run may try again,
-            // and that run will evaluate authorization again before it does.
-            throw new RetryableShareException(operationId, "provider.not-applied");
+            // no earlier than the provider asked, and that run evaluates authorization first.
+            throw new RetryableShareException(operationId, "provider.not-applied", result.RetryNotBefore);
         }
     }
 }
@@ -221,7 +239,8 @@ public sealed class ShareFolderJob(
 The interfaces are illustrative, but the job is only as safe as the semantics behind them. The store has to guarantee these:
 
 - **`TryStartAttemptAsync` is an atomic, durable claim.** A conditional update, a concurrency token, or a uniqueness constraint moves the operation from `Pending` to `Executing` and records the attempt in one step. An in-memory check followed by a separate write does not provide this. Where the policy requires it, the same conditional write also checks that the project, membership, and allowlist versions the decision read are still current, which shrinks the gap between checking and using the facts. It does not close that gap entirely: the provider call still happens after the claim.
-- **Outcomes are durable state transitions.** `Completed` and `Unknown` are recorded against the operation. `NotApplied` returns it to `Pending` atomically, so the next run re-evaluates before trying again.
+- **The claim reports why it failed.** Another run owning the operation and a terminal operation end the run. A changed fact leaves the operation `Pending` and schedules a fresh evaluation, so the job is not marked finished with work still outstanding. An uncertain commit dispatches nothing and lets the next run read the durable state.
+- **Outcomes are durable state transitions.** `Completed` and `Unknown` are recorded against the operation. `NotApplied` returns it to `Pending` atomically, with any provider-requested `NotBefore` time persisted, so the next run waits for it and re-evaluates before trying again.
 - **An abandoned `Executing` attempt becomes `Unknown`.** If the worker dies holding a claim, a lease or timeout moves the attempt to `Unknown`, never back to `Pending`.
 - **Entering `Unknown` hands the operation to reconciliation.** The job returning early is safe only because something else is responsible for the unresolved operation and it stays visible to operators.
 - **Terminal markers are conditional.** `TryMarkRejectedAsync` and `TryMarkNeedsReviewAsync` succeed only from `Pending`, so a concurrent denial cannot overwrite an operation that is executing or already completed.
@@ -230,7 +249,7 @@ On Monday, this version behaves differently from 11:40 onward. The 14:30 run eva
 
 Three details matter more than the code's shape:
 
-- **The authorizer reads authoritative state, not the original request's identity artifacts.** The job has no `HttpContext` and no `ClaimsPrincipal`. Re-evaluation works only if the facts the policy needs, such as project membership, legal holds, and allowlists, can be read from the stores that own them. Copying the lead's access token or serialized claims into the job to "re-run" the policy later would only replay the 09:14 identity snapshot, and it would put a bearer credential in a queue.
+- **The authorizer reads authoritative state, not the original request's identity artifacts.** The job has no `HttpContext` and no `ClaimsPrincipal`. Re-evaluation works only if the facts the policy needs, such as project membership, legal holds, and allowlists, can be read from the stores that own them. Copying the lead's serialized claims into the job to "re-run" the policy later would only replay the 09:14 identity snapshot. Copying the lead's access token would do the same and also put a bearer credential in a queue.
 - **`CannotDetermine` is not `Denied`, and it is not `Allowed`.** If the authorizer cannot answer, the attempt is deferred. Retrying the *question* is safe because asking has no side effect. [Should Authorization Fail Open, Fail Closed, or Defer?](fail-open-fail-closed-or-defer.md#resilience-is-transport-not-authority) covers that case in depth.
 - **The evaluation counts as part of the attempt.** It is recorded with the attempt it permitted, so the evidence can show which decision allowed which attempt.
 
@@ -272,7 +291,7 @@ Whether a resource-version change or a policy revision should invalidate a decis
 
 ## Resend Only What Is Safe to Repeat. Reconcile the Rest.
 
-Re-evaluating authorization makes retries safe from stale authority. It does not make them safe from duplicated effects. The second half of the problem is deciding which failures may be retried at all.
+Re-evaluating authorization stops retries from reusing an earlier decision, within the validity rules and the dispatch gap described above. It does nothing about duplicated effects. The second half of the problem is deciding which failures may be retried at all.
 
 Suppose nothing changed on Monday, and the 14:30 run is allowed. This time the provider is slow: it creates the invitation, but its response takes 12 seconds. The standard resilience handler's 10-second attempt timeout fires, the retry strategy handles the resulting `TimeoutRejectedException`, and about two seconds later it resends the `POST`. The provider has no idempotency key for this endpoint, so it creates a second invitation. The application records one invitation ID. Months later, when someone revokes the reviewer's access, the recorded invitation is revoked and the other one still works.
 
@@ -301,23 +320,33 @@ builder.Services
             ShouldRetryAfterHeader = true,   // chooses the delay; it does not require the header
             // Timeouts, connection resets, and other 5xx responses are not retried here:
             // the request may already have taken effect.
-            ShouldHandle = args => ValueTask.FromResult(IsDocumentedNotProcessed(args.Outcome.Result))
+            ShouldHandle = args => ValueTask.FromResult(ShouldResendNow(args.Outcome.Result, TimeProvider.System))
         });
         pipeline.AddTimeout(TimeSpan.FromSeconds(10)); // per attempt, inside the retry
     });
 
-// The provider's documented "not processed" signal is the status code *and* a Retry-After
-// header. A wait longer than the resend window ends the attempt as NotApplied, and the
-// job library's next run, which re-evaluates authorization first, takes over.
+// Evidence: the provider documents "not processed" as the status code *and* a Retry-After
+// header, in either its delay-seconds or HTTP-date form. Without the header, there is no
+// documented guarantee, and the storage client classifies the response as Unknown.
 static bool IsDocumentedNotProcessed(HttpResponseMessage? response) =>
     response is { StatusCode: HttpStatusCode.ServiceUnavailable or HttpStatusCode.TooManyRequests }
-    && response.Headers.RetryAfter?.Delta is { } wait
-    && wait <= TimeSpan.FromSeconds(5);
+    && response.Headers.RetryAfter is { Delta: not null } or { Date: not null };
+
+// Timing: a separate question. A documented not-processed response whose requested wait
+// exceeds the resend window is still NotApplied; it just is not resent inside this attempt.
+static bool ShouldResendNow(HttpResponseMessage? response, TimeProvider clock) =>
+    IsDocumentedNotProcessed(response)
+    && RequestedWait(response!.Headers.RetryAfter!, clock) <= TimeSpan.FromSeconds(5);
+
+static TimeSpan RequestedWait(RetryConditionHeaderValue retryAfter, TimeProvider clock) =>
+    retryAfter.Delta ?? (retryAfter.Date!.Value - clock.GetUtcNow());
 ```
 
 For a client that should never resend a `POST`, `options.Retry.DisableForUnsafeHttpMethods()` on the standard handler is the simpler alternative.
 
-The storage client then maps what it saw into three outcomes: `Completed` when the provider returns the invitation, `NotApplied` when the provider documents that nothing happened, and `Unknown` for a timeout (including the outer one firing mid-request), a reset connection, or any response that does not establish either. An `Unknown` attempt moves the operation to `Unknown`, which the job above refuses to retry. A separate reconciliation step asks the provider what happened before anything else may run.
+The timeouts bound how long the client waits and keep it from starting new sends; they do not stop the provider from processing a request it already received. That is why a timeout always becomes `Unknown`.
+
+The storage client then maps what it saw into three outcomes: `Completed` when the provider returns the invitation; `NotApplied` when the response is documented as not processed, carrying the provider's requested time as `RetryNotBefore`; and `Unknown` for a timeout (including the outer one firing mid-request), a reset connection, a `503` without `Retry-After`, or any response that does not establish either. An `Unknown` attempt moves the operation to `Unknown`, which the job above refuses to retry. A separate reconciliation step asks the provider what happened before anything else may run.
 
 Reconciliation is only as good as the provider's answers. Listing the folder's invitations resolves the attempt only if a match can be reliably tied to this operation, for example through a client reference the provider stores with the invitation, and not merely to an invitation for the same address that someone created earlier. An empty listing proves `NotApplied` only if the provider guarantees that a request it accepted is visible by the time you look and that no earlier request is still executing. Without those guarantees, the attempt stays `Unknown` and goes to a person; it does not become `NotApplied` because a list came back empty.
 
@@ -350,7 +379,7 @@ Keep the two apart in code and in evidence:
 
 - Refreshing the worker's token is transport. It can happen inside one attempt, and it does not create a decision.
 - Re-establishing eligibility is authorization. It happens at the start of each attempt that can outlive the earlier decision, and it creates or checks a decision.
-- A `403 Forbidden` from the provider normally means the provider refused the worker or this request under its own authorization or policy: a missing service permission, a tenant or resource policy, or a revoked entitlement. It is not a transient fault. Investigate the provider-side condition before resubmitting; retrying it automatically hides the problem.
+- A `403 Forbidden` from the provider normally means the provider refused the worker or this request under its own authorization or policy: a missing service permission, a tenant or resource policy, or a revoked entitlement. Do not treat it as a transient fault unless the provider explicitly documents a retryable condition behind that response. Investigate the provider-side condition before resubmitting; retrying it automatically hides the problem.
 
 The inverse also holds: a request-time authorization decision is not a credential. The lead's 09:14 approval does not give the worker any provider permission, and the worker's provider permission does not mean any particular share is allowed. [How Short-Lived Execution Authority Differs from User Authorization](short-lived-execution-authority-vs-user-authorization.md#which-facts-must-still-be-true-on-friday) explains why the requester's authority and the executor's credentials are different things.
 
@@ -447,7 +476,9 @@ public async Task Unavailable_authorizer_defers_without_calling_the_provider()
 Also cover:
 
 - **Other fact changes.** Removing the lead from the project, or the reviewer's domain from the allowlist, between runs produces no invitation, exactly like the legal hold.
-- **Missing or long `Retry-After`.** A `503` without the header, or with a wait longer than the resend window, is not resent inside the attempt; the operation returns to `Pending` for the next run.
+- **Missing `Retry-After`.** A `503` without the header carries no documented no-effect guarantee: it is not resent, and the attempt is `Unknown` unless other evidence establishes that nothing was processed.
+- **Long `Retry-After`.** A documented not-processed response whose requested wait exceeds the resend window is not resent inside the attempt; the operation returns to `Pending` with the provider's `NotBefore` time, and no run starts earlier.
+- **Changed facts at claim time.** A fact that changes between evaluation and claim leaves the operation `Pending` and schedules another run; the job is not marked finished.
 - **Crash after dispatch.** A worker that stops after the provider creates the invitation but before the outcome is recorded leaves the attempt `Unknown`, never `Pending`, and no later run sends again.
 - **Inconclusive reconciliation.** An empty or ambiguous invitation listing, without a provider finality guarantee, leaves the attempt `Unknown` and escalates it.
 - **Token refresh.** A `401` followed by a successful token refresh resends inside the same attempt, creates no new decision, and does not bypass a legal hold placed before the attempt began.
@@ -473,7 +504,7 @@ Read-only calls are a partial exception. Retrying a `GET` cannot create a duplic
 
 **Re-evaluate on every attempt** when a job, message handler, or saga can retry over minutes or longer, and the policy's inputs can be read from authoritative stores at execution time. This is the common case, and it requires no tokens, no capability infrastructure, and no workflow product. It is the `ShareFolderJob` above.
 
-**Carry explicit decision bounds** only when the decision cannot be re-evaluated later, such as a human approval or a risk check whose inputs are gone. Then the decision needs an expiry, the policy revision, and a version for every fact it depended on, and the execution boundary must enforce all of them.
+**Carry explicit decision bounds** when the decision cannot be re-evaluated later, such as a human approval or a risk check whose inputs are gone. Bounds can also complement re-evaluation, for example by letting the claim check that the facts the latest evaluation read are still current. Then the decision needs an expiry, the policy revision, and a version for every fact it depended on, and the execution boundary must enforce all of them.
 
 **Narrow, single-use execution authority** becomes worth its cost only when the executor cannot read authoritative state, sits in a different trust boundary, or must be limited to exactly one operation. [Do You Need a Capability Token, or Are Roles and Claims Enough?](roles-claims-or-capability-token-dotnet.md) covers that choice, and most teams that only need safe retries should stop before it.
 
@@ -511,7 +542,7 @@ The 14:30 denial overwrites `DEC-5120`, so the record now says the request was n
 
 ### 8. Unbounded resubmission
 
-A dead-letter "resend all" tool restarts jobs from last month. If eligibility is checked inside each attempt this is harmless; if it is not, the resubmission tool is the most powerful authorization bypass in the system.
+A dead-letter "resend all" tool restarts jobs from last month. If eligibility is checked inside each attempt, and unresolved earlier attempts are reconciled first, resubmission does not replay stale authority, though a bulk resend can still overload dependencies. If eligibility is not checked, the resubmission tool is the most powerful authorization bypass in the system.
 
 ---
 
