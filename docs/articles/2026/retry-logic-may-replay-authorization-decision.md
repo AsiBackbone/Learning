@@ -30,7 +30,7 @@ Every component did exactly what it was configured to do. The endpoint authorize
 
 > **A retry policy answers "may this attempt run again, and when?" It does not answer "is the operation still allowed?" Any retry loop that can outlive the validity of the decision behind it should re-establish eligibility inside the loop. Resend only what your system or the provider can establish as safe to repeat, and reconcile ambiguous outcomes instead of resending them.**
 
-The opposite mistake matters too. Most retries are harmless, many need no extra authorization logic at all, and not every retry needs a new token or a new approval. Near the end, this article covers when ordinary retry plus the authorization you already have is enough.
+The opposite mistake matters too. Many retries are harmless, many need no extra authorization logic at all, and not every retry needs a new token or a new approval. Near the end, this article covers when ordinary retry plus the authorization you already have is enough.
 
 ---
 
@@ -240,8 +240,8 @@ The interfaces are illustrative, but the job is only as safe as the semantics be
 
 - **`TryStartAttemptAsync` is an atomic, durable claim.** A conditional update, a concurrency token, or a uniqueness constraint moves the operation from `Pending` to `Executing` and records the attempt in one step. An in-memory check followed by a separate write does not provide this. Where the policy requires it, the same conditional write also checks that the project, membership, and allowlist versions the decision read are still current, which shrinks the gap between checking and using the facts. It does not close that gap entirely: the provider call still happens after the claim.
 - **The claim reports why it failed.** Another run owning the operation and a terminal operation end the run. A changed fact leaves the operation `Pending` and schedules a fresh evaluation, so the job is not marked finished with work still outstanding. An uncertain commit dispatches nothing and lets the next run read the durable state.
-- **Outcomes are durable state transitions.** `Completed` and `Unknown` are recorded against the operation. `NotApplied` returns it to `Pending` atomically, with any provider-requested `NotBefore` time persisted, so the next run waits for it and re-evaluates before trying again.
-- **An abandoned `Executing` attempt becomes `Unknown`.** If the worker dies holding a claim, a lease or timeout moves the attempt to `Unknown`, never back to `Pending`.
+- **Outcomes are durable state transitions.** `Completed` and `Unknown` are recorded against the operation. `NotApplied` returns it to `Pending` atomically, with any provider-requested `NotBefore` time persisted. `TryStartAttemptAsync` enforces that time when claiming an attempt, so a manual resubmission cannot start early either; the scheduler's delay is not the only enforcement point. The next run also re-evaluates before trying again.
+- **An abandoned `Executing` attempt becomes `Unknown`.** If the worker dies holding a claim, a lease or timeout moves the attempt to `Unknown`, never back to `Pending`. Lease expiry does not prove the worker stopped: a paused worker can resume and send after recovery has already asked the provider and found nothing. Before recovery releases the operation for another attempt, it must prevent the earlier attempt from dispatching or committing a stale outcome, for example by fencing its writes with a lease epoch and having the worker re-check its lease immediately before sending. A lease check alone narrows the check-to-send gap but does not close it, so where recovery cannot establish that the earlier attempt can no longer send, the attempt stays `Unknown`.
 - **Entering `Unknown` hands the operation to reconciliation.** The job returning early is safe only because something else is responsible for the unresolved operation and it stays visible to operators.
 - **Terminal markers are conditional.** `TryMarkRejectedAsync` and `TryMarkNeedsReviewAsync` succeed only from `Pending`, so a concurrent denial cannot overwrite an operation that is executing or already completed.
 
@@ -344,7 +344,7 @@ static TimeSpan RequestedWait(RetryConditionHeaderValue retryAfter, TimeProvider
 
 For a client that should never resend a `POST`, `options.Retry.DisableForUnsafeHttpMethods()` on the standard handler is the simpler alternative.
 
-The timeouts bound how long the client waits and keep it from starting new sends; they do not stop the provider from processing a request it already received. That is why a timeout always becomes `Unknown`.
+The timeouts bound how long the client waits and signal cancellation; they keep the client from starting new sends only if every callback and handler in the call path honors that cancellation, because Polly cannot stop code that ignores its token. They never stop the provider from processing a request it already received. That is why a timeout always becomes `Unknown`.
 
 The storage client then maps what it saw into three outcomes: `Completed` when the provider returns the invitation; `NotApplied` when the response is documented as not processed, carrying the provider's requested time as `RetryNotBefore`; and `Unknown` for a timeout (including the outer one firing mid-request), a reset connection, a `503` without `Retry-After`, or any response that does not establish either. An `Unknown` attempt moves the operation to `Unknown`, which the job above refuses to retry. A separate reconciliation step asks the provider what happened before anything else may run.
 
@@ -480,6 +480,7 @@ Also cover:
 - **Long `Retry-After`.** A documented not-processed response whose requested wait exceeds the resend window is not resent inside the attempt; the operation returns to `Pending` with the provider's `NotBefore` time, and no run starts earlier.
 - **Changed facts at claim time.** A fact that changes between evaluation and claim leaves the operation `Pending` and schedules another run; the job is not marked finished.
 - **Crash after dispatch.** A worker that stops after the provider creates the invitation but before the outcome is recorded leaves the attempt `Unknown`, never `Pending`, and no later run sends again.
+- **Paused worker.** A worker that pauses after claiming, loses its lease, and resumes after recovery cannot send, and its late outcome write is refused.
 - **Inconclusive reconciliation.** An empty or ambiguous invitation listing, without a provider finality guarantee, leaves the attempt `Unknown` and escalates it.
 - **Token refresh.** A `401` followed by a successful token refresh resends inside the same attempt, creates no new decision, and does not bypass a legal hold placed before the attempt began.
 - **Decision bounds.** When full re-evaluation is not possible, a decision whose `ValidUntil`, policy revision, or any recorded fact version no longer matches leads to a request for a new decision, not to execution and not to another retry.
@@ -542,7 +543,7 @@ The 14:30 denial overwrites `DEC-5120`, so the record now says the request was n
 
 ### 8. Unbounded resubmission
 
-A dead-letter "resend all" tool restarts jobs from last month. If eligibility is checked inside each attempt, and unresolved earlier attempts are reconciled first, resubmission does not replay stale authority, though a bulk resend can still overload dependencies. If eligibility is not checked, the resubmission tool is the most powerful authorization bypass in the system.
+A dead-letter "resend all" tool restarts jobs from last month. If eligibility is checked inside each attempt, and unresolved earlier attempts are reconciled first, resubmission does not replay stale authority, though a bulk resend can still overload dependencies. If eligibility is not checked, the resubmission tool is a potentially powerful authorization bypass.
 
 ---
 
