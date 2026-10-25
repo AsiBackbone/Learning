@@ -29,14 +29,14 @@ The titles below are editorial hypotheses based on recognizable reader problems 
 
 | Priority | Meaning |
 | --- | --- |
-| **P0 — next publication set** | Strong standalone search problem, substantial source material, and a clear article/curriculum distinction. These are the first four candidates to consider. |
+| **P0 — next publication set** | Strong standalone search problem, substantial source material, and a clear article/curriculum distinction. These are the candidates to consider first. |
 | **P1 — strong follow-on** | Strong candidate with good source depth, but lower priority than the first publication set or some overlap that should be managed deliberately. |
 
 A backlog item becomes implementation work only when a dedicated issue is opened for that article. The implementation issue should record the final problem statement, working title, proposed permanent slug, supporting Learning sources, and scope boundaries. Record the issue number beside the candidate when that promotion happens.
 
 ---
 
-## P0 — Next Publication Set
+## Published P0 Candidates
 
 ### 1. When ASP.NET Core Authorization Is Not Enough
 
@@ -171,7 +171,7 @@ Point implementation-focused readers to typed proposal/schema validation and the
 
 ---
 
-## P1 — Strong Follow-On Candidates
+## Published P1 Candidates
 
 ### 5. Authorization vs. Approval vs. Acknowledgment: Which Decision Do You Actually Have?
 
@@ -526,6 +526,169 @@ The retrofit playbook covers phased changes to application behavior, and the ADR
 #### Natural deeper path
 
 Lead to the retrofit playbook for phased change and stopping rules, the ADR page for recording why the baseline exists and when the strategy should change, and the ReferenceApplication refresh procedure for one concrete implementation.
+
+---
+
+## P0 — Next Publication Set
+
+### 16. Your Retry Logic May Be Replaying an Authorization Decision
+
+- **Priority:** P0
+- **Implementation issue:** Not opened
+- **Permanent slug:** `retry-logic-may-replay-authorization-decision`
+
+#### Reader / search problem
+
+A .NET team uses Polly, a queue, a worker, or another resilience mechanism to retry a failed operation and assumes that retrying execution also permits reuse of the decision or authority from the first attempt. Typical questions include:
+
+- When a transient failure is retried, is the system retrying transport, one execution attempt, the logical operation, or the authority behind it?
+- Can an earlier authorization decision be reused after policy, resource, actor, or risk context changes?
+- Does an idempotency key make old authority safe to present again?
+- When should a retry preserve the same operation identity, and when does it require reevaluation or new authority?
+
+#### Existing Learning support
+
+- [Replay Protection and Bounded-Use Authority](../docs/security/replay-protection-and-bounded-use.md)
+- [Idempotency Does Not Prevent Authority Replay](../docs/articles/2026/idempotency-does-not-prevent-authority-replay.md)
+- [An Allowed Decision Does Not Mean the Operation Succeeded](../docs/articles/2026/allowed-decision-does-not-mean-execution-succeeded.md)
+- [Delayed Financial Payout and Ambiguous External Commit](../docs/case-studies/delayed-financial-payout-and-ambiguous-external-commit.md)
+
+#### Article / curriculum distinction
+
+The replay-protection material explains atomic consumption, and the existing articles separate idempotency, decisions, attempts, outcomes, and reconciliation in depth. This article should begin with automatic .NET retry behavior and make one narrower distinction: retry policy answers when an attempt may run again, not whether an old decision or grant remains valid. It should separate transport redelivery, execution retry, operation identity, authority reuse, reevaluation, and reconciliation; show at least one retryable pre-execution failure and one ambiguous post-send outcome; and explain when ordinary retry plus current authorization is sufficient. It must not imply that every retry needs a new token, that transient-fault libraries own authorization policy, or that idempotency proves authority freshness or exactly-once effects.
+
+#### Natural deeper path
+
+Lead to Idempotency Does Not Prevent Authority Replay for the identifier and ambiguous-outcome model, Replay Protection and Bounded-Use Authority for atomic consumption, and the delayed-payout case study for a complete reconciliation path.
+
+---
+
+### 17. Where Should Authorization Live in a .NET Application?
+
+- **Priority:** P0
+- **Implementation issue:** Not opened
+- **Permanent slug:** `where-authorization-should-live-dotnet-application`
+
+#### Reader / search problem
+
+A .NET developer knows an operation needs protection but is unsure whether the check belongs in middleware, an endpoint or controller, an authorization handler, an application service, a domain boundary, a policy engine, or the final execution gateway. The practical questions are:
+
+- Which layer should authenticate the caller, resolve authoritative resource context, decide permission, and enforce the result?
+- How close should enforcement be to the protected side effect?
+- When is ASP.NET Core authorization sufficient, and when does delayed or delegated execution require another boundary?
+- How can a team avoid both scattered checks and a centralized component that owns responsibilities it cannot safely know?
+
+#### Existing Learning support
+
+- [When ASP.NET Core Authorization Is Enough](../docs/architecture/when-aspnet-core-authorization-is-enough.md)
+- [When a Simple Application Service Is Enough](../docs/architecture/when-a-simple-application-service-is-enough.md)
+- [Policy Engines, Rules Engines, and Distributed Policy Enforcement](../docs/architecture/policy-engines-rules-engines-and-distributed-policy-enforcement.md)
+- [Decision Before Execution](../docs/tutorials/decision-before-execution.md)
+
+#### Article / curriculum distinction
+
+The existing comparisons examine each mechanism separately. This article should synthesize them into a placement guide organized around responsibilities rather than framework features: authenticate at the host boundary, rebuild security-sensitive facts from authoritative sources, evaluate policy where the required facts and policy are available, and enforce immediately before the protected effect. It should compare common placements with concrete strengths and failure modes, include a proportional path from endpoint policy to application service to separate decision and execution boundaries, and make clear that one operation can legitimately involve more than one layer. It must not prescribe one universal layer, treat domain validation as a substitute for authorization, or imply that every application needs a remote policy engine or governed-execution pipeline.
+
+#### Natural deeper path
+
+Lead first to When ASP.NET Core Authorization Is Enough and When a Simple Application Service Is Enough, then to Decision Before Execution or the policy-engine comparison only when the operation's lifecycle or distribution justifies the additional boundary.
+
+---
+
+### 18. A Background Job Should Not Inherit Everything the User Could Do
+
+- **Priority:** P0
+- **Implementation issue:** Not opened
+- **Permanent slug:** `background-job-should-not-inherit-user-authority`
+
+#### Reader / search problem
+
+An authenticated user starts work in an ASP.NET Core request, but a queue or `BackgroundService` performs it later. The team needs to decide what identity and authority cross that asynchronous boundary. Typical questions include:
+
+- Should the job carry the user's access token, claims, roles, or service credential?
+- How can the worker receive permission for one report, export, or command without inheriting everything the user or worker service can do?
+- Which actor should appear in audit evidence when a service executes work requested by a user?
+- What changes when the user, resource, tenant, policy, or job state changes before execution?
+
+#### Existing Learning support
+
+- [How Short-Lived Execution Authority Differs from User Authorization](../docs/articles/2026/short-lived-execution-authority-vs-user-authorization.md)
+- [Capability-Scoped Background Operation](../docs/case-studies/capability-scoped-background-operation.md)
+- [Scoped Capability and Host-Owned Execution](../docs/tutorials/scoped-capability-and-host-owned-execution.md)
+- [Shared Multi-Tenant Worker and Delayed Execution Isolation](../docs/case-studies/shared-multi-tenant-worker-and-delayed-execution-isolation.md)
+
+#### Article / curriculum distinction
+
+The existing article explains the conceptual distinction between user authorization and execution authority, while the case studies model complete delayed-execution designs. This article should use one ordinary `Generate Report` flow to teach least privilege across the HTTP-to-queue-to-worker boundary before introducing capability terminology. It should distinguish requester identity, worker identity, operation-specific authority, job delivery, and current host validation; compare simple same-host work with delayed or cross-process work; and explain when a stored job identifier plus current authorization is enough. It must not recommend copying bearer tokens into queue messages, erase the requesting actor from provenance, assume every background job needs a custom token, or present a worker's service identity as proof that each requested operation is allowed.
+
+#### Natural deeper path
+
+Lead to How Short-Lived Execution Authority Differs from User Authorization for the authority model, Capability-Scoped Background Operation for the end-to-end design, and the multi-tenant worker case study when one worker serves several tenant trust boundaries.
+
+---
+
+## P1 — Strong Follow-On Candidates
+
+### 19. Your Security Check Passed. Then the World Changed.
+
+- **Priority:** P1
+- **Implementation issue:** Not opened
+- **Permanent slug:** `security-check-passed-then-world-changed`
+
+#### Reader / search problem
+
+A security or policy check succeeds, but execution happens later after the resource, role, tenant, risk signal, policy, or environment may have changed. The team needs to know when the earlier decision remains usable and when the system must reevaluate. Typical questions include:
+
+- How long can an authorization or approval be trusted?
+- Which changes invalidate old authority, and which changes are only historical context?
+- Should policy deployment, resource-version drift, role removal, or a changed incident posture block delayed execution?
+- How can a system preserve the original decision without pretending it is still current?
+
+#### Existing Learning support
+
+- [Adaptive Risk Context, Freshness, and Drift](../docs/advanced/adaptive-risk-context-freshness-and-drift.md)
+- [Policy Versioning and Decision Provenance](../docs/governance/policy-versioning-and-decision-provenance.md)
+- [Scoped Capability and Host-Owned Execution](../docs/tutorials/scoped-capability-and-host-owned-execution.md)
+- [Delayed Financial Payout and Ambiguous External Commit](../docs/case-studies/delayed-financial-payout-and-ambiguous-external-commit.md)
+
+#### Article / curriculum distinction
+
+The advanced material covers detailed risk provenance, policy identity, freshness rules, and drift. This article should turn the broader time-of-check/time-of-use problem into an approachable practitioner guide. It should follow one delayed operation, distinguish historical decision truth from current execution eligibility, classify changes that require rejection, reevaluation, or no action, and show how resource versions, expiry, and explicit freshness rules can bound reuse. It must not claim that every state change invalidates a decision, prescribe one universal lifetime, rewrite historical decisions when current conditions differ, or imply that reevaluation guarantees the external operation will succeed.
+
+#### Natural deeper path
+
+Lead to Policy Versioning and Decision Provenance for policy drift, Scoped Capability and Host-Owned Execution for bounded continuation authority, and Adaptive Risk Context, Freshness, and Drift when probabilistic observations or changing risk inputs matter.
+
+---
+
+### 20. Passing Authentication Does Not Make Input Trustworthy
+
+- **Priority:** P1
+- **Implementation issue:** Not opened
+- **Permanent slug:** `authentication-does-not-make-input-trustworthy`
+
+#### Reader / search problem
+
+An application receives a valid authenticated request and downstream code begins treating its identifiers, tenant values, prices, resource state, or requested operation as trusted facts. The recurring misconception is:
+
+> The caller is authenticated, so the request values are trustworthy.
+
+The reader needs to separate identity proof, input validation, authoritative context, authorization, policy decisions, and execution authority.
+
+#### Existing Learning support
+
+- [Trust Boundaries and Least Privilege](../docs/security/trust-boundaries-and-least-privilege.md)
+- [Policy Context and Explicit Decision Outcomes](../docs/tutorials/policy-context-and-explicit-decision-outcomes.md)
+- [Role-Based, Claims-Based, and Capability-Based Authorization](../docs/architecture/role-based-claims-based-and-capability-based-authorization.md)
+- [Typed AI Proposed Intent and Schema-Validation Boundaries](../docs/ai-integration/typed-ai-proposed-intent-and-schema-validation-boundaries.md)
+
+#### Article / curriculum distinction
+
+The trust-boundary and policy-context material provides the deeper architecture treatment, while the AI page shows an especially sharp form of untrusted proposed input. This article should start with an ordinary authenticated ASP.NET Core request, show how a valid identity can still submit malformed, stale, unauthorized, cross-tenant, or adversarial values, and map each concern to the component responsible for it. It should explain that authentication can make some identity claims authoritative without making every request field true. It must not imply that all token claims are attacker-controlled, collapse validation into authorization, prescribe duplicate database reads for every field, or treat an authenticated caller as inherently malicious.
+
+#### Natural deeper path
+
+Lead to Trust Boundaries and Least Privilege for authoritative-context reconstruction, Policy Context and Explicit Decision Outcomes for separating facts from decisions, and the typed-AI proposal page for the same boundary when proposed input originates from a model.
 
 ---
 
