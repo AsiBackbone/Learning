@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "account": "jackdaw-patio",
-  "cursorSha": "3644f1d341bb8325743a286f82579e1a029d306e",
+  "cursorSha": "ce482e46e0bf2f257c16b2a8488b0444a290c28c",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
@@ -62,6 +62,11 @@
       "sourceBlobSha": "04ddd5cc6ff86b2d44c215a0954006df39edb543",
       "postId": "2114352419479957616",
       "postedAtUtc": "2026-10-25T13:44:34.4033938+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/discovery-is-not-authorization-ai-assisted-development.html": {
+      "sourceBlobSha": "ff4151ddbe3ae6c0dd8e44eb7a39788b2724dcbe",
+      "postId": "2114748083179237435",
+      "postedAtUtc": "2026-10-26T15:56:47.9792752+00:00"
     }
   }
 }
