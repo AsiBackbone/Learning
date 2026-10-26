@@ -761,7 +761,8 @@ Lead to Replay Protection and Bounded-Use Authority for atomic consumption and f
 ### 23. Discovery Is Not Authorization: Using GitHub Issues to Govern AI-Assisted Development
 
 - **Priority:** P1
-- **Implementation issue:** Not opened
+- **Implementation issue:** Not opened; published directly from this backlog entry
+- **Publication:** [Published October 26, 2026](../docs/articles/2026/discovery-is-not-authorization-ai-assisted-development.md)
 - **Permanent slug:** `discovery-is-not-authorization-ai-assisted-development`
 
 #### Reader / search problem

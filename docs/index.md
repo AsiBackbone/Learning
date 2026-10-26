@@ -166,9 +166,9 @@ The goal is to make the reasoning visible—not to prove that one framework or a
 
 Learning 1.4 is the current documentation baseline aligned with its reviewed AsiBackbone 7.0.0 and NetCoreApplicationTemplate 2.11.2 boundaries. The dated [implementation-currentness review](getting-started/implementation-currentness-review-2026-10-24.md) records why Learning retains those archival pins after reviewing AsiBackbone 7.5.1 and NetCoreApplicationTemplate 2.11.6. The [compatibility and API boundary](getting-started/asibackbone-7-api-boundary.md) pins the selected implementation references; earlier Learning snapshots remain available as historical guidance. Recent publications include:
 
+- [Discovery Is Not Authorization: Using GitHub Issues to Govern AI-Assisted Development](articles/2026/discovery-is-not-authorization-ai-assisted-development.md)
 - [Your Retry Logic May Be Replaying an Authorization Decision](articles/2026/retry-logic-may-replay-authorization-decision.md)
 - [You Don't Need to Roll Back What You Never Merged](articles/2026/you-dont-need-to-roll-back-what-you-never-merged.md)
-- [An Allowed Decision Does Not Mean the Operation Succeeded](articles/2026/allowed-decision-does-not-mean-execution-succeeded.md)
 
 New publications are announced in the [RSS feed](https://asibackbone.github.io/Learning/feed.xml).
 

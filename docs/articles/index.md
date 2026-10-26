@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| AI coding agents that find adjacent work outside their assigned issue | [Discovery Is Not Authorization: Using GitHub Issues to Govern AI-Assisted Development](2026/discovery-is-not-authorization-ai-assisted-development.md) |
 | Polly, queue, and background-job retries that reuse an earlier authorization decision | [Your Retry Logic May Be Replaying an Authorization Decision](2026/retry-logic-may-replay-authorization-decision.md) |
 | .NET LTS migrations, template-derived applications, upstream baselines, and isolated upgrade candidates | [You Don't Need to Roll Back What You Never Merged](2026/you-dont-need-to-roll-back-what-you-never-merged.md) |
 | Allowed or approved operations that failed, unknown outcomes, retries, and compensation | [An Allowed Decision Does Not Mean the Operation Succeeded](2026/allowed-decision-does-not-mean-execution-succeeded.md) |
@@ -49,6 +50,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Discovery Is Not Authorization: Using GitHub Issues to Govern AI-Assisted Development](2026/discovery-is-not-authorization-ai-assisted-development.md)
+
+**Christopher D. Cavell** · **October 26, 2026**
+
+An AI coding agent assigned to add a CSV export finds a slow query, a possible cross-tenant read, a documentation mismatch, and a refactoring it would prefer, and fixing all four in one pull request lets unreviewed changes ride on an approved one. This guide treats the issue as a work order with an outcome, acceptance criteria, non-goals, and constraints; sorts discoveries into blocking dependencies, separate work, security-sensitive findings, and noise; shows when an agent should stop and ask, propose a linked follow-on issue, escalate privately, or drop a finding; describes what a follow-on issue should carry; explains what GitHub references, sub-issues, dependencies, and closing keywords do and do not guarantee; treats issue text from people without authority as data rather than instructions; and states when a lighter process is enough.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/discovery-is-not-authorization-ai-assisted-development.html`
 
 ### [Your Retry Logic May Be Replaying an Authorization Decision](2026/retry-logic-may-replay-authorization-decision.md)
 
