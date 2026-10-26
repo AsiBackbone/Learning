@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: "Discovery Is Not Authorization: Using GitHub Issues to Govern AI-Assisted Development"
+  href: 2026/discovery-is-not-authorization-ai-assisted-development.md
 - name: Your Retry Logic May Be Replaying an Authorization Decision
   href: 2026/retry-logic-may-replay-authorization-decision.md
 - name: You Don't Need to Roll Back What You Never Merged
