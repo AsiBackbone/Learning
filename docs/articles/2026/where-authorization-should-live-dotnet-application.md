@@ -74,7 +74,7 @@ The rules do not all belong in the same place, and the entry paths do not all ha
 | **Decide** | Given those facts, what does policy say about this operation? | The facts, the policy, and the requested operation | A policy component the operation calls: an ASP.NET Core authorization handler, an in-process class, or a policy engine |
 | **Enforce** | What stops the side effect when the answer is not "yes"? | Control over the code path that causes the effect | The point every entry path to the effect must cross |
 
-Separating them answers most placement arguments. The authentication middleware is excellent at the first question and cannot answer the second. A policy engine is excellent at the third and cannot do the fourth for you. The boundary that actually produces the effect is the last reliable enforcement point: earlier components may also enforce, but they cannot substitute for the component that controls whether the effect occurs. That boundary may not know who the original requester was unless the earlier layers pass it along.
+Separating them settles many placement arguments. The authentication middleware is excellent at the first question and cannot answer the second. A policy engine is excellent at the third and cannot do the fourth for you. The boundary that actually produces the effect is the last reliable enforcement point: earlier components may also enforce, but they cannot substitute for the component that controls whether the effect occurs. That boundary may not know who the original requester was unless the earlier layers pass it along.
 
 One operation can therefore legitimately involve several layers. That is not duplication, as long as each layer answers a different question.
 
@@ -110,7 +110,7 @@ A MediatR `IPipelineBehavior` or a decorator around command handlers is a good h
 
 An application service such as `InvoiceApprovalService.ApproveAsync` is the code that performs the use case. It can load the invoice and the approver's current facts, evaluate policy, and perform the change. If every entry path calls it, it is the place the paths meet.
 
-That makes it the natural home for the deciding check on R2 to R5 in most applications. It requires one discipline: the service must receive the actor as an explicit argument that each entry path constructs from its own authenticated source. It should not reach for `HttpContext`, which the job and the chat handler do not have.
+That makes it the natural home for the deciding check on R2 to R5 in many applications. It requires one discipline: the service must receive the actor as an explicit argument that each entry path constructs from its own authenticated source. It should not reach for `HttpContext`, which the job and the chat handler do not have.
 
 ### The domain model
 
@@ -148,7 +148,7 @@ The payment run is a different component that acts hours or days after the appro
 | Domain model | Only what it is passed | Yes | Every path that mutates through the entity | Invariants such as R6 | Coupled directly to identity infrastructure |
 | EF Core query filter | Only the configured scope | Rows in LINQ queries | LINQ queries over the filtered entity | Defense in depth for R3 on reads | Mistaken for the decision, or fed a tenant from the request |
 | Database row-level security | The database identity, trusted session context, or both | Rows, and writes if configured | Applicable statements on protected tables, subject to policy and role exemptions | Defense in depth for R3, and more if policies cover writes | Fed an untrusted identity, or assumed to cover other stores |
-| Policy engine | Only what it is given | Only what it is given | None by itself | Deciding when policy is shared or changes independently | Treated as enforcement, or given caller-supplied facts |
+| Policy engine | Supplied facts and any configured trusted data sources | Supplied facts and any configured trusted data sources | None by itself | Deciding when policy is shared or changes independently | Treated as enforcement, or given caller-supplied facts |
 | Later effect-producing boundary | Usually a service identity | Yes, at execution time | Every path to that effect | Execution-time eligibility such as R7 | Assumed to inherit the original decision forever |
 
 The column that decides the deciding check's location is "covers every entry path." The column that decides what it can check is "sees the resource." In this design, the application service is the first placement with "yes" in both. In other systems, another operation boundary can play that role: a command handler, a façade that owns a transactional aggregate, a database procedure, or a separate service.
@@ -547,7 +547,7 @@ public async Task Payment_run_does_not_pay_after_bank_details_change()
 }
 ```
 
-`ApproveThroughAsync` drives each path through its real composition: the HTTP pipeline through `WebApplicationFactory` for the API and batch endpoints, and the registered message handler for the chat path. A test that calls `InvoiceApprovalService` directly proves the policy. Only a test through each entry path proves that the path uses it. The second test shows that a limit lowered after sign-in is respected; on its own it does not prove which source supplied the limit, so pair it with a test of the directory the service reads from.
+`ApproveThroughAsync` drives each path through its real composition: the HTTP pipeline through `WebApplicationFactory` for the API and batch endpoints, and the registered message handler for the chat path. A test that calls `InvoiceApprovalService` directly exercises the policy. Tests through each entry path demonstrate that the tested restrictions hold at that boundary; architecture tests, described below, separately check that callers use the shared operation. The second test shows that a limit lowered after sign-in is respected; on its own it does not prove which source supplied the limit, so pair it with a test of the directory the service reads from.
 
 Two more checks are worth automating:
 
@@ -671,4 +671,4 @@ To practice consolidating scattered checks into one deciding step, work through 
 
 There is no single layer where authorization lives, because authorization is not a single thing. Establish who is asking at the host boundary where the credential is validated. Read the facts from the stores that own them. Decide where those facts and the policy are available. Enforce at the point every path to the side effect must cross.
 
-In most ASP.NET Core applications, that means a fallback policy and coarse endpoint policies at the edge, the deciding check inside the application service that performs the use case, invariants in the domain, tenant filters underneath as a backstop, and an execution-time check in any component that acts later. Earlier layers may reject early, but apart from deliberate channel-specific requirements they should not reject what the deciding check would allow, and they should never be the only thing that says yes. When an endpoint is the only door and the effect happens inside the request, an endpoint policy is the whole design. Revisit the question when a second door appears.
+In many ASP.NET Core applications, that means a fallback policy and coarse endpoint policies at the edge, the deciding check inside the application service that performs the use case, invariants in the domain, tenant filters underneath as a backstop, and an execution-time check in any component that acts later. Earlier layers may reject early, but apart from deliberate channel-specific requirements they should not reject what the deciding check would allow, and they should never be the only thing that says yes. When an endpoint is the only door and the effect happens inside the request, an endpoint policy is the whole design. Revisit the question when a second door appears.
