@@ -6,6 +6,10 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+### Changed
+
+- Replaced the documentation logo, favicon, RSS feed image, and social cards with the open-book glyph from the AsiBackbone glyph family, which the organization site also uses. The social card now uses the canonical `AsiBackbone` spelling instead of "ASI BACKBONE". File names and image dimensions are unchanged.
+
 ### Added
 
 - Published [Discovery Is Not Authorization: Using GitHub Issues to Govern AI-Assisted Development](docs/articles/2026/discovery-is-not-authorization-ai-assisted-development.md), a standalone article on why an AI coding agent that finds adjacent work while working an assigned issue is not thereby authorized to perform it. It follows one CSV-export issue through four discoveries, treats the issue as a work order with an outcome, acceptance criteria, non-goals, and constraints, classifies discoveries as blocking dependencies, separate work, security-sensitive findings, or noise, shows when to stop and ask, propose a linked follow-on issue, escalate privately, or drop a finding, describes what a follow-on issue should carry so its origin and evidence remain traceable, explains what GitHub references, sub-issues, issue dependencies, and closing keywords do and do not establish, treats issue-thread text from people without authority as data rather than instructions, and states when a lighter process is enough.
