@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "account": "jackdaw-patio",
-  "cursorSha": "2022bb16c781388cd4d5eeb644b48426feade83b",
+  "cursorSha": "c8ff886d91b0d2a0d8b9f4b9eafc84246077dc93",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
@@ -67,6 +67,11 @@
       "sourceBlobSha": "ff4151ddbe3ae6c0dd8e44eb7a39788b2724dcbe",
       "postId": "2114748083179237435",
       "postedAtUtc": "2026-10-26T15:56:47.9792752+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/where-authorization-should-live-dotnet-application.html": {
+      "sourceBlobSha": "902d05b5f72a377b9c497f9245b44f830d0f3134",
+      "postId": "2115547674674131338",
+      "postedAtUtc": "2026-10-28T20:54:05.4084246+00:00"
     }
   }
 }
