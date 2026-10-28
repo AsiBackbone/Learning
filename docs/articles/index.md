@@ -56,7 +56,7 @@ The Learning site is the canonical publication host. Cross-posted copies should 
 
 **Christopher D. Cavell** · **October 28, 2026**
 
-An invoice-approval feature gains a bulk screen, a chat approval bot, and a nightly auto-approval job, and a clerk ends up approving their own invoices because each entry path carried its own copy of the rules. This guide separates establishing the actor, establishing facts, deciding, and enforcing; compares what middleware, endpoint policies, resource-based checks, pipeline behaviors, application services, domain models, data-access filters, policy engines, and later executors can each see; puts the deciding check where every path to the side effect meets; keeps early checks strictly weaker than the decision; and states when an endpoint policy is the whole design.
+An invoice-approval feature gains a bulk screen, a chat approval bot, and a nightly auto-approval job, and a clerk ends up approving their own invoices because each entry path carried its own copy of the rules. This guide separates establishing the actor, establishing facts, deciding, and enforcing; compares what middleware, endpoint policies, resource-based checks, pipeline behaviors, application services, domain models, data-access filters, policy engines, and later executors can each see; puts the deciding check where every path to the side effect meets; keeps early checks from rejecting what the decision would allow; and states when an endpoint policy is the whole design.
 
 Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/where-authorization-should-live-dotnet-application.html`
 
