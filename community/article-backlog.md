@@ -567,7 +567,8 @@ Lead to Idempotency Does Not Prevent Authority Replay for the identifier and amb
 ### 17. Where Should Authorization Live in a .NET Application?
 
 - **Priority:** P0
-- **Implementation issue:** Not opened
+- **Implementation issue:** Not opened; published directly from this backlog entry
+- **Publication:** [Published October 28, 2026](../docs/articles/2026/where-authorization-should-live-dotnet-application.md)
 - **Permanent slug:** `where-authorization-should-live-dotnet-application`
 
 #### Reader / search problem
