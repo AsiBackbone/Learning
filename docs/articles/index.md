@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Choosing which layer of a .NET application should authenticate, decide, and enforce, and covering every entry path to a side effect | [Where Should Authorization Live in a .NET Application?](2026/where-authorization-should-live-dotnet-application.md) |
 | AI coding agents that find adjacent work outside their assigned issue | [Discovery Is Not Authorization: Using GitHub Issues to Govern AI-Assisted Development](2026/discovery-is-not-authorization-ai-assisted-development.md) |
 | Polly, queue, and background-job retries that reuse an earlier authorization decision | [Your Retry Logic May Be Replaying an Authorization Decision](2026/retry-logic-may-replay-authorization-decision.md) |
 | .NET LTS migrations, template-derived applications, upstream baselines, and isolated upgrade candidates | [You Don't Need to Roll Back What You Never Merged](2026/you-dont-need-to-roll-back-what-you-never-merged.md) |
@@ -50,6 +51,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Where Should Authorization Live in a .NET Application?](2026/where-authorization-should-live-dotnet-application.md)
+
+**Christopher D. Cavell** · **October 28, 2026**
+
+An invoice-approval feature gains a bulk screen, a chat approval bot, and a nightly auto-approval job, and a clerk ends up approving their own invoices because each entry path carried its own copy of the rules. This guide separates establishing the actor, establishing facts, deciding, and enforcing; compares what middleware, endpoint policies, resource-based checks, pipeline behaviors, application services, domain models, data-access filters, policy engines, and later executors can each see; puts the deciding check where every path to the side effect meets; keeps early checks from rejecting what the decision would allow; and states when an endpoint policy is the whole design.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/where-authorization-should-live-dotnet-application.html`
 
 ### [Discovery Is Not Authorization: Using GitHub Issues to Govern AI-Assisted Development](2026/discovery-is-not-authorization-ai-assisted-development.md)
 
