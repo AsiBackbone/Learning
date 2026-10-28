@@ -32,7 +32,7 @@ Every rule existed somewhere in the codebase. The failure was where each one liv
 
 > **For placement purposes, treat authorization as four responsibilities rather than one check: establish who is asking, establish the facts, decide, and enforce. Put each one where its inputs are trustworthy. Put the deciding check for an operation at the point every path to its side effect must cross, as close to the effect as the facts it needs are available. Earlier layers may reject early. They should not be the only thing that says yes.**
 
-That is not an argument for moving every check into one place or for adding layers. Most endpoints in most applications are well served by an endpoint policy and a resource check in the handler. Near the end, this article covers when that is the whole design.
+That is not an argument for moving every check into one place or for adding layers. Many ordinary endpoints are well served by an endpoint policy and, when needed, a resource check in the handler. Near the end, this article covers when that is the whole design.
 
 ---
 
@@ -84,7 +84,7 @@ One operation can therefore legitimately involve several layers. That is not dup
 
 ### Authentication middleware and a fallback policy
 
-The host's authentication pipeline validates the applicable credential and establishes the principal for the request, and `UseAuthorization` evaluates the endpoint's authorization metadata. A **fallback policy**, set through `AuthorizationOptions.FallbackPolicy`, applies to endpoints that have no authorization metadata. Setting it to require an authenticated user means an endpoint with no authorization metadata rejects anonymous callers, for requests that pass through the authorization middleware. Anything served earlier in the pipeline, such as static files mapped before `UseAuthorization`, is outside it. An endpoint can still opt out explicitly with `AllowAnonymous`.
+The host's authentication pipeline validates the applicable credential and establishes the principal for the request, and `UseAuthorization` evaluates the endpoint's authorization metadata. A **fallback policy**, set through `AuthorizationOptions.FallbackPolicy`, applies to endpoints that have no authorization metadata. Setting it to require an authenticated user means an endpoint with no authorization metadata rejects anonymous callers, for requests that pass through the authorization middleware. Anything served earlier in the pipeline, such as static files served by middleware that runs before `UseAuthorization`, is outside it. An endpoint can still opt out explicitly with `AllowAnonymous`.
 
 A fallback policy restores authentication, not a missing operation permission. An authenticated caller still reaches an endpoint whose developer forgot `RequireAuthorization("invoices.approve")`.
 
@@ -94,7 +94,7 @@ This layer is the right home for R1 and for "deny by default." It sees the reque
 
 `[Authorize(Policy = "...")]` and `RequireAuthorization("...")` attach a named policy to an endpoint or a route group. The policy's requirements can check roles, claims, scopes, or anything an authorization handler can compute from the user.
 
-This is a good home for R2 as an early, coarse check: callers without any approval permission are rejected before the endpoint runs. [Microsoft's documentation on resource-based authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/resourcebased) notes the limit: attribute evaluation happens before data binding and before the handler that loads the resource runs. A policy evaluated from endpoint metadata therefore cannot check R3 to R6 against the invoice the endpoint will load. A custom authorization handler can use injected services to fetch resource facts itself, but then the invoice is loaded twice, by two pieces of code that can disagree about which version they saw.
+This is a good home for R2 as an early, coarse check: callers without any approval permission are rejected before the endpoint runs. [Microsoft's documentation on resource-based authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/resourcebased) notes the limit: attribute evaluation happens before data binding and before the handler that loads the resource runs. A policy evaluated from endpoint metadata therefore cannot check R3 to R6 against the invoice the endpoint will load. A custom authorization handler can use injected services to fetch resource facts itself. Unless loading is coordinated, for example through a shared scoped loader, the handler and the endpoint may duplicate the work or retrieve different versions of the invoice.
 
 ### Resource-based checks in the endpoint or controller
 
@@ -122,9 +122,9 @@ Invariants and authorization are different kinds of rules. A useful test: *would
 
 EF Core [**global query filters**](https://learn.microsoft.com/en-us/ef/core/querying/filters), configured with `HasQueryFilter`, can add `TenantId == currentTenant` to every LINQ query for an entity type. They are strong defense in depth for R3 on reads, especially for list and search queries, where a forgotten `Where` clause is the classic cross-tenant read.
 
-A query filter is a backstop, not the decision. It can be disabled with `IgnoreQueryFilters`, and it provides no boundary for raw SQL or any other data-access path that does not compose an EF LINQ query over the filtered entity. It also does not validate what `SaveChanges` writes: tenant-safe reads and tenant-safe writes need separate attention. Its tenant value is only as trustworthy as where it came from, which must be the authenticated context, not a request parameter. And the simple tenant filter shown later enforces row scope, not the approval policy: it knows nothing about limits or submitters.
+A query filter is a backstop, not the decision. It can be disabled with `IgnoreQueryFilters`. It does not constrain SQL executed directly through APIs such as `Database.ExecuteSql`, or any access outside EF's entity-query pipeline. Composable `FromSql` entity queries can still have the filter applied. It also does not validate what `SaveChanges` writes: tenant-safe reads and tenant-safe writes need separate attention. Its tenant value is only as trustworthy as where it came from, which must be the authenticated context, not a request parameter. And the simple tenant filter shown later enforces row scope, not the approval policy: it knows nothing about limits or submitters.
 
-Database **row-level security** is a different and stronger mechanism. SQL Server security policies can include block predicates that reject writes, and PostgreSQL row security policies can restrict both the rows a statement sees and the rows it may write, and can consult other tables. Depending on how far it is taken, the database can enforce part of the rule set itself. It is still fed the actor's identity or tenant by the application, so it is only as trustworthy as that value, and it protects only the database it runs in.
+Database **row-level security** is a different and stronger mechanism. SQL Server security policies can include block predicates that reject writes, and PostgreSQL row security policies can restrict both the rows a statement sees and the rows it may write, and can consult other tables. Depending on how far it is taken, the database can enforce part of the rule set itself. Its policies key on the database identity, a trusted session value the application sets, or both, so it is only as trustworthy as that identity or value. It covers only the tables and commands its policies apply to, subject to role exemptions such as table owners and roles allowed to bypass row security, and it protects only the database it runs in.
 
 ### A policy engine
 
@@ -145,9 +145,9 @@ The payment run is a different component that acts hours or days after the appro
 | Resource-based check in the endpoint | Yes | Yes | That endpoint only | R2 to R5 when the endpoint is the only door | A second door appears |
 | Pipeline behavior or decorator | Usually | Not unless built to load it | Calls through the decorated registration | Uniform mechanics, coarse checks | It becomes the only check for resource rules |
 | Application service | Yes, if passed explicitly | Yes | Every path that calls it | The deciding check for R2 to R5 | Some path skips it, or it reads identity from ambient HTTP state |
-| Domain model | No | Yes | Every path that mutates the entity | Invariants such as R6 | Asked to know about callers and limits |
+| Domain model | Only what it is passed | Yes | Every path that mutates through the entity | Invariants such as R6 | Coupled directly to identity infrastructure |
 | EF Core query filter | Only the configured scope | Rows in LINQ queries | LINQ queries over the filtered entity | Defense in depth for R3 on reads | Mistaken for the decision, or fed a tenant from the request |
-| Database row-level security | Only what the application sets | Rows, and writes if configured | Statements against that database | Defense in depth for R3, and more if policies cover writes | Fed an untrusted identity, or assumed to cover other stores |
+| Database row-level security | The database identity, trusted session context, or both | Rows, and writes if configured | Applicable statements on protected tables, subject to policy and role exemptions | Defense in depth for R3, and more if policies cover writes | Fed an untrusted identity, or assumed to cover other stores |
 | Policy engine | Only what it is given | Only what it is given | None by itself | Deciding when policy is shared or changes independently | Treated as enforcement, or given caller-supplied facts |
 | Later effect-producing boundary | Usually a service identity | Yes, at execution time | Every path to that effect | Execution-time eligibility such as R7 | Assumed to inherit the original decision forever |
 
@@ -345,7 +345,7 @@ public sealed class ChatApprovalHandler(IChatIdentityMap identities, InvoiceAppr
 }
 ```
 
-The nightly job calls the same service with `new Actor.Automation("recurring-contract-approval", tenantId)`. The job runner creates that actor from trusted job configuration and the tenant it is processing. No request-controlled input may select an automation identity or process name, and the directory, not the job, decides whether that process may approve invoices for that tenant. A per-invoice ceiling is the simplest contract rule; a cumulative contract budget would need the remaining budget as another fact, read and consumed in the same write.
+The nightly job calls the same service with `new Actor.Automation("recurring-contract-approval", tenantId)`. The job runner creates that actor from trusted job configuration and the tenant it is processing, and accepts only process names from a configured allow-list. No request-controlled input may select an automation identity or process name, and the directory, not the job, decides whether that process may approve invoices for that tenant. A per-invoice ceiling is the simplest contract rule; a cumulative contract budget would need the remaining budget as another fact, read and consumed in the same write.
 
 Notice what moved and what stayed:
 
@@ -376,7 +376,7 @@ Accessibility modifiers such as `internal` are a control against accidental misu
 
 Two opposite mistakes are common.
 
-**Every caller-dependent rule pushed into the entity.** An entity can check caller-dependent rules without doing I/O: the service loads an immutable approver value and passes it to `invoice.Approve(approver)`. That is a legitimate design, and some teams prefer it because the rules live next to the data. Its cost is that the entity's API now models callers, limits, and kinds of automation, and every new kind of actor changes the domain model. Payables keeps the entity to rules about what an invoice can become and keeps rules about who may cause it in the policy. Both designs work if the split is deliberate.
+**Every caller-dependent rule pushed into the entity.** An entity can check caller-dependent rules without doing I/O: the service loads an immutable approver value and passes it to `invoice.Approve(approver)`. That is a legitimate design, and some teams prefer it because the rules live next to the data. Its cost is that the entity's API now models callers, limits, and kinds of automation, and a new kind of actor may require changes to the domain API. Payables keeps the entity to rules about what an invoice can become and keeps rules about who may cause it in the policy. Both designs work if the split is deliberate.
 
 **Invariants left to authorization.** If R6 lives only in the policy, any path that does not call the policy can approve a paid invoice: a future endpoint, or a job that reuses the store. The rule was never about permission. It was about what an invoice can become.
 
@@ -444,6 +444,8 @@ This requires the approval to be bound to what the approver actually reviewed, w
 - **Record the version the approver saw.** The approval screen shows the vendor's bank details along with a version that the server issued. The approve request sends that version back, and the service treats it as an assertion to validate: it approves only if the version still matches the current vendor record, and stores it with the approval. Reading the latest version when the request arrives would record what was current, not what the approver saw.
 - **Pay to exactly what was approved.** Checking the version and then fetching the payment destination in a separate step leaves another window for change. The payment instruction should use the destination stored with, or locked to, the approved version, or check the version and read the destination in the same transaction.
 
+The earlier `ApproveAsync` snippet omits the reviewed-version input and its persistence; implementing R7 requires extending that flow. Checking the vendor version and recording the approval also need the consistency guarantee the application intends, such as including the vendor version in the conditional write, rather than assuming a separate read is still current.
+
 The payment run does not re-run the approver's permission check; that decision is history. In this example, an approver who later leaves or loses the permission does not by that fact alone invalidate a completed approval; if your policy says otherwise, that is one more execution-time rule to add here. The payment run checks the facts that must still hold for *execution*: status, holds, and the bank details the approval covered.
 
 The same separation applies to any queue, worker, or downstream service. The executor should receive an operation identifier and read current state, not a copy of the requester's claims or token. [How Short-Lived Execution Authority Differs from User Authorization](short-lived-execution-authority-vs-user-authorization.md#which-facts-must-still-be-true-on-friday) covers the handoff in detail, and [Your Retry Logic May Be Replaying an Authorization Decision](retry-logic-may-replay-authorization-decision.md) covers what happens when that executor retries.
@@ -498,7 +500,7 @@ Moving a step later should be a response to a specific pressure, such as a new e
 
 ## Testing That Every Path Is Covered
 
-The tests that matter assert that the effect did not happen, through each real entry path, not that one method returned `Denied`. They are specifications of the behavior described above, not evidence of a working implementation.
+The tests that matter assert that the effect did not happen, through each real entry path, not that one method returned `Denied`. They are specifications of the behavior described above, not evidence of a working implementation, and each demonstrates behavior only under the conditions it sets up.
 
 ```csharp
 public static TheoryData<EntryPath> AllEntryPaths =>
@@ -545,14 +547,14 @@ public async Task Payment_run_does_not_pay_after_bank_details_change()
 }
 ```
 
-`ApproveThroughAsync` drives each path through its real composition: the HTTP pipeline through `WebApplicationFactory` for the API and batch endpoints, and the registered message handler for the chat path. A test that calls `InvoiceApprovalService` directly proves the policy. Only a test through each entry path proves that the path uses it. The second test also proves that the limit is read at approval time rather than taken from a claim issued at sign-in.
+`ApproveThroughAsync` drives each path through its real composition: the HTTP pipeline through `WebApplicationFactory` for the API and batch endpoints, and the registered message handler for the chat path. A test that calls `InvoiceApprovalService` directly proves the policy. Only a test through each entry path proves that the path uses it. The second test shows that a limit lowered after sign-in is respected; on its own it does not prove which source supplied the limit, so pair it with a test of the directory the service reads from.
 
 Two more checks are worth automating:
 
 - **An architecture rule that the effect has one caller.** An architecture-test library or a Roslyn analyzer can fail the build when any type other than the invoice store calls `Invoice.Approve`, or when anything outside `InvoiceApprovalService` calls `TryApproveAsync`.
 - **Coverage tests for endpoint metadata.** Enumerate the application's endpoints and assert that each has authorization metadata or an explicit `AllowAnonymous`, which catches the endpoint someone forgot. Separately, send an unauthenticated HTTP request to an endpoint without metadata and assert that the fallback policy rejects it; the enumeration proves the metadata exists, and only the request proves the pipeline enforces it.
 
-Also cover a cross-tenant invoice ID on every path (expect not found and no write), the nightly job approving an over-contract invoice (expect a denial), a concurrent change to the invoice between evaluation and write (expect a conflict and no approval), and a vendor placed on hold after approval (expect no payment). [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) develops the technique of counting calls to the executor.
+Also cover a cross-tenant invoice ID on every path (expect not found and no write), the nightly job approving an over-contract invoice (expect a denial), an automation process the directory has not enabled for the tenant approving an otherwise eligible invoice (expect a denial and no write), a concurrent change to the invoice between evaluation and write (expect a conflict and no approval), and a vendor placed on hold after approval (expect no payment). [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) develops the technique of counting calls to the executor.
 
 ---
 
@@ -563,7 +565,7 @@ For a great many endpoints, stage 1 or 2 of the proportional path is the entire 
 - the endpoint is the only way to cause the effect, and is likely to stay that way;
 - the effect happens within the request, in the same process;
 - the rule depends on the caller and, at most, the resource the endpoint loads;
-- a fallback policy ensures that a forgotten attribute fails closed;
+- a fallback policy rejects anonymous requests when authorization metadata is missing, and a test verifies the endpoint's required operation permission;
 - a test sends a request without the required permission and asserts no effect.
 
 Read endpoints often meet all five conditions, provided their queries are scoped by tenant or ownership in the query itself. The signal to move the check is not size or seniority. It is a second door into the same room: a batch endpoint, a message consumer, a job, an admin tool, or an executor that acts later.
@@ -596,9 +598,9 @@ An approval limit, role, or account status is read from a claim issued hours ear
 
 A state rule lives only in the policy, so a path that skips the policy can make a transition the domain should never allow.
 
-### 7. Authorization inside the entity
+### 7. Caller-dependent rules coupled to identity infrastructure
 
-The entity learns about users, roles, and limits, and the system's own processes must impersonate a person to use it.
+The entity depends directly on HTTP state, identity-provider claims, or directory access, which makes jobs and other callers hard to support. Passing immutable, application-loaded actor facts into the entity is a different and legitimate design.
 
 ### 8. A filter or engine mistaken for the decision and its enforcement
 
@@ -627,13 +629,13 @@ A later worker performs the effect because approval once happened, without check
 4. Does each entry path establish the actor from its own authenticated source and pass it explicitly?
 5. Are security-relevant facts read from the stores that own them, not from the request or from long-lived claims?
 6. Which component decides, and which component enforces? If a policy engine decides, does your code still refuse the effect without an allow?
-7. Are domain invariants enforced by the domain for every caller, and are caller-dependent rules kept out of entities?
+7. Are invariants enforced for every supported mutation path, and is the placement of caller-dependent rules a deliberate choice?
 
 **Layers**
 
-8. Does every operation the deciding check would allow also pass each early check, and is no early check the only allow?
+8. Does every operation the deciding check would allow also pass each early check that stands for the same permission, apart from deliberate channel-specific requirements, and is no early check the only allow?
 9. Is there a fallback policy so an endpoint without authorization metadata requires authentication, and does each consequential endpoint still declare its operation permission explicitly?
-10. Are query filters and row-level security fed from authenticated context, are writes covered as well as reads, and are they treated as defense in depth rather than as the decision?
+10. Are query filters and row-level security keyed on a trusted identity, either the authenticated application context or a trusted database identity, are writes covered as well as reads, and are they treated as defense in depth rather than as the decision?
 
 **Later execution**
 
@@ -669,4 +671,4 @@ To practice consolidating scattered checks into one deciding step, work through 
 
 There is no single layer where authorization lives, because authorization is not a single thing. Establish who is asking at the host boundary where the credential is validated. Read the facts from the stores that own them. Decide where those facts and the policy are available. Enforce at the point every path to the side effect must cross.
 
-In most ASP.NET Core applications, that means a fallback policy and coarse endpoint policies at the edge, the deciding check inside the application service that performs the use case, invariants in the domain, tenant filters underneath as a backstop, and an execution-time check in any component that acts later. Earlier layers may reject early, but they should not reject what the deciding check would allow, and they should never be the only thing that says yes. When an endpoint is the only door and the effect happens inside the request, an endpoint policy is the whole design. Revisit the question when a second door appears.
+In most ASP.NET Core applications, that means a fallback policy and coarse endpoint policies at the edge, the deciding check inside the application service that performs the use case, invariants in the domain, tenant filters underneath as a backstop, and an execution-time check in any component that acts later. Earlier layers may reject early, but apart from deliberate channel-specific requirements they should not reject what the deciding check would allow, and they should never be the only thing that says yes. When an endpoint is the only door and the effect happens inside the request, an endpoint policy is the whole design. Revisit the question when a second door appears.
