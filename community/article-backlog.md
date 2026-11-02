@@ -600,7 +600,8 @@ Lead first to When ASP.NET Core Authorization Is Enough and When a Simple Applic
 ### 18. A Background Job Should Not Inherit Everything the User Could Do
 
 - **Priority:** P0
-- **Implementation issue:** Not opened
+- **Implementation issue:** Not opened; published directly from this backlog entry
+- **Publication:** [Published November 2, 2026](../docs/articles/2026/background-job-should-not-inherit-user-authority.md)
 - **Permanent slug:** `background-job-should-not-inherit-user-authority`
 
 #### Reader / search problem

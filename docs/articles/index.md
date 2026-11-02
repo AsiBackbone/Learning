@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| What identity and authority should cross from an ASP.NET Core request to a queued job or `BackgroundService` | [A Background Job Should Not Inherit Everything the User Could Do](2026/background-job-should-not-inherit-user-authority.md) |
 | Choosing which layer of a .NET application should authenticate, decide, and enforce, and covering every entry path to a side effect | [Where Should Authorization Live in a .NET Application?](2026/where-authorization-should-live-dotnet-application.md) |
 | AI coding agents that find adjacent work outside their assigned issue | [Discovery Is Not Authorization: Using GitHub Issues to Govern AI-Assisted Development](2026/discovery-is-not-authorization-ai-assisted-development.md) |
 | Polly, queue, and background-job retries that reuse an earlier authorization decision | [Your Retry Logic May Be Replaying an Authorization Decision](2026/retry-logic-may-replay-authorization-decision.md) |
@@ -51,6 +52,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [A Background Job Should Not Inherit Everything the User Could Do](2026/background-job-should-not-inherit-user-authority.md)
+
+**Christopher D. Cavell** · **November 2, 2026**
+
+A report job first forwards the analyst's access token, which expires in a backed-up queue, and then runs under a broad service identity, which produces a statement for an analyst removed from the account, includes bank details their screen masks, and records nobody but the service account. This guide separates requester identity, worker identity, the accepted operation, job delivery, and the check before work starts; explains why a queue message should carry a job identifier rather than tokens, claims, or credentials; follows one `Generate Report` flow from HTTP request to `BackgroundService`; classifies which changes should stop a waiting job; covers reusing authorization handlers in a worker, two-actor evidence, delegated access when a downstream service must see the user, and authorizing the finished report against its actual contents; and states when a stored job identifier plus current authorization is enough.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/background-job-should-not-inherit-user-authority.html`
 
 ### [Where Should Authorization Live in a .NET Application?](2026/where-authorization-should-live-dotnet-application.md)
 

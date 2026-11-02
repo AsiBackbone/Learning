@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: A Background Job Should Not Inherit Everything the User Could Do
+  href: 2026/background-job-should-not-inherit-user-authority.md
 - name: "Where Should Authorization Live in a .NET Application?"
   href: 2026/where-authorization-should-live-dotnet-application.md
 - name: "Discovery Is Not Authorization: Using GitHub Issues to Govern AI-Assisted Development"
