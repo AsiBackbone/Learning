@@ -237,7 +237,7 @@ public sealed class ReportRequests(
 }
 ```
 
-The policy is ordinary code with no I/O, and the API and the worker share its implementation. That keeps the request and the worker from drifting into two policies, although separately deployed versions can still differ for a while during a rollout. When a rule tightens, deploying the worker first is the safer order: a job the old API accepted is rejected visibly, rather than an old worker running what the new rule forbids:
+The policy is ordinary code with no I/O, and the API and the worker share its implementation. That keeps the request and the worker from drifting into two policies:
 
 ```csharp
 public sealed class StatementPolicy
@@ -254,6 +254,8 @@ public sealed class StatementPolicy
     }
 }
 ```
+
+Sharing an implementation does not make deployments atomic, so the API and the worker can run different versions during a rollout. When a rule tightens, finish rolling out the worker first, and drain or stop older consumers before relying on the new rule. A job the old API accepted is then rejected visibly, rather than an old worker running what the new rule forbids.
 
 ### The worker authenticates as itself and starts from the job
 
@@ -324,7 +326,7 @@ public sealed class ReportJobRunner(
         // The worker's access is the outer limit. The decision's scope is what this report may contain.
         Statement statement = await builder.BuildAsync(job.AccountId, job.Period, decision.Scope, ct);
 
-        // Keyed by job, so a rerun does not create a second report. Recovery needs more; see below.
+        // Simplified: keyed by job. Recovery needs an attempt-specific key and a conditional publish; see below.
         ReportId report = await reports.PutAsync(job.Id, statement, ct);
         await jobs.CompleteAsync(job.Id, report, clock.GetUtcNow(), CancellationToken.None);
     }
@@ -358,7 +360,7 @@ The rare job that really does span tenants, such as a platform-wide metrics roll
 Three things in this sketch are deliberately limited:
 
 - **The guarantee has a stated edge.** The decision is made before the claim, and the claim protects only the job's own state. An analyst removed between the check and the claim, or during a long build, still gets a finished statement in the store. For this feature that is acceptable, partly because the download is checked separately, as a later section shows. An operation with an irreversible effect may need to bring those facts into the claim itself, or check them at the point of effect. [Where Should Authorization Live in a .NET Application?](where-authorization-should-live-dotnet-application.md) discusses making that guarantee explicit.
-- **Crash recovery is omitted.** A worker that dies after claiming leaves a job in `Running`. A production design needs a lease or a sweeper that returns it to the queue. Rebuilding a statement is cheap and repeatable, so this flow can try again, but recovery must also stop an expired attempt. A paused worker can resume after another worker has taken over the job, and the two attempts may hold different field scopes, so a shared report key alone would let the older attempt overwrite the newer result. Use attempt-specific output, such as `reports/{jobId}/{attemptId}`, with a conditional publish-and-complete step, or an equivalent ownership check. [Your Retry Logic May Be Replaying an Authorization Decision](retry-logic-may-replay-authorization-decision.md) covers leases, retries, and what changes when the effect cannot safely be repeated.
+- **Crash recovery is omitted.** A worker that dies after claiming leaves a job in `Running`. A production design needs a lease or a sweeper that returns it to the queue. Rebuilding a statement is cheap and repeatable, so this flow can try again, but recovery must also stop an expired attempt. A paused worker can resume after another worker has taken over the job, and the two attempts may hold different field scopes, so a shared report key alone would let the older attempt overwrite the newer result. Use attempt-specific output, such as `reports/{jobId}/{attemptId}`, with a conditional publish-and-complete step that succeeds only while this attempt still owns the job, or an equivalent ownership check. [Your Retry Logic May Be Replaying an Authorization Decision](retry-logic-may-replay-authorization-decision.md) covers leases, retries, and what changes when the effect cannot safely be repeated.
 - **Application filtering is not containment.** `decision.Scope` keeps an honest worker from over-sharing. It does not contain a compromised one, which can read everything its identity can reach.
 
 So the worker's identity still has to be narrow on its own terms. Give it the data access its job type needs and nothing more: read access to billing tables, write access to the report store, no payment API, and no administrative roles. A separate identity per kind of job costs little and limits how far one flaw can travel. If tenants must be isolated from a compromised worker, that takes separately enforced identities or partitions, and [Can One Worker Safely Execute Delayed Operations for Many Tenants?](multi-tenant-worker-execution-authority.md) works through it.
@@ -410,7 +412,7 @@ Three conditions make this safe:
 - **Creating the principal does not establish that the account is still eligible.** The default factory builds claims from the stored user; it does not check lockout or your application's own rules. The evaluation path must still check current account status, tenant status, and any other execution-time restrictions, as `StatementPolicy` does.
 - **Conditions about the original sign-in are not rebuilt.** "Signed in with multi-factor authentication," "on a managed device," and "from an allowed network" describe the moment of the request. The worker cannot re-establish them, and a rebuilt principal should not pretend to. Where the operation's policy accepts that, evaluate them when the job is accepted, record that they passed, and leave them out of the worker's policy. If execution requires fresh authentication, defer the job for renewed user action instead.
 
-The second condition is a useful way to sort a policy in general. Some requirements are about **how the actor arrived**, and only the actor can establish them again. Others are about **what is true of the actor and the resource**, and the worker can check them again later. Splitting a policy along that line makes the re-check possible without weakening either part.
+The third condition is a useful way to sort a policy in general. Some requirements are about **how the actor arrived**, and only the actor can establish them again. Others are about **what is true of the actor and the resource**, and the worker can check them again later. Splitting a policy along that line makes the re-check possible without weakening either part.
 
 ---
 
@@ -459,7 +461,7 @@ The statement in the report store has its own lifetime, and generating it is not
 
 So the download endpoint should authorize the current request against the job's account, the same way any other endpoint would, and also against what the file actually contains. Current account access alone does not cover every field in an older report. An analyst who could view bank details when the PDF was built, lost that permission last week, and is still assigned to the account would pass an account-only check and receive those details. Record the scope each report was built with, compare it with the downloader's current permissions, and deny the download or regenerate a narrower report if the file contains anything the downloader may not currently view. A report narrower than the downloader's current permissions is still safe to release. Regenerating is a new operation with its own decision and record, not a silent rewrite of the old file.
 
-Do not treat "this report was generated for you" as a permanent entitlement, and do not email a link that works for anyone who holds it indefinitely. A short-lived storage URL is reasonable when it is issued after that check and for that download. Set a retention period too: a finished statement is a copy of sensitive data that the source system's later permission changes will not reach.
+Do not treat "this report was generated for you" as a permanent entitlement, and do not email a link that works for anyone who holds it indefinitely. A short-lived storage URL is reasonable when it is issued after that check and for that download. Set a retention period too: a finished statement is a copy of sensitive data that the source system's later permission changes will not reach. A later legal hold does not reach it automatically either, so the hold policy should say whether stored reports are retained or blocked, and retention cleanup must respect that answer.
 
 If the report is delivered instead of pulled, for example emailed as an attachment, the delivery step is the last point of control, and it should perform the same check, including the report's contents, against the recipients. Once sent, it cannot be recalled by any of the checks above.
 
@@ -503,7 +505,7 @@ A separately issued, operation-specific grant, often called a **capability**, na
 
 ## Testing the Boundary
 
-These tests prove negatives through the real worker and download paths: no credential crossed, no report appeared, and no file was released. They are specifications of the behavior described above, not evidence of a working implementation, and each demonstrates behavior only under the conditions it sets up.
+These tests prove negatives through the real worker and download paths: no credential crossed, no report appeared, and a forbidden download was refused. They are specifications of the behavior described above, not evidence of a working implementation, and each demonstrates behavior only under the conditions it sets up.
 
 ```csharp
 [Fact]
@@ -645,21 +647,21 @@ An architecture test can also fail the build if a type in the worker project tak
 7. Is that identity limited to what this kind of job needs, independently of any application check?
 8. Does each job get its own scope, with its tenant taken from the job record?
 9. Does a missing tenant or user fail the operation rather than widen it?
+10. Does a lease or sweeper recover a job stranded in `Running`, and is an expired attempt prevented from publishing or completing it?
 
 **The decision**
 
-10. Is the same policy implementation used at the request and in the worker, evaluated against current authoritative facts?
-11. Has the team written down what should happen for each change: requester removed, resource state, tenant, policy, cancellation?
-12. Is each sign-in condition, such as multi-factor authentication, either accepted at the request by policy or deferred for renewed user action, and never rebuilt by the worker?
-13. Does an unavailable dependency leave the job waiting, rather than proceeding?
-14. Is the output limited by the decision's scope rather than by what the worker can read?
+11. Is the same policy implementation used at the request and in the worker, evaluated against current authoritative facts?
+12. Has the team written down what should happen for each change: requester removed, resource state, tenant, policy, cancellation?
+13. Is each sign-in condition, such as multi-factor authentication, either accepted at the request by policy or deferred for renewed user action, and never rebuilt by the worker?
+14. Does an unavailable dependency leave the job waiting, rather than proceeding?
+15. Is the output limited by the decision's scope rather than by what the worker can read?
 
 **Afterward**
 
-15. Do records show both the requester and the executor, in separate fields?
-16. Is the finished output authorized at download or delivery against its actual contents, and does it have a retention period?
-17. Does each recurring job have a defined owner, and a rule for when that owner loses access?
-18. Does a lease or sweeper recover a job stranded in `Running`, and is an expired attempt prevented from publishing or completing it?
+16. Do records show both the requester and the executor, in separate fields?
+17. Is the finished output authorized at download or delivery against its actual contents, and does it have a retention period?
+18. Does each recurring job have a defined owner, and a rule for when that owner loses access?
 
 **Proportion**
 
