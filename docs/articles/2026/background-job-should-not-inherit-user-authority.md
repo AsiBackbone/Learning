@@ -101,6 +101,7 @@ After the token failures, the worker gets its own identity, and the code still n
 
 ```csharp
 // Anti-pattern: no HTTP request is treated as "the system, with no limits."
+// _currentTenant below is this service, injected into the DbContext.
 public sealed class CurrentTenant(IHttpContextAccessor http) : ICurrentTenant
 {
     public string? TenantId => http.HttpContext?.User.FindFirstValue("tid");
@@ -227,7 +228,8 @@ public sealed class ReportRequests(
         var job = ReportJob.Queue(requester, account.Id, request.Period);
 
         // The job, the decision, and an outbox row commit together. A publisher sends
-        // ReportJobReady(job.Id) afterward, so a queue outage cannot lose an accepted job.
+        // ReportJobReady(job.Id) afterward, so a queue outage cannot lose an accepted job. It may
+        // publish the same message twice, which is one reason the worker's claim is conditional.
         await jobs.AddWithOutboxAsync(job, decision, clock.GetUtcNow(), ct);
 
         return RequestResult.Accepted(job.Id);
@@ -235,7 +237,7 @@ public sealed class ReportRequests(
 }
 ```
 
-The policy is ordinary code with no I/O, and the API and the worker share its implementation. That keeps the request and the worker from drifting into two policies, although separately deployed versions can still differ for a while during a rollout:
+The policy is ordinary code with no I/O, and the API and the worker share its implementation. That keeps the request and the worker from drifting into two policies, although separately deployed versions can still differ for a while during a rollout. When a rule tightens, deploying the worker first is the safer order: a job the old API accepted is rejected visibly, rather than an old worker running what the new rule forbids:
 
 ```csharp
 public sealed class StatementPolicy
@@ -332,6 +334,9 @@ public sealed class ReportJobRunner(
 The tenant filter needs a matching change. Replace the `CurrentTenant` service from the earlier anti-pattern with a context that the job sets explicitly, because "no tenant" should fail rather than widen:
 
 ```csharp
+// One instance per scope, so one job's tenant cannot reach another job.
+services.AddScoped<ITenantContext, TenantContext>();
+
 public sealed class TenantContext : ITenantContext
 {
     private string? _tenantId;
@@ -346,12 +351,14 @@ modelBuilder.Entity<Invoice>().HasQueryFilter(
     invoice => invoice.TenantId == _tenantContext.RequiredTenantId);
 ```
 
+The runner and its tenant-filtered data access must resolve the same scoped instance, set before any tenant-scoped query runs: from the job record in the worker, and from the authenticated request in the API.
+
 The rare job that really does span tenants, such as a platform-wide metrics rollup, should say so with an explicit `IgnoreQueryFilters()` that a reviewer can find. It should not rely on a value that happens to be null. [That call disables every filter on the entity type](https://learn.microsoft.com/en-us/ef/core/querying/filters), including any soft-deletion filter, so the job must reapply the other restrictions it still needs. From EF Core 10, named filters can be disabled individually.
 
 Three things in this sketch are deliberately limited:
 
 - **The guarantee has a stated edge.** The decision is made before the claim, and the claim protects only the job's own state. An analyst removed between the check and the claim, or during a long build, still gets a finished statement in the store. For this feature that is acceptable, partly because the download is checked separately, as a later section shows. An operation with an irreversible effect may need to bring those facts into the claim itself, or check them at the point of effect. [Where Should Authorization Live in a .NET Application?](where-authorization-should-live-dotnet-application.md) discusses making that guarantee explicit.
-- **Crash recovery is omitted.** A worker that dies after claiming leaves a job in `Running`. A production design needs a lease or a sweeper that returns it to the queue. Rebuilding a statement is cheap and repeatable, so this flow can try again, but recovery must also stop an expired attempt. A paused worker can resume after another worker has taken over the job, and the two attempts may hold different field scopes, so a shared report key alone would let the older attempt overwrite the newer result. Use attempt-specific output with a conditional publish-and-complete step, or an equivalent ownership check. [Your Retry Logic May Be Replaying an Authorization Decision](retry-logic-may-replay-authorization-decision.md) covers leases, retries, and what changes when the effect cannot safely be repeated.
+- **Crash recovery is omitted.** A worker that dies after claiming leaves a job in `Running`. A production design needs a lease or a sweeper that returns it to the queue. Rebuilding a statement is cheap and repeatable, so this flow can try again, but recovery must also stop an expired attempt. A paused worker can resume after another worker has taken over the job, and the two attempts may hold different field scopes, so a shared report key alone would let the older attempt overwrite the newer result. Use attempt-specific output, such as `reports/{jobId}/{attemptId}`, with a conditional publish-and-complete step, or an equivalent ownership check. [Your Retry Logic May Be Replaying an Authorization Decision](retry-logic-may-replay-authorization-decision.md) covers leases, retries, and what changes when the effect cannot safely be repeated.
 - **Application filtering is not containment.** `decision.Scope` keeps an honest worker from over-sharing. It does not contain a compromised one, which can read everything its identity can reach.
 
 So the worker's identity still has to be narrow on its own terms. Give it the data access its job type needs and nothing more: read access to billing tables, write access to the report store, no payment API, and no administrative roles. A separate identity per kind of job costs little and limits how far one flaw can travel. If tenants must be isolated from a compromised worker, that takes separately enforced identities or partitions, and [Can One Worker Safely Execute Delayed Operations for Many Tenants?](multi-tenant-worker-execution-authority.md) works through it.
@@ -397,9 +404,10 @@ ClaimsPrincipal requester = await principals.CreateForEvaluationAsync(job.Tenant
 AuthorizationResult result = await authorization.AuthorizeAsync(requester, account, "GenerateStatement");
 ```
 
-Two conditions make this safe:
+Three conditions make this safe:
 
-- **The principal is rebuilt from current data, never from claims saved at request time.** Saved claims would make the check a replay of the sign-in. If your application uses ASP.NET Core Identity, [`IUserClaimsPrincipalFactory<TUser>`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuserclaimsprincipalfactory-1) creates a principal from the stored user. With an external identity provider, only the facts you hold locally can be rebuilt. If a handler depends on a claim only the provider issues, that fact must be moved into a store the worker can read, or dropped from the worker's policy deliberately.
+- **The principal is rebuilt from current data, never from claims saved at request time.** Saved claims would make the check a replay of the sign-in. If your application uses ASP.NET Core Identity, [`IUserClaimsPrincipalFactory<TUser>`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuserclaimsprincipalfactory-1) creates a principal from the stored user. With an external identity provider, only the facts you hold locally can be rebuilt. If a handler depends on a claim only the provider issues and the requirement must still hold at execution, obtain that fact from an authoritative source the worker can read, or defer the job. Leave it out of the worker's policy only when the operation explicitly accepts the recorded request-time evidence.
+- **Creating the principal does not establish that the account is still eligible.** The default factory builds claims from the stored user; it does not check lockout or your application's own rules. The evaluation path must still check current account status, tenant status, and any other execution-time restrictions, as `StatementPolicy` does.
 - **Conditions about the original sign-in are not rebuilt.** "Signed in with multi-factor authentication," "on a managed device," and "from an allowed network" describe the moment of the request. The worker cannot re-establish them, and a rebuilt principal should not pretend to. Where the operation's policy accepts that, evaluate them when the job is accepted, record that they passed, and leave them out of the worker's policy. If execution requires fresh authentication, defer the job for renewed user action instead.
 
 The second condition is a useful way to sort a policy in general. Some requirements are about **how the actor arrived**, and only the actor can establish them again. Others are about **what is true of the actor and the resource**, and the worker can check them again later. Splitting a policy along that line makes the re-check possible without weakening either part.
@@ -439,7 +447,7 @@ Use a delegation mechanism that keeps both identities and keeps the secret out o
 - **[OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693.html)** lets an authorization server issue a new token for a specific target. It distinguishes delegation, where the acting party keeps its own identity, from impersonation, where it is indistinguishable from the user. A delegation token can express this directly, with `sub` naming the user and the `act` claim naming the acting party, which preserves the two-actor record this article asks for.
 - **Microsoft Entra's [On-Behalf-Of flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-on-behalf-of-flow)** obtains a separate token for the downstream API, using a token whose audience is your API. For work that outlives the request, [MSAL.NET's long-running OBO support](https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/web-apps-apis/on-behalf-of-flow) starts the process in the API with `InitiateLongRunningProcessInWebApi`, and later code calls `AcquireTokenInLongRunningProcess` with a session key, using the same application and a shared distributed token cache. The tokens stay in that server-side cache. The job record needs to hold only the session key, and the queue message still carries only the job identifier.
 
-Be clear about what that buys. The secret is no longer in the queue, and the downstream service sees the user. But MSAL's documentation notes that these APIs store a refresh token, which has a long lifetime and can be used repeatedly, so the cache is now a store of standing user access. It needs real protection, and you should end the session when the job finishes, with `StopLongRunningProcessInWebApiAsync` in MSAL.NET 4.51.0 or later. The delegated token also describes the user's scopes, not this one report, so it does not make your own pre-work check unnecessary. And the job needs somewhere to go when the provider requires the user to sign in again, for example a `NeedsUserAction` state, instead of failing silently or retrying forever.
+Be clear about what that buys. The secret is no longer in the queue, and the downstream service sees the user. But MSAL's documentation notes that these APIs store a refresh token, which has a long lifetime and can be used repeatedly, so the cache is now a store of standing user access. It needs real protection, and you should end the session when the job finishes or is cancelled, with `StopLongRunningProcessInWebApiAsync` in MSAL.NET 4.51.0 or later. The delegated token also describes the user's scopes, not this one report, so it does not make your own pre-work check unnecessary. And the job needs somewhere to go when the provider requires the user to sign in again, for example a `NeedsUserAction` state, instead of failing silently or retrying forever.
 
 Use delegation only for the calls that need it. A worker can read your own billing database under its own identity and call the one user-permissioned service with a delegated token.
 
@@ -449,7 +457,7 @@ Use delegation only for the calls that need it. A worker can read your own billi
 
 The statement in the report store has its own lifetime, and generating it is not the last decision. The analyst may lose access between generation and download, and a build that started before their removal may finish after it.
 
-So the download endpoint should authorize the current request against the job's account, the same way any other endpoint would, and also against what the file actually contains. Current account access alone does not cover every field in an older report. An analyst who could view bank details when the PDF was built, lost that permission last week, and is still assigned to the account would pass an account-only check and receive those details. Record the scope each report was built with, compare it with the downloader's current permissions, and deny the download or regenerate a narrower report if the file contains anything the downloader may not currently view. A report narrower than the downloader's current permissions is still safe to release.
+So the download endpoint should authorize the current request against the job's account, the same way any other endpoint would, and also against what the file actually contains. Current account access alone does not cover every field in an older report. An analyst who could view bank details when the PDF was built, lost that permission last week, and is still assigned to the account would pass an account-only check and receive those details. Record the scope each report was built with, compare it with the downloader's current permissions, and deny the download or regenerate a narrower report if the file contains anything the downloader may not currently view. A report narrower than the downloader's current permissions is still safe to release. Regenerating is a new operation with its own decision and record, not a silent rewrite of the old file.
 
 Do not treat "this report was generated for you" as a permanent entitlement, and do not email a link that works for anyone who holds it indefinitely. A short-lived storage URL is reasonable when it is issued after that check and for that download. Set a retention period too: a finished statement is a copy of sensitive data that the source system's later permission changes will not reach.
 
@@ -495,7 +503,7 @@ A separately issued, operation-specific grant, often called a **capability**, na
 
 ## Testing the Boundary
 
-These tests prove negatives through the real worker path: no credential crossed, and no report appeared. They are specifications of the behavior described above, not evidence of a working implementation, and each demonstrates behavior only under the conditions it sets up.
+These tests prove negatives through the real worker and download paths: no credential crossed, no report appeared, and no file was released. They are specifications of the behavior described above, not evidence of a working implementation, and each demonstrates behavior only under the conditions it sets up.
 
 ```csharp
 [Fact]
@@ -539,6 +547,21 @@ public async Task Report_contains_only_what_the_requester_may_see()
 }
 
 [Fact]
+public async Task Report_with_bank_details_is_refused_after_that_permission_is_removed()
+{
+    var harness = ReportHarness.Create();
+    harness.Directory.AssignAnalyst("analyst-17", "tenant-north", "A-204", canViewBankDetails: true);
+    await harness.PostReportRequestAsync(user: "analyst-17", tenant: "tenant-north", account: "A-204");
+    await harness.RunWorkerAsync();
+    ReportId report = harness.Reports.Stored.Single().Id;
+
+    harness.Directory.RemoveBankDetailsPermission("analyst-17");    // still assigned to the account
+    HttpResponseMessage response = await harness.DownloadAsync(report, user: "analyst-17", tenant: "tenant-north");
+
+    Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+}
+
+[Fact]
 public async Task Expired_user_session_does_not_stop_an_allowed_job()
 {
     var harness = ReportHarness.Create();
@@ -574,7 +597,7 @@ Also cover:
 - **Cross-tenant job data.** A job row whose recorded account belongs to another tenant finds no account and stores nothing, which tests the tenant-scoped lookup independently of the API.
 - **The evidence.** A completed job records the requester and the worker as separate fields, and the worker's reads are not logged as the analyst's activity.
 - **Tenant suspension.** A tenant suspended while the job waits produces a rejected job and no stored statement.
-- **The download.** An analyst unassigned after generation is refused at the download endpoint. So is an analyst who is still assigned but lost the bank-details permission after a report containing them was built.
+- **The download.** An analyst unassigned after generation is refused at the download endpoint. A masked report remains downloadable after the analyst gains the bank-details permission, because it contains nothing they may not view.
 
 An architecture test can also fail the build if a type in the worker project takes a dependency on `IHttpContextAccessor`, or if a message contract gains a property beyond the identifier. [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md) develops the technique of asserting that an effect never happened.
 
@@ -636,11 +659,12 @@ An architecture test can also fail the build if a type in the worker project tak
 15. Do records show both the requester and the executor, in separate fields?
 16. Is the finished output authorized at download or delivery against its actual contents, and does it have a retention period?
 17. Does each recurring job have a defined owner, and a rule for when that owner loses access?
+18. Does a lease or sweeper recover a job stranded in `Running`, and is an expired attempt prevented from publishing or completing it?
 
 **Proportion**
 
-18. If delegated access is used, is it limited to the calls that need it, held server-side, and ended when the job finishes?
-19. If a capability is used, can you name which of its conditions justifies it?
+19. If delegated access is used, is it limited to the calls that need it, held server-side, and ended when the job finishes or is cancelled?
+20. If a capability is used, can you name which of its conditions justifies it?
 
 ---
 
