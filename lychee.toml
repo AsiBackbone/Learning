@@ -56,4 +56,7 @@ exclude = [
 
   # Zenodo DOI occasionally times out for automated link validation.
   '^https://doi\.org/10\.5281/zenodo\.21938556$'
+
+  # OWASP does not allow automatic scans.
+  '^https://genai\.owasp\.org/llmrisk/llm01-prompt-injection/$'
 ]
