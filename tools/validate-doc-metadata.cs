@@ -734,9 +734,19 @@ static class MetadataValidator
             errors.Add($"{relativePath}: landing-page title is missing or does not use the descriptive SEO title.");
         }
 
-        if (!html.Contains("<meta name=\"docfx:defersearch\" content=\"true\">", StringComparison.Ordinal))
+        if (!html.Contains(
+                "<form class=\"search\" role=\"search\" action=\"https://asibackbone.github.io/search/\" method=\"get\">",
+                StringComparison.Ordinal) ||
+            !html.Contains(
+                "<input class=\"form-control\" name=\"q\" type=\"search\"",
+                StringComparison.Ordinal))
         {
-            errors.Add($"{relativePath}: search-index initialization must be deferred until search is used.");
+            errors.Add($"{relativePath}: organization-wide documentation search form is missing.");
+        }
+
+        if (html.Contains("id=\"search-query\"", StringComparison.Ordinal))
+        {
+            errors.Add($"{relativePath}: repository-local DocFX search must not be initialized.");
         }
 
         if (html.Contains("<meta name=\"docfx:tocrel\"", StringComparison.OrdinalIgnoreCase))
@@ -763,9 +773,11 @@ static class MetadataValidator
 
         string runtimeScriptPath = Path.Combine(outputRoot, "public", "main.js");
         if (!File.Exists(runtimeScriptPath) ||
-            !File.ReadAllText(runtimeScriptPath).Contains("DeferredWorker", StringComparison.Ordinal))
+            !File.ReadAllText(runtimeScriptPath).Contains(
+                "Search is routed to the organization-owned search page",
+                StringComparison.Ordinal))
         {
-            errors.Add("public/main.js: deferred search runtime was not included in the generated site.");
+            errors.Add("public/main.js: organization-search template runtime was not included in the generated site.");
         }
     }
 
