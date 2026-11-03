@@ -18,7 +18,7 @@
 
 ## Five-Minute Preview — Watch Policy as Code Stop an Operation
 
-Want the shortest look at this .NET architecture before deciding whether to read further? With the .NET 10 SDK installed, clone the repository and run one command:
+Want the shortest look at this .NET architecture before deciding whether to read further? With .NET SDK 10.0.400 or a later 10.0.4xx patch installed (pinned in `global.json`), clone the repository and run one command:
 
 ```bash
 git clone https://github.com/AsiBackbone/Learning.git
@@ -36,7 +36,7 @@ Tests, troubleshooting, and the deeper explanation are optional next steps in th
 
 Prefer to see the architecture run before reading the deeper explanation? The foundational **Decision Before Execution** sample provides the shortest path from clone to observable behavior.
 
-**Prerequisite:** .NET 10 SDK
+**Prerequisite:** .NET SDK 10.0.400 or a later 10.0.4xx patch. `global.json` pins `10.0.400` with `rollForward: latestPatch`, so an earlier .NET 10 feature band such as 10.0.1xx will not resolve.
 
 Learning selects `Microsoft.Testing.Platform` in `global.json`, and every sample test project uses the aligned `xunit.v3` runner integration. The same `dotnet test` commands are used locally and in CI.
 
