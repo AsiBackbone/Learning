@@ -102,6 +102,7 @@ static class DocFxTemplateBaselineValidator
                 localOverridePath,
                 baseline.DocFxVersion,
                 errors);
+            ValidateOrganizationSearchForm(localOverridePath, errors);
         }
 
         ValidateLocalTemplateLayout(repositoryRoot, errors);
@@ -234,6 +235,35 @@ static class DocFxTemplateBaselineValidator
         {
             errors.Add(
                 $"Custom _master.tmpl declares DocFX modern template v{declaredVersion}, but baseline metadata declares v{baselineVersion}.");
+        }
+    }
+
+    private static void ValidateOrganizationSearchForm(
+        string path,
+        ICollection<string> errors)
+    {
+        string template = File.ReadAllText(path);
+        string[] requiredContent =
+        [
+            "action=\"https://asibackbone.github.io/search/\" method=\"get\"",
+            "name=\"q\" type=\"search\"",
+            "placeholder=\"Search all AsiBackbone\"",
+            "aria-label=\"Search all AsiBackbone documentation\""
+        ];
+
+        foreach (string requiredText in requiredContent)
+        {
+            if (!template.Contains(requiredText, StringComparison.Ordinal))
+            {
+                errors.Add(
+                    $"The custom _master.tmpl is missing organization-search markup: {requiredText}");
+            }
+        }
+
+        if (template.Contains("id=\"search-query\"", StringComparison.Ordinal))
+        {
+            errors.Add(
+                "The custom _master.tmpl must not expose DocFX's repository-local search-query id.");
         }
     }
 
