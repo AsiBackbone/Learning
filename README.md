@@ -16,6 +16,22 @@
 
 `AsiBackbone` is the product name. Learning is the educational layer of the AsiBackbone organization and keeps its architecture lessons useful independently of the product implementation.
 
+## Five-Minute Preview — Watch Policy as Code Stop an Operation
+
+Want the shortest look at this .NET architecture before deciding whether to read further? With the .NET 10 SDK installed, clone the repository and run one command:
+
+```bash
+git clone https://github.com/AsiBackbone/Learning.git
+cd Learning
+dotnet run --project samples/decision-before-execution/Sample/DecisionBeforeExecution.csproj
+```
+
+The console sample evaluates five deterministic `account.disable` requests. Look for one thing: only the `Allowed` request prints `Executor invoked: True`. The denied, deferred, escalation-recommended, and acknowledgment-required requests never reach the executor.
+
+That single observation — **a blocked decision never reaches the executor** — is the boundary the rest of Learning explains, whether the operation sits behind ASP.NET Core authorization, runs in a background job, or is an AI tool call.
+
+Tests, troubleshooting, and the deeper explanation are optional next steps in the ten-minute path below. If anything in this preview was unclear, ask in [Q&A](https://github.com/orgs/AsiBackbone/discussions/categories/q-a).
+
 ## Quick Start — Run It in 10 Minutes
 
 Prefer to see the architecture run before reading the deeper explanation? The foundational **Decision Before Execution** sample provides the shortest path from clone to observable behavior.
@@ -132,7 +148,8 @@ The organization contains complementary projects with different responsibilities
 | --- | --- |
 | [Learning](https://asibackbone.github.io/Learning/) | Teaches concepts, patterns, tradeoffs, samples, and labs |
 | [AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) | Working governance and policy-control implementation |
-| [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) | ASP.NET Core reference application and architecture specimen |
+| [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) | Secure-by-default ASP.NET Core application template and architecture specimen |
+| [ReferenceApplication](https://github.com/AsiBackbone/ReferenceApplication) | Runnable integration specimen that builds on NetCoreApplicationTemplate and adds AsiBackbone governance (currently pre-release) |
 
 Learning connects to the implementation repositories when fuller examples are useful, but adoption of either implementation repository is not required to benefit from the educational material.
 
@@ -152,13 +169,27 @@ Production systems remain responsible for their own authentication, authorizatio
 
 Use the canonical project surfaces for deeper information rather than treating the root README as the full reference manual:
 
-**Questions and ideas → [Organization Discussions](https://github.com/orgs/AsiBackbone/discussions) · Concrete work → [Issues](https://github.com/AsiBackbone/Learning/issues) · Changes → [Pull Requests](https://github.com/AsiBackbone/Learning/pulls)**
+**Exploratory feedback → [Organization Discussions](https://github.com/orgs/AsiBackbone/discussions) · Concrete work → [Issues](https://github.com/AsiBackbone/Learning/issues) · Changes → [Pull Requests](https://github.com/AsiBackbone/Learning/pulls)**
+
+### Feedback That Helps Most Now
+
+The Learning 1.4 foundational path is established, so the most useful feedback now comes from first-time readers: unclear prerequisites, confusing terminology, commands that failed, missing counterexamples, and cases where the pattern is unnecessary for your application.
+
+Start a discussion in the category that fits, and name `AsiBackbone/Learning` in it:
+
+| Category | Question to answer |
+| --- | --- |
+| [Q&A](https://github.com/orgs/AsiBackbone/discussions/categories/q-a) | What is unclear in the five-minute preview or the ten-minute quick start? |
+| [Ideas](https://github.com/orgs/AsiBackbone/discussions/categories/ideas) | Which tutorial, lab, or counterexample should Learning add next? |
+| [Architecture & Integration](https://github.com/orgs/AsiBackbone/discussions/categories/architecture-integration) | Where would this decision-before-execution or policy-as-code approach not fit your application? |
+
+When feedback becomes concrete repository work — a reproducible bug, a content correction, or a scoped improvement — use the [issue forms](https://github.com/AsiBackbone/Learning/issues/new/choose) instead.
 
 - **Published documentation:** [asibackbone.github.io/Learning](https://asibackbone.github.io/Learning/)
 - **XML sitemap:** `https://asibackbone.github.io/Learning/sitemap.xml` — submit this canonical sitemap URL to Google Search Console and Bing Webmaster Tools.
 - **Contribution guidance:** [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Project status and planned work:** [ROADMAP.md](ROADMAP.md)
-- **Questions and ideas:** [AsiBackbone Organization Discussions](https://github.com/orgs/AsiBackbone/discussions)
+- **Questions and ideas:** [Q&A](https://github.com/orgs/AsiBackbone/discussions/categories/q-a), [Ideas](https://github.com/orgs/AsiBackbone/discussions/categories/ideas), and [Architecture & Integration](https://github.com/orgs/AsiBackbone/discussions/categories/architecture-integration) in the AsiBackbone Organization Discussions
 - **Governance:** [GOVERNANCE.md](GOVERNANCE.md)
 - **Security policy:** [SECURITY.md](SECURITY.md)
 - **Citation metadata:** [CITATION.cff](CITATION.cff)
