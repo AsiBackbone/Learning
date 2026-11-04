@@ -8,6 +8,7 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ### Changed
 
+- The README ecosystem table now describes ReferenceApplication as stable `1.x` instead of pre-release, matching its prepared `1.0.0` release.
 - Added a five-minute preview to the README that runs one deterministic Decision Before Execution scenario and names the single observation to make, while keeping the ten-minute quick start as the fuller path. The README ecosystem table now lists ReferenceApplication as the runnable NetCoreApplicationTemplate + AsiBackbone integration specimen, and the community section routes first-time feedback directly to the Q&A, Ideas, and Architecture & Integration discussion categories with repository-specific questions and states which feedback is most useful now.
 - Replaced the documentation logo, favicon, RSS feed image, and social cards with the open-book glyph from the AsiBackbone glyph family, which the organization site also uses. The social card now uses the canonical `AsiBackbone` spelling instead of "ASI BACKBONE". File names and image dimensions are unchanged.
 
