@@ -136,7 +136,7 @@ Many organizations say yes: she was authorized when she decided, the decision be
 
 The failure is not either answer. It is having no answer, so the outcome depends on something accidental, such as whether a session or cached token happened to survive.
 
-A deliberate withdrawal is a different event from a role change. If Priya withdraws her approval because she learned something about the deal, the approval no longer applies, whatever the organization decided about transfers. Record the withdrawal as its own event, and treat it like a change to what was decided about: the operation needs a new decision.
+A deliberate withdrawal is a different event from a role change. If Priya withdraws her approval because she learned something about the deal, the approval no longer applies, whatever the organization decided about transfers. Record the withdrawal as its own event, and treat it as a change to the decision's current applicability: the operation now needs a new decision.
 
 ### Something the decision did not depend on
 
@@ -325,6 +325,8 @@ public sealed class OfferSendPolicy
 }
 ```
 
+`ApprovalForCurrentTerms` is resolved through the quote's current-state projection, described above. The loader reads the quote's `ActiveApprovalId`, loads that immutable approval, and confirms that it belongs to this quote and these terms. It does not search for any historical approval with a matching hash, which could pick a superseded one and cause an avoidable claim failure.
+
 This sketch stops at the first failing rule. A real check may collect every failing reason, so that the rep can resolve them together.
 
 `CannotDetermine` is not `Deny`, and it is never `Allow`. If the ERP cannot answer, the offer waits. [Should Authorization Fail Open, Fail Closed, or Defer?](fail-open-fail-closed-or-defer.md) covers that case.
@@ -382,7 +384,9 @@ await delivery.SendAsync(offer, attemptId, ct);
 
 Two details of the predicate matter more than its shape:
 
-- **Expiry is checked against the database clock, at the claim.** The policy evaluated `ExpiresAt` against the application's clock a moment earlier, and recording the decision takes time. Comparing with that earlier `now` in the claim would let an approval that expired in between still succeed. EF Core providers translate `DateTimeOffset.UtcNow` inside a query to a database function where they support it, for example SQL Server's [date and time function mappings](https://learn.microsoft.com/en-us/ef/core/providers/sql-server/functions#date-and-time-functions), so the comparison happens when the update runs. Whichever clock you use, name it as the authority for the boundary, and expect the application's earlier evaluation to disagree with it occasionally by a little clock skew.
+- **Expiry is checked against the database clock, at the claim.** The policy evaluated `ExpiresAt` against the application's clock a moment earlier, and recording the decision takes time. Reusing the application timestamp from that earlier evaluation would allow the claim to succeed even if the approval expired before the database executed the update. EF Core providers translate `DateTimeOffset.UtcNow` inside a query to a database function where they support it. The SQL Server provider's [date and time function mappings](https://learn.microsoft.com/en-us/ef/core/providers/sql-server/functions#date-and-time-functions) translate it to `SYSUTCDATETIME()`, which SQL Server evaluates when the statement runs.
+
+That example is specific to SQL Server. For another provider, verify both the translation and the time semantics. Some database time functions return the time the transaction or statement started rather than the current wall-clock time, and [PostgreSQL distinguishes these explicitly](https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-CURRENT). A value fixed at the start of a long transaction does not enforce expiry at a later claim. If the member does not translate inside an update, use a provider-specific function or a SQL fragment instead. The boundary is the time the database predicate evaluates, not delivery or transaction commit. Name that clock as the authority for the boundary, and expect the application's earlier evaluation to disagree with it occasionally by a little clock skew.
 - **Every claim-critical value lives on the claimed row.** Checking a separate withdrawals table from inside the update would look equivalent, but it is not. A withdrawal inserted into another table does not necessarily conflict with the update, and the ordering between them then depends on the database and isolation configuration. With the values on the quote row, both writers contend for the same row, and a single-row conditional update decides the order. This shape is also simpler for EF Core providers to translate than correlated subqueries inside an update. Verify the generated SQL against your provider either way.
 
 The claim's durable record of the attempt, and of the check that permitted it, is on the quote row, written in the same statement as the state change. If the process stops before the send-check outcome is recorded, the quote row still says which attempt holds it and which decision allowed it.
@@ -563,7 +567,7 @@ Also cover:
 - **The race at approval.** An edit committed between the approval's terms comparison and its insert makes the insert fail, and no approval is recorded.
 - **The race at the claim.** An edit committed between the check and the claim makes the claim fail, records a claim-conflict outcome against the check, and sends nothing. An edit attempted after the claim is refused, because the quote is no longer a draft.
 - **Expiry after evaluation.** An integration test against the real database pauses the handler after evaluation, waits until the database clock passes the approval's `ExpiresAt`, then lets the claim run. The claim fails.
-- **Withdrawal racing the claim.** Run a withdrawal and a claim concurrently many times against the real database. Exactly one of them succeeds each time. When the withdrawal wins, nothing is sent. When the claim wins, the withdrawal is refused and the approval stays on record without a withdrawal.
+- **Withdrawal racing the claim.** Against the real database, start from an unexpired active approval and use synchronization barriers to force each ordering in turn. When the withdrawal commits first, the claim fails and nothing is sent. When the claim commits first, the withdrawal is refused and the approval stays on record without a withdrawal. Repeated free-running concurrent trials add confidence, and each run must end with exactly one success. If the provider reports a lost race as a concurrency exception rather than zero affected rows, treat it as a failed competing operation, and make sure nothing is delivered.
 - **Every writer.** An import or administrative update that targets a quote in `Sending` changes nothing, and neither does a withdrawal.
 - **The current actor.** Dana, reassigned away from the account after approval, is denied with `sender.not-account-owner`.
 - **Withdrawal.** An approval Priya withdraws needs a new approval, and both the approval and the withdrawal remain on record.
