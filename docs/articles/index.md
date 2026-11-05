@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Approvals and authorization checks that go stale before delayed execution, time-of-check to time-of-use, and which changes should invalidate a decision | [Your Security Check Passed. Then the World Changed.](2026/security-check-passed-then-world-changed.md) |
 | What identity and authority should cross from an ASP.NET Core request to a queued job or `BackgroundService` | [A Background Job Should Not Inherit Everything the User Could Do](2026/background-job-should-not-inherit-user-authority.md) |
 | Choosing which layer of a .NET application should authenticate, decide, and enforce, and covering every entry path to a side effect | [Where Should Authorization Live in a .NET Application?](2026/where-authorization-should-live-dotnet-application.md) |
 | AI coding agents that find adjacent work outside their assigned issue | [Discovery Is Not Authorization: Using GitHub Issues to Govern AI-Assisted Development](2026/discovery-is-not-authorization-ai-assisted-development.md) |
@@ -52,6 +53,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Your Security Check Passed. Then the World Changed.](2026/security-check-passed-then-world-changed.md)
+
+**Christopher D. Cavell** · **November 5, 2026**
+
+A sales manager approves a quote that changes a minute before her click, and four days later the offer goes out under a lowered approval limit, after she has changed roles and the customer has been placed on credit hold, because a status flag says `Approved`. This guide separates the historical truth of a decision from current eligibility to act on it; classifies six kinds of change by whether they need a new decision, a re-read, a re-evaluation, a written policy choice, or no action; explains why invalidating on every change is its own failure; compares re-reading, version binding, event invalidation, expiry, and accepting facts as of the decision; closes the time-of-check to time-of-use gap with a reviewed-terms precondition at approval and a conditional EF Core claim at use; and states when ordinary authorization at the point of use is enough.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/security-check-passed-then-world-changed.html`
 
 ### [A Background Job Should Not Inherit Everything the User Could Do](2026/background-job-should-not-inherit-user-authority.md)
 
