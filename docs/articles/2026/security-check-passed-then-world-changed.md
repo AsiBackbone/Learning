@@ -152,7 +152,7 @@ After an incident like Friday's, the tempting fix is to discard approvals whenev
 - **Workarounds.** Reps learn to request approval at the last possible minute, to avoid touching an approved quote, or to split one deal into several quotes under the threshold.
 - **Lost signal.** When every change invalidates, an invalidation no longer tells anyone that something important happened.
 
-GitHub's branch protection is a useful comparison. Its option to [dismiss stale pull request approvals](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches) is triggered by pushed commits that affect the pull request's diff, because those change the code under review. The control is scoped to the reviewed content, not to every piece of pull request metadata. The rule follows what the reviewer actually approved.
+GitHub's branch protection is a useful comparison. Its option to [dismiss stale pull request approvals](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches) dismisses approvals when the reviewed diff changes after review, for example through pushed commits, because the code under review has changed. The control is scoped to the reviewed content, not to every piece of pull request metadata. The rule follows what the reviewer actually approved.
 
 Classify each change once, deliberately, and test the classification. That is less work than living with either extreme.
 
@@ -225,7 +225,7 @@ The fingerprint covers only the decision-relevant terms, so an internal note add
 public sealed record QuoteApproval(
     Guid ApprovalId,
     Guid QuoteId,
-    int Revision,                    // recorded for evidence: the quote revision when the approval was recorded
+    int Revision,                    // evidence only: the revision loaded while processing; the terms hash decides applicability
     string TermsHash,                // used for applicability: exactly what was approved
     decimal DiscountPercent,
     string ApprovedBy,
@@ -276,7 +276,9 @@ public sealed class QuoteApprovals(
 }
 ```
 
-`TryAddIfTermsUnchangedAsync` carries the real guarantee, and a transaction alone does not provide it. Under the default read-committed isolation in most databases, a transaction that reads the quote and then inserts the approval can still interleave with an edit that commits in between. The store needs a write that actually conflicts with concurrent edits. For example, in the same transaction as the insert, it can run a conditional update on the quote row, such as incrementing an approval counter `WHERE Id = @quoteId AND TermsHash = @hash AND Status = 'Draft'`, and roll back if no row changed. A row lock or a serializable transaction can do the same job, at a different cost.
+`TryAddIfTermsUnchangedAsync` carries the real guarantee, and a transaction alone does not provide it. Read committed is the default isolation level in both [SQL Server](https://learn.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql) and [PostgreSQL](https://www.postgresql.org/docs/current/transaction-iso.html), and under it a transaction that reads the quote and then inserts the approval can still interleave with an edit that commits in between. The store needs a write that actually conflicts with concurrent edits.
+
+This sketch uses the quote row itself. In the same transaction as the insert, the store runs a conditional update that sets two current-state columns on the quote, `ActiveApprovalId` and `ActiveApprovalExpiresAt`, `WHERE Id = @quoteId AND TermsHash = @hash AND Status = 'Draft'`, and rolls back if no row changed. The approval record stays immutable history. Those two columns are a projection of which approval is currently usable, and they become the one place that approving, withdrawing, and sending all have to write. A row lock or a serializable transaction can do the same job, at a different cost.
 
 The fingerprint has to be computed the same way every time, from a canonical form of the terms, or two identical deals will produce different hashes. [Policy Versioning and Decision Provenance](../../governance/policy-versioning-and-decision-provenance.md#fingerprints-require-canonicalization) covers canonicalization. If your quotes already increment a revision only when the terms change, binding to that revision is simpler and equally correct.
 
@@ -327,7 +329,7 @@ This sketch stops at the first failing rule. A real check may collect every fail
 
 `CannotDetermine` is not `Deny`, and it is never `Allow`. If the ERP cannot answer, the offer waits. [Should Authorization Fail Open, Fail Closed, or Defer?](fail-open-fail-closed-or-defer.md) covers that case.
 
-An allowed decision is still a check, and a check is followed by a gap. Dana could save revision 6 in another tab a millisecond after the policy reads revision 5, and the approval could expire or be withdrawn in the same interval. So the send claims the quote with one conditional write that repeats every check that lives in the same database, and then sends exactly the terms that were checked:
+An allowed decision is still a check, and a check is followed by a gap. Dana could save revision 6 in another tab a millisecond after the policy reads revision 5, and the approval could expire or be withdrawn in the same interval. So the send claims the quote with one conditional write that repeats the checks on state in the same database, and then sends exactly the terms that were checked:
 
 ```csharp
 // Inside the send handler. `facts` was just loaded from current sources for this quote and this sender.
@@ -346,18 +348,21 @@ Guid attemptId = Guid.NewGuid();
 Guid? approvalId = decision.ApprovalId;
 
 // Draft to Sending, only if the quote still has the terms that were checked, nobody else is
-// sending it, and the approval relied on is still unexpired and not withdrawn.
+// sending it, and the approval relied on is still the quote's active, unexpired approval.
+// Every claim-critical value is on the claimed row, so this is a single-row conditional update.
 int claimed = await db.Quotes
     .Where(q => q.Id == quoteId
              && q.Status == QuoteStatus.Draft
              && q.TermsHash == decision.TermsHash
              && (approvalId == null
-                 || db.QuoteApprovals.Any(a => a.ApprovalId == approvalId
-                                            && a.ExpiresAt > now
-                                            && !db.ApprovalWithdrawals.Any(w => w.ApprovalId == approvalId))))
+                 || (q.ActiveApprovalId == approvalId
+                     // Translated to the database clock by providers that support it: the claim, not
+                     // the earlier evaluation, defines the expiry boundary.
+                     && q.ActiveApprovalExpiresAt > DateTimeOffset.UtcNow)))
     .ExecuteUpdateAsync(setters => setters
         .SetProperty(q => q.Status, QuoteStatus.Sending)
-        .SetProperty(q => q.SendAttemptId, attemptId), ct);    // the attempt is recorded with the claim
+        .SetProperty(q => q.SendAttemptId, attemptId)     // the attempt is recorded with the claim,
+        .SetProperty(q => q.SendCheckId, checkId), ct);   // and so is the check that permitted it
 
 if (claimed == 0)
 {
@@ -375,13 +380,23 @@ await delivery.SendAsync(offer, attemptId, ct);
 
 [`ExecuteUpdateAsync`](https://learn.microsoft.com/en-us/ef/core/saving/execute-insert-update-delete) returns the number of rows it changed, so zero means no row satisfied the condition and this invocation stops. It applies only the conditions you write in the query; it does not add tracked-entity concurrency checks for you. Tracked entities with a [concurrency token](https://learn.microsoft.com/en-us/ef/core/saving/concurrency) achieve a similar result: when a configured concurrency token no longer matches, the expected update affects no row, and `SaveChanges` throws `DbUpdateConcurrencyException`. Either works. A read followed by an unconditional write does not.
 
-The claim's durable record of the attempt is the `SendAttemptId` on the quote row, written in the same statement as the state change. The send-check outcome links that attempt to the decision that permitted it. If the process stops between the two writes, the quote row still says which attempt holds it.
+Two details of the predicate matter more than its shape:
 
-The claim protects only the conditions actually written into it. It works only because every other writer respects it, and that is a system-wide write invariant, not a convention: every path that modifies decision-relevant terms must condition its update on `Status == Draft`. A single administrative screen, import, repair script, or background job that bypasses the condition reopens the race.
+- **Expiry is checked against the database clock, at the claim.** The policy evaluated `ExpiresAt` against the application's clock a moment earlier, and recording the decision takes time. Comparing with that earlier `now` in the claim would let an approval that expired in between still succeed. EF Core providers translate `DateTimeOffset.UtcNow` inside a query to a database function where they support it, for example SQL Server's [date and time function mappings](https://learn.microsoft.com/en-us/ef/core/providers/sql-server/functions#date-and-time-functions), so the comparison happens when the update runs. Whichever clock you use, name it as the authority for the boundary, and expect the application's earlier evaluation to disagree with it occasionally by a little clock skew.
+- **Every claim-critical value lives on the claimed row.** Checking a separate withdrawals table from inside the update would look equivalent, but it is not. A withdrawal inserted into another table does not necessarily conflict with the update, and the ordering between them then depends on the database and isolation configuration. With the values on the quote row, both writers contend for the same row, and a single-row conditional update decides the order. This shape is also simpler for EF Core providers to translate than correlated subqueries inside an update. Verify the generated SQL against your provider either way.
+
+The claim's durable record of the attempt, and of the check that permitted it, is on the quote row, written in the same statement as the state change. If the process stops before the send-check outcome is recorded, the quote row still says which attempt holds it and which decision allowed it.
+
+The claim protects only the conditions actually written into it. It works only because every other writer respects it, and that is a system-wide write invariant, not a convention:
+
+- Every path that modifies decision-relevant terms conditions its update on `Status == Draft`.
+- Withdrawing an approval is a conditional update on the same row, in the same transaction as inserting the withdrawal event: clear `ActiveApprovalId` `WHERE ActiveApprovalId = @approvalId AND Status = 'Draft'`. If the withdrawal wins, the claim fails. If the claim wins, the withdrawal fails visibly, because the offer is already being sent, and it cannot retroactively cancel that attempt. Stopping an offer already in flight is a separate operation.
+
+A single administrative screen, import, repair script, or background job that bypasses those conditions reopens the race.
 
 Two limits of this sketch are deliberate:
 
-- **Some facts are outside the conditional write.** Credit status lives in the ERP, and account ownership lives in the CRM, so a hold or reassignment between the read and the claim is not seen. The same is true of a policy revision deployed in that interval. This company accepts that gap of milliseconds for an offer, because in its process signing an offer does not ship anything: the order-booking step, which is where credit actually matters, checks credit status again when the customer signs. Each fact that must hold at claim time either needs a predicate in the claim, coordinated concurrency protection with its owner, or an explicitly accepted freshness window. When a stale answer from another system is not acceptable, have the system that performs the effect enforce the rule itself. [Where Should Authorization Live in a .NET Application?](where-authorization-should-live-dotnet-application.md) discusses where that check belongs.
+- **Some facts are outside the conditional write.** Credit status lives in the ERP, and account ownership lives in the CRM, so a hold or reassignment between the read and the claim is not seen. The same is true of a policy change in that interval, unless the applicable policy identity or limit is stored locally and repeated in the claim. This company accepts that gap of milliseconds for an offer, because in its process signing an offer does not ship anything: the order-booking step, which is where credit actually matters, checks credit status again when the customer signs. Each fact that must hold at claim time either needs a predicate in the claim, coordinated concurrency protection with its owner, or an explicitly accepted freshness window. When a stale answer from another system is not acceptable, have the system that performs the effect enforce the rule itself. [Where Should Authorization Live in a .NET Application?](where-authorization-should-live-dotnet-application.md) discusses where that check belongs.
 - **Delivery failure and recovery are omitted.** A crash after the claim leaves a quote in `Sending` with an unknown outcome. Recovery asks the delivery service what happened to `attemptId` before anything sends again. [An Allowed Decision Does Not Mean the Operation Succeeded](allowed-decision-does-not-mean-execution-succeeded.md) covers that lifecycle, and [Your Retry Logic May Be Replaying an Authorization Decision](retry-logic-may-replay-authorization-decision.md) covers why each retry repeats the check.
 
 ---
@@ -546,8 +561,10 @@ public async Task Unrelated_changes_do_not_invalidate_the_approval()
 Also cover:
 
 - **The race at approval.** An edit committed between the approval's terms comparison and its insert makes the insert fail, and no approval is recorded.
-- **The race at the claim.** An edit committed between the check and the claim makes the claim fail, records a claim-conflict outcome against the check, and sends nothing. So does an approval that expires or is withdrawn in that interval. An edit attempted after the claim is refused, because the quote is no longer a draft.
-- **Every writer.** An import or administrative update that targets a quote in `Sending` changes nothing.
+- **The race at the claim.** An edit committed between the check and the claim makes the claim fail, records a claim-conflict outcome against the check, and sends nothing. An edit attempted after the claim is refused, because the quote is no longer a draft.
+- **Expiry after evaluation.** An integration test against the real database pauses the handler after evaluation, waits until the database clock passes the approval's `ExpiresAt`, then lets the claim run. The claim fails.
+- **Withdrawal racing the claim.** Run a withdrawal and a claim concurrently many times against the real database. Exactly one of them succeeds each time. When the withdrawal wins, nothing is sent. When the claim wins, the withdrawal is refused and the approval stays on record without a withdrawal.
+- **Every writer.** An import or administrative update that targets a quote in `Sending` changes nothing, and neither does a withdrawal.
 - **The current actor.** Dana, reassigned away from the account after approval, is denied with `sender.not-account-owner`.
 - **Withdrawal.** An approval Priya withdraws needs a new approval, and both the approval and the withdrawal remain on record.
 - **Expiry.** An approval used exactly at `ExpiresAt`, or later, needs a new approval; one used a moment before it does not.
@@ -608,8 +625,8 @@ Also cover:
 
 **The point of use**
 
-13. Does one conditional write repeat every check on local state, such as terms, status, approval expiry, and withdrawal, as it changes the state?
-14. Is it a system-wide invariant that every writer of decision-relevant data respects the claimed state?
+13. Does one conditional write repeat every check on local state, such as terms, status, the active approval, and its expiry against a named authoritative clock, as it changes the state?
+14. Is it a system-wide invariant that every writer of decision-relevant data, including approval and withdrawal, contends for the same claimed row and respects its state?
 15. Does the effect use exactly what was checked, rather than a fresh read?
 16. Where a fact lives outside that write, is the remaining gap accepted in writing or enforced again at the system that performs the effect?
 17. Does a failed claim get its own recorded outcome, linked to the check that allowed it?
@@ -630,7 +647,7 @@ When the later executor is another process that should hold only bounded authori
 - [CWE-367: Time-of-check Time-of-use (TOCTOU) Race Condition](https://cwe.mitre.org/data/definitions/367.html) describes the general weakness whose shape this article applies to business decisions.
 - [RFC 9110, HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110.html#name-if-match), defines `If-Match` and `412 Precondition Failed`, and [RFC 6585](https://www.rfc-editor.org/rfc/rfc6585.html) defines `428 Precondition Required`.
 - [Handling Concurrency Conflicts](https://learn.microsoft.com/en-us/ef/core/saving/concurrency), in the EF Core documentation, covers concurrency tokens and `DbUpdateConcurrencyException`, and [ExecuteUpdate and ExecuteDelete](https://learn.microsoft.com/en-us/ef/core/saving/execute-insert-update-delete) covers set-based conditional updates.
-- [About protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches), in the GitHub documentation, describes dismissing stale pull request approvals when pushed commits affect the diff.
+- [About protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches), in the GitHub documentation, describes dismissing stale pull request approvals when the reviewed diff changes.
 - [Continuous access evaluation](https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-continuous-access-evaluation), in the Microsoft Entra documentation, describes responding to critical events instead of relying on token lifetime alone.
 
 ---
