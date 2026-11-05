@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: "Your Security Check Passed. Then the World Changed."
+  href: 2026/security-check-passed-then-world-changed.md
 - name: A Background Job Should Not Inherit Everything the User Could Do
   href: 2026/background-job-should-not-inherit-user-authority.md
 - name: "Where Should Authorization Live in a .NET Application?"

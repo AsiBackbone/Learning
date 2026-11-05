@@ -635,7 +635,8 @@ Lead to How Short-Lived Execution Authority Differs from User Authorization for 
 ### 19. Your Security Check Passed. Then the World Changed.
 
 - **Priority:** P1
-- **Implementation issue:** Not opened
+- **Implementation issue:** Not opened; published directly from this backlog entry
+- **Publication:** [Published November 5, 2026](../docs/articles/2026/security-check-passed-then-world-changed.md)
 - **Permanent slug:** `security-check-passed-then-world-changed`
 
 #### Reader / search problem
