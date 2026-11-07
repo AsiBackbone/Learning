@@ -6,6 +6,8 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-11-07
+
 ### Changed
 
 - The README ecosystem table now describes ReferenceApplication as stable `1.x` instead of pre-release, matching its prepared `1.0.0` release.
@@ -140,7 +142,8 @@ Learning releases are archival and citation snapshots of educational material. T
 
 - Obsolete dependency-check suppressions for packages not used by Learning.
 
-[Unreleased]: https://github.com/AsiBackbone/Learning/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/AsiBackbone/Learning/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/AsiBackbone/Learning/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/AsiBackbone/Learning/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/AsiBackbone/Learning/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/AsiBackbone/Learning/compare/v1.1.0...v1.2.0

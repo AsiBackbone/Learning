@@ -164,7 +164,7 @@ The goal is to make the reasoning visible—not to prove that one framework or a
 
 ## Recently added
 
-Learning 1.4 is the current documentation baseline aligned with its reviewed AsiBackbone 7.0.0 and NetCoreApplicationTemplate 2.11.2 boundaries. The dated [implementation-currentness review](getting-started/implementation-currentness-review-2026-10-24.md) records why Learning retains those archival pins after reviewing AsiBackbone 7.5.1 and NetCoreApplicationTemplate 2.11.6. The [compatibility and API boundary](getting-started/asibackbone-7-api-boundary.md) pins the selected implementation references; earlier Learning snapshots remain available as historical guidance. Recent publications include:
+Learning 1.5 is the current documentation baseline aligned with its reviewed AsiBackbone 7.0.0 and NetCoreApplicationTemplate 2.11.2 boundaries. The dated [implementation-currentness review](getting-started/implementation-currentness-review-2026-11-07.md) records why Learning retains those archival pins after reviewing AsiBackbone 7.5.3 and NetCoreApplicationTemplate 2.11.8. The [compatibility and API boundary](getting-started/asibackbone-7-api-boundary.md) pins the selected implementation references; earlier Learning snapshots remain available as historical guidance. Recent publications include:
 
 - [Your Security Check Passed. Then the World Changed.](articles/2026/security-check-passed-then-world-changed.md)
 - [A Background Job Should Not Inherit Everything the User Could Do](articles/2026/background-job-should-not-inherit-user-authority.md)
