@@ -1,9 +1,9 @@
 ---
-description: A valid token tells you who sent an ASP.NET Core request. It does not make the account IDs, tenant, prices, or status in that request true.
+description: A valid token tells an ASP.NET Core API which subject an issuer vouched for. It does not make the account IDs, tenant, prices, or status in the request true.
 title: Passing Authentication Does Not Make Input Trustworthy
 author: Christopher D. Cavell
 published: "2026-11-07"
-summary: Authentication establishes who sent a request, as asserted by an issuer you trust. It does not make the request's identifiers, tenant values, prices, or status true. Sort every field by who owns it. Take identity from the validated principal, resolve selectors and check that this caller may use them, validate the input the caller owns, compute the facts the server owns, and treat the client's copy of a server-owned value as a precondition. One scoped read per resource is usually enough.
+summary: A validated bearer token tells an API which subject a trusted issuer asserted. It does not make the request's identifiers, tenant values, prices, or status true. Sort every field by who owns it. Take identity from the validated principal, resolve selectors and check that this caller may use them, validate the input the caller owns, compute the facts the server owns, and treat the client's copy of a server-owned value as a precondition. One scoped read per resource is a useful default.
 feed: true
 x_hashtags:
   - DotNet
@@ -18,13 +18,13 @@ x_hashtags:
 
 **Prerequisites:** No formal prerequisites. Familiarity with ASP.NET Core minimal APIs or controllers, JWT bearer authentication, and EF Core is helpful. No AsiBackbone package or prior Learning material is required.
 
-**Sample scope:** The C# targets .NET 8 or later. The entities, price catalog, validator, and test helpers are illustrative, not a runnable sample or a recommended domain model. Framework behavior is described from Microsoft's documentation as of November 2026; check the current documentation for your versions.
+**Sample scope:** The C# targets .NET 8 or later. The entities, price catalog, validator, and test helpers are illustrative, not a runnable sample or a recommended domain model. The tests rely on helpers that are described but not shown. The scenario and its incidents are hypothetical. Framework behavior is described from Microsoft's documentation as of November 2026; check the current documentation for your versions.
 
 **What this article covers:** what a validated token does and does not establish; five ways an authenticated request can still be wrong; sorting request values into identity, selectors, caller-owned input, server-owned facts, and hints; which component owns each concern in ASP.NET Core; an order endpoint rebuilt so each field is handled by its owner; why validation and authorization answer different questions; using the client's copy of a price as a precondition; which token claims can decide access; how to avoid re-reading every field; the same mistake with gateways, internal services, webhooks, and AI tool calls; and when ordinary validation is enough.
 
 **In plain terms:** a courier shows a valid company badge at the loading dock and hands over a delivery note. The badge proves the courier works for a company you deal with. It does not prove the note's prices are current, that the goods are addressed to the right warehouse, or that the "pre-approved" stamp on it came from anyone who may approve. The dock checks the badge once, and then checks each line of the note against whoever actually owns that fact.
 
-Consider a hypothetical wholesale ordering platform. Each tenant is a distributor. Each distributor has customer accounts, and buyers at those customers sign in and place orders. Every API call requires a valid access token, and the order endpoint requires an `orders.place` policy. A quarterly review of disputed orders finds five problems. Every request involved was authenticated.
+Consider a hypothetical wholesale ordering platform. Each tenant is a distributor. Each distributor has customer accounts, and buyers at those customers sign in and place orders. Every API call requires a valid access token, and the order endpoint requires an `orders.place` policy, registered at startup, that requires an authenticated buyer with the expected subject and tenant claims. A quarterly review of disputed orders finds five problems. Every request involved was authenticated.
 
 1. **Old prices.** A mobile app release cached the price list and kept sending last month's unit prices after a price increase. The server stored them. Nobody was attacking anything.
 2. **Someone else's account.** A buyer who had moved from one customer to another still had the old customer's account ID bookmarked. Orders went onto the old customer's credit line.
@@ -56,27 +56,30 @@ app.MapPost("/api/orders", async (Order order, ClaimsPrincipal user, OrderingDbC
 
 The team's first reaction was to treat buyers as hostile and add checks everywhere. That would not have explained the first three problems, which were mistakes, and it would not have pointed to the fix. The real mistake was in what the code assumed authentication had settled.
 
-> **Authentication tells you who sent the request. It does not make anything the request says true. Take identity from the authenticated principal. Resolve every identifier the caller sends and confirm that this caller may use it. Validate the input the caller owns. Compute the facts the server owns, and treat the caller's copy of them as something to compare, never something to store.**
+> **Authentication tells you which subject a trusted issuer vouched for. It does not make anything else the request says true. Take identity from the authenticated principal. Resolve every identifier the caller sends and confirm that this caller may use it. Validate the input the caller owns. Compute the facts the server owns, and treat the caller's copy of them as something to compare, never something to store.**
 
 That does not mean every field needs its own database lookup, or that callers should be treated as attackers. Near the end, this article covers how little extra work most endpoints need.
+
+In this article, the **caller** is the principal that the accepted credential represents: here, a buyer. That is not necessarily the person or software that physically sent the request. An app can act for a user, a workload can hold an app-only token, and a stolen token can be presented by someone else.
 
 ---
 
 ## What Authentication Actually Established
 
-When the JWT bearer handler accepts a token, it has checked that a trusted issuer signed it, that it was issued for this API, and that it has not expired. The claims inside it are what that issuer asserted when it issued the token. That is a real and useful guarantee:
+When a properly configured JWT bearer handler accepts an access token, it has verified the token's signature against trusted signing keys, and checked that the issuer is one it expects, that the audience is this API, and that the token is within its lifetime. Those checks are on by default in `TokenValidationParameters`, but they can be turned off, so they are part of what you configure and test. The claims inside the token are what that issuer asserted when it issued it. That is a real and useful guarantee:
 
-- **The caller is who the token says.** The `sub` or object ID and the tenant ID identify the user, as the issuer knows them. Your code can rely on these without a database read.
+- **The token identifies the subject the issuer says it represents.** The subject identifier, and in Microsoft Entra ID the tenant ID, are the issuer's statements about whom the token represents. Your code can rely on them without a database read.
 - **Issuer-assigned claims are the issuer's statements.** Application roles that an administrator assigned can be relied on to the extent that you trust that administrator, as of the token's issue time.
 
 It does not establish anything else:
 
-- **The body, route, query string, and headers.** The token is attached to the request, and the request is not signed by the token. A valid token says nothing about the JSON next to it.
+- **That the presenter is the rightful holder.** A bearer token can be used by anyone who holds it. Validation proves that the token is genuine, not that it was not copied. Sender-constrained tokens, through DPoP or mutual TLS, bind the token to a key that the client must prove it holds.
+- **The body, route, query string, and headers.** The token is attached to the request, and the request is not signed by the token. A valid token says nothing about the JSON next to it. Even a sender-constrained token does not sign the body.
 - **That the client is your client.** A public client, whether a browser app, a mobile app, or a script, runs on a device you do not control. The request may come from a modified build, a stale build, or `curl`. Checks done only in the client can be skipped. [CWE-602](https://cwe.mitre.org/data/definitions/602.html) names this weakness: client-side enforcement of server-side security.
-- **Current state.** Claims are a snapshot from issue time. A buyer removed from an account an hour ago may still carry a token issued before the removal.
+- **Current state.** Claims are a snapshot from issue time, and a bearer JWT is not checked for revocation by default. A buyer removed from an account an hour ago may still carry a token issued before the removal. Short token lifetimes narrow that window. A check at the point of use closes it.
 - **Permission for this operation on this resource.** `orders.place` says the caller may place orders somewhere. It says nothing about account `C-2041`.
 
-Two misconceptions sit on either side of this. One treats a valid token as proof that the request is honest. The other treats every claim in a validated token as attacker-controlled. Neither is right. The token is reliable for who the caller is and what the issuer asserted. The rest of the request needs to be judged field by field.
+Two misconceptions sit on either side of this. One treats a valid token as proof that the request is honest. The other treats every claim in a validated token as attacker-controlled. Neither is right. The token is reliable for which subject it represents and what the issuer asserted. The rest of the request needs to be judged field by field.
 
 ---
 
@@ -84,7 +87,7 @@ Two misconceptions sit on either side of this. One treats a valid token as proof
 
 The five incidents are different failures, and each has a different owner:
 
-| Kind of wrong | In the example | Who caused it | What catches it |
+| Kind of wrong | In the example | Possible origin | What catches it |
 | --- | --- | --- | --- |
 | **Malformed** | Quantity `-40` | A client bug, or anyone | Shape and range validation at the API boundary |
 | **Stale** | Last month's prices | An old client build | Computing the price on the server, and comparing the client's copy as a precondition |
@@ -114,7 +117,7 @@ Applied to the original `Order` entity:
 
 | Field | Kind | Treatment |
 | --- | --- | --- |
-| `PlacedByUserId` | Identity | From `sub`. The original check compared the body with the token and then ignored everything else. |
+| `PlacedByUserId` | Identity | From the validated subject claim. The original check compared the body with the token and then ignored everything else. |
 | `TenantId` | Identity | From the token's tenant claim. A different value in the body is a mistake or an attempt, never an instruction. |
 | `CustomerAccountId` | Selector | Must exist in this tenant, and this buyer must be assigned to it with permission to order. |
 | `ShippingAddressId` | Selector | Must belong to *that* account. Checking only the first identifier in a request is a common gap. |
@@ -123,7 +126,7 @@ Applied to the original `Order` entity:
 | `Lines[].UnitPrice` | Server-owned fact | From the account's price list today. |
 | `Total` | Server-owned fact | Computed from server prices. |
 | `Status` | Server-owned fact | Set by the server, based on account state and credit. |
-| `PurchaseOrderNumber` | Caller-owned input | Validate length and characters. Store it as text and encode it on output. |
+| `PurchaseOrderNumber` | Caller-owned input | Validate length and characters. Store the raw text, and encode it for each output: HTML-encode it in a page, and let the serializer handle it in JSON. |
 
 Two things about this sort are easy to miss.
 
@@ -139,7 +142,7 @@ In ASP.NET Core, the five kinds of wrong map to different components. Mixing the
 
 | Concern | Component that owns it | ASP.NET Core mechanism | It is not |
 | --- | --- | --- | --- |
-| Is this a well-formed request? | Binding and validation | DTOs, DataAnnotations or a validator, `[ApiController]` automatic `400`, `Results.ValidationProblem` | Permission |
+| Is this a well-formed request? | Binding and validation | DTOs, DataAnnotations or a validator, `[ApiController]` automatic `400` for controllers, `Results.ValidationProblem` | Permission |
 | Who is calling? | Authentication | JWT bearer or cookie handler, `ClaimsPrincipal` | Permission for this resource |
 | May this caller use this resource? | Resource-based authorization | A scoped query, or `IAuthorizationService.AuthorizeAsync(user, resource, requirement)` | Validation that the ID is well formed |
 | What are the authoritative facts? | Systems of record | Repositories, the price catalog, the credit service | Anything the client sends |
@@ -148,7 +151,7 @@ In ASP.NET Core, the five kinds of wrong map to different components. Mixing the
 
 The first row and the third row are where most confusion lives. `[Range(1, 10_000)]` on `Quantity` says the number is sensible. It does not say this buyer may order on this account. And an authorization handler that confirms the buyer is assigned to the account does not say that `-40` is a valid quantity. Each answers its own question. An endpoint needs both, and neither substitutes for the other.
 
-Business rules are a third, separate question. A buyer may be fully authorized to place orders on an account that is on credit hold. The order is then refused, or held for review, because of the account's state, not because of who the buyer is. Putting "account on hold" inside an authorization policy makes the policy depend on facts that change for reasons unrelated to the caller, and it turns a business outcome into a `403`.
+Business rules are a third, separate question. A buyer may be fully authorized to place orders on an account that is on credit hold. The order is then refused, or held for review, because of the account's state, not because of who the buyer is. Many resource-based authorization handlers do check resource state, and some teams deliberately model "no orders on a held account" as authorization. Keeping it as a business rule is usually clearer. The caller gets an outcome such as `409` or `422` that explains what to fix, rather than a `403` that suggests they lack permission, and the policy does not change when facts unrelated to the caller change.
 
 For a fuller guide to which layer should establish facts and which should decide, see [Where Should Authorization Live in a .NET Application?](where-authorization-should-live-dotnet-application.md).
 
@@ -165,17 +168,19 @@ For a fuller guide to which layer should establish facts and which should decide
 public sealed record PlaceOrderRequest(
     Guid CustomerAccountId,
     Guid ShippingAddressId,
-    IReadOnlyList<PlaceOrderLine> Lines,
-    decimal ExpectedTotal,
+    IReadOnlyList<PlaceOrderLine?>? Lines,
+    decimal? ExpectedTotal, // Nullable, so a missing precondition is a 400, not a silent 0.
     string? PurchaseOrderNumber);
 
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record PlaceOrderLine(string Sku, int Quantity);
+public sealed record PlaceOrderLine(string? Sku, int Quantity);
 ```
+
+The nullable annotations are deliberate. A JSON body can omit any property or send `null`. An omitted `decimal` would arrive as `0`, and an omitted `Guid` as `Guid.Empty`. The validator rejects all of these explicitly, so the handler never has to guess whether a value was sent.
 
 The safety comes from the shape of the type. A request DTO with no `Status` property cannot set a status, whatever the JSON says. Microsoft's web API tutorial describes the same pattern as [preventing over-posting](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-web-api).
 
-`JsonUnmappedMemberHandling.Disallow` is a separate choice. By default, System.Text.Json [ignores JSON properties that have no matching member](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/missing-members), so `"status": "Approved"` would be silently dropped. That is already safe. `Disallow` makes deserialization fail instead, which minimal APIs return as `400 Bad Request`. The benefit is that the attempt becomes visible, and so does the misconfigured integration that still sends `tenantId`. The cost is that a client sending a field the server does not yet know about breaks. Many teams disallow unknown members on write endpoints for public clients and allow them elsewhere. Either choice is defensible. What matters is that safety does not depend on it.
+`JsonUnmappedMemberHandling.Disallow` is a separate choice. By default, System.Text.Json [ignores JSON properties that have no matching member](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/missing-members), so `"status": "Approved"` would be silently dropped. That is already safe. `Disallow` makes deserialization throw a `JsonException` instead. In the standard minimal API binding pipeline that this example uses, the request then fails with `400 Bad Request` before the handler runs. The request fails, but nobody notices unless something records it, so log or count these binding failures. With that in place, both the smuggled `status` and the misconfigured integration that still sends `tenantId` show up. The cost is that a client sending a field the server does not yet know about breaks. Many teams disallow unknown members on write endpoints for public clients and allow them elsewhere. Either choice is defensible. What matters is that safety does not depend on it.
 
 ### Validation answers "is this a sensible request?"
 
@@ -186,22 +191,43 @@ public static class PlaceOrderValidator
     {
         var errors = new Dictionary<string, string[]>();
 
+        if (request.CustomerAccountId == Guid.Empty)
+        {
+            errors["customerAccountId"] = ["A customer account is required."];
+        }
+
+        if (request.ShippingAddressId == Guid.Empty)
+        {
+            errors["shippingAddressId"] = ["A shipping address is required."];
+        }
+
+        if (request.ExpectedTotal is null)
+        {
+            errors["expectedTotal"] = ["The total shown to the buyer is required."];
+        }
+
         if (request.Lines is not { Count: > 0 and <= 200 })
         {
             errors["lines"] = ["An order needs between 1 and 200 lines."];
         }
-        else if (request.Lines.Any(line => line.Quantity is < 1 or > 10_000))
+        else if (request.Lines.Any(line => line is null || string.IsNullOrWhiteSpace(line.Sku)))
+        {
+            errors["lines"] = ["Each line needs a SKU."];
+        }
+        else if (request.Lines.Any(line => line!.Quantity is < 1 or > 10_000))
         {
             errors["lines"] = ["Each quantity must be between 1 and 10,000."];
         }
-        else if (request.Lines.GroupBy(line => line.Sku).Any(group => group.Count() > 1))
+        // Compare SKUs the way the catalog does. This catalog is case-insensitive.
+        else if (request.Lines.GroupBy(line => line!.Sku!.Trim(), StringComparer.OrdinalIgnoreCase).Any(group => group.Count() > 1))
         {
             errors["lines"] = ["Each SKU may appear only once."];
         }
 
-        if (request.PurchaseOrderNumber is { Length: > 40 })
+        if (request.PurchaseOrderNumber is { } po
+            && (po.Length > 40 || po.Any(c => !char.IsAsciiLetterOrDigit(c) && c is not ('-' or '/' or '.'))))
         {
-            errors["purchaseOrderNumber"] = ["A purchase-order number has at most 40 characters."];
+            errors["purchaseOrderNumber"] = ["Use up to 40 letters, digits, hyphens, slashes, or periods."];
         }
 
         return errors;
@@ -209,7 +235,7 @@ public static class PlaceOrderValidator
 }
 ```
 
-This is a hand-written validator so that the example does not depend on a particular library or framework version. DataAnnotations with `[ApiController]`, a validation library, or the built-in minimal API validation in recent ASP.NET Core versions all do the same job. None of them consult the database or the user. They only decide whether the request makes sense on its own.
+This is a hand-written validator so that the example behaves the same on every supported version. On controllers, DataAnnotations with `[ApiController]` return an automatic `400`. On minimal APIs, built-in DataAnnotations validation arrived in .NET 10 and is opt-in through `builder.Services.AddValidation()`. On .NET 8 and 9, use an explicit validator like this one, an endpoint filter, or a validation library. None of these consult the database or the user. They only decide whether the request makes sense on its own.
 
 ### The handler sends each field to its owner
 
@@ -229,35 +255,35 @@ app.MapPost("/api/orders", async (
         }
 
         // 2. Identity comes from the validated principal, never from the request.
-        Buyer buyer = Buyer.FromPrincipal(user); // Reads sub and tid; fails if either is missing.
+        // Reads the issuer's subject and tenant claims, as this API's token configuration
+        // maps them, and fails if either is missing.
+        Buyer buyer = Buyer.FromPrincipal(user);
 
-        // 3. The selector becomes a record, scoped to what this buyer may use.
-        //    Tenant, existence, and assignment are checked in one query.
-        CustomerAccount? account = await db.CustomerAccounts
+        // 3. Selectors become records, scoped to what this buyer may use. Tenant, existence,
+        //    assignment, and the address's owner are checked in one query.
+        var match = await db.CustomerAccounts
             .Where(a => a.TenantId == buyer.TenantId
                 && a.Id == request.CustomerAccountId
                 && a.Buyers.Any(b => b.UserId == buyer.UserId && b.CanPlaceOrders))
+            .Select(a => new
+            {
+                Account = a,
+                AddressBelongs = a.ShippingAddresses.Any(x => x.Id == request.ShippingAddressId),
+            })
             .SingleOrDefaultAsync(ct);
 
-        if (account is null)
+        // Every identifier in the request, not only the first one. A foreign account and a
+        // foreign address get the same answer, so neither response reveals what exists.
+        if (match is null || !match.AddressBelongs)
         {
-            return Results.NotFound(); // Not found and not yours look the same to the caller.
+            return Results.NotFound();
         }
 
-        // Every identifier in the request, not only the first one.
-        bool addressBelongsToAccount = await db.ShippingAddresses
-            .AnyAsync(a => a.Id == request.ShippingAddressId && a.CustomerAccountId == account.Id, ct);
+        CustomerAccount account = match.Account;
 
-        if (!addressBelongsToAccount)
-        {
-            return Results.ValidationProblem(new Dictionary<string, string[]>
-            {
-                ["shippingAddressId"] = ["Choose one of this account's shipping addresses."],
-            });
-        }
-
-        // 4. Server-owned facts: prices from the catalog that applies to this account today.
-        PricedOrder priced = await prices.PriceAsync(account, request.Lines, ct);
+        // 4. Server-owned facts: prices from the catalog that applies to this account today,
+        //    with the total rounded to the currency's minor unit by the rule the client displays.
+        PricedOrder priced = await prices.PriceAsync(account, request.Lines!, ct);
 
         if (priced.UnknownSkus.Count > 0)
         {
@@ -267,12 +293,13 @@ app.MapPost("/api/orders", async (
             });
         }
 
-        // 5. The client's total is a precondition. It is compared, never stored.
+        // 5. The client's total is a precondition. It is compared, never stored. This buyer may
+        //    see this account's prices, so the current total can be returned.
         if (priced.Total != request.ExpectedTotal)
         {
             return Results.Problem(
                 statusCode: StatusCodes.Status409Conflict,
-                title: "Prices have changed.",
+                title: "The order total differs from the expected total.",
                 extensions: new Dictionary<string, object?> { ["currentTotal"] = priced.Total });
         }
 
@@ -288,20 +315,31 @@ app.MapPost("/api/orders", async (
 
         return Results.Created($"/api/orders/{order.Id}", OrderResponse.From(order));
     })
-    .RequireAuthorization("orders.place");
+    .RequireAuthorization("orders.place"); // The policy must be registered with AddAuthorization at startup.
 ```
 
 Walking the five incidents through it:
 
 - **Quantity `-40`** fails validation in step 1, before any query.
 - **The old customer's account ID** resolves to nothing in step 3, because the buyer is no longer assigned to it. The buyer gets `404`, and no order is created.
-- **The wrong tenant** is impossible to express. The DTO has no `TenantId`, and the account query is scoped to the principal's tenant. With `Disallow`, the partner's request fails loudly with `400`, which is how the misconfiguration gets found in hours instead of two days.
+- **The wrong tenant** is impossible to express. The DTO has no `TenantId`, and the account query is scoped to the principal's tenant. With `Disallow`, the partner's request fails at binding with `400` on its first call, instead of succeeding quietly in the wrong tenant.
 - **Last month's prices** are never read. The server prices the order, and if the mobile app's total differs, the buyer gets `409` with the current total to confirm.
 - **`"status": "Approved"`** has nowhere to go. `account.PlaceOrder` decides the initial status from the account's credit position.
 
-Step 3 combines the lookup and the authorization into one query. That is a common and efficient form of resource-based authorization. When the rule is more involved, or shared with other endpoints, load the account first and call [`IAuthorizationService.AuthorizeAsync(user, account, requirement)`](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/resourcebased) with an authorization handler. Either way, the buyer's permission is checked against the account the server loaded, not against anything the request claims about it. A tenant-scoped EF Core global query filter can supply the `TenantId` predicate everywhere, as long as it reads the tenant from the authenticated principal and has no "no tenant means all tenants" escape. [A Background Job Should Not Inherit Everything the User Could Do](background-job-should-not-inherit-user-authority.md#the-job-inherits-the-worker) shows how that escape goes wrong.
+Step 3 combines the lookup and the authorization into one query. That is a common and efficient form of resource-based authorization. When the rule is more involved, or shared with other endpoints, load the account first and call [`IAuthorizationService.AuthorizeAsync(user, account, requirement)`](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/resourcebased) with an authorization handler. Either way, the buyer's permission is checked against the account the server loaded, not against anything the request claims about it. A tenant-scoped EF Core global query filter can supply the `TenantId` predicate by default, as long as it reads the tenant from the authenticated principal and has no "no tenant means all tenants" escape. A filter applies to queries for the entity types it is configured on. `IgnoreQueryFilters` bypasses it, and it does not check writes. [A Background Job Should Not Inherit Everything the User Could Do](background-job-should-not-inherit-user-authority.md#the-job-inherits-the-worker) shows how that escape goes wrong.
 
-Returning `404` for an account the buyer may not use is a choice. It avoids confirming that an account ID exists. A `403` is also reasonable when existence is not sensitive. Use one response consistently, so the difference between the two does not leak what the choice was meant to hide.
+Returning `404` for an account or address the buyer may not use is a choice. It avoids confirming that an ID exists. A `403` is also reasonable when existence is not sensitive. Use one response consistently, for every selector, so the difference between the two does not leak what the choice was meant to hide. The cost is that a buyer who picks a just-deleted address gets a plain `404`, and the client has to refresh its list.
+
+### Checked at lookup, not at commit
+
+Each check in the handler describes what it saw when it ran. If the buyer's assignment is revoked, or a price changes, after step 3 or step 4 but before `SaveChangesAsync`, the order is still created on the strength of facts that are no longer true. Wrapping the handler in a transaction does not change that by itself: at the default read-committed isolation, rows read earlier can still change before the commit.
+
+Whether that gap matters is a business decision. For many ordering systems, a few milliseconds is accepted. When the facts must still hold at commit, use the mechanism that fits where the fact lives:
+
+- **A fact in the same database**: a conditional write or a concurrency token that fails if the assignment or the price-list version changed, or a stricter isolation level for that transaction.
+- **A fact owned by another service**: a server-issued quote or reservation with its own expiry, which the order consumes.
+
+Retries create a separate risk. A client that times out and resends can place the same order twice. An idempotency key, stored with the order under a unique constraint, prevents the duplicate. [Your Security Check Passed. Then the World Changed.](security-check-passed-then-world-changed.md) covers the check-to-use gap in depth, and [Idempotency Does Not Prevent Authority Replay](idempotency-does-not-prevent-authority-replay.md) explains what an idempotency key does and does not prove.
 
 ---
 
@@ -309,12 +347,14 @@ Returning `404` for an account the buyer may not use is a choice. It avoids conf
 
 The mobile app showed the buyer a total before they pressed **Place order**. That total is useful information. It is the buyer's record of what they agreed to. It is not a price.
 
-So the rebuilt request keeps it, renamed `ExpectedTotal`, and the server uses it only for comparison. If the server's price differs, the order is not placed, and the client shows the new total for the buyer to confirm. The result is a better outcome than either alternative:
+So the rebuilt request keeps it, renamed `ExpectedTotal`, and the server uses it only for comparison. If the server's total differs, the order is not placed, and the client shows the new total for the buyer to confirm. The result is a better outcome than either alternative:
 
 - Accepting the client's price lets a stale or modified client set prices.
 - Silently repricing charges the buyer an amount they never saw.
 
-This is the same pattern as an `If-Match` header or a version number on an update: the client tells the server what it believes is current, and the server refuses to act if that belief is wrong. The client's value is a precondition, not an input. [Your Security Check Passed. Then the World Changed.](security-check-passed-then-world-changed.md) applies the same idea to approvals that must bind to exactly what a person reviewed.
+Three limits apply. The comparison is exact, so the server and client must round the same way, to the currency's minor unit. It checks only the grand total: two line prices can change and offset each other, and the amount sent does not prove what the buyer actually read. If the order must bind to specific lines, prices, currency, or terms, have the server issue a quote with an ID and version, and let the order reference it. Finally, returning `currentTotal` is itself an output decision. Here the buyer may already see this account's prices. Where a caller may not see the authoritative value, return the conflict without it.
+
+This follows the same idea as an `If-Match` header: the client tells the server what it believes is current, and the server refuses to act if that belief is wrong. `If-Match` compares an entity tag for the target resource and normally answers a mismatch with `412 Precondition Failed`. A value in the body is an application-level precondition, so this example uses `409 Conflict`. Either way, the client's value is a precondition, not an input. [Your Security Check Passed. Then the World Changed.](security-check-passed-then-world-changed.md) applies the same idea to approvals that must bind to exactly what a person reviewed.
 
 The same treatment fits other server-owned values that a client legitimately displays: a quote version, an exchange rate, a shipping charge, or the status an editor saw before saving.
 
@@ -326,12 +366,12 @@ Once the body is handled, the remaining question is how far to trust the princip
 
 | Claim | Where its value comes from | Suitable for authorization? |
 | --- | --- | --- |
-| `sub`, or `oid` with `tid` in Microsoft Entra ID | The issuer's stable identifier for the user and tenant | Yes. This is the identity to key on. |
-| Application roles or groups assigned by an administrator | Administrative assignment, as of issue time | Yes, for coarse permission, remembering it is a snapshot |
+| Generic OpenID Connect: `iss` with `sub`. Microsoft Entra ID: `tid` with `oid`. | The issuer's stable identifier for the subject. A `sub` is unique only within its issuer, and in Entra ID it is also specific to the application. | Yes. This pair is the identity to key on, within the scope the issuer defines. |
+| Application roles, scopes, or groups from an administratively controlled assignment | Administrative assignment, as of issue time | Yes, for coarse permission, subject to token freshness, the issuer's claim semantics, and any group-overage handling the platform requires |
 | `email`, `preferred_username`, `upn`, `unique_name` | Often editable by tenant administrators, and sometimes by users | No. Microsoft's guidance on [validating claims](https://learn.microsoft.com/en-us/entra/identity-platform/claims-validation) explicitly warns against using these to decide access. |
 | Custom claims mapped from profile attributes | Whoever can edit that attribute, possibly the user | Only if you know who can write the attribute |
 | Claims added by your `IClaimsTransformation` | Your code and the sources it reads | As trustworthy as those sources. A transformation that copies a request header into a claim has made the header look like identity. |
-| A user ID or role in a header set by an API gateway | The gateway, if nothing else can reach the service | Only when the network guarantees that every request passed through the gateway, and the gateway strips any incoming copy |
+| A user ID or role in a header set by an API gateway | The gateway, if nothing else can reach the service | Only when every request must pass through the gateway, enforced by network isolation or by mutual TLS between gateway and service, and the gateway strips any incoming copy. Stripping alone does not help a caller who can reach the service directly. |
 
 Identity claims from a validated token do not need a database read to be believed. Permission claims are a snapshot. If a removed assignment must take effect before the token expires, check the assignment at the point of use, as step 3 does, rather than trusting the token's copy.
 
@@ -343,13 +383,13 @@ The same applies to network facts. `X-Forwarded-For` and `X-Forwarded-Proto` are
 
 The cure for trusting everything is not to doubt everything. Most fields need no lookup at all, and the ones that do can usually be checked together.
 
-- **Caller-owned input needs validation, not lookups.** A quantity, a note, or a requested date is checked for shape and business rules. There is nothing to read.
+- **Caller-owned input needs boundary validation first, not lookups.** A quantity, a note, or a requested date is checked for shape and range without reading anything. Business rules may then evaluate it against authoritative state, such as stock, shipping cutoffs, or a customer-specific minimum, where the operation needs them.
 - **Identity needs no read.** The validated principal is the source.
-- **Each resource needs one scoped read.** Load the account with the tenant and assignment in the predicate. Existence, tenant, and permission come back in one query, and the result is the record you were going to use anyway.
+- **One scoped read per resource is a useful default.** Load the account with the tenant and assignment in the predicate. Existence, tenant, and permission come back in one query, and the result is the record you were going to use anyway. Authorization handlers, external policy services, and complex aggregates sometimes need more calls. The goal is to avoid redundant reads, not to hit a number.
 - **Server-owned facts are read once, where they are used.** The price catalog is called once for the whole order. It would be called whether or not the client sent prices.
-- **Child identifiers often fold into the parent's query.** The shipping address can be loaded through the account's navigation property, or checked in the same round trip.
+- **Child identifiers often fold into the parent's query.** The rebuilt handler checks the shipping address in the same query as the account, through the account's navigation property.
 
-In the rebuilt endpoint, every query except the address check would exist even if the client were perfectly trustworthy. The secure version is mostly the same work done in the right order, with the client's values in different places.
+In the rebuilt endpoint, every query would exist even if the client were perfectly trustworthy. The secure version is mostly the same work done in the right order, with the client's values in different places.
 
 ---
 
@@ -359,7 +399,7 @@ The habit applies wherever an authenticated party sends data, not only to users.
 
 **Internal services.** A service authenticated with a workload identity or mutual TLS sends `{"onBehalfOfUserId": "u-17", "tenantId": "t-4"}`. The credential proves which service sent the request. The user and tenant inside it are that service's assertion. Whether to accept them is a decision about how much you trust that service, and it should be written down rather than implied by "it's internal." Where the downstream service needs the user's own authority, delegation protocols such as On-Behalf-Of carry it in a token the issuer signs, rather than in a field the caller writes.
 
-**Webhooks.** A valid signature proves the payload came from the provider. It does not prove the payload is the latest state, that it has not been delivered before, or that it refers to an object in your tenant. Treat event identifiers as selectors, de-duplicate deliveries, and look up current state from the provider when the decision matters.
+**Webhooks.** A correctly verified signature shows that the payload was signed with the provider's configured key or secret and was not altered afterward. It does not show that the event is fresh or unique, that the payload is the latest state, that it has not been delivered before, or that it refers to an object in your tenant. Treat event identifiers as selectors, de-duplicate deliveries, and look up current state from the provider when the decision matters.
 
 **AI tool calls.** When a model produces arguments for a tool, the session may be authenticated as a real user, and the arguments are still proposals. They are selectors and caller-owned input at best, and they never establish identity, tenant, or permission. [Typed AI Proposed Intent and Schema-Validation Boundaries](../../ai-integration/typed-ai-proposed-intent-and-schema-validation-boundaries.md) applies this field-by-field sort to model output.
 
@@ -386,21 +426,24 @@ The full treatment is for endpoints that do at least one of the following:
 
 ## Testing the Boundary
 
-Unit tests of the validator are useful, but the failures in this article live in the gaps between components. Integration tests with `WebApplicationFactory` and a test authentication handler exercise the whole path. Each test should state what was sent, as whom, and what must not have happened.
+Unit tests of the validator are useful, but the failures in this article live in the gaps between components. Integration tests with `WebApplicationFactory` and a test authentication handler exercise the application from binding to persistence, using a principal the test supplies. They do not test your real JWT validation or claim mapping. Cover those separately, with tests that send tokens through the configured bearer handler. Each test should state what was sent, as whom, and what must not have happened.
+
+The tests below are illustrative. `OrderingApiFactory`, `CreateClientAs`, the `Test*` fixtures, `Prices`, and `CountOrdersAsync` stand for helpers you would write: a factory that swaps in a test authentication handler and a seeded database, and a fake price catalog.
 
 ```csharp
 public sealed class PlaceOrderBoundaryTests(OrderingApiFactory factory) : IClassFixture<OrderingApiFactory>
 {
     [Fact]
-    public async Task Buyer_cannot_order_on_an_account_they_are_not_assigned_to()
+    public async Task Buyer_cannot_order_on_an_unassigned_account_in_their_own_tenant()
     {
+        // Contoso is in the same tenant as Alice, so only the assignment check can refuse this.
         HttpClient client = factory.CreateClientAs(TestBuyers.AliceAtNorthwind);
 
         HttpResponseMessage response = await client.PostAsJsonAsync(
-            "/api/orders", TestOrders.Valid(account: TestAccounts.Contoso));
+            "/api/orders", TestOrders.Valid(account: TestAccounts.ContosoInAlicesTenant));
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        Assert.Equal(0, await factory.CountOrdersAsync(TestAccounts.Contoso));
+        Assert.Equal(0, await factory.CountOrdersAsync(TestAccounts.ContosoInAlicesTenant));
     }
 
     [Fact]
@@ -438,12 +481,15 @@ public sealed class PlaceOrderBoundaryTests(OrderingApiFactory factory) : IClass
 Also cover:
 
 - A body containing `tenantId`, `placedByUserId`, `unitPrice`, or `total`, each rejected, or, if you allow unknown members, ignored, with the stored order showing the server's values.
+- An account ID from another tenant, tested separately from the same-tenant assignment case.
 - A route or header tenant that differs from the principal's tenant.
-- A shipping address that exists but belongs to another account in the same tenant.
+- A shipping address that exists but belongs to another account in the same tenant, which must get the same `404` as a foreign account.
 - A buyer removed from an account after their token was issued, using that token.
 - The same request from a buyer who *is* assigned, which must succeed. A boundary that refuses everyone passes every negative test.
-- Zero, negative, and very large quantities, an empty line list, and duplicate SKUs.
-- A token whose `email` claim matches an assigned buyer but whose `sub` does not, which must be refused.
+- Zero, negative, and very large quantities, an empty line list, a `null` line, a blank SKU, and SKUs that differ only in case.
+- A missing `expectedTotal` or an empty account ID, each a `400`, not a `409` or a `404`.
+- The same request sent twice with one idempotency key, which must create one order.
+- A token whose `email` claim matches an assigned buyer but whose subject does not, which must be refused.
 
 ---
 
@@ -476,31 +522,33 @@ Also cover:
 **The request type**
 
 1. Is the request bound to a DTO that contains only selectors, caller-owned input, and preconditions, never to an entity?
-2. Is there no identity, tenant, status, price, total, or limit field that the server reads as a fact?
-3. Is the handling of unknown JSON members a deliberate choice, with safety that does not depend on it?
+2. Is there no identity, tenant, status, price, total, or limit field that the server reads as a fact, except as a compared precondition?
+3. Are missing values, `null` elements, and default `Guid` or numeric values rejected rather than silently used?
+4. Is the handling of unknown JSON members a deliberate choice, with safety that does not depend on it, and are rejections logged or counted?
 
 **Identity and claims**
 
-4. Do the user and tenant come only from the validated principal?
-5. Are authorization decisions keyed on stable identifiers such as `sub`, or `oid` with `tid`, never on `email` or other editable claims?
-6. Does every claim added by claims transformation, a gateway, or middleware come from a source that the caller cannot set?
+5. Do the user and tenant come only from the validated principal, with the token validation settings deliberately configured?
+6. Are authorization decisions keyed on stable identifiers, such as `iss` with `sub`, or `tid` with `oid` in Microsoft Entra ID, never on `email` or other editable claims?
+7. Does every claim added by claims transformation, a gateway, or middleware come from a source that the caller cannot set?
 
 **Selectors**
 
-7. Is every identifier in the request, including nested and child identifiers, resolved to a record that this caller may use?
-8. Is the tenant scope taken from the principal, with no "no tenant means all tenants" path?
-9. Do route, query, and header values get the same treatment as body values?
-10. Is the response for "not found" and "not yours" a deliberate, consistent choice?
+8. Is every identifier in the request, including nested and child identifiers, resolved to a record that this caller may use?
+9. Is the tenant scope taken from the principal, with no "no tenant means all tenants" path?
+10. Do route, query, and header values get the same treatment as body values?
+11. Is the response for "not found" and "not yours" a deliberate choice, applied the same way to every selector?
 
 **Facts and preconditions**
 
-11. Are server-owned facts computed or looked up on the server, every time?
-12. Where the client sends its copy of a server-owned value, is it only compared, with a conflict response when it differs?
+12. Are server-owned facts computed or looked up on the server, every time?
+13. Where the client sends its copy of a server-owned value, is it only compared, under a stated rounding rule, with a conflict response when it differs?
+14. Is the gap between the checks and the commit either accepted in writing or closed with a conditional write, a concurrency token, or a quote, and are retries protected by an idempotency key?
 
 **Proportion and tests**
 
-13. Does each resource cost one scoped read, rather than one read per field?
-14. Do integration tests cover a foreign account, a foreign child ID, a smuggled server-owned field, a stale precondition, and the allowed case?
+15. Is each resource read once with its scope in the predicate, rather than once per field?
+16. Do integration tests cover a foreign account in the same tenant and in another tenant, a foreign child ID, a smuggled server-owned field, a missing precondition, a stale precondition, and the allowed case?
 
 ---
 
@@ -526,8 +574,4 @@ When the input comes from a language model rather than a person, [Typed AI Propo
 
 ## The Short Answer
 
-A validated token answers one question well: who sent this request, according to an issuer you trust. Rely on it for that. Do not let it vouch for anything else in the request.
-
-Sort each value by who owns it. Identity comes from the principal. Selectors are resolved and checked against what this caller may use, every one of them. Caller-owned input is validated and then believed. Server-owned facts are computed on the server, and the client's copy of one is a precondition to compare. Hints stay hints unless infrastructure you configured vouches for them.
-
-For most endpoints, that means a narrow DTO, a validator, one scoped query per resource, and no field the caller can use to set what the server owns. The rest is the work you were already doing, in the right place.
+A validated token tells you which subject a trusted issuer vouched for. Rely on it for that, and for nothing else in the request. Identity comes from the principal. Every selector is resolved and checked against what this caller may use. Caller-owned input is validated and then believed. Server-owned facts are computed on the server, and the client's copy is only compared. For most endpoints, that is a narrow DTO, a validator, and one scoped query per resource: the work you were already doing, in the right place.
