@@ -668,7 +668,8 @@ Lead to Policy Versioning and Decision Provenance for policy drift, Scoped Capab
 ### 20. Passing Authentication Does Not Make Input Trustworthy
 
 - **Priority:** P1
-- **Implementation issue:** Not opened
+- **Implementation issue:** Not opened; published directly from this backlog entry
+- **Publication:** [Published November 7, 2026](../docs/articles/2026/authentication-does-not-make-input-trustworthy.md)
 - **Permanent slug:** `authentication-does-not-make-input-trustworthy`
 
 #### Reader / search problem

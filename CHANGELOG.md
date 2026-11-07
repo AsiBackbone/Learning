@@ -6,6 +6,10 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+### Added
+
+- Published [Passing Authentication Does Not Make Input Trustworthy](docs/articles/2026/authentication-does-not-make-input-trustworthy.md), a standalone article on why a valid token establishes who sent an ASP.NET Core request without making its identifiers, tenant values, prices, or status true. It follows five disputed orders on a hypothetical wholesale ordering API, all authenticated, and classifies them as malformed, stale, unauthorized, cross-tenant, and adversarial input. It sorts request values into identity, selectors, caller-owned input, server-owned facts, and hints. It maps each concern to binding and validation, authentication, resource-based authorization, systems of record, business rules, or preconditions. It rebuilds the endpoint with a narrow DTO, optional rejection of unmapped JSON members, a validator, one tenant- and assignment-scoped query, server-side pricing, and the client's total as a `409` precondition. It also explains which token claims are suitable for authorization, applies the same sort to internal services, webhooks, and AI tool calls, and states when ordinary validation and a caller-scoped query are enough.
+
 ## [1.5.0] - 2026-11-07
 
 ### Changed
