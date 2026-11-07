@@ -68,7 +68,7 @@ In this article, the **caller** is the principal that the accepted credential re
 
 When a properly configured JWT bearer handler accepts an access token, it has verified the token's signature against trusted signing keys, and checked that the issuer is one it expects, that the audience is this API, and that the token is currently valid under its lifetime claims and the configured clock skew. In `TokenValidationParameters`, issuer, audience, and lifetime validation are on by default, and signed tokens are required. Each can still be relaxed, replaced by a custom validator, or misconfigured. Review the effective settings and test them against the tokens your API accepts. Set them explicitly where that makes the intended contract clearer. The claims inside the token are what that issuer asserted when it issued it. That is a real and useful guarantee:
 
-- **The token identifies the subject the issuer says it represents.** In generic OpenID Connect, the stable key is the issuer (`iss`) with the subject (`sub`). In Microsoft Entra ID, it is the tenant ID (`tid`) with the object ID (`oid`). These are the issuer's statements about whom the token represents, as your claim mapping exposes them. Your code can rely on them without a database read.
+- **The token identifies the subject the issuer says it represents.** In generic OpenID Connect, the stable key is the issuer (`iss`) with the subject (`sub`). In Microsoft Entra ID, it is the tenant ID (`tid`) with the object ID (`oid`). These are the issuer's statements about whom the token represents, as your claim mapping exposes them. Your code needs no database read to rely on what the issuer asserted. Mapping that external identity to your own buyer or tenant records may still need a lookup.
 - **Issuer-assigned claims are the issuer's statements.** Application roles issued from an administratively controlled assignment can support coarse authorization, according to the issuer's documented semantics, as of the token's issue time.
 
 It does not establish anything else:
@@ -118,7 +118,7 @@ Applied to the original `Order` entity:
 | Field | Kind | Treatment |
 | --- | --- | --- |
 | `PlacedByUserId` | Identity | From the validated principal: `tid` with `oid` in Microsoft Entra ID, or `iss` with `sub` in generic OpenID Connect. The original check compared the body with the token and then ignored everything else. |
-| `TenantId` | Identity | Resolved on the server from the validated principal, through a mapping table from the identity tenant to an internal distributor ID, or a lookup keyed by the stable user key. The two IDs are different values. This sample assumes one Entra tenant per distributor; real deployments may map several either way. A different value in the body is a mistake or an attempt, never an instruction. |
+| `TenantId` | Identity | Resolved on the server from the validated principal, through a mapping table from the identity tenant to an internal distributor ID, or a lookup keyed by the stable user key. The handler below uses the tenant mapping. The two IDs are different values. This sample assumes one Entra tenant per distributor; real deployments may map several either way. A different value in the body is a mistake or an attempt, never an instruction. |
 | `CustomerAccountId` | Selector | Must exist in this tenant, and this buyer must be assigned to it with permission to order. |
 | `ShippingAddressId` | Selector | Must belong to *that* account. Checking only the first identifier in a request is a common gap. |
 | `Lines[].Sku` | Selector | Must exist in the catalog that applies to this account. |
@@ -169,7 +169,9 @@ public sealed record PlaceOrderRequest(
     Guid CustomerAccountId,
     Guid ShippingAddressId,
     IReadOnlyList<PlaceOrderLine?>? Lines,
-    decimal? ExpectedTotal, // Nullable, so a missing precondition is a 400, not a silent 0.
+    // Nullable, so a missing precondition is a 400, not a silent 0. Strict, because the
+    // web defaults would also accept a quoted number such as "125.00".
+    [property: JsonNumberHandling(JsonNumberHandling.Strict)] decimal? ExpectedTotal,
     string? PurchaseOrderNumber);
 
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
@@ -290,14 +292,16 @@ app.MapPost("/api/orders", async (
 
         // 2. Identity comes from the validated principal, never from the request.
         //    The user key is tid with oid in Microsoft Entra ID, or iss with sub in generic
-        //    OpenID Connect. Those identify the user, not the distributor. The resolver looks
-        //    up the Entra tid in a server-side mapping table to find the internal distributor
-        //    ID, which is a different value. It never reads the request. It returns null for
-        //    missing claims or an unmapped tenant, and the order is refused before any
-        //    account is queried.
+        //    OpenID Connect. Those identify the user, not the distributor. The resolver maps
+        //    that external key to the application's internal buyer ID, and looks up the
+        //    Entra tid in a server-side mapping table to find the internal distributor ID.
+        //    Both are different values from the claims, and neither comes from the request.
+        //    It returns null for missing claims or an unmapped tenant.
         Buyer? buyer = await buyers.ResolveAsync(user, ct);
         if (buyer is null)
         {
+            // Authentication already succeeded, so a missing application mapping is
+            // insufficient application authority: 403, not 401.
             return Results.Forbid();
         }
 
@@ -351,6 +355,7 @@ app.MapPost("/api/orders", async (
         // 6. Business rules and status belong to the domain, not to the caller.
         //    Accepted gaps in this example: no idempotency key, and the checks above are
         //    not re-enforced at commit. See "Checked at lookup, not at commit."
+        //    buyer.UserId is the internal ID from the resolver, not a raw oid or sub.
         Order order = account.PlaceOrder(
             placedBy: buyer.UserId,
             shippingAddressId: input.ShippingAddressId,
@@ -362,14 +367,16 @@ app.MapPost("/api/orders", async (
 
         return Results.Created($"/api/orders/{order.Id}", OrderResponse.From(order));
     })
-    .RequireAuthorization("orders.place"); // The policy must be registered with AddAuthorization at startup.
+    .RequireAuthorization("orders.place");
+    // At startup, register the orders.place policy with AddAuthorization, and register
+    // IBuyerResolver and IPriceCatalog with dependency injection.
 ```
 
 Walking the five incidents through it:
 
 - **Quantity `-40`** fails validation in step 1, before any query.
 - **The old customer's account ID** resolves to nothing in step 3, because the buyer is no longer assigned to it. The buyer gets `404`, and no order is created.
-- **The wrong tenant** cannot override the principal's tenant. The DTO has no `TenantId`, and the account query is scoped to the principal's tenant. With `Disallow`, the partner's request fails at binding with `400` on its first call, instead of succeeding quietly in the wrong tenant.
+- **The wrong tenant** cannot override the distributor tenant that the server resolved from the validated principal. The DTO has no `TenantId`, and the account query is scoped to `buyer.DistributorTenantId`, which came from the server-side mapping, not the request. With `Disallow`, the partner's request fails at binding with `400` on its first call, instead of succeeding quietly in the wrong tenant.
 - **Last month's prices** are never read. The server prices the order, and if the mobile app's total differs, the buyer gets `409` with the current total to confirm.
 - **`"status": "Approved"`** has nowhere to go. `account.PlaceOrder` decides the initial status from the account's credit position.
 
@@ -383,13 +390,14 @@ Each check in the handler describes what it saw when it ran. If the buyer's assi
 
 Whether that gap matters is a business decision. For many ordering systems, a few milliseconds is accepted. When the facts must still hold at commit, use the mechanism that fits where the fact lives:
 
-- **A fact in the same database**: make the order's transaction contend with the change that would invalidate it. EF Core's optimistic concurrency check applies when it updates or deletes the entity that carries the token, so inserting the order does not, by itself, compare the account's token. One protocol works like this:
-  - Inside the order's transaction, re-read each row the decision depends on, such as the assignment and the price list, under a shared row lock held until commit. For example, use `FOR SHARE` in PostgreSQL or a `HOLDLOCK` hint in SQL Server.
-  - Confirm that each row's version is still the one the decision used, and roll back if it is not. The order verifies the version. It does not change it, so concurrent orders do not block each other.
-  - Every writer that revokes an assignment or changes a price bumps that row's version.
+- **A fact in the same database**: make the order's transaction contend with the change that would invalidate it. EF Core's optimistic concurrency check applies when it updates or deletes the entity that carries the token, so inserting the order does not, by itself, compare the account's token. One general protocol:
+  1. Open an explicit transaction and keep it open through `SaveChangesAsync`.
+  2. As the last step before inserting the order, after pricing, re-read the versioned state the decision depended on, such as the assignment and the price list. Use a database-specific locking read that stops an invalidating writer from committing until this transaction ends. EF Core LINQ has no locking hint, so this is usually raw SQL. PostgreSQL's `SELECT ... FOR SHARE` is one fit. On SQL Server, choose and test the query and hints for your schema, indexes, and isolation settings.
+  3. Confirm that each version still matches the one the decision used, and roll back if it does not. The order only verifies versions, so its locking reads are compatible with other orders' locking reads.
+  4. Every writer that revokes an assignment or changes a price updates that version. If prices are stored as history rather than updated in place, the version lives on the price-list header, not on an individual historical price row.
 
-  The guarantee is that an order cannot commit against a version that a committed revocation or repricing has already replaced. A revocation that starts while an order holds its lock waits, then succeeds after the order commits. Verify this behavior on your database engine. Raising the isolation level is not a substitute. Depending on the engine, repeatable read either holds read locks (SQL Server) or works from a transaction snapshot (PostgreSQL), and serializable guarantees some serial order of the transactions. Neither states which business change should win, and both can fail with serialization or deadlock errors that need a retry.
-- **A fact owned by another service**: a server-issued quote or reservation with its own expiry, which the order consumes.
+  The guarantee is that an order cannot commit against a version that an already committed revocation or repricing has replaced. A revocation that starts while the order holds its lock waits, then succeeds after the order commits. Prove this with concurrency tests on your actual engine. Raising the isolation level is not a substitute. It does not state which business change should win, and it adds serialization or deadlock errors that need a retry.
+- **A fact owned by another service**, such as an external price catalog with no row to lock: a server-issued quote or reservation with its own expiry, which the order consumes.
 
 Retries create a separate risk: a client that times out and resends can place the same order twice. The example accepts that gap. [Your Security Check Passed. Then the World Changed.](security-check-passed-then-world-changed.md) covers the check-to-use gap in depth, and [Idempotency Does Not Prevent Authority Replay](idempotency-does-not-prevent-authority-replay.md) explains how to scope an idempotency key and what it does and does not prove.
 
@@ -404,7 +412,7 @@ So the rebuilt request keeps it, renamed `ExpectedTotal`, and the server uses it
 - Accepting the client's price lets a stale or modified client set prices.
 - Silently repricing charges the buyer an amount they never saw.
 
-Three limits apply. The comparison is exact, so the server and client must compute the total the same way: the account's currency, each line rounded to that currency's minor unit with the same midpoint rule, then summed. `ExpectedTotal` is a JSON number, not a locale-formatted string, so locale affects only how the client displays it. It checks only the grand total: two line prices can change and offset each other, and the amount sent does not prove what the buyer actually read. If the order must bind to specific lines, prices, currency, or terms, have the server issue a quote with an ID and version, and let the order reference it. Finally, returning `currentTotal` is itself an output decision. Here the buyer may already see this account's prices. Where a caller may not see the authoritative value, return the conflict without it.
+Three limits apply. The comparison is exact, so the server and client must compute the total the same way: the account's currency, each line rounded to that currency's minor unit with the same midpoint rule, then summed. `ExpectedTotal` must be a JSON number token, so a quoted or locale-formatted string is rejected, and locale affects only how the client displays the total. It checks only the grand total: two line prices can change and offset each other, and the amount sent does not prove what the buyer actually read. If the order must bind to specific lines, prices, currency, or terms, have the server issue a quote with an ID and version, and let the order reference it. Finally, returning `currentTotal` is itself an output decision. Here the buyer may already see this account's prices. Where a caller may not see the authoritative value, return the conflict without it.
 
 This follows the same idea as an `If-Match` header: the client tells the server what it believes is current, and the server refuses to act if that belief is wrong. `If-Match` compares an entity tag for the target resource and normally answers a mismatch with `412 Precondition Failed`. `If-Match` also needs an existing resource. For a create such as this one, a body precondition or a server-issued quote is the closer fit, so this example uses `409 Conflict`. Either way, the client's value is a precondition, not an input. [Your Security Check Passed. Then the World Changed.](security-check-passed-then-world-changed.md) applies the same idea to approvals that must bind to exactly what a person reviewed.
 
@@ -426,7 +434,7 @@ Once the body is handled, the remaining question is how far to trust the princip
 | Claims added by your `IClaimsTransformation` | Your code and the sources it reads | As trustworthy as those sources. A transformation that copies a request header into a claim has made the header look like identity. |
 | A user ID or role in a header set by an API gateway | The gateway, if nothing else can reach the service | Only when every request must pass through the gateway, enforced by network isolation or by mutual TLS between gateway and service, and the gateway strips any incoming copy. Stripping alone does not help a caller who can reach the service directly. |
 
-Identity claims from a validated token do not need a database read to be believed. Permission claims are a snapshot. If a removed assignment must take effect before the token expires, check the assignment at the point of use, as step 3 does, rather than trusting the token's copy.
+Stable identity claims from a validated token do not need a database read to establish what the issuer asserted. Your application may still need a lookup to map that external identity to an internal buyer, distributor, or current assignment. Permission claims are a snapshot. If a removed assignment must take effect before the token expires, check the assignment at the point of use, as step 3 does, rather than trusting the token's copy.
 
 The same applies to network facts. `X-Forwarded-For` and `X-Forwarded-Proto` are request headers that any client can send. ASP.NET Core's Forwarded Headers Middleware applies them only from [known proxies or networks](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer) that you configure. A client IP address used for rate limiting or risk scoring is only as trustworthy as that configuration.
 
@@ -437,7 +445,7 @@ The same applies to network facts. `X-Forwarded-For` and `X-Forwarded-Proto` are
 The cure for trusting everything is not to doubt everything. Most fields need no lookup at all, and the ones that do can usually be checked together.
 
 - **Caller-owned input needs boundary validation first, not lookups.** A quantity, a note, or a requested date is checked for shape and range without reading anything. Business rules may then evaluate it against authoritative state, such as stock, shipping cutoffs, or a customer-specific minimum, where the operation needs them.
-- **Identity needs no read.** The validated principal is the source.
+- **Identity needs no read to be believed.** The validated principal is the source. Translating it to internal buyer and distributor IDs is one mapping lookup, which can come from configuration, a cache, or a table.
 - **One scoped read per resource is a useful default.** Load the account with the tenant and assignment in the predicate. Existence, tenant, and permission come back in one query, and the result is the record you were going to use anyway. Authorization handlers, external policy services, and complex aggregates sometimes need more calls. The goal is to avoid redundant reads, not to hit a number.
 - **Server-owned facts are read once, where they are used.** The price catalog is called once for the whole order. It would be called whether or not the client sent prices.
 - **Child identifiers often fold into the parent's query.** The rebuilt handler checks the shipping address in the same query as the account, through the account's navigation property.
@@ -541,7 +549,7 @@ Also cover:
 - The same request from a buyer who *is* assigned, which must succeed. A boundary that refuses everyone passes every negative test.
 - Zero, negative, and very large quantities, an empty line list, a `null` line, and a blank SKU.
 - SKUs that differ only in case or surrounding whitespace, which are duplicates, and a single SKU with surrounding whitespace, which must be priced as its normalized form.
-- A missing or negative `expectedTotal`, an empty account ID, or an empty purchase-order number, each a `400`, not a `409` or a `404`.
+- A missing, negative, or quoted `expectedTotal`, an empty account ID, or an empty purchase-order number, each a `400`, not a `409` or a `404`.
 - A token whose tenant has no distributor mapping, refused with `403` before any account is queried.
 - If you add idempotency: the same request sent twice with one key must create one order, and the same key with different order details must be refused.
 - A token whose `email` claim matches an assigned buyer but whose subject does not, which must be refused.
@@ -598,7 +606,7 @@ Also cover:
 
 12. Are server-owned facts computed or looked up on the server, every time?
 13. Where the client sends its copy of a server-owned value, is it only compared, under a stated rounding rule, with a conflict response when it differs, or replaced by a server-issued quote where exact terms must bind?
-14. Is the gap between the checks and the commit either accepted in writing or closed by re-checking, under a lock held to commit, the versions the decision used, with every invalidating writer bumping them, or by a quote? Is duplicate submission on retry either accepted or handled with a scoped idempotency key?
+14. Is the gap between the checks and the commit either accepted in writing or closed by re-checking, under a lock held to commit, the versions the decision used, with every invalidating writer updating them? Where a quote binds the price and terms, is the buyer's current authorization still enforced separately? Is duplicate submission on retry either accepted or handled with a scoped idempotency key?
 
 **Proportion and tests**
 
@@ -629,4 +637,4 @@ When the input comes from a language model rather than a person, [Typed AI Propo
 
 ## The Short Answer
 
-A validated token tells you which subject a trusted issuer vouched for. Rely on it for that, and for nothing else in the request. Identity comes from the principal. Every selector is resolved and checked against what this caller may use. Caller-owned input is validated and then accepted as the caller's stated intent. Server-owned facts are computed on the server, and the client's copy is only compared. For most endpoints, that is a narrow DTO, a validator, and one scoped query per resource: the work you were already doing, in the right place.
+A validated token tells you which subject a trusted issuer vouched for. Rely on it for that, and for nothing else in the request. Identity is established from the validated principal and mapped to application identity on the server. Every selector is resolved and checked against what this caller may use. Caller-owned input is validated and then accepted as the caller's stated intent. Server-owned facts are computed on the server, and the client's copy is only compared. For most endpoints, that is a narrow DTO, a validator, and one scoped query per resource: the work you were already doing, in the right place.
