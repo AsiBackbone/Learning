@@ -18,7 +18,7 @@ x_hashtags:
 
 **Prerequisites:** No formal prerequisites. Familiarity with ASP.NET Core minimal APIs or controllers, JWT bearer authentication, and EF Core is helpful. No AsiBackbone package or prior Learning material is required.
 
-**Sample scope:** The C# targets .NET 8 or later. The entities, price catalog, validator, and test helpers are illustrative, not a runnable sample or a recommended domain model. The tests rely on helpers that are described but not shown. The scenario and its incidents are hypothetical. As with other code snippets in Learning documentation, the snippets here are also offered under the MIT License. Framework behavior is described from Microsoft's documentation as of November 2026; check the current documentation for your versions.
+**Sample scope:** The C# targets .NET 8 or later. The entities, price catalog, validator, and test helpers are illustrative, not a runnable sample or a recommended domain model. The tests rely on helpers that are described but not shown. The scenario and its incidents are hypothetical. The code snippets in this article are also offered under the MIT License, as described in the repository's [licensing terms](https://github.com/AsiBackbone/Learning/blob/main/LICENSING.md). Framework behavior is described from Microsoft's documentation as of November 2026; check the current documentation for your versions.
 
 **What this article covers:** what a validated token does and does not establish; five ways an authenticated request can still be wrong; sorting request values into identity, selectors, caller-owned input, server-owned facts, and hints; which component owns each concern in ASP.NET Core; an order endpoint rebuilt so each field is handled by its owner; why validation and authorization answer different questions; using the client's copy of a price as a precondition; which token claims can decide access; how to avoid re-reading every field; the same mistake with gateways, internal services, webhooks, and AI tool calls; and when ordinary validation is enough.
 
@@ -66,7 +66,7 @@ In this article, the **caller** is the principal that the accepted credential re
 
 ## What Authentication Actually Established
 
-When a properly configured JWT bearer handler accepts an access token, it has verified the token's signature against trusted signing keys, and checked that the issuer is one it expects, that the audience is this API, and that the token is not expired or used before its valid time, within the configured clock skew. Configure and test each of these checks for the tokens your API accepts. Do not assume the defaults cover them. The claims inside the token are what that issuer asserted when it issued it. That is a real and useful guarantee:
+When a properly configured JWT bearer handler accepts an access token, it has verified the token's signature against trusted signing keys, and checked that the issuer is one it expects, that the audience is this API, and that the token is currently valid under its lifetime claims and the configured clock skew. In `TokenValidationParameters`, issuer, audience, and lifetime validation are on by default, and signed tokens are required. Each can still be relaxed, replaced by a custom validator, or misconfigured, so set them explicitly and test them for the tokens your API accepts. The claims inside the token are what that issuer asserted when it issued it. That is a real and useful guarantee:
 
 - **The token identifies the subject the issuer says it represents.** In generic OpenID Connect, the stable key is the issuer (`iss`) with the subject (`sub`). In Microsoft Entra ID, it is the tenant ID (`tid`) with the object ID (`oid`). These are the issuer's statements about whom the token represents, as your claim mapping exposes them. Your code can rely on them without a database read.
 - **Issuer-assigned claims are the issuer's statements.** Application roles that an administrator assigned can be relied on to the extent that you trust that administrator, as of the token's issue time.
@@ -117,8 +117,8 @@ Applied to the original `Order` entity:
 
 | Field | Kind | Treatment |
 | --- | --- | --- |
-| `PlacedByUserId` | Identity | From the validated subject claim. The original check compared the body with the token and then ignored everything else. |
-| `TenantId` | Identity | From the token's tenant claim. A different value in the body is a mistake or an attempt, never an instruction. |
+| `PlacedByUserId` | Identity | From the validated principal: `tid` with `oid` in Microsoft Entra ID, or `iss` with `sub` in generic OpenID Connect. The original check compared the body with the token and then ignored everything else. |
+| `TenantId` | Identity | Resolved from the validated principal, either by a configured mapping from the identity tenant or from trusted application data. A different value in the body is a mistake or an attempt, never an instruction. |
 | `CustomerAccountId` | Selector | Must exist in this tenant, and this buyer must be assigned to it with permission to order. |
 | `ShippingAddressId` | Selector | Must belong to *that* account. Checking only the first identifier in a request is a common gap. |
 | `Lines[].Sku` | Selector | Must exist in the catalog that applies to this account. |
@@ -130,7 +130,7 @@ Applied to the original `Order` entity:
 
 Two things about this sort are easy to miss.
 
-**Caller-owned input is genuinely authoritative.** When the buyer says "twelve pallets," that is the truth about what the buyer wants. The server validates that twelve is a legal quantity. It does not need to doubt that the buyer meant twelve. Treating every value with suspicion buries the few that need it.
+**Caller-owned input is genuinely authoritative.** When the buyer says "twelve pallets," that is the caller's stated intent, and no other source is needed to establish what quantity the buyer requested. The server validates that twelve is a legal quantity. It does not need to doubt that the buyer meant twelve. Treating every value with suspicion buries the few that need it.
 
 **Where a value arrives does not change its kind.** A tenant ID in the route (`/tenants/{tenantId}/orders`), a header (`X-Tenant-Id`), or the query string is still a value the caller chose. A route parameter is not more trustworthy than a body field. If the route carries the tenant for routing, compare it with the principal's tenant and refuse a mismatch.
 
@@ -175,7 +175,8 @@ public sealed record PlaceOrderRequest(
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 public sealed record PlaceOrderLine(string? Sku, int Quantity);
 
-// What the handler works with after validation: no nulls, no defaults, SKUs normalized.
+// What the handler works with after validation: no null or default selectors, lines, or
+// total, and normalized SKUs. The purchase-order number stays optional.
 public sealed record ValidatedOrder(
     Guid CustomerAccountId,
     Guid ShippingAddressId,
@@ -190,15 +191,16 @@ A JSON body can omit any property, and it can send `null` for a nullable one. Wi
 
 The safety comes from the shape of the type. A request DTO with no `Status` property cannot set a status, whatever the JSON says. Microsoft's web API tutorial describes the same pattern as [preventing over-posting](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-web-api).
 
-`JsonUnmappedMemberHandling.Disallow` is a separate choice. By default, System.Text.Json [ignores JSON properties that have no matching member](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/missing-members), so `"status": "Approved"` would be silently dropped. That is already safe. `Disallow` makes deserialization throw a `JsonException` instead. In the standard minimal API binding pipeline that this example uses, the request then fails with `400 Bad Request` before the handler runs. If you have custom exception handling, check that it does not turn this into a `500`. The request fails, but nobody notices unless something records it, so log or count these binding failures. With that in place, both the smuggled `status` and the misconfigured integration that still sends `tenantId` show up. The cost is that a client sending a field the server does not yet know about breaks. Many teams disallow unknown members on write endpoints for public clients and allow them elsewhere. Either choice is defensible. What matters is that safety does not depend on it.
+`JsonUnmappedMemberHandling.Disallow` is a separate choice. By default, System.Text.Json [ignores JSON properties that have no matching member](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/missing-members), so `"status": "Approved"` would be silently dropped. That is already safe. `Disallow` makes deserialization throw a `JsonException` instead. In the standard minimal API request-binding path that this example assumes, the failed body binding is returned as `400 Bad Request` before the handler runs. If you have custom exception handling, check that it does not turn this into a `500`. The request fails, but nobody notices unless something records it, so log or count these binding failures. With that in place, both the smuggled `status` and the misconfigured integration that still sends `tenantId` show up. The cost is that a client sending a field the server does not yet know about breaks. Many teams disallow unknown members on write endpoints for public clients and allow them elsewhere. Either choice is defensible. What matters is that safety does not depend on it.
 
 ### Validation answers "is this a sensible request?"
 
 ```csharp
 public static class PlaceOrderValidator
 {
-    // Catalog SKUs are uppercase ASCII. The boundary trims and uppercases each SKU,
-    // and the catalog only ever receives the normalized form.
+    // This illustrative catalog matches SKUs case-insensitively after trimming. The
+    // boundary normalizes each SKU once, and the catalog only receives that form.
+    // Whether a SKU exists is still the catalog's decision.
     private static string NormalizeSku(string sku) => sku.Trim().ToUpperInvariant();
 
     public static (ValidatedOrder? Order, Dictionary<string, string[]> Errors) Validate(PlaceOrderRequest request)
@@ -215,7 +217,7 @@ public static class PlaceOrderValidator
             errors["shippingAddressId"] = ["A shipping address is required."];
         }
 
-        if (request.ExpectedTotal is not >= 0m)
+        if (request.ExpectedTotal is null or < 0m)
         {
             errors["expectedTotal"] = ["The total shown to the buyer is required and cannot be negative."];
         }
@@ -238,11 +240,12 @@ public static class PlaceOrderValidator
         }
 
         // An example business format, not a security control. The value is kept exactly as
-        // supplied: surrounding whitespace is rejected, not trimmed.
+        // supplied: surrounding whitespace is rejected, not trimmed. Omit the property, or
+        // send null, when there is no purchase-order number; an empty string is rejected.
         if (request.PurchaseOrderNumber is { } po
-            && (po.Length > 40 || po.Any(c => !char.IsAsciiLetterOrDigit(c) && c is not ('-' or '/' or '.'))))
+            && (po.Length is 0 or > 40 || po.Any(c => !char.IsAsciiLetterOrDigit(c) && c is not ('-' or '/' or '.'))))
         {
-            errors["purchaseOrderNumber"] = ["Use up to 40 ASCII letters, digits, hyphens, slashes, or periods."];
+            errors["purchaseOrderNumber"] = ["Use 1 to 40 ASCII letters, digits, hyphens, slashes, or periods."];
         }
 
         if (errors.Count > 0)
@@ -260,7 +263,7 @@ public static class PlaceOrderValidator
 }
 ```
 
-The validator returns either errors or a `ValidatedOrder`. Everything after it works with non-null values and normalized SKUs, so the rule that found duplicates is the same rule the catalog sees.
+The validator returns either errors or a `ValidatedOrder`. Everything after it works with present selectors, lines, and total, and with normalized SKUs, so the rule that found duplicates is the same rule the catalog sees.
 
 This is a hand-written validator so that the example behaves the same on every supported version. On controllers, DataAnnotations with `[ApiController]` return an automatic `400`. On minimal APIs, built-in DataAnnotations validation arrived in .NET 10 and is opt-in through `builder.Services.AddValidation()`. On .NET 8 and 9, use an explicit validator like this one, an endpoint filter, or a validation library. None of these consult the database or the user. They only decide whether the request makes sense on its own.
 
@@ -283,8 +286,11 @@ app.MapPost("/api/orders", async (
         }
 
         // 2. Identity comes from the validated principal, never from the request.
-        //    In Microsoft Entra ID this reads tid and oid; for generic OpenID Connect it
-        //    would read iss and sub. It fails if either claim is missing.
+        //    The user key is tid with oid in Microsoft Entra ID, or iss with sub in generic
+        //    OpenID Connect. Those identify the user, not the distributor. This sample assumes
+        //    a configured one-to-one mapping from the Entra tenant to the distributor tenant;
+        //    otherwise, resolve the distributor from trusted application data. Missing claims
+        //    or an unmapped tenant are refused here, before any account is queried.
         Buyer buyer = Buyer.FromPrincipal(user);
 
         // 3. Selectors become records, scoped to what this buyer may use. Tenant, existence,
@@ -310,8 +316,8 @@ app.MapPost("/api/orders", async (
         CustomerAccount account = match.Account;
 
         // 4. Server-owned facts: prices from the catalog that applies to this account today.
-        //    PriceAsync owns rounding: it rounds the total to the currency's minor unit,
-        //    using the same documented rule the client uses for display.
+        //    PriceAsync owns rounding. Its contract rounds the total to the currency's minor
+        //    unit with MidpointRounding.AwayFromZero, the rule the client also uses for display.
         PricedOrder priced = await prices.PriceAsync(account, input.Lines, ct);
 
         if (priced.UnknownSkus.Count > 0)
@@ -363,11 +369,11 @@ Returning `404` for an account or address the buyer may not use is a choice. It 
 
 ### Checked at lookup, not at commit
 
-Each check in the handler describes what it saw when it ran. If the buyer's assignment is revoked, or a price changes, after step 3 or step 4 but before `SaveChangesAsync`, the order is still created on the strength of facts that are no longer true. Wrapping the handler in a transaction does not change that by itself. Under read-committed isolation, the default in SQL Server and PostgreSQL, rows read earlier can still change before the commit.
+Each check in the handler describes what it saw when it ran. If the buyer's assignment is revoked, or a price changes, after step 3 or step 4 but before `SaveChangesAsync`, the order is still created on the strength of facts that are no longer true. Wrapping the handler in a transaction does not change that by itself. Under read-committed isolation, rows read earlier can still change before the commit.
 
 Whether that gap matters is a business decision. For many ordering systems, a few milliseconds is accepted. When the facts must still hold at commit, use the mechanism that fits where the fact lives:
 
-- **A fact in the same database**: the write itself must enforce the version you read. EF Core checks a concurrency token only when it updates or deletes the entity that carries it, so inserting an order does not check the account's token. Either make the transaction also update the rows the decision depends on, conditionally on their version, or use repeatable-read or serializable isolation for that transaction.
+- **A fact in the same database**: the write must enforce the version you read, and the change that revokes or reprices must contend with it. EF Core's optimistic concurrency check applies when it updates or deletes the entity that carries the token. Inserting the order does not, by itself, compare the account's token. One protocol is for the order transaction to change a version column on the assignment or price-list row, conditionally on the version it read, using a conditional SQL update or a real property change. A no-op update is skipped. Revocation and repricing then update the same version, so whichever commits second fails. Stricter isolation levels are not a shortcut. Repeatable read can keep working from an older snapshot, and serializable guarantees only some serial order, which may place the order before the revocation. Both can also fail with serialization or deadlock errors that need a retry.
 - **A fact owned by another service**: a server-issued quote or reservation with its own expiry, which the order consumes.
 
 Retries create a separate risk: a client that times out and resends can place the same order twice. The example accepts that gap. [Your Security Check Passed. Then the World Changed.](security-check-passed-then-world-changed.md) covers the check-to-use gap in depth, and [Idempotency Does Not Prevent Authority Replay](idempotency-does-not-prevent-authority-replay.md) explains how to scope an idempotency key and what it does and does not prove.
@@ -398,7 +404,8 @@ Once the body is handled, the remaining question is how far to trust the princip
 | Claim | Where its value comes from | Suitable for authorization? |
 | --- | --- | --- |
 | Generic OpenID Connect: `iss` with `sub`. Microsoft Entra ID: `tid` with `oid`. | The issuer's stable identifier for the subject. A `sub` is unique only within its issuer, and in Entra ID it is also specific to the application. | Yes. This pair is the identity to key on, within the scope the issuer defines. |
-| Application roles, scopes, or groups from an administratively controlled assignment | Administrative assignment, as of issue time | Yes, for coarse permission, subject to token freshness, the issuer's claim semantics, and any group-overage handling the platform requires |
+| Application roles or groups from an administratively controlled assignment | Administrative assignment, as of issue time | Yes, for coarse permission, subject to token freshness, the issuer's claim semantics, and any group-overage handling the platform requires |
+| Delegated scopes, such as `scp` in Microsoft Entra ID | Consent for what the client may do on the user's behalf | As a limit on the client, yes. They do not by themselves prove that the user holds the underlying permission. |
 | `email`, `preferred_username`, `upn`, `unique_name` | Often editable by tenant administrators, and sometimes by users | No. Microsoft's guidance on [validating claims](https://learn.microsoft.com/en-us/entra/identity-platform/claims-validation) explicitly warns against using these to decide access. |
 | Custom claims mapped from profile attributes | Whoever can edit that attribute, possibly the user | Only if you know who can write the attribute |
 | Claims added by your `IClaimsTransformation` | Your code and the sources it reads | As trustworthy as those sources. A transformation that copies a request header into a claim has made the header look like identity. |
@@ -428,9 +435,9 @@ In the rebuilt endpoint, every query would exist even if the client were perfect
 
 The habit applies wherever an authenticated party sends data, not only to users.
 
-**Internal services.** A service authenticated with a workload identity or mutual TLS sends `{"onBehalfOfUserId": "u-17", "tenantId": "t-4"}`. The accepted credential identifies the workload the issuer says it represents. With mutual TLS or another sender-constrained credential, you also gain stronger assurance that this workload presented it. The user and tenant inside the payload are that service's assertion. Whether to accept them is a decision about how much you trust that service, and it should be written down rather than implied by "it's internal." Where the downstream service needs the user's own authority, delegation protocols such as On-Behalf-Of carry it in a token the issuer signs, rather than in a field the caller writes.
+**Internal services.** A service authenticated with a workload identity or mutual TLS sends `{"onBehalfOfUserId": "u-17", "tenantId": "t-4"}`. A workload token identifies the workload its issuer says it represents. With mutual TLS, the identity comes instead from the client certificate, validated against a certificate authority you trust, and you also gain stronger assurance about who presented it. The user and tenant inside the payload are that service's assertion. Whether to accept them is a decision about how much you trust that service, and it should be written down rather than implied by "it's internal." Where the downstream service needs the user's own authority, delegation protocols such as On-Behalf-Of carry it in a token the issuer signs, rather than in a field the caller writes.
 
-**Webhooks.** A correctly verified signature shows that the payload was signed with the provider's configured key or secret and was not altered afterward. It does not show that the event is fresh or unique, that the payload is the latest state, that it has not been delivered before, or that it refers to an object in your tenant. If the provider signs a timestamp, reject deliveries outside a short tolerance. Treat event identifiers as selectors, de-duplicate deliveries, since a replay inside the tolerance window is still possible, and look up current state from the provider when the decision matters.
+**Webhooks.** A correctly verified signature shows that the payload was signed with the provider's configured key or secret and was not altered afterward. It does not show that the event is fresh or unique, that the payload is the latest state, that it has not been delivered before, or that it refers to an object in your tenant. If the provider signs a timestamp, reject deliveries outside a short tolerance. A replay inside that window is still possible, so de-duplicate deliveries by event identifier as well. Treat event identifiers as selectors, and look up current state from the provider when the decision matters.
 
 **AI tool calls.** When a model produces arguments for a tool, the session may be authenticated as a real user, and the arguments are still proposals. They are selectors and caller-owned input at best, and they never establish identity, tenant, or permission. [Typed AI Proposed Intent and Schema-Validation Boundaries](../../ai-integration/typed-ai-proposed-intent-and-schema-validation-boundaries.md) applies this field-by-field sort to model output.
 
@@ -519,7 +526,8 @@ Also cover:
 - The same request from a buyer who *is* assigned, which must succeed. A boundary that refuses everyone passes every negative test.
 - Zero, negative, and very large quantities, an empty line list, a `null` line, and a blank SKU.
 - SKUs that differ only in case or surrounding whitespace, which are duplicates, and a single SKU with surrounding whitespace, which must be priced as its normalized form.
-- A missing or negative `expectedTotal`, or an empty account ID, each a `400`, not a `409` or a `404`.
+- A missing or negative `expectedTotal`, an empty account ID, or an empty purchase-order number, each a `400`, not a `409` or a `404`.
+- A token whose tenant has no distributor mapping, refused before any account is queried.
 - If you add idempotency: the same request sent twice with one key must create one order, and the same key with different order details must be refused.
 - A token whose `email` claim matches an assigned buyer but whose subject does not, which must be refused.
 
@@ -575,7 +583,7 @@ Also cover:
 
 12. Are server-owned facts computed or looked up on the server, every time?
 13. Where the client sends its copy of a server-owned value, is it only compared, under a stated rounding rule, with a conflict response when it differs, or replaced by a server-issued quote where exact terms must bind?
-14. Is the gap between the checks and the commit either accepted in writing or closed by a write that enforces the versions it read, a stricter isolation level, or a quote? Is duplicate submission on retry either accepted or handled with a scoped idempotency key?
+14. Is the gap between the checks and the commit either accepted in writing or closed by a write that enforces the versions it read and contends with the change that would invalidate them, or by a quote? Is duplicate submission on retry either accepted or handled with a scoped idempotency key?
 
 **Proportion and tests**
 
