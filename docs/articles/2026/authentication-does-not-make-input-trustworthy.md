@@ -298,12 +298,13 @@ app.MapPost("/api/orders", async (
         //    that external key to the application's internal buyer ID, and looks up the
         //    Entra tid in a server-side mapping table to find the internal distributor ID.
         //    Both are different values from the claims, and neither comes from the request.
-        //    It returns null for missing claims or an unmapped tenant.
+        //    It returns null when the internal mapping is missing, or, as a fallback, when
+        //    the principal lacks the required claims.
         Buyer? buyer = await buyers.ResolveAsync(user, ct);
         if (buyer is null)
         {
-            // Authentication already succeeded, so a missing application mapping is
-            // insufficient application authority: 403, not 401.
+            // The caller is authenticated but has no internal application mapping: 403.
+            // Permission to order on a particular account is checked in step 3.
             return Results.Forbid();
         }
 
@@ -374,7 +375,7 @@ app.MapPost("/api/orders", async (
     // IBuyerResolver and IPriceCatalog with dependency injection.
 ```
 
-If the claims required to establish a valid principal are absent, reject the credential during authentication. The resolver's 403 is for an authenticated external identity that lacks the internal application mapping or authority required to order.
+Where authentication is configured to reject a token that lacks the required identity claims, for example in the JWT bearer handler's token validation, that request fails with `401` and never reaches the handler. The resolver's `403` is for an authenticated external identity with no internal buyer or distributor mapping. It is also the fallback if a principal without the required claims reaches the handler. Whether the buyer may order on a particular account is a separate question, answered in step 3, and a buyer without that permission gets `404`, not `403`.
 
 Walking the five incidents through it:
 
@@ -396,12 +397,12 @@ Whether that gap matters is a business decision. For many ordering systems, a fe
 
 - **A fact in the same database**: make the order's transaction contend with the change that would invalidate it. EF Core's optimistic concurrency check applies when it updates or deletes the entity that carries the token, so inserting the order does not, by itself, compare the account's token. One general protocol:
   1. Open an explicit transaction, and keep that same transaction open through the locking reads and `SaveChangesAsync`, then call `CommitAsync`.
-  2. As the last step before inserting the order, after pricing, re-read the versioned state the decision depended on, such as the assignment and the price list. Use a database-specific locking read that stops an invalidating writer from committing until this transaction ends. EF Core LINQ has no locking hint, so this is usually raw SQL. PostgreSQL's `SELECT ... FOR SHARE` is one fit. On SQL Server, choose and test the query and hints for your schema, indexes, and isolation settings.
+  2. As the last step before inserting the order, after pricing, re-read the versioned state the decision depended on, such as the assignment and the price list. Use a database-specific locking read that stops an invalidating writer from committing until this transaction ends. EF Core LINQ has no locking hint, so this is usually raw SQL. In PostgreSQL, `SELECT ... FOR SHARE` is one fit. In SQL Server, one starting point is a read `WITH (HOLDLOCK, ROWLOCK)`, which takes serializable-level shared locks for that statement and holds them until the transaction ends. SQL Server may still lock a range or escalate, depending on indexes and lock escalation. In either engine, confirm with a concurrency test that an invalidating update waits and other orders do not.
   3. Confirm that each version still matches the one the decision used, and roll back if it does not. The order only verifies versions, so its locking reads are compatible with other orders' locking reads.
   4. Every writer that revokes an assignment or changes a price updates that version. If prices are stored as history rather than updated in place, the version lives on the price-list header, not on an individual historical price row.
 
   When every invalidating writer follows this protocol, and the locks you chose have the conflict behavior you verified, an order cannot commit against a version that an already committed revocation or repricing has replaced. A revocation that starts while the order holds its lock waits, then succeeds after the order commits. Prove this with concurrency tests on your actual engine. Raising the isolation level is not a substitute. It does not state which business change should win, and it adds serialization or deadlock errors that need a retry.
-- **A fact owned by another service**, such as an external price catalog with no row to lock: a server-issued quote or reservation with its own expiry, which the order consumes.
+- **A fact owned by another service**, such as an external price catalog with no row to lock: a server-issued quote or reservation with its own expiry, which the order consumes. A quote binds price and terms, not permission. When consuming it, verify that it belongs to this buyer and account and has not expired, and re-check the buyer's assignment at that moment, rather than relying on the authorization that existed when the quote was issued.
 
 Retries create a separate risk: a client that times out and resends can place the same order twice. The example accepts that gap. [Your Security Check Passed. Then the World Changed.](security-check-passed-then-world-changed.md) covers the check-to-use gap in depth, and [Idempotency Does Not Prevent Authority Replay](idempotency-does-not-prevent-authority-replay.md) explains how to scope an idempotency key and what it does and does not prove.
 
@@ -416,7 +417,7 @@ So the rebuilt request keeps it, renamed `ExpectedTotal`, and the server uses it
 - Accepting the client's price lets a stale or modified client set prices.
 - Silently repricing charges the buyer an amount they never saw.
 
-Three limits apply. The comparison is exact, so the server and client must compute the total the same way: the account's currency, each line rounded to that currency's minor unit with the same midpoint rule, then summed. `ExpectedTotal` must be a JSON number token, so a quoted or locale-formatted string is rejected, and locale affects only how the client displays the total. It checks only the grand total: two line prices can change and offset each other, and the amount sent does not prove what the buyer actually read. If the order must bind to specific lines, prices, currency, or terms, have the server issue a quote with an ID and version, and let the order reference it. Finally, returning `currentTotal` is itself an output decision. Here the buyer may already see this account's prices. Where a caller may not see the authoritative value, return the conflict without it.
+Three limits apply. The comparison is exact, so the server and client must compute the total the same way: the account's currency, each line rounded to that currency's minor unit with the same midpoint rule, then summed. A JSON number is culture-independent whether or not `Strict` is set, so locale affects only how the client displays the total. `Strict` is this endpoint's contract choice to accept only a number token, so a quoted value such as `"125.00"` is rejected. It checks only the grand total: two line prices can change and offset each other, and the amount sent does not prove what the buyer actually read. If the order must bind to specific lines, prices, currency, or terms, have the server issue a quote with an ID and version, and let the order reference it. Finally, returning `currentTotal` is itself an output decision. Here the buyer may already see this account's prices. Where a caller may not see the authoritative value, return the conflict without it.
 
 This follows the same idea as an `If-Match` header: the client tells the server what it believes is current, and the server refuses to act if that belief is wrong. `If-Match` compares an entity tag for the target resource and normally answers a mismatch with `412 Precondition Failed`. `If-Match` also needs an existing resource. For a create such as this one, a body precondition or a server-issued quote is the closer fit, so this example uses `409 Conflict`. Either way, the client's value is a precondition, not an input. [Your Security Check Passed. Then the World Changed.](security-check-passed-then-world-changed.md) applies the same idea to approvals that must bind to exactly what a person reviewed.
 
@@ -555,6 +556,7 @@ Also cover:
 - SKUs that differ only in case or surrounding whitespace, which are duplicates, and a single SKU with surrounding whitespace, which must be priced as its normalized form.
 - A missing, negative, or quoted `expectedTotal`, an empty account ID, or an empty purchase-order number, each a `400`, not a `409` or a `404`.
 - A token whose tenant has no distributor mapping, refused with `403` before any account is queried.
+- A token missing the required identity claims: `401` if your authentication configuration rejects it, otherwise the resolver's `403` fallback. Test whichever your configuration produces.
 - If you add idempotency: the same request sent twice with one key must create one order, and the same key with different order details must be refused.
 - A token whose `email` claim matches an assigned buyer but whose subject does not, which must be refused.
 
