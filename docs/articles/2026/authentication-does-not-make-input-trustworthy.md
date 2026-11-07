@@ -68,7 +68,7 @@ In this article, the **caller** is the principal that the accepted credential re
 
 When a properly configured JWT bearer handler accepts an access token, it has verified the token's signature against trusted signing keys, and checked that the issuer is one it expects, that the audience is this API, and that the token is currently valid under its lifetime claims and the configured clock skew. In `TokenValidationParameters`, issuer, audience, and lifetime validation are on by default, and signed tokens are required. Each can still be relaxed, replaced by a custom validator, or misconfigured. Review the effective settings and test them against the tokens your API accepts. Set them explicitly where that makes the intended contract clearer. The claims inside the token are what that issuer asserted when it issued it. That is a real and useful guarantee:
 
-- **The token identifies the subject the issuer says it represents.** In generic OpenID Connect, the stable key is the issuer (`iss`) with the subject (`sub`). In Microsoft Entra ID, it is the tenant ID (`tid`) with the object ID (`oid`). These are the issuer's statements about whom the token represents, as your claim mapping exposes them. Your code needs no database read to rely on what the issuer asserted. Mapping that external identity to your own buyer or tenant records may still need a lookup.
+- **The token identifies the subject the issuer says it represents.** In generic OpenID Connect, the stable key is the issuer (`iss`) with the subject (`sub`). In Microsoft Entra ID, it is the tenant ID (`tid`) with the object ID (`oid`). These are the issuer's statements about whom the token represents, as your claim mapping exposes them. By default, `JwtBearerOptions.MapInboundClaims` is `true`, so the JWT bearer handler renames some claims. For example, `sub` usually arrives as `ClaimTypes.NameIdentifier`, so code that reads the raw `"sub"` name finds nothing. Either set `MapInboundClaims = false` and read the issuer's claim names, or read the mapped claim types consistently, and test whichever you choose with a real token. Your code needs no database read to rely on what the issuer asserted. Mapping that external identity to your own buyer or tenant records may still need a lookup.
 - **Issuer-assigned claims are the issuer's statements.** Application roles issued from an administratively controlled assignment can support coarse authorization, according to the issuer's documented semantics, as of the token's issue time.
 
 It does not establish anything else:
@@ -298,6 +298,7 @@ app.MapPost("/api/orders", async (
         //    that external key to the application's internal buyer ID, and looks up the
         //    Entra tid in a server-side mapping table to find the internal distributor ID.
         //    Both are different values from the claims, and neither comes from the request.
+        //    It reads claim types that match the host's JWT claim mapping (MapInboundClaims).
         //    It returns null when the internal mapping is missing, or, as a fallback, when
         //    the principal lacks the required claims.
         Buyer? buyer = await buyers.ResolveAsync(user, ct);
@@ -441,7 +442,12 @@ Once the body is handled, the remaining question is how far to trust the princip
 
 Stable identity claims from a validated token do not need a database read to establish what the issuer asserted. Your application may still need a lookup to map that external identity to an internal buyer, distributor, or current assignment. Permission claims are a snapshot. If a removed assignment must take effect before the token expires, check the assignment at the point of use, as step 3 does, rather than trusting the token's copy.
 
-The same applies to network facts. `X-Forwarded-For` and `X-Forwarded-Proto` are request headers that any client can send. ASP.NET Core's Forwarded Headers Middleware applies them only from [known proxies or networks](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer) that you configure. A client IP address used for rate limiting or risk scoring is only as trustworthy as that configuration.
+The same applies to network facts. `X-Forwarded-For` and `X-Forwarded-Proto` are request headers that any client can send. ASP.NET Core's Forwarded Headers Middleware is meant to apply them only from [known proxies or networks](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer) that you configure, and that guarantee has conditions:
+
+- **Patch level.** Before ASP.NET Core 8.0.17 and 9.0.6, when `X-Forwarded-For` processing was not enabled, the middleware accepted `X-Forwarded-Proto`, `X-Forwarded-Host`, and `X-Forwarded-Prefix` from any source. Microsoft's [security-hardening change](https://learn.microsoft.com/en-us/aspnet/core/breaking-changes/8/forwarded-headers-unknown-proxies) closed that gap, so stay on a patched release.
+- **Configuration.** Clearing `KnownProxies` and `KnownNetworks` (named `KnownIPNetworks` in newer releases) trusts every source again. The `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true` setting enables forwarding without restricting which proxies are accepted. Keep an allowlist of the proxies or networks that actually sit in front of the app.
+
+A client IP address used for rate limiting or risk scoring is only as trustworthy as that patch level and allowlist.
 
 ---
 
