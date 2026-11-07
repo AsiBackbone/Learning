@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Authenticated requests whose account IDs, tenant values, prices, or status fields are still untrustworthy, over-posting, and object-level authorization | [Passing Authentication Does Not Make Input Trustworthy](2026/authentication-does-not-make-input-trustworthy.md) |
 | Approvals and authorization checks that go stale before delayed execution, time-of-check to time-of-use, and which changes should invalidate a decision | [Your Security Check Passed. Then the World Changed.](2026/security-check-passed-then-world-changed.md) |
 | What identity and authority should cross from an ASP.NET Core request to a queued job or `BackgroundService` | [A Background Job Should Not Inherit Everything the User Could Do](2026/background-job-should-not-inherit-user-authority.md) |
 | Choosing which layer of a .NET application should authenticate, decide, and enforce, and covering every entry path to a side effect | [Where Should Authorization Live in a .NET Application?](2026/where-authorization-should-live-dotnet-application.md) |
@@ -53,6 +54,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Passing Authentication Does Not Make Input Trustworthy](2026/authentication-does-not-make-input-trustworthy.md)
+
+**Christopher D. Cavell** · **November 7, 2026**
+
+Every request behind five disputed orders on a wholesale ordering API carried a valid token: last month's prices from a cached mobile build, an account ID a buyer no longer had rights to, a tenant ID from a copied configuration file, a negative quantity, and a status of `Approved` added by a script. This guide separates what authentication establishes from what the rest of the request claims; sorts every value into identity, selectors, caller-owned input, server-owned facts, and hints; maps malformed, stale, unauthorized, cross-tenant, and adversarial input to the component that owns each; rebuilds the endpoint with a narrow DTO, a validator, one scoped query per resource, server-side pricing, and the client's total as a precondition; explains which token claims can decide access; and shows how little extra work most endpoints need.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/authentication-does-not-make-input-trustworthy.html`
 
 ### [Your Security Check Passed. Then the World Changed.](2026/security-check-passed-then-world-changed.md)
 

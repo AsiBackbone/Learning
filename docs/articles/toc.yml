@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: Passing Authentication Does Not Make Input Trustworthy
+  href: 2026/authentication-does-not-make-input-trustworthy.md
 - name: "Your Security Check Passed. Then the World Changed."
   href: 2026/security-check-passed-then-world-changed.md
 - name: A Background Job Should Not Inherit Everything the User Could Do
