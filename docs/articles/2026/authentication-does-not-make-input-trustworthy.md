@@ -92,7 +92,7 @@ The five incidents are different failures, and each has a different owner:
 | **Malformed** | Quantity `-40` | A client bug, or anyone | Shape and range validation at the API boundary |
 | **Stale** | Last month's prices | An old client build | Computing the price on the server, and comparing the client's copy as a precondition |
 | **Unauthorized** | The old customer's account ID | A buyer acting in good faith | Resolving the account and checking that this buyer may use it |
-| **Cross-tenant** | `TenantId` from the wrong configuration file | A misconfigured integration | Taking the tenant from the authenticated principal |
+| **Cross-tenant** | `TenantId` from the wrong configuration file | A misconfigured integration | Resolving the distributor tenant on the server from the validated external identity |
 | **Adversarial** | `"status": "Approved"` | A buyer trying to skip review | Never binding server-owned fields from the request |
 
 Only one of the five was an attack. All five were authenticated. The fix for each is the same habit: know who owns each value, and let only that owner set it.
@@ -117,7 +117,7 @@ Applied to the original `Order` entity:
 
 | Field | Kind | Treatment |
 | --- | --- | --- |
-| `PlacedByUserId` | Identity | From the validated principal: `tid` with `oid` in Microsoft Entra ID, or `iss` with `sub` in generic OpenID Connect. The original check compared the body with the token and then ignored everything else. |
+| `PlacedByUserId` | Identity | The internal buyer ID, resolved on the server from the validated principal's stable external key: `tid` with `oid` in Microsoft Entra ID, or `iss` with `sub` in generic OpenID Connect. The original check compared the body with the token and then ignored everything else. |
 | `TenantId` | Identity | Resolved on the server from the validated principal, through a mapping table from the identity tenant to an internal distributor ID, or a lookup keyed by the stable user key. The handler below uses the tenant mapping. The two IDs are different values. This sample assumes one Entra tenant per distributor; real deployments may map several either way. A different value in the body is a mistake or an attempt, never an instruction. |
 | `CustomerAccountId` | Selector | Must exist in this tenant, and this buyer must be assigned to it with permission to order. |
 | `ShippingAddressId` | Selector | Must belong to *that* account. Checking only the first identifier in a request is a common gap. |
@@ -132,7 +132,7 @@ Two things about this sort are easy to miss.
 
 **Caller-owned input is genuinely authoritative.** When the buyer says "twelve pallets," that is the caller's stated intent, and no other source is needed to establish what quantity the buyer requested. The server validates that twelve is a legal quantity. It does not need to doubt that the buyer meant twelve. Treating every value with suspicion buries the few that need it.
 
-**Where a value arrives does not change its kind.** A tenant ID in the route (`/tenants/{tenantId}/orders`), a header (`X-Tenant-Id`), or the query string is still a value the caller chose. A route parameter is not more trustworthy than a body field. If the route carries the tenant for routing, compare it with the principal's tenant and refuse a mismatch.
+**Where a value arrives does not change its kind.** A tenant ID in the route (`/tenants/{tenantId}/orders`), a header (`X-Tenant-Id`), or the query string is still a value the caller chose. A route parameter is not more trustworthy than a body field. If the route carries the application tenant for routing, compare it with the distributor tenant that the server resolved from the validated principal, and refuse a mismatch.
 
 ---
 
@@ -169,8 +169,10 @@ public sealed record PlaceOrderRequest(
     Guid CustomerAccountId,
     Guid ShippingAddressId,
     IReadOnlyList<PlaceOrderLine?>? Lines,
-    // Nullable, so a missing precondition is a 400, not a silent 0. Strict, because the
-    // web defaults would also accept a quoted number such as "125.00".
+    // Nullable, so a missing precondition is a 400 rather than a silent zero.
+    // Strict by contract: this endpoint accepts a JSON number token, not a numeric string,
+    // which the web defaults would otherwise accept. Server-side pricing, not this
+    // attribute, is what keeps the client from setting prices.
     [property: JsonNumberHandling(JsonNumberHandling.Strict)] decimal? ExpectedTotal,
     string? PurchaseOrderNumber);
 
@@ -372,6 +374,8 @@ app.MapPost("/api/orders", async (
     // IBuyerResolver and IPriceCatalog with dependency injection.
 ```
 
+If the claims required to establish a valid principal are absent, reject the credential during authentication. The resolver's 403 is for an authenticated external identity that lacks the internal application mapping or authority required to order.
+
 Walking the five incidents through it:
 
 - **Quantity `-40`** fails validation in step 1, before any query.
@@ -391,12 +395,12 @@ Each check in the handler describes what it saw when it ran. If the buyer's assi
 Whether that gap matters is a business decision. For many ordering systems, a few milliseconds is accepted. When the facts must still hold at commit, use the mechanism that fits where the fact lives:
 
 - **A fact in the same database**: make the order's transaction contend with the change that would invalidate it. EF Core's optimistic concurrency check applies when it updates or deletes the entity that carries the token, so inserting the order does not, by itself, compare the account's token. One general protocol:
-  1. Open an explicit transaction and keep it open through `SaveChangesAsync`.
+  1. Open an explicit transaction, and keep that same transaction open through the locking reads and `SaveChangesAsync`, then call `CommitAsync`.
   2. As the last step before inserting the order, after pricing, re-read the versioned state the decision depended on, such as the assignment and the price list. Use a database-specific locking read that stops an invalidating writer from committing until this transaction ends. EF Core LINQ has no locking hint, so this is usually raw SQL. PostgreSQL's `SELECT ... FOR SHARE` is one fit. On SQL Server, choose and test the query and hints for your schema, indexes, and isolation settings.
   3. Confirm that each version still matches the one the decision used, and roll back if it does not. The order only verifies versions, so its locking reads are compatible with other orders' locking reads.
   4. Every writer that revokes an assignment or changes a price updates that version. If prices are stored as history rather than updated in place, the version lives on the price-list header, not on an individual historical price row.
 
-  The guarantee is that an order cannot commit against a version that an already committed revocation or repricing has replaced. A revocation that starts while the order holds its lock waits, then succeeds after the order commits. Prove this with concurrency tests on your actual engine. Raising the isolation level is not a substitute. It does not state which business change should win, and it adds serialization or deadlock errors that need a retry.
+  When every invalidating writer follows this protocol, and the locks you chose have the conflict behavior you verified, an order cannot commit against a version that an already committed revocation or repricing has replaced. A revocation that starts while the order holds its lock waits, then succeeds after the order commits. Prove this with concurrency tests on your actual engine. Raising the isolation level is not a substitute. It does not state which business change should win, and it adds serialization or deadlock errors that need a retry.
 - **A fact owned by another service**, such as an external price catalog with no row to lock: a server-issued quote or reservation with its own expiry, which the order consumes.
 
 Retries create a separate risk: a client that times out and resends can place the same order twice. The example accepts that gap. [Your Security Check Passed. Then the World Changed.](security-check-passed-then-world-changed.md) covers the check-to-use gap in depth, and [Idempotency Does Not Prevent Authority Replay](idempotency-does-not-prevent-authority-replay.md) explains how to scope an idempotency key and what it does and does not prove.
@@ -543,7 +547,7 @@ Also cover:
 
 - A body containing `tenantId`, `placedByUserId`, `unitPrice`, or `total`, each rejected, or, if you allow unknown members, ignored, with the stored order showing the server's values.
 - An account ID from another tenant, tested separately from the same-tenant assignment case.
-- A route or header tenant that differs from the principal's tenant.
+- A route or header application-tenant value that differs from the distributor tenant the server resolved.
 - A shipping address that exists but belongs to another account in the same tenant, which must get the same `404` as a foreign account.
 - A buyer removed from an account after their token was issued, using that token.
 - The same request from a buyer who *is* assigned, which must succeed. A boundary that refuses everyone passes every negative test.
@@ -591,14 +595,14 @@ Also cover:
 
 **Identity and claims**
 
-5. Do the user and tenant come only from the validated principal, with the token validation settings deliberately configured?
+5. Does the external identity come only from the validated principal, and are internal user and tenant identifiers resolved from trusted server-side mappings?
 6. Are authorization decisions keyed on stable identifiers, such as `iss` with `sub`, or `tid` with `oid` in Microsoft Entra ID, never on `email` or other editable claims?
 7. Does every claim added by claims transformation, a gateway, or middleware come from a source that the caller cannot set?
 
 **Selectors**
 
 8. Is every identifier in the request, including nested and child identifiers, resolved to a record that this caller may use?
-9. Is the tenant scope taken from the principal, with no "no tenant means all tenants" path?
+9. Is the application tenant scope resolved on the server from the validated principal, with no request-controlled or "no tenant means all tenants" path?
 10. Do route, query, and header values get the same treatment as body values?
 11. For each selector whose existence is sensitive, do "not found" and "not yours" get the same response?
 
