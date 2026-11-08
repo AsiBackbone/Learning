@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: A Correlation ID Is Not a Distributed Audit Trail
+  href: 2026/correlation-id-is-not-distributed-audit-trail.md
 - name: Passing Authentication Does Not Make Input Trustworthy
   href: 2026/authentication-does-not-make-input-trustworthy.md
 - name: "Your Security Check Passed. Then the World Changed."
