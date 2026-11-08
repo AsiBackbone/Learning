@@ -50,7 +50,7 @@ A week later, the partner's export and a closer look at the message broker tell 
 - **The storefront decided on stale information.** The WMS recorded the pick of `S-1` at 09:13:58.9 by its own clock. The webhook reporting it reached the storefront at 09:14:06, after the decision, so the decision read `S-1` as still allocated.
 - **The refund rule had a bug.** Payments refunded the whole order when *any* hold succeeded, rather than when all of them had.
 - **The webhooks were missing from the search.** The WMS does not know the storefront's correlation ID. Its `shipment.picked` and `shipment.dispatched` events were logged under the WMS shipment reference.
-- **The trace had no spans.** This request was in the 90% that head sampling did not record, so no spans were exported for it. Its trace ID still appeared on every log line, which made it look as if there should be a trace to open.
+- **The traces had no spans.** The storefront request was in the 90% that head sampling did not record. The two worker traces, each of which made its own sampling decision, happened to be unrecorded as well. No spans were exported, yet every log line still carried a trace ID, which made it look as if there should be a trace to open.
 
 No log line was false, although several were underspecified. The correlation ID found every line it was attached to, and the team still told the wrong story. The search could not show which lines were about the same thing, what had been decided and on what facts, what the other side observed, or what happened first.
 
@@ -135,7 +135,7 @@ observed   wms-evt-88347  shipment=S-1  shipment.dispatched  wms-time=11:40:12.0
 refund     rf-3c0  corr=8c1f  cause=op-18  amount=full order
 ```
 
-The two attempts carry different trace IDs because each message was processed in its own trace, linked to the storefront's trace rather than continuing it. That is normal across a message broker, as the tracing section explains.
+The two attempts carry different trace IDs because, with this team's link-based instrumentation, each message was processed in its own trace, linked to the storefront's trace rather than continuing it. That is common across a message broker, as the tracing section explains. Instrumentation that parents single-message processing on the creation context would show one shared trace ID instead.
 
 The webhook rows carry no correlation ID from the partner. The storefront added it when it recorded them, by looking up the WMS shipment reference in its own durable mapping from partner references to shipments, and from the shipment to its order and cancellation workflow. The lookup does not depend on any operation still being open: `op-17` was already `Rejected` when the `picked` event arrived, and the `dispatched` event came hours later.
 
@@ -242,7 +242,11 @@ public async Task HandleAsync(IncomingMessage<HoldShipment> message, Cancellatio
     // If the WMS honors the idempotency key, Unknown and Sending with an expired lease
     // are claimable too. Otherwise reconciliation owns those states. Only one worker
     // can hold a valid claim. The lease must outlast the WMS call plus the result write.
-    var claim = await operations.TryClaimAsync(hold.OperationId, lease: TimeSpan.FromMinutes(2), ct);
+    var claim = await operations.TryClaimAsync(
+        hold.OperationId,
+        lease: TimeSpan.FromMinutes(2),
+        resendAfterUnknownAllowed: wms.HonorsIdempotencyKey,
+        ct);
 
     switch (claim.Status)
     {
@@ -285,14 +289,20 @@ public async Task HandleAsync(IncomingMessage<HoldShipment> message, Cancellatio
     }
     catch (Exception ex)
     {
-        // A timeout, a dropped connection, or anything else after the request may have left.
+        // A timeout, a dropped connection, cancellation, or anything else after the request may have left.
         result = WmsHoldResult.Unknown(WmsErrors.ReasonCode(ex));
     }
 
     // Records the attempt's result and the operation's next state in one transaction,
     // with a version check so that a stale writer cannot overwrite a final state.
+    // When resending is not safe, the same transaction writes an outbox row that hands
+    // an Unknown operation to reconciliation, so the handoff is durable before we acknowledge.
     // If this write fails, the exception surfaces and the message is redelivered.
-    await operations.RecordAttemptResultAsync(attempt.AttemptId, result, ct);
+    await operations.RecordAttemptResultAsync(
+        attempt.AttemptId,
+        result,
+        reconcileIfUnknown: !wms.HonorsIdempotencyKey,
+        ct);
 
     logger.LogInformation(
         "Hold attempt {AttemptId} finished {Result} with reason {ReasonCode}",
@@ -312,9 +322,12 @@ public async Task HandleAsync(IncomingMessage<HoldShipment> message, Cancellatio
             throw new HoldOutcomeUnknownException(hold.OperationId);
 
         case WmsResultKind.Unknown:
-            // Not safe to resend. Ask the WMS what happened instead.
-            await reconciliation.ScheduleAsync(hold.OperationId, ct);
+            // Not safe to resend. Reconciliation was durably queued with the result above.
             return;
+
+        default:
+            // Never acknowledge a result this handler does not understand.
+            throw new UnexpectedHoldResultException(hold.OperationId, result.Kind);
     }
 }
 ```
@@ -331,13 +344,15 @@ The operation moves through a small set of states:
 
 `NotSent` is an attempt result, not an operation state. When an attempt fails before the request could have left, `RecordAttemptResultAsync` returns the operation to `Planned` in the same transaction, so the next delivery can claim it.
 
-A worker never acknowledges a message whose operation is still unsettled, unless it has handed the operation to reconciliation. Acknowledging after `NotSent` or `Unknown` would leave nothing to try again.
+A worker never acknowledges a message whose operation is still unsettled, unless reconciliation has durably accepted the operation. Acknowledging after `NotSent` or `Unknown` would leave nothing to try again. A handoff that is only a method call after the result is saved is not durable: if that call fails and the redelivered message then finds the operation already awaiting reconciliation, the worker acknowledges it, and nothing ever reconciles it. That is why the reconciliation work item is written in the same transaction as the result.
 
-The claim is the first layer of protection against two workers calling out at once, and it holds only while the lease is valid. If a WMS call outlives its lease, another worker can claim the operation while the first request is still in flight. Set the lease above the worst-case call plus the result write, or renew it during long calls, and use fencing, such as a claim version checked on every write, where your store supports it. Even then, a local lease cannot guarantee that the external call happens exactly once. The WMS idempotency key remains a necessary second layer, not a substitute.
+Redelivery itself runs out. If a `NotSent` or `Unknown` message keeps failing until the broker dead-letters it, the operation is left `Planned` or `Unknown` with no message to move it. A dead-letter handler or a periodic recovery sweep must find operations that are not final and have no live message, and either requeue them or hand them to reconciliation. Acknowledging a message for an operation that reconciliation already owns is safe for the same reason: reconciliation and recovery scan the database, not the broker, so they do not depend on the message coming back.
+
+The claim is the first layer of protection against two workers calling out at once, and it holds only while the lease is valid. If a WMS call outlives its lease, another worker can claim the operation while the first request is still in flight. Set the lease above the worst-case call plus the result write, or renew it during long calls, and use fencing, such as a claim version checked on every write, where your store supports it. Fencing protects your own database from a stale writer. It cannot stop a request that has already been sent, unless the external system also checks the fencing token. Even then, a local lease cannot guarantee that the external call happens exactly once. The WMS idempotency key remains a necessary second layer, not a substitute.
 
 A `Sending` operation whose lease has expired is treated like `Unknown`, because the worker that held it may have sent the request before it died. Its attempt row has a start and no result. A recovery job that looks for unfinished attempts under expired leases finds these, and then either lets a later delivery resend with the same key or hands them to reconciliation. The same job catches attempts whose result write failed. "Every attempt gets an outcome" is true only once recovery has run, not at the moment of a crash.
 
-An `Unknown` outcome is not a failure. The WMS may have applied the hold before the connection dropped. A later delivery may claim the operation and send again with the same operation ID, but only if the WMS documents that it honors that idempotency key for this request. The code makes that a visible branch. Without that guarantee, an unknown outcome needs reconciliation, such as asking the WMS for the shipment's hold status, not a resend. [An Allowed Decision Does Not Mean the Operation Succeeded](allowed-decision-does-not-mean-execution-succeeded.md) covers unknown outcomes and what to do with them.
+An `Unknown` outcome is not a failure. The WMS may have applied the hold before the connection dropped. Cancellation belongs here too. An `OperationCanceledException` from shutdown, a lost lease, or an HTTP timeout does not show that the remote operation was cancelled once the request may have left, so the code records `Unknown` rather than treating cancellation as "nothing happened." If shutdown also prevents the result write, the recovery job picks up the unfinished attempt. A later delivery may claim the operation and send again with the same operation ID, but only if the WMS documents that it honors that idempotency key for this request. The code makes that a visible branch. Without that guarantee, an unknown outcome needs reconciliation, such as asking the WMS for the shipment's hold status, not a resend. [An Allowed Decision Does Not Mean the Operation Succeeded](allowed-decision-does-not-mean-execution-succeeded.md) covers unknown outcomes and what to do with them.
 
 The log lines are still there. They now name which operation and attempt they were about, and the reason code comes from the WMS response body rather than the status code alone. The durable record is the attempt row, and the log line is how an engineer finds it quickly. Duplicate deliveries for finished operations do not create attempt rows. Their log line, with message ID and delivery count in scope, is enough to show that they arrived.
 
@@ -554,7 +569,7 @@ Two more tests are worth adding. For the worker, deliver a message whose operati
 
 **12. Relying on the partner's idempotency alone.** Two workers that both see a non-final operation both call out. Claim the operation first, and treat the downstream key as a second layer.
 
-**13. Acknowledging unsettled work.** A worker that records `Unknown` or `NotSent` and then returns normally acknowledges the message, and nothing ever tries again. Redeliver, or hand the operation to reconciliation, before acknowledging.
+**13. Acknowledging unsettled work.** A worker that records `Unknown` or `NotSent` and then returns normally acknowledges the message, and nothing ever tries again. Redeliver, or durably hand the operation to reconciliation, before acknowledging, and sweep for unsettled operations whose messages were dead-lettered.
 
 ---
 
@@ -572,7 +587,7 @@ Two more tests are worth adding. For the worker, deliver a message whose operati
 5. Is the decision recorded with its reason code, policy version, and the inputs it read, including how current those inputs were?
 6. Are planned effects and their outbox messages written in the same transaction as the decision, with a message ID the relay reuses on every publish?
 7. Does the worker claim the operation before calling out, with a lease that outlasts the call or is renewed, and treat a missing operation as an error rather than a duplicate?
-8. Does the worker acknowledge a message only once its operation is final or handed to reconciliation?
+8. Does the worker acknowledge a message only once its operation is final or durably handed to reconciliation, and does a sweep catch unsettled operations whose messages were dead-lettered?
 9. Is every attempt durably recorded before the external call, given a result with the counterpart's reason code, `NotSent`, or `Unknown`, and reconciled by a recovery job if a crash or failed write left it without one?
 10. Is a resend after `Unknown` allowed only where the counterpart documents that it honors the idempotency key, with reconciliation otherwise?
 11. Are external events recorded with the partner's event ID, the partner's time, your received time, and a mapping to your identities based on stable business references?
