@@ -240,12 +240,13 @@ public async Task HandleAsync(IncomingMessage<HoldShipment> message, Cancellatio
 
     // Atomically moves the operation to Sending, under a lease, if it is Planned.
     // If the WMS honors the idempotency key, Unknown and Sending with an expired lease
-    // are claimable too. Otherwise reconciliation owns those states. Only one worker
-    // can hold a valid claim. The lease must outlast the WMS call plus the result write.
+    // are claimable too: the flag below covers both uncertain states. Otherwise reconciliation
+    // owns them. Only one worker can hold a valid claim. The lease must outlast the WMS call
+    // plus the result write.
     var claim = await operations.TryClaimAsync(
         hold.OperationId,
         lease: TimeSpan.FromMinutes(2),
-        resendAfterUnknownAllowed: wms.HonorsIdempotencyKey,
+        resendAfterUncertainAllowed: wms.HonorsIdempotencyKey,
         ct);
 
     switch (claim.Status)
@@ -352,7 +353,11 @@ The claim is the first layer of protection against two workers calling out at on
 
 A `Sending` operation whose lease has expired is treated like `Unknown`, because the worker that held it may have sent the request before it died. Its attempt row has a start and no result. A recovery job that looks for unfinished attempts under expired leases finds these, and then either lets a later delivery resend with the same key or hands them to reconciliation. The same job catches attempts whose result write failed. "Every attempt gets an outcome" is true only once recovery has run, not at the moment of a crash.
 
-An `Unknown` outcome is not a failure. The WMS may have applied the hold before the connection dropped. Cancellation belongs here too. An `OperationCanceledException` from shutdown, a lost lease, or an HTTP timeout does not show that the remote operation was cancelled once the request may have left, so the code records `Unknown` rather than treating cancellation as "nothing happened." If shutdown also prevents the result write, the recovery job picks up the unfinished attempt. A later delivery may claim the operation and send again with the same operation ID, but only if the WMS documents that it honors that idempotency key for this request. The code makes that a visible branch. Without that guarantee, an unknown outcome needs reconciliation, such as asking the WMS for the shipment's hold status, not a resend. [An Allowed Decision Does Not Mean the Operation Succeeded](allowed-decision-does-not-mean-execution-succeeded.md) covers unknown outcomes and what to do with them.
+An `Unknown` outcome is not a failure. The WMS may have applied the hold before the connection dropped. Cancellation follows the same rule, and `FailedBeforeSending` is the discriminator. Cancellation before the request could have left is `NotSent`. An `OperationCanceledException` from shutdown, a lost lease, or an HTTP timeout after the request may have left does not show that the remote operation was cancelled, so the code records `Unknown` rather than treating cancellation as "nothing happened." If shutdown also prevents the result write, the recovery job picks up the unfinished attempt.
+
+The broad `catch` that records everything else as `Unknown` is deliberately conservative for an illustration. Do not copy it as is. A production client should distinguish recognized transport ambiguity from unexpected local failures such as programming errors, keep the diagnostic detail, and still fall back to recovery when the external outcome cannot be established.
+
+A later delivery may claim the operation and send again with the same operation ID, but only if the WMS documents that it honors that idempotency key for this request. Such guarantees have a scope and a lifetime: they may depend on the endpoint, the request payload, how keys are scoped, and how long the provider retains them. The code makes the resend a visible branch. Without that guarantee, an unknown outcome needs reconciliation, such as asking the WMS for the shipment's hold status, not a resend. [An Allowed Decision Does Not Mean the Operation Succeeded](allowed-decision-does-not-mean-execution-succeeded.md) covers unknown outcomes and what to do with them.
 
 The log lines are still there. They now name which operation and attempt they were about, and the reason code comes from the WMS response body rather than the status code alone. The durable record is the attempt row, and the log line is how an engineer finds it quickly. Duplicate deliveries for finished operations do not create attempt rows. Their log line, with message ID and delivery count in scope, is enough to show that they arrived.
 
