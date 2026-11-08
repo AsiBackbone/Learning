@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "account": "jackdaw-patio",
-  "cursorSha": "74d24083e1cffed436abc9fa4fb2dd0bf156e190",
+  "cursorSha": "2070f43f9fe0a57ca6f1de7c7eae3e74baeac0b9",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
@@ -87,6 +87,11 @@
       "sourceBlobSha": "3e92d905f026613f8e97b84c33943eb4c1a791ff",
       "postId": "2119075167896744009",
       "postedAtUtc": "2026-11-07T14:31:05.372057+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/correlation-id-is-not-distributed-audit-trail.html": {
+      "sourceBlobSha": "d9b3040abc348eac173841b2d65d391b6c4d88c7",
+      "postId": "2119464433693175939",
+      "postedAtUtc": "2026-11-08T16:17:53.530343+00:00"
     }
   }
 }
