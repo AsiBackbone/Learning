@@ -700,7 +700,8 @@ Lead to Trust Boundaries and Least Privilege for authoritative-context reconstru
 ### 21. A Correlation ID Is Not a Distributed Audit Trail
 
 - **Priority:** P1
-- **Implementation issue:** Not opened
+- **Implementation issue:** Not opened; published directly from this backlog entry
+- **Publication:** [Published November 8, 2026](../docs/articles/2026/correlation-id-is-not-distributed-audit-trail.md)
 - **Permanent slug:** `correlation-id-is-not-distributed-audit-trail`
 
 #### Reader / search problem

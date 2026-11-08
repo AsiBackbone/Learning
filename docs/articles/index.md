@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Reconstructing what happened across an API, queue, worker, and webhook, correlation IDs versus trace IDs, duplicate and out-of-order delivery, and sampled traces as evidence | [A Correlation ID Is Not a Distributed Audit Trail](2026/correlation-id-is-not-distributed-audit-trail.md) |
 | Authenticated requests whose account IDs, tenant values, prices, or status fields are still untrustworthy, over-posting, and object-level authorization | [Passing Authentication Does Not Make Input Trustworthy](2026/authentication-does-not-make-input-trustworthy.md) |
 | Approvals and authorization checks that go stale before delayed execution, time-of-check to time-of-use, and which changes should invalidate a decision | [Your Security Check Passed. Then the World Changed.](2026/security-check-passed-then-world-changed.md) |
 | What identity and authority should cross from an ASP.NET Core request to a queued job or `BackgroundService` | [A Background Job Should Not Inherit Everything the User Could Do](2026/background-job-should-not-inherit-user-authority.md) |
@@ -54,6 +55,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [A Correlation ID Is Not a Distributed Audit Trail](2026/correlation-id-is-not-distributed-audit-trail.md)
+
+**Christopher D. Cavell** · **November 8, 2026**
+
+One correlation ID connected every log line behind a disputed order cancellation, and the team still told the wrong story. Two shipments read as one retry, a rejected hold read as a transient conflict, and the partner's webhooks and a sampled-out trace never appeared in the search. This guide separates what a correlation ID supports from what readers conclude from it; gives decisions, intended effects, messages, attempts, and external events their own identities; shows what the API, worker, and webhook handler should record at each handoff; handles duplicate and out-of-order delivery without trusting cross-host timestamps; treats sampled traces as navigation rather than evidence; carries identifiers without payloads, credentials, or caller-controlled authority; and shows when structured logs plus durable operation records are enough.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/correlation-id-is-not-distributed-audit-trail.html`
 
 ### [Passing Authentication Does Not Make Input Trustworthy](2026/authentication-does-not-make-input-trustworthy.md)
 
