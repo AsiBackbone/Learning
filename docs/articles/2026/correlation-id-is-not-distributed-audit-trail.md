@@ -100,7 +100,7 @@ The fix starts by giving each thing that can be decided, sent, attempted, or obs
 | **Trace ID and span ID** | Tracing, through `Activity` | One technical path and one unit of work | Where did time go on this path, if the trace was recorded? |
 | **Causation ID** | Whoever writes a record that something else led to | The record that directly led to this one | What caused this? |
 
-Not every broker has a delivery count. Azure Service Bus exposes one, Amazon SQS exposes an approximate receive count, RabbitMQ sets a redelivered flag and counts deliveries only on some queue types, and Kafka has no per-message count at all. Where the broker gives you nothing reliable, count attempts per operation in your own attempt records instead. A delivery count of 1 never proves that an operation has not been processed elsewhere, because a relay that republished a message, or a second message for the same operation, starts its own count.
+Broker delivery metadata varies by product, queue type, and version. Some brokers provide a delivery count, some only a redelivery indicator, and some nothing reliable per message. As of this writing, Azure Service Bus exposes a delivery count, and Amazon SQS an approximate receive count. RabbitMQ classic queues set a redelivered flag, while quorum queues also expose an `x-delivery-count` header. Kafka's classic consumer-group model has no per-message count. Where the broker gives you nothing reliable, count attempts per operation in your own attempt records instead. A delivery count of 1 never proves that an operation has not been processed elsewhere, because a relay that republished a message, or a second message for the same operation, starts its own count.
 
 Four relationships are hiding in that table, and a single correlation ID collapses all of them:
 
@@ -135,6 +135,8 @@ observed   wms-evt-88347  shipment=S-1  shipment.dispatched  wms-time=11:40:12.0
 refund     rf-3c0  corr=8c1f  cause=op-18  amount=full order
 ```
 
+The two attempts carry different trace IDs because each message was processed in its own trace, linked to the storefront's trace rather than continuing it. That is normal across a message broker, as the tracing section explains.
+
 The webhook rows carry no correlation ID from the partner. The storefront added it when it recorded them, by looking up the WMS shipment reference in its own durable mapping from partner references to shipments, and from the shipment to its order and cancellation workflow. The lookup does not depend on any operation still being open: `op-17` was already `Rejected` when the `picked` event arrived, and the `dispatched` event came hours later.
 
 Each question now has an answer that does not depend on inference:
@@ -143,7 +145,7 @@ Each question now has an answer that does not depend on inference:
 - **What did the decision know?** It read `S-1` as allocated, from a webhook received at 09:12:40, about 80 seconds before the decision. Policy version 4 had no rule about how fresh shipment status had to be. The recorded inputs explain why the storefront returned `Allowed` under its local policy. They do not show that the shipment state was current, or that confirming a cancellation before the WMS accepted every hold was safe. That is a design question for a different article: [Your Security Check Passed. Then the World Changed.](security-check-passed-then-world-changed.md)
 - **What did the WMS say?** It rejected the `S-1` hold because the shipment was already picked.
 - **Why was there a refund?** `rf-3c0` was caused by `op-18` alone. The refund rule fired on one held shipment out of two.
-- **Was the partner at fault?** No. `S-1` was never held.
+- **Was the partner at fault for `S-1`?** No. `S-1` was never held, and the WMS said so at the time.
 
 Notice what settles the ordering question, and what does not. The WMS clock says the pick happened at 09:13:58.9, and the storefront clock says the decision happened at 09:14:02.140. Those are readings from two clocks owned by two organizations. They suggest an order, but they do not prove one.
 
@@ -160,7 +162,9 @@ Each record should be written by the component that knows the fact, at the momen
 The decision, the operations it plans, and the outbox messages that carry them are written together. If the transaction fails, none of them exist. If it commits, the intent to send each message is durably recorded. A relay then publishes the outbox rows and retries until the broker acknowledges them, provided the relay is running, its storage is durable, and someone notices when it stalls. A relay can also crash after publishing and before marking a row as sent, so it may publish the same message again. That is why consumers must tolerate duplicates, and why the message ID is the outbox row's ID rather than a value minted at publish time.
 
 ```csharp
-// Illustrative. The decision service reads the facts it needs and returns them as recorded inputs.
+// Illustrative. correlationId was validated or generated at the edge (not shown).
+// The decision service reads the facts it needs and returns them as recorded inputs.
+// In this example, DecisionId, OperationId, and the outbox Id are all Guid values.
 await using var tx = await db.Database.BeginTransactionAsync(ct);
 
 var decision = await decisions.EvaluateCancellationAsync(order, ct);
@@ -175,6 +179,8 @@ if (decision.Outcome is not DecisionOutcome.Allowed)
 
 foreach (var shipment in order.Shipments)
 {
+    // Plan mints OperationId with Guid.NewGuid(), a random version 4 value,
+    // because it is later sent to the WMS as an idempotency key.
     var operation = HoldOperation.Plan(
         decisionId: decision.DecisionId,      // causation: the decision that planned this effect
         correlationId: correlationId,
@@ -214,13 +220,14 @@ Three details carry most of the value:
 
 ### The worker: claim, attempt, and outcome
 
-The worker first claims the operation, so that two deliveries cannot call the WMS at the same time. It then records the attempt before calling the WMS, and records the outcome, including the WMS's reason, whatever happens.
+The worker first claims the operation, so that two deliveries do not call the WMS at the same time while the claim is valid. It then records the attempt before calling the WMS, records the outcome, including the WMS's reason, and decides what happens to the message based on that outcome. The lease duration, claim rules, and acknowledgment behavior shown here are illustrative.
 
 ```csharp
 public async Task HandleAsync(IncomingMessage<HoldShipment> message, CancellationToken ct)
 {
     // In this illustrative host, returning normally acknowledges the message.
     // Throwing leaves it to the broker's redelivery and dead-letter policy.
+    // Retryable exceptions are redelivered after a delay, not immediately.
     var hold = message.Body;
 
     using var scope = logger.BeginScope(new Dictionary<string, object?>
@@ -231,8 +238,10 @@ public async Task HandleAsync(IncomingMessage<HoldShipment> message, Cancellatio
         ["DeliveryCount"] = message.DeliveryCount,   // null where the broker provides none
     });
 
-    // Atomically moves the operation to Sending, under a lease, if it is Planned, Unknown,
-    // or Sending with an expired lease. Only one worker can win the claim.
+    // Atomically moves the operation to Sending, under a lease, if it is Planned.
+    // If the WMS honors the idempotency key, Unknown and Sending with an expired lease
+    // are claimable too. Otherwise reconciliation owns those states. Only one worker
+    // can hold a valid claim. The lease must outlast the WMS call plus the result write.
     var claim = await operations.TryClaimAsync(hold.OperationId, lease: TimeSpan.FromMinutes(2), ct);
 
     switch (claim.Status)
@@ -246,9 +255,14 @@ public async Task HandleAsync(IncomingMessage<HoldShipment> message, Cancellatio
             logger.LogInformation("Hold operation is {State}; acknowledging duplicate delivery", claim.State);
             return;
 
+        case ClaimStatus.AwaitingReconciliation:
+            logger.LogInformation("Hold operation is {State}; reconciliation owns it", claim.State);
+            return;
+
         case ClaimStatus.ClaimedElsewhere:
-            // Another delivery is calling the WMS now. Try again later rather than call twice.
-            throw new OperationBusyException(hold.OperationId);
+            // Another delivery is calling the WMS now. Retry after the lease would expire
+            // rather than call twice, and size the broker's retry budget for that delay.
+            throw new OperationBusyException(hold.OperationId, retryAfter: claim.LeaseExpiresAt);
     }
 
     var attempt = await attempts.StartAsync(
@@ -277,11 +291,31 @@ public async Task HandleAsync(IncomingMessage<HoldShipment> message, Cancellatio
 
     // Records the attempt's result and the operation's next state in one transaction,
     // with a version check so that a stale writer cannot overwrite a final state.
+    // If this write fails, the exception surfaces and the message is redelivered.
     await operations.RecordAttemptResultAsync(attempt.AttemptId, result, ct);
 
     logger.LogInformation(
         "Hold attempt {AttemptId} finished {Result} with reason {ReasonCode}",
         attempt.AttemptId, result.Kind, result.ReasonCode);
+
+    switch (result.Kind)
+    {
+        case WmsResultKind.Held or WmsResultKind.Rejected:
+            return;                                    // final: acknowledge
+
+        case WmsResultKind.NotSent:
+            // Nothing reached the WMS, and the operation is Planned again. Redeliver later.
+            throw new HoldNotSentException(hold.OperationId);
+
+        case WmsResultKind.Unknown when wms.HonorsIdempotencyKey:
+            // Safe to resend with the same key on a later delivery.
+            throw new HoldOutcomeUnknownException(hold.OperationId);
+
+        case WmsResultKind.Unknown:
+            // Not safe to resend. Ask the WMS what happened instead.
+            await reconciliation.ScheduleAsync(hold.OperationId, ct);
+            return;
+    }
 }
 ```
 
@@ -289,16 +323,21 @@ The operation moves through a small set of states:
 
 | State | Meaning | Final? |
 | --- | --- | --- |
-| `Planned` | Recorded with the decision; not yet claimed | No |
+| `Planned` | Recorded with the decision, or returned here after a `NotSent` attempt; not claimed | No |
 | `Sending` | Claimed by one worker under a lease | No |
 | `Held` | The WMS confirmed the hold | Yes |
 | `Rejected` | The WMS refused, with a reason such as `shipment_already_picked` | Yes |
-| `NotSent` | The request failed before it could have left; returns to `Planned` for a later delivery | No |
 | `Unknown` | The request may have reached the WMS, but no answer came back | No |
 
-The claim is the first layer of protection against two workers calling out at once. The WMS idempotency key is a second layer, not a substitute. A `Sending` operation whose lease has expired is treated like `Unknown`, because the worker that held it may have sent the request before it died.
+`NotSent` is an attempt result, not an operation state. When an attempt fails before the request could have left, `RecordAttemptResultAsync` returns the operation to `Planned` in the same transaction, so the next delivery can claim it.
 
-An `Unknown` outcome is not a failure. The WMS may have applied the hold before the connection dropped. A later delivery may claim the operation and send again with the same operation ID, but only if the WMS documents that it honors that idempotency key for this request. Without that guarantee, an unknown outcome needs reconciliation, such as asking the WMS for the shipment's hold status, not a resend. [An Allowed Decision Does Not Mean the Operation Succeeded](allowed-decision-does-not-mean-execution-succeeded.md) covers unknown outcomes and what to do with them.
+A worker never acknowledges a message whose operation is still unsettled, unless it has handed the operation to reconciliation. Acknowledging after `NotSent` or `Unknown` would leave nothing to try again.
+
+The claim is the first layer of protection against two workers calling out at once, and it holds only while the lease is valid. If a WMS call outlives its lease, another worker can claim the operation while the first request is still in flight. Set the lease above the worst-case call plus the result write, or renew it during long calls, and use fencing, such as a claim version checked on every write, where your store supports it. Even then, a local lease cannot guarantee that the external call happens exactly once. The WMS idempotency key remains a necessary second layer, not a substitute.
+
+A `Sending` operation whose lease has expired is treated like `Unknown`, because the worker that held it may have sent the request before it died. Its attempt row has a start and no result. A recovery job that looks for unfinished attempts under expired leases finds these, and then either lets a later delivery resend with the same key or hands them to reconciliation. The same job catches attempts whose result write failed. "Every attempt gets an outcome" is true only once recovery has run, not at the moment of a crash.
+
+An `Unknown` outcome is not a failure. The WMS may have applied the hold before the connection dropped. A later delivery may claim the operation and send again with the same operation ID, but only if the WMS documents that it honors that idempotency key for this request. The code makes that a visible branch. Without that guarantee, an unknown outcome needs reconciliation, such as asking the WMS for the shipment's hold status, not a resend. [An Allowed Decision Does Not Mean the Operation Succeeded](allowed-decision-does-not-mean-execution-succeeded.md) covers unknown outcomes and what to do with them.
 
 The log lines are still there. They now name which operation and attempt they were about, and the reason code comes from the WMS response body rather than the status code alone. The durable record is the attempt row, and the log line is how an engineer finds it quickly. Duplicate deliveries for finished operations do not create attempt rows. Their log line, with message ID and delivery count in scope, is enough to show that they arrived.
 
@@ -323,7 +362,7 @@ Base the mapping on stable business identity, such as the WMS shipment reference
 
 Store both timestamps. `ExternalTime` is what the partner says. `ReceivedAt` is when your system could first have acted on it. In the incident, `ReceivedAt` was the timestamp that answered the question.
 
-Deduplicating on the partner's event ID works only if the partner guarantees that it is unique and stable across retries. Some senders issue a new event ID when they redeliver. Check the partner's contract. Where it is weak, add a second check on a business key, such as shipment, event type, and external time together.
+Deduplicating on the partner's event ID works only if the partner guarantees that it is unique and stable across retries. Some senders issue a new event ID when they redeliver. Check the partner's contract. Prefer a documented event ID or per-source sequence number wherever one exists. Where the contract is weak, a business key, such as shipment, event type, and external time together, can serve as a fallback. It is a heuristic, not an identity: two legitimate events can share those values, so be careful not to suppress them.
 
 Verify the webhook's signature or other sender authentication before recording anything from it as an observation. An unauthenticated request is a claim from anyone. If you keep a security record of rejected webhook requests, keep it minimal and separate from authenticated business observations.
 
@@ -356,7 +395,7 @@ Most brokers deliver at least once by default. Some offer at-most-once modes, an
 
 Distributed tracing is the most natural place to look for a cross-service story, and in the incident it held nothing.
 
-Tracing systems sample. With head sampling, the decision is made at the start of a trace and propagated in the `sampled` flag of the W3C `traceparent` header. The specification describes that flag as meaning the caller *may* have recorded trace data. A trace that was not sampled exports no spans, although log records written during it may still carry its trace ID, as they did here. Tail sampling, which decides after a trace completes, can keep more of the traces you care about, such as those with errors, but it is still a selection made for diagnosis. A trace that *was* kept may still be lost to exporter backpressure, collector failure, or a retention window shorter than your audit obligations. None of that is a defect. It is what makes tracing cheap enough to leave on.
+Tracing systems sample. With head sampling, the decision is made at the start of a trace and propagated in the `sampled` flag of the W3C `traceparent` header. The specification describes that flag as meaning the caller *may* have recorded trace data. A trace that was not sampled exports no spans, although log records written during it may still carry its trace ID, as they did here. Tail sampling, which decides after a trace completes, can keep more of the traces you care about, such as those with errors, but it is still a selection made for diagnosis. A trace that *was* kept may still be lost to exporter backpressure, collector failure, or a retention window shorter than your audit obligations. Sampling and bounded retention are deliberate cost tradeoffs. Export failures are undesirable but possible. Together, they mean tracing should not be the only record of what happened.
 
 So the rule from [AI Governance Observability and End-to-End Decision Tracing](../../ai-integration/ai-governance-observability-and-end-to-end-decision-tracing.md#sampling-and-the-evidence-boundary) applies to any workflow:
 
@@ -390,9 +429,9 @@ The fix in the example adds identifiers to every boundary. That raises a fair wo
 
 **Never credentials.** A bearer token in a message header becomes a credential at rest in the broker, in dead-letter queues, and in every log that dumps headers. [A Background Job Should Not Inherit Everything the User Could Do](background-job-should-not-inherit-user-authority.md) covers what should cross to a worker instead.
 
-**Caller-supplied correlation IDs are input.** If clients may send an `X-Correlation-ID` header, check its length and characters, and generate your own value when it fails. Never let it select a tenant, a user, or a record. [Secure Logging Across Trust Boundaries](../../security/secure-logging-across-trust-boundaries.md#caller-supplied-correlation-values-are-untrusted-input) gives a safe flow. The same applies to an inbound `traceparent` from the public internet. The W3C Trace Context specification's security and privacy considerations discuss restarting the trace where requests enter a trusted network, and treating authenticated and unauthenticated callers differently, because an untrusted caller can otherwise force sampling or collide with your trace IDs. Restarting at that trust boundary is a deployment choice consistent with that guidance. If you restart, you can still keep the caller's value as a link or an attribute for support purposes.
+**Caller-supplied correlation IDs are input.** If clients may send an `X-Correlation-ID` header, check its length and characters, and generate your own value when it fails. Never let it select a tenant, a user, or a record. [Secure Logging Across Trust Boundaries](../../security/secure-logging-across-trust-boundaries.md#caller-supplied-correlation-values-are-untrusted-input) gives a safe flow. The same applies to an inbound `traceparent` from the public internet. The W3C Trace Context specification describes restarting the trace in services that act as a "front gate" into secure networks, in its section on mutating the `traceparent` field. Its security and privacy considerations also discuss treating authenticated and unauthenticated callers differently, because an untrusted caller can otherwise force sampling or collide with your trace IDs. If you restart, you can still keep the caller's value as a link or an attribute for support purposes.
 
-**Baggage can cross every instrumented boundary.** W3C Baggage is forwarded wherever a baggage propagator is configured, and OpenTelemetry's default propagator configuration includes one. With typical settings, baggage set through the OpenTelemetry API or on an `Activity` is then added to instrumented outbound calls, including calls to third parties. The OpenTelemetry documentation warns that it can reach unintended recipients and has no integrity checks. Check your propagator configuration, use baggage only for small, non-sensitive routing hints, and never treat a baggage value as a trusted fact.
+**Baggage can cross every instrumented boundary.** W3C Baggage is forwarded wherever a baggage propagator is configured, and OpenTelemetry's default propagator configuration includes one. With typical settings, baggage is then added to instrumented outbound calls, including calls to third parties. In .NET, OpenTelemetry's `Baggage` API and `Activity` baggage are separate stores, and which one is forwarded depends on the propagators your setup uses. The OpenTelemetry documentation warns that it can reach unintended recipients and has no integrity checks. Check your propagator configuration, use baggage only for small, non-sensitive routing hints, and never treat a baggage value as a trusted fact.
 
 **Decide what the partner sees.** Sending your internal operation ID to the WMS as an idempotency key is a deliberate choice. The partner needs a stable key, and a random version 4 GUID reveals little and no customer data, although the partner can, by design, tell that two requests carry the same key. A time-ordered GUID, such as version 7, also reveals when it was created. Sending your correlation ID, customer ID, or decision ID to a third party is a different choice, and usually unnecessary. Keep the mapping on your side.
 
@@ -456,7 +495,7 @@ public async Task Cancelling_a_two_shipment_order_plans_one_operation_and_messag
 }
 ```
 
-The second test assumes that the WMS contract guarantees idempotent handling of repeated requests with the same key. Without that guarantee, the right behavior after an unknown outcome is reconciliation, not a resend, and a companion test should assert that no second request is sent. Under the assumption, a redelivery after an unknown outcome is recorded as another attempt at the same operation, with the same idempotency key, and a late duplicate does not change a final state:
+The second test assumes that the WMS contract guarantees idempotent handling of repeated requests with the same key. Without that guarantee, the right behavior after an unknown outcome is reconciliation, not a resend, and a companion test should assert that no second request is sent and that reconciliation is scheduled. The harness acts as the broker: when the handler throws, it records the message as not acknowledged and lets the test deliver it again. Under the assumption, a redelivery after an unknown outcome is recorded as another attempt at the same operation, with the same idempotency key, and a late duplicate does not change a final state:
 
 ```csharp
 [Fact]
@@ -465,6 +504,7 @@ public async Task Redelivery_after_unknown_outcome_reuses_the_operation_identity
     var operationId = Guid.NewGuid();
     var messageId = Guid.NewGuid();
     var wms = new ScriptedWms(
+        honorsIdempotencyKey: true,
         WmsHoldResult.Unknown("wms.no_response"),
         WmsHoldResult.Held("HLD-30944"));
     var harness = await WorkerHarness.WithPlannedHoldAsync(operationId, "S-2", wms);
@@ -514,6 +554,8 @@ Two more tests are worth adding. For the worker, deliver a message whose operati
 
 **12. Relying on the partner's idempotency alone.** Two workers that both see a non-final operation both call out. Claim the operation first, and treat the downstream key as a second layer.
 
+**13. Acknowledging unsettled work.** A worker that records `Unknown` or `NotSent` and then returns normally acknowledges the message, and nothing ever tries again. Redeliver, or hand the operation to reconciliation, before acknowledging.
+
 ---
 
 ## A Short Review Checklist
@@ -529,27 +571,28 @@ Two more tests are worth adding. For the worker, deliver a message whose operati
 
 5. Is the decision recorded with its reason code, policy version, and the inputs it read, including how current those inputs were?
 6. Are planned effects and their outbox messages written in the same transaction as the decision, with a message ID the relay reuses on every publish?
-7. Does the worker claim the operation before calling out, and treat a missing operation as an error rather than a duplicate?
-8. Does every started attempt get an outcome, including the counterpart's reason code, `NotSent`, or `Unknown`?
-9. Is a resend after `Unknown` allowed only where the counterpart documents that it honors the idempotency key, with reconciliation otherwise?
-10. Are external events recorded with the partner's event ID, the partner's time, your received time, and a mapping to your identities based on stable business references?
+7. Does the worker claim the operation before calling out, with a lease that outlasts the call or is renewed, and treat a missing operation as an error rather than a duplicate?
+8. Does the worker acknowledge a message only once its operation is final or handed to reconciliation?
+9. Is every attempt durably recorded before the external call, given a result with the counterpart's reason code, `NotSent`, or `Unknown`, and reconciled by a recovery job if a crash or failed write left it without one?
+10. Is a resend after `Unknown` allowed only where the counterpart documents that it honors the idempotency key, with reconciliation otherwise?
+11. Are external events recorded with the partner's event ID, the partner's time, your received time, and a mapping to your identities based on stable business references?
 
 **Ordering and duplicates**
 
-11. Are state transitions conditional, so late or duplicate results cannot move a final state backward?
-12. Is order established by sequence, version, causation, and recorded inputs rather than by timestamps from different hosts?
-13. Have you checked what your broker provides for redelivery counts, and what your partners guarantee about event ID uniqueness?
+12. Are state transitions conditional, so late or duplicate results cannot move a final state backward?
+13. Is order established by sequence, version, causation, and recorded inputs rather than by timestamps from different hosts?
+14. Have you checked what your broker provides for redelivery counts, and what your partners guarantee about event ID uniqueness?
 
 **Telemetry and leakage**
 
-14. Can every evidence question be answered without a trace existing?
-15. Do headers, baggage, and log scopes carry identifiers only, with no credentials, payloads, or sensitive facts?
-16. Is an inbound `traceparent` from untrusted callers either restarted or deliberately accepted?
+15. Can every evidence question be answered without a trace existing?
+16. Do headers, baggage, and log scopes carry identifiers only, with no credentials, payloads, or sensitive facts?
+17. Is an inbound `traceparent` from untrusted callers either restarted or deliberately accepted?
 
 **Proportion and tests**
 
-17. Is the extra recording limited to workflows that cross an asynchronous boundary, call another system, or may be questioned later?
-18. Do tests assert that identities are distinct, that redelivery reuses the operation identity, that missing state is not acknowledged, and that duplicate external events are recorded once?
+18. Is the extra recording limited to workflows that cross an asynchronous boundary, call another system, or may be questioned later?
+19. Do tests assert that identities are distinct, that redelivery reuses the operation identity, that missing state is not acknowledged, and that duplicate external events are recorded once?
 
 ---
 
