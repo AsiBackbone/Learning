@@ -266,7 +266,8 @@ sealed class GitPublicationSelector(GitRepository git, Uri siteRoot)
                 current.XHashtags,
                 change.NewPath,
                 getBlobSha(change.NewPath),
-                canonicalUrl));
+                canonicalUrl,
+                current.XQuestion));
         }
 
         return selected
@@ -284,7 +285,7 @@ static class PublicationMetadataReader
 {
     private static readonly HashSet<string> PublicationKeys = new(StringComparer.OrdinalIgnoreCase)
     {
-        "title", "author", "published", "summary", "feed"
+        "title", "author", "published", "summary", "feed", "x_question"
     };
 
     private static readonly HashSet<string> AllowedXHashtags = new(StringComparer.Ordinal)
@@ -398,12 +399,17 @@ static class PublicationMetadataReader
             throw new InvalidDataException($"{path}: future publication date '{published:yyyy-MM-dd}' is not allowed.");
         }
 
+        string? xQuestion = values.TryGetValue("x_question", out string? questionText)
+            ? XQuestionRules.Validate(questionText, path)
+            : null;
+
         return new PublicationMetadata(
             Required("title"),
             Required("author"),
             published,
             Required("summary"),
-            xHashtags);
+            xHashtags,
+            xQuestion);
     }
 
     private static IReadOnlyList<string> ReadXHashtags(
@@ -605,48 +611,152 @@ sealed class GitRepository(string repositoryRoot)
 
 sealed class JackdawPatioPostComposer : IXPostComposer
 {
-    private const int MaximumLength = 280;
-    private const string Prefix = "New from AsiBackbone Learning:\n\n";
+    // tools/validate-doc-metadata.cs repeats this layout to reject an x_question that
+    // cannot fit before publication. Keep the two in sync.
+    public const string Prefix = "New from AsiBackbone Learning:\n\n";
 
     public string Compose(LearningPublication publication)
     {
         string hashtags = string.Join(' ', publication.XHashtags.Select(static hashtag => $"#{hashtag}"));
-        string suffix = $"\n\n{hashtags}\n\n{publication.CanonicalUrl}";
-        int titleBudget = MaximumLength - CountTextElements(Prefix) - CountTextElements(suffix);
+        string question = publication.XQuestion is { } value ? $"\n\n{value}" : string.Empty;
+        string beforeUrl = $"{question}\n\n{hashtags}\n\n";
+        int titleBudget = XTextLength.MaximumWeightedLength -
+            XTextLength.Weighted(Prefix) -
+            XTextLength.Weighted(beforeUrl) -
+            XTextLength.UrlWeight;
+
+        if (publication.XQuestion is not null)
+        {
+            // A question is never shortened, and neither is the title it accompanies.
+            int over = XTextLength.Weighted(publication.Title) - titleBudget;
+            if (over > 0)
+            {
+                throw new InvalidDataException(
+                    $"{publication.SourcePath}: 'x_question' makes the X post {over} character(s) too long; shorten the question or the title.");
+            }
+        }
 
         if (titleBudget < 1)
         {
-            throw new InvalidDataException("The canonical URL leaves no room for a post title.");
+            throw new InvalidDataException("The post layout leaves no room for a title.");
         }
 
         string title = Truncate(publication.Title, titleBudget);
-        string post = Prefix + title + suffix;
+        string text = Prefix + title + beforeUrl;
 
-        if (CountTextElements(post) > MaximumLength)
+        if (XTextLength.Weighted(text) + XTextLength.UrlWeight > XTextLength.MaximumWeightedLength)
         {
-            throw new InvalidDataException("The composed X post exceeds 280 Unicode text elements.");
+            throw new InvalidDataException("The composed X post exceeds X's 280-character weighted limit.");
         }
 
-        return post;
+        return text + publication.CanonicalUrl;
     }
 
-    private static string Truncate(string value, int maximumElements)
+    private static string Truncate(string value, int maximumWeight)
     {
-        int count = CountTextElements(value);
-
-        if (count <= maximumElements)
+        if (XTextLength.Weighted(value) <= maximumWeight)
         {
             return value;
         }
 
         const string ellipsis = "…";
-        int kept = Math.Max(0, maximumElements - 1);
-        int[] indexes = StringInfo.ParseCombiningCharacters(value);
-        return value[..indexes[kept]] + ellipsis;
+        int budget = maximumWeight - XTextLength.Weighted(ellipsis);
+        var kept = new StringBuilder();
+        int used = 0;
+        TextElementEnumerator elements = StringInfo.GetTextElementEnumerator(value);
+
+        while (elements.MoveNext())
+        {
+            string element = elements.GetTextElement();
+            int weight = XTextLength.Weighted(element);
+            if (used + weight > budget)
+            {
+                break;
+            }
+
+            kept.Append(element);
+            used += weight;
+        }
+
+        return kept.Append(ellipsis).ToString();
+    }
+}
+
+static class XQuestionRules
+{
+    // tools/validate-doc-metadata.cs applies the same rules. Keep the two in sync.
+    public static string Validate(string value, string path)
+    {
+        string question = value.Trim();
+        string? problem = Problem(question);
+        return problem is null
+            ? question
+            : throw new InvalidDataException($"{path}: 'x_question' {problem}");
     }
 
-    private static int CountTextElements(string value) =>
-        StringInfo.ParseCombiningCharacters(value).Length;
+    public static string? Problem(string question) =>
+        question.Length == 0 ? "must not be empty." :
+        question.Any(char.IsControl) ? "must be a single line without control characters." :
+        !question.EndsWith('?') ? "must end with a question mark." :
+        question.Contains('#') || question.Contains('@')
+            ? "must not contain hashtags or mentions; use 'x_hashtags' for hashtags." :
+        question.Contains("://", StringComparison.Ordinal) || question.Contains("www.", StringComparison.OrdinalIgnoreCase)
+            ? "must not contain links; the publisher adds the canonical URL." :
+        null;
+}
+
+static class XTextLength
+{
+    // tools/validate-doc-metadata.cs repeats this counting. Keep the two in sync.
+    public const int MaximumWeightedLength = 280;
+
+    // X shortens every link with t.co and counts it as 23 characters, whatever its length.
+    public const int UrlWeight = 23;
+
+    // Approximates X's weighted count: a code point in X's light ranges, which cover
+    // Latin, Greek, Cyrillic, and common punctuation, counts 1; any other code point
+    // counts 2; an emoji sequence counts 2 in total. Text is NFC-normalized first, as X does.
+    public static int Weighted(string text)
+    {
+        int total = 0;
+        TextElementEnumerator elements = StringInfo.GetTextElementEnumerator(text.Normalize(NormalizationForm.FormC));
+
+        while (elements.MoveNext())
+        {
+            string element = elements.GetTextElement();
+            if (IsEmoji(element))
+            {
+                total += 2;
+                continue;
+            }
+
+            foreach (Rune rune in element.EnumerateRunes())
+            {
+                total += IsLight(rune.Value) ? 1 : 2;
+            }
+        }
+
+        return total;
+    }
+
+    private static bool IsLight(int value) =>
+        value <= 0x10FF ||
+        value is >= 0x2000 and <= 0x200D ||
+        value is >= 0x2010 and <= 0x201F ||
+        value is >= 0x2032 and <= 0x2037;
+
+    private static bool IsEmoji(string element)
+    {
+        foreach (Rune rune in element.EnumerateRunes())
+        {
+            if (rune.Value is 0x200D or 0xFE0F or (>= 0x1F000 and <= 0x1FAFF) or (>= 0x2600 and <= 0x27BF))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
 
 sealed class XPublisher(IXClient client, IPublisherStateStore store, IXPostComposer composer)
@@ -1084,6 +1194,7 @@ static class XPublisherSelfTest
         {
             TestSelection();
             TestInvalidMetadata();
+            TestXQuestionMetadata();
             TestComposition();
             TestResponseClassification();
             TestRetryDelays();
@@ -1159,6 +1270,49 @@ static class XPublisherSelfTest
             "default X hashtag was not applied.");
     }
 
+    private static void TestXQuestionMetadata()
+    {
+        const string header = "---\ntitle: Q\nauthor: Test\npublished: 2026-09-12\nsummary: S.\nfeed: true\n";
+
+        Assert(
+            PublicationMetadataReader.Read(header + "---", "docs/none.md", Today)!.XQuestion is null,
+            "a missing x_question should be null.");
+        Assert(
+            PublicationMetadataReader.Read(header + "x_question: Ever been fooled by a log search?\n---", "docs/plain.md", Today)!
+                .XQuestion == "Ever been fooled by a log search?",
+            "a plain x_question was not read.");
+        Assert(
+            PublicationMetadataReader.Read(header + "x_question: \"Where does your check live: API or worker?\"\n---", "docs/quoted.md", Today)!
+                .XQuestion == "Where does your check live: API or worker?",
+            "a quoted x_question was not read.");
+
+        IReadOnlyList<LearningPublication> selected = GitPublicationSelector.SelectChanges(
+            [new GitChange(GitChangeKind.Added, null, "docs/q.md")],
+            _ => null,
+            _ => header + "x_question: Ever been fooled?\n---",
+            _ => "blob",
+            new HashSet<string> { "https://asibackbone.github.io/Learning/q.html" },
+            Today,
+            SiteRoot);
+        Assert(selected.Single().XQuestion == "Ever been fooled?", "x_question was not carried into the publication.");
+
+        string[] invalid =
+        [
+            "x_question: Not a question",
+            "x_question: \"\"",
+            "x_question: Is this #DotNet?",
+            "x_question: Have you asked @someone?",
+            "x_question: Seen https://example.com?",
+            "x_question: |\n  Multi-line?",
+            "x_question: One?\nx_question: Two?",
+        ];
+
+        foreach (string line in invalid)
+        {
+            AssertThrows<InvalidDataException>(() => PublicationMetadataReader.Read(header + line + "\n---", "docs/invalid.md", Today));
+        }
+    }
+
     private static void TestInvalidMetadata()
     {
         AssertThrows<InvalidDataException>(() => PublicationMetadataReader.Read(
@@ -1195,13 +1349,45 @@ static class XPublisherSelfTest
 
     private static void TestComposition()
     {
+        var composer = new JackdawPatioPostComposer();
+
         string longTitle = string.Concat(Enumerable.Repeat("👩🏽‍💻", 300));
         LearningPublication publication = Publication(longTitle, hashtags: ["DotNet", "AISecurity"]);
-        string post = new JackdawPatioPostComposer().Compose(publication);
-        Assert(StringInfo.ParseCombiningCharacters(post).Length <= 280, "post exceeded text-element limit.");
+        string post = composer.Compose(publication);
+        Assert(WeightedPostLength(post, publication.CanonicalUrl) <= 280, "post exceeded the weighted limit.");
         Assert(post.Contains("\n\n#DotNet #AISecurity\n\n", StringComparison.Ordinal), "hashtags were not composed.");
         Assert(post.EndsWith(publication.CanonicalUrl, StringComparison.Ordinal), "canonical URL was not preserved.");
+        Assert(post.Contains('…'), "a long title was not truncated with an ellipsis.");
+
+        Assert(
+            composer.Compose(Publication("Short title")) ==
+                "New from AsiBackbone Learning:\n\nShort title\n\n#DotNet\n\nhttps://asibackbone.github.io/Learning/article.html",
+            "a post without a question changed layout.");
+
+        string question = "Has a correlation ID search ever told you the wrong story?";
+        Assert(
+            composer.Compose(Publication("Short title", question: question)) ==
+                $"New from AsiBackbone Learning:\n\nShort title\n\n{question}\n\n#DotNet\n\nhttps://asibackbone.github.io/Learning/article.html",
+            "the question was not placed between the title and the hashtags.");
+
+        string longUrl = "https://asibackbone.github.io/Learning/articles/2026/" + new string('a', 250) + ".html";
+        string fullTitle = new('t', 150);
+        Assert(
+            composer.Compose(Publication(fullTitle, canonicalUrl: longUrl)).Contains(fullTitle, StringComparison.Ordinal),
+            "a long URL should count as 23 characters, not shorten the title.");
+
+        // A question that does not fit must fail rather than truncate.
+        AssertThrows<InvalidDataException>(
+            () => composer.Compose(Publication(new string('t', 120), question: new string('q', 120) + "?")));
+
+        Assert(XTextLength.Weighted("abc") == 3, "Latin text should count 1 per character.");
+        Assert(XTextLength.Weighted("日本") == 4, "CJK text should count 2 per character.");
+        Assert(XTextLength.Weighted("👩🏽‍💻") == 2, "an emoji sequence should count 2.");
+        Assert(XTextLength.Weighted("…") == 2, "the ellipsis is outside X's light ranges.");
     }
+
+    private static int WeightedPostLength(string post, string canonicalUrl) =>
+        XTextLength.Weighted(post[..^canonicalUrl.Length]) + XTextLength.UrlWeight;
 
     private static void TestResponseClassification()
     {
@@ -1409,8 +1595,9 @@ static class XPublisherSelfTest
     private static LearningPublication Publication(
         string title,
         string canonicalUrl = "https://asibackbone.github.io/Learning/article.html",
-        IReadOnlyList<string>? hashtags = null) =>
-        new(title, "Test Author", Today, "Summary", hashtags ?? ["DotNet"], "docs/article.md", "blob", canonicalUrl);
+        IReadOnlyList<string>? hashtags = null,
+        string? question = null) =>
+        new(title, "Test Author", Today, "Summary", hashtags ?? ["DotNet"], "docs/article.md", "blob", canonicalUrl, question);
 
     private static void Assert(bool condition, string message)
     {
@@ -1563,7 +1750,8 @@ sealed record PublicationMetadata(
     string Author,
     DateOnly Published,
     string Summary,
-    IReadOnlyList<string> XHashtags);
+    IReadOnlyList<string> XHashtags,
+    string? XQuestion = null);
 sealed record LearningPublication(
     string Title,
     string Author,
@@ -1572,7 +1760,8 @@ sealed record LearningPublication(
     IReadOnlyList<string> XHashtags,
     string SourcePath,
     string SourceBlobSha,
-    string CanonicalUrl);
+    string CanonicalUrl,
+    string? XQuestion = null);
 sealed record XPost(string Id, string Text);
 sealed record XPublicationReceipt(string SourceBlobSha, string PostId, DateTimeOffset PostedAtUtc);
 sealed record CreatePostRequest(string Text);

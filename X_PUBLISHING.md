@@ -35,6 +35,20 @@ unique values, must include `DotNet`, and may add one of `AspNetCore`,
 build and publisher both reject malformed, unsupported, duplicate, or excessive
 hashtags before any X API create call.
 
+Feed-enabled pages may also ask readers a question:
+
+```yaml
+x_question: Has a correlation ID search ever told you the wrong story?
+```
+
+The question is optional and author-written, so it is reviewed in the same pull
+request as the page. Write one that readers can answer from their own
+experience, rather than a teaser for the article. It must be one line, end with
+`?`, and contain no hashtags, mentions, or links. The question is never
+truncated: the documentation build fails when the question, the full title, the
+hashtags, and the link do not fit in one post, and reports how many characters
+to remove.
+
 ## Initial setup
 
 1. Create a protected GitHub Environment named `jackdaw-patio-x`. Restrict it to
@@ -71,13 +85,21 @@ New from AsiBackbone Learning:
 
 {title}
 
+[{x_question}]
+
 #DotNet [#topicalHashtag]
 
 {canonicalUrl}
 ```
 
-Long titles are truncated at a Unicode text-element boundary while preserving
-the selected hashtags and canonical URL within the 280-character budget. Before
+The question block appears only when `x_question` is present. Length follows
+X's weighted count: the link counts as 23 characters because X shortens it,
+emoji sequences count 2, and characters outside X's Latin and punctuation
+ranges count 2. Without a question, a long title is truncated at a Unicode
+text-element boundary, preserving the hashtags and link within the 280-character
+budget. With a question, nothing is truncated; a post that does not fit fails
+the documentation build before merge, and the publisher refuses it as a
+backstop. Before
 every create call, the publisher searches recent account posts for that URL. A
 successful create or reconciliation writes its post ID and source blob SHA
 immediately. The cursor advances only after every candidate succeeds.
