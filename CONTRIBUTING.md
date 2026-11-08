@@ -490,6 +490,7 @@ feed: true
 x_hashtags:
   - DotNet
   - AspNetCore
+x_question: Where does your team draw the line between policies and handlers?
 ---
 ```
 
@@ -503,6 +504,7 @@ The fields mean:
 - `summary` is the concise article description used by the feed.
 - `feed` controls RSS participation explicitly. Only `feed: true` publishes an item.
 - `x_hashtags` optionally selects one or two controlled hashtags for the first X announcement. Omit it to use `#DotNet`. When present, use YAML list syntax, include `DotNet`, and select at most one topical value from `AspNetCore`, `SoftwareArchitecture`, `CyberSecurity`, `AISecurity`, `AIGovernance`, or `DevSecOps`. Write values without the leading `#`; the publisher adds it. CamelCase values are intentional for screen-reader clarity.
+- `x_question` optionally adds one question to the first X announcement, between the title and the hashtags, to invite replies. Ask something readers can answer from their own experience. It must be a single line ending in `?`, with no hashtags, mentions, or links. It is never truncated: `tools/validate-doc-metadata.cs` fails the documentation build when the full post would exceed X's limit. See [X_PUBLISHING.md](X_PUBLISHING.md) for the post layout.
 
 For a feed-enabled article, `title`, `author`, `published`, and `summary` are required. Publication remains opt-in even when some metadata is present. The feed generator validates required fields, date formats, canonical generated HTML targets, and writes `docs/_site/feed.xml`.
 
@@ -572,6 +574,7 @@ Before publishing a new standalone article, normally confirm that:
 - [ ] `summary` is concise and useful when shown in the RSS feed or an external preview.
 - [ ] `feed: true` opts the article into the existing publication feed.
 - [ ] Optional `x_hashtags` metadata contains one or two allowed values, includes `DotNet`, and accurately represents the article's topic.
+- [ ] Optional `x_question` asks one question readers can answer from experience, and the documentation build confirms that the post fits.
 - [ ] The landing page's **Recently added** list in `docs/index.md` names the three newest published articles, newest first, using each article's exact `title`, as plain `- [Title](articles/<year>/<slug>.md)` items. `tools/validate-doc-metadata.cs` fails the documentation build when this list is stale or contains any other list item.
 - [ ] The article stands alone without requiring earlier tutorials or Learning-specific background.
 - [ ] The opening establishes a concrete technical problem before introducing repository-specific language.

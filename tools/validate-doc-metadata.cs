@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -89,6 +90,15 @@ static class MetadataValidator
     private static readonly Regex XHashtagsFrontMatterRegex = new(
         @"^x_hashtags:[ \t]*(?<value>.*?)[ \t]*$",
         RegexOptions.Compiled);
+
+    private static readonly Regex XQuestionFrontMatterRegex = new(
+        @"^x_question:[ \t]*(?<value>.*?)[ \t]*$",
+        RegexOptions.Compiled);
+
+    // These must match JackdawPatioPostComposer and XTextLength in tools/publish-x.cs.
+    private const string XPostPrefix = "New from AsiBackbone Learning:\n\n";
+    private const int XUrlWeight = 23;
+    private const int XMaximumWeightedLength = 280;
 
     private static readonly Regex XHashtagListItemRegex = new(
         @"^[ \t]+-[ \t]+(?<value>[A-Za-z0-9]+)[ \t]*$",
@@ -230,9 +240,12 @@ static class MetadataValidator
             int lineNumber = 0;
             bool inFrontMatter = false;
 
-            if (relativePath.StartsWith("docs/articles/", StringComparison.Ordinal))
+            if (relativePath.StartsWith("docs/", StringComparison.Ordinal))
             {
-                ValidateXHashtagFrontMatter(relativePath, File.ReadAllLines(path), errors);
+                // The X publisher reads these keys from any feed-enabled page under docs/.
+                string[] sourceLines = File.ReadAllLines(path);
+                IReadOnlyList<string>? hashtags = ValidateXHashtagFrontMatter(relativePath, sourceLines, errors);
+                ValidateXQuestionFrontMatter(relativePath, sourceLines, hashtags, errors);
             }
 
             foreach (string line in File.ReadLines(path))
@@ -324,14 +337,19 @@ static class MetadataValidator
         }
     }
 
-    private static void ValidateXHashtagFrontMatter(
+    // Returns the hashtags the X publisher will use, the default when the key is absent,
+    // or null when the key is invalid.
+    private static IReadOnlyList<string>? ValidateXHashtagFrontMatter(
         string relativePath,
         IReadOnlyList<string> lines,
         ICollection<string> errors)
     {
+        IReadOnlyList<string> defaultHashtags = ["DotNet"];
+        int errorsBefore = errors.Count;
+
         if (lines.Count == 0 || !string.Equals(lines[0].Trim(), "---", StringComparison.Ordinal))
         {
-            return;
+            return defaultHashtags;
         }
 
         int closingIndex = -1;
@@ -352,13 +370,13 @@ static class MetadataValidator
 
         if (closingIndex < 0 || keyIndexes.Count == 0)
         {
-            return;
+            return defaultHashtags;
         }
 
         if (keyIndexes.Count > 1)
         {
             errors.Add($"{relativePath}: frontmatter key 'x_hashtags' appears more than once.");
-            return;
+            return null;
         }
 
         int keyIndex = keyIndexes[0];
@@ -367,7 +385,7 @@ static class MetadataValidator
         {
             errors.Add(
                 $"{relativePath}:{keyIndex + 1}: 'x_hashtags' must be a YAML block list with one hashtag per item.");
-            return;
+            return null;
         }
 
         var hashtags = new List<string>();
@@ -398,7 +416,7 @@ static class MetadataValidator
         if (hashtags.Count is < 1 or > 2)
         {
             errors.Add($"{relativePath}: 'x_hashtags' must contain one or two entries.");
-            return;
+            return null;
         }
 
         if (hashtags.Distinct(StringComparer.Ordinal).Count() != hashtags.Count)
@@ -417,6 +435,144 @@ static class MetadataValidator
                 $"{relativePath}: unsupported X hashtag '{hashtag}'. Allowed values: " +
                 $"{string.Join(", ", AllowedXHashtags.Order())}.");
         }
+
+        return errors.Count == errorsBefore ? hashtags : null;
+    }
+
+    // Mirrors XQuestionRules, XTextLength, and JackdawPatioPostComposer in tools/publish-x.cs,
+    // so that an x_question that the publisher would reject fails the pull request instead.
+    private static void ValidateXQuestionFrontMatter(
+        string relativePath,
+        IReadOnlyList<string> lines,
+        IReadOnlyList<string>? hashtags,
+        ICollection<string> errors)
+    {
+        if (lines.Count == 0 || !string.Equals(lines[0].Trim(), "---", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        string? title = null;
+        var questions = new List<(int Index, string RawValue)>();
+
+        for (int index = 1; index < lines.Count; index++)
+        {
+            if (string.Equals(lines[index].Trim(), "---", StringComparison.Ordinal))
+            {
+                break;
+            }
+
+            Match titleMatch = TitleFrontMatterRegex.Match(lines[index]);
+            if (titleMatch.Success)
+            {
+                title = ParseScalar(titleMatch.Groups["value"].Value);
+            }
+
+            Match questionMatch = XQuestionFrontMatterRegex.Match(lines[index]);
+            if (questionMatch.Success)
+            {
+                questions.Add((index, questionMatch.Groups["value"].Value));
+            }
+        }
+
+        if (questions.Count == 0)
+        {
+            return;
+        }
+
+        if (questions.Count > 1)
+        {
+            errors.Add($"{relativePath}: frontmatter key 'x_question' appears more than once.");
+            return;
+        }
+
+        (int questionIndex, string rawValue) = questions[0];
+        if (rawValue.StartsWith('|') || rawValue.StartsWith('>'))
+        {
+            errors.Add($"{relativePath}:{questionIndex + 1}: 'x_question' must be single-line.");
+            return;
+        }
+
+        string question = ParseScalar(rawValue).Trim();
+        string? problem = XQuestionProblem(question);
+        if (problem is not null)
+        {
+            errors.Add($"{relativePath}:{questionIndex + 1}: 'x_question' {problem}");
+            return;
+        }
+
+        if (title is null || hashtags is null)
+        {
+            return;
+        }
+
+        string hashtagText = string.Join(' ', hashtags.Select(static hashtag => $"#{hashtag}"));
+        string withoutUrl = $"{XPostPrefix}{title}\n\n{question}\n\n{hashtagText}\n\n";
+        int over = XWeightedLength(withoutUrl) + XUrlWeight - XMaximumWeightedLength;
+        if (over > 0)
+        {
+            errors.Add(
+                $"{relativePath}:{questionIndex + 1}: 'x_question' makes the X post {over} character(s) too long; " +
+                "shorten the question or the title.");
+        }
+    }
+
+    private static string? XQuestionProblem(string question) =>
+        question.Length == 0 ? "must not be empty." :
+        question.Any(char.IsControl) ? "must be a single line without control characters." :
+        !question.EndsWith('?') ? "must end with a question mark." :
+        question.Contains('#') || question.Contains('@')
+            ? "must not contain hashtags or mentions; use 'x_hashtags' for hashtags." :
+        question.Contains("://", StringComparison.Ordinal) || question.Contains("www.", StringComparison.OrdinalIgnoreCase)
+            ? "must not contain links; the publisher adds the canonical URL." :
+        null;
+
+    private static int XWeightedLength(string text)
+    {
+        int total = 0;
+        TextElementEnumerator elements = StringInfo.GetTextElementEnumerator(text.Normalize(NormalizationForm.FormC));
+
+        while (elements.MoveNext())
+        {
+            string element = elements.GetTextElement();
+            bool emoji = element.EnumerateRunes().Any(static rune =>
+                rune.Value is 0x200D or 0xFE0F or (>= 0x1F000 and <= 0x1FAFF) or (>= 0x2600 and <= 0x27BF));
+            if (emoji)
+            {
+                total += 2;
+                continue;
+            }
+
+            foreach (Rune rune in element.EnumerateRunes())
+            {
+                int value = rune.Value;
+                bool light = value <= 0x10FF ||
+                    value is >= 0x2000 and <= 0x200D ||
+                    value is >= 0x2010 and <= 0x201F ||
+                    value is >= 0x2032 and <= 0x2037;
+                total += light ? 1 : 2;
+            }
+        }
+
+        return total;
+    }
+
+    private static string ParseScalar(string value)
+    {
+        value = value.Trim();
+
+        if (value.Length >= 2 && value[0] == '\'' && value[^1] == '\'')
+        {
+            return value[1..^1].Replace("''", "'", StringComparison.Ordinal);
+        }
+
+        if (value.Length >= 2 && value[0] == '"' && value[^1] == '"')
+        {
+            using JsonDocument document = JsonDocument.Parse(value);
+            return document.RootElement.GetString() ?? string.Empty;
+        }
+
+        return value;
     }
 
     private static void ValidateDescriptionFrontMatter(
