@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "account": "jackdaw-patio",
-  "cursorSha": "5ad14c863707abc28d8852043c157b6fc6a6f274",
+  "cursorSha": "0313474f5668cac1d1ca17a6b723663295d947f3",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
@@ -92,6 +92,11 @@
       "sourceBlobSha": "d9b3040abc348eac173841b2d65d391b6c4d88c7",
       "postId": "2119464433693175939",
       "postedAtUtc": "2026-11-08T16:17:53.530343+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/in-memory-grant-store-is-not-distributed-replay-protection.html": {
+      "sourceBlobSha": "f727210f4f3d6d0a3d15b8b7aed6f295a9c90297",
+      "postId": "2120551293374595486",
+      "postedAtUtc": "2026-11-11T16:16:41.1154048+00:00"
     }
   }
 }
