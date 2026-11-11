@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| One-time grants or capabilities accepted twice across application instances or after a restart, and what a shared, durable, atomic consumption store must guarantee | [An In-Memory Grant Store Is Not Distributed Replay Protection](2026/in-memory-grant-store-is-not-distributed-replay-protection.md) |
 | Reconstructing what happened across an API, queue, worker, and webhook, correlation IDs versus trace IDs, duplicate and out-of-order delivery, and sampled traces as evidence | [A Correlation ID Is Not a Distributed Audit Trail](2026/correlation-id-is-not-distributed-audit-trail.md) |
 | Authenticated requests whose account IDs, tenant values, prices, or status fields are still untrustworthy, over-posting, and object-level authorization | [Passing Authentication Does Not Make Input Trustworthy](2026/authentication-does-not-make-input-trustworthy.md) |
 | Approvals and authorization checks that go stale before delayed execution, time-of-check to time-of-use, and which changes should invalidate a decision | [Your Security Check Passed. Then the World Changed.](2026/security-check-passed-then-world-changed.md) |
@@ -55,6 +56,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [An In-Memory Grant Store Is Not Distributed Replay Protection](2026/in-memory-grant-store-is-not-distributed-replay-protection.md)
+
+**Christopher D. Cavell** · **November 11, 2026**
+
+A support application consumed one-time credit grants in a thread-safe `ConcurrentDictionary`, and a customer still received the same $250 credit twice: a retry after a gateway timeout reached a second instance whose memory had never seen the grant, and a rolling restart erased the record on the first. This guide shows why process-local atomicity does not extend across instances or restarts; why sticky sessions, a distributed cache, and short expiry narrow the gap without closing it; the minimum contract a production store must meet and the application features around it; one write that checks expiry and revocation, claims the grant, and records the operation; where admission belongs and how retries and recovery work; how replay protection differs from idempotency and exactly-once external effects; what to do when the store is unavailable; how long to retain consumption records; tests that model several instances and restarts; and when an in-memory store is the right choice.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/in-memory-grant-store-is-not-distributed-replay-protection.html`
 
 ### [A Correlation ID Is Not a Distributed Audit Trail](2026/correlation-id-is-not-distributed-audit-trail.md)
 
