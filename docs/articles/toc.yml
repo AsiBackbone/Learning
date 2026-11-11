@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: An In-Memory Grant Store Is Not Distributed Replay Protection
+  href: 2026/in-memory-grant-store-is-not-distributed-replay-protection.md
 - name: A Correlation ID Is Not a Distributed Audit Trail
   href: 2026/correlation-id-is-not-distributed-audit-trail.md
 - name: Passing Authentication Does Not Make Input Trustworthy

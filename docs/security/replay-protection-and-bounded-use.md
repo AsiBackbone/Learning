@@ -487,6 +487,8 @@ That may mean:
 
 Do not claim distributed replay protection from a process-local collection.
 
+For a standalone walk-through of this failure in a deployed application, including a restart that erases consumption history and the store contract that closes both paths, read [An In-Memory Grant Store Is Not Distributed Replay Protection](../articles/2026/in-memory-grant-store-is-not-distributed-replay-protection.md).
+
 ## Process Restart Is Also a Boundary
 
 Even one application instance can lose replay state:

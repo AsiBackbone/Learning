@@ -733,7 +733,8 @@ Lead to Your Audit Log Records the Story, Not the Decision for the evidence gap,
 ### 22. An In-Memory Grant Store Is Not Distributed Replay Protection
 
 - **Priority:** P1
-- **Implementation issue:** Not opened
+- **Implementation issue:** [#476](https://github.com/AsiBackbone/Learning/issues/476)
+- **Publication:** [Published November 11, 2026](../docs/articles/2026/in-memory-grant-store-is-not-distributed-replay-protection.md)
 - **Permanent slug:** `in-memory-grant-store-is-not-distributed-replay-protection`
 
 #### Reader / search problem
