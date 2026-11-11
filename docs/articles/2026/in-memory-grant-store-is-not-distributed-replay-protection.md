@@ -21,7 +21,7 @@ x_question: "Has an in-memory grant or capability store ever let the same operat
 
 **Sample scope:** The C# targets .NET 8 or later, and the SQL uses PostgreSQL syntax. Other stores that offer a conditional write or a unique constraint inside a transaction can meet the same contract. The stores, the billing client, the operation records, the helpers, and the tests are illustrative sketches, not a runnable sample, a production-ready pattern, or a recommended schema. The scenario and its incidents are hypothetical. Original prose is licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/), and original code examples are additionally offered under the [MIT License](https://opensource.org/license/mit), as described in the repository's [licensing terms](https://github.com/AsiBackbone/Learning/blob/main/LICENSING.md). Third-party material, where identified, remains under its original license. External sources were last verified on November 11, 2026.
 
-**What this article covers:** why process-local atomicity stops at the process; two hypothetical incidents; why common fixes narrow the gap without closing it; the store contract; admitting a grant and recording the operation in one write; revocation ordering; where admission belongs, and how retries and status work; how recovery and the original executor share ownership; how replay protection differs from idempotency and exactly-once effects; outages, retention, and tests; and when an in-memory store is the right choice.
+**What this article covers:** why process-local atomicity stops at the process; two hypothetical incidents; why common fixes narrow the gap without closing it; the store contract; admitting a grant and recording the operation in one write; revocation ordering; where admission belongs, and how retries and status work; how recovery and the original executor share ownership, and the timing values that hold it together; how replay protection differs from idempotency and exactly-once effects; outages, retention, and tests; and when an in-memory store is the right choice.
 
 **In plain terms:** picture a voucher that can be redeemed once, at a shop with two tills. Each cashier keeps a private list of vouchers already redeemed. A customer redeems the voucher at till A, then walks to till B, where the cashier checks a list that has never seen it. At closing time, both lists go in the bin, and tomorrow the voucher looks new again everywhere. The voucher was never one-time. It was one-time per cashier, per day. Making it one-time means one shared list, kept overnight, where crossing out a voucher and checking it are the same act.
 
@@ -101,6 +101,8 @@ Teams that find this bug usually try one of these first. Each reduces how often 
 **A distributed cache.** Microsoft's documentation describes a distributed cache as coherent across servers and able to survive server restarts and deployments, and for caching it is. The `IDistributedCache` interface still exposes only get, set, refresh, and remove, with their async forms. Reading a key and then setting it is the same check-then-act race as before, only across the network: two instances can both read "absent" and both proceed. Some cache engines offer an atomic set-if-absent operation, which fixes the race, but `IDistributedCache` does not expose it, so using it means calling the engine's own client. Even then, it is enough only if the engine's durability and retention also meet the contract. Can the engine evict the key under memory pressure? Can a failover lose a write that was acknowledged? Can the key expire or be removed while the grant can still be admitted? If any answer is yes, a consumed record can disappear while the grant is still acceptable. The store's behavior settles the question, not the product name.
 
 **Shorter expiry.** A five-minute grant has a smaller replay window than a fifteen-minute grant. It still has one. In the incident, the retry came 18 seconds after the first request, well inside any expiry that leaves room for a human to act. Expiry limits *when* a grant may be admitted. Consumption limits *how many times*. They are separate checks, and a short expiry is a reason to keep consumption records for less time, not a reason to skip them.
+
+The replay problem itself is simple: every instance must agree whether a grant has already been used. The rest of the article covers the harder production questions. How do you make that decision durable and atomic? How do you recover when an outcome is uncertain? How do you keep the guarantee through revocation, failures, and cleanup? Readers who only need the first answer can stop after the store contract and the next section.
 
 ---
 
@@ -183,7 +185,7 @@ The name matters. `TryAdmit` claims the use. A pair of methods named `IsConsumed
 
 ## One Write Admits the Grant and Records the Operation
 
-The examples in this section assume three things. Each admission runs as its own short statement, in an implicit transaction under PostgreSQL's default Read Committed isolation, not inside a longer caller transaction. Timestamp parameters use `timestamptz`, so comparisons do not depend on the session's time zone, and duration parameters such as `@admission_leeway`, `@execution_lease`, `@recovery_lease`, and `@maximum_grant_lifetime` use `interval`. The leeway is fixed while any grant issued under it can still be admitted, as discussed below; a versioned leeway would add a policy version to the signed token and to `ValidatedGrant`, and admission and retention would look up the leeway for that version rather than read current configuration. And the uniqueness the examples rely on exists in the schema:
+The examples in this section assume three things. Each admission runs as its own short statement, in an implicit transaction under PostgreSQL's default Read Committed isolation, not inside a longer caller transaction. Timestamp parameters use `timestamptz`, so comparisons do not depend on the session's time zone, and duration parameters such as `@admission_leeway`, `@execution_lease`, `@recovery_lease`, and `@submission_window` use `interval`. The handler's `InitialOwnerVersion` constant supplies `@initial_owner_version`, so the two cannot drift apart. The leeway is fixed while any grant issued under it can still be admitted, as discussed below; a versioned leeway would add a policy version to the signed token and to `ValidatedGrant`, and admission and retention would look up the leeway for that version rather than read current configuration. And the uniqueness the examples rely on exists in the schema:
 
 ```sql
 -- Row form: grants are stored when issued.
@@ -218,6 +220,7 @@ CREATE TABLE operations (
     status        text        NOT NULL,     -- Admitted, Succeeded, Failed, Unknown, NeedsReconciliation
     owner_version integer     NOT NULL,
     lease_until   timestamptz NOT NULL,
+    submit_by     timestamptz NOT NULL,     -- latest time a create request may be sent
     created_at    timestamptz NOT NULL,
     UNIQUE (issuer, grant_id)               -- defense in depth: one operation per grant
 );
@@ -241,9 +244,10 @@ WITH claim AS (
 )
 INSERT INTO operations (
     operation_id, issuer, grant_id, caller_id, account_id, amount, currency,
-    status, owner_version, lease_until, created_at)
+    status, owner_version, lease_until, submit_by, created_at)
 SELECT @operation_id, issuer, grant_id, @caller_id, @account_id, @amount, @currency,
-       'Admitted', 1, clock_timestamp() + @execution_lease, clock_timestamp()
+       'Admitted', @initial_owner_version, clock_timestamp() + @execution_lease,
+       clock_timestamp() + @submission_window, clock_timestamp()
 FROM claim
 RETURNING operation_id;
 ```
@@ -260,9 +264,10 @@ WITH claim AS (
 )
 INSERT INTO operations (
     operation_id, issuer, grant_id, caller_id, account_id, amount, currency,
-    status, owner_version, lease_until, created_at)
+    status, owner_version, lease_until, submit_by, created_at)
 SELECT @operation_id, issuer, grant_id, @caller_id, @account_id, @amount, @currency,
-       'Admitted', 1, clock_timestamp() + @execution_lease, clock_timestamp()
+       'Admitted', @initial_owner_version, clock_timestamp() + @execution_lease,
+       clock_timestamp() + @submission_window, clock_timestamp()
 FROM claim
 RETURNING operation_id;
 ```
@@ -295,26 +300,21 @@ WHERE issuer = @issuer
 RETURNING grant_id;
 ```
 
-In the token form, revocation claims the grant's key in `grant_consumptions` with no operation:
+In the token form, revocation claims the grant's key in `grant_consumptions` with no operation. Unlike the row form, an insert succeeds for any key it is given, so the revoker must first prove that the grant was issued: by presenting the signed grant, which the revocation service verifies, or by finding it in the issuer's issuance log. Either source also supplies the grant's trusted expiry, which sets how long the revocation row is kept:
 
 ```sql
+-- @expires_at comes from the verified grant or the issuance log, never from the request.
 INSERT INTO grant_consumptions (issuer, grant_id, operation_id, consumed_at, retain_until)
-VALUES (@issuer, @grant_id, NULL, statement_timestamp(),
-        statement_timestamp() + @maximum_grant_lifetime + @admission_leeway)
+VALUES (@issuer, @grant_id, NULL, statement_timestamp(), @expires_at + @admission_leeway)
 ON CONFLICT (issuer, grant_id) DO NOTHING
 RETURNING grant_id;
 ```
 
 In both forms, no row returned means the grant was already used, or already revoked, and the revocation changes nothing. Revocation cannot recall an operation admitted before it, and it does not erase that operation's record. In the token form, `consumed_at` on a revocation row is the time the key was claimed, and the null `operation_id` is what marks the row as a revocation rather than a use.
 
-The token-form revocation does not need to know the grant's expiry, but its `retain_until` is safe only under stated rules:
+Without proof of issuance, a revoker could claim the key of a grant that was never issued and block a future grant that happens to receive that ID. Rate limits and privilege narrow a flood. They do not stop a targeted claim. If no trusted expiry is available, a fallback is to retain the row until the revocation time plus the longest lifetime any grant may have, plus the allowed issue-time skew, plus the leeway. That fallback is safe only if validators enforce it: they reject a grant whose expiry is more than the maximum lifetime after its issue time, or whose issue time is ahead of the validator's clock by more than the skew. `ValidatedGrant` would then carry the issue time, and the maximum lifetime, like the leeway, can never be shortened while grants issued under it are outstanding.
 
-- **Issuance enforces the maximum lifetime.** Validators reject any grant whose expiry is more than `@maximum_grant_lifetime` after its issue time, or whose issue time is in the future beyond a small, bounded skew, and include that skew in the bound. Otherwise a long-lived or future-dated grant can outlast its revocation row.
-- **The grant already exists.** The rule covers revoking an issued grant. Pre-revoking an ID that has not been issued yet is a different feature with its own retention.
-- **Policy changes never shorten existing revocations.** Like the leeway, a shorter maximum lifetime applies only once every grant issued under the old one has aged out.
-- **The trusted expiry is better when available.** If the revoker has it, for example from an issuance log, retain the row through that expiry plus the leeway, which also avoids keeping rows for a revocation issued late in a grant's life longer than needed.
-
-Revocation is itself a privileged write. Restrict it to the issuer or authorized supervisors, validate the shape and length of the grant ID, and rate-limit it, so a buggy or hostile caller cannot pre-claim arbitrary keys or flood the table.
+Revocation is itself a privileged write. Restrict it to the issuer or authorized supervisors, validate the shape and length of the grant ID, and rate-limit it.
 
 ---
 
@@ -406,7 +406,17 @@ public sealed class ApplyCreditHandler(
         }
 
         // Admitted: the grant is spent, the operation intent is durable, and
-        // this attempt owns the operation (owner_version 1) until its lease ends.
+        // this attempt owns the operation at the initial owner version until
+        // its lease ends.
+        //
+        // Re-check just before submitting: still Admitted, still this owner
+        // version, and before both lease_until and submit_by. This narrows the
+        // delayed-submission window; it cannot fence a pause after the check.
+        if (!await operations.MaySubmitAsync(intent.OperationId, InitialOwnerVersion, CancellationToken.None))
+        {
+            return CreditResult.Pending(intent.OperationId);
+        }
+
         // The billing call gets its own timeout rather than the request's token,
         // so a client disconnect does not abandon it halfway.
         BillingOutcome outcome;
@@ -435,7 +445,9 @@ public sealed class ApplyCreditHandler(
                 // may have acted, such as a response that fails to deserialize.
                 // Cancelling the client call does not cancel billing's work, so
                 // the credit may exist. Log it, so programming errors and
-                // provider-contract changes do not vanish into pending work.
+                // provider-contract changes do not vanish into pending work,
+                // but scrub exception details that can carry provider
+                // responses, account data, tokens, or credentials.
                 logger.LogWarning(ex,
                     "Billing outcome unknown for operation {OperationId}", intent.OperationId);
                 outcome = BillingOutcome.Unknown;
@@ -494,7 +506,7 @@ SET owner_version = owner_version + 1,
     lease_until   = clock_timestamp() + @recovery_lease
 WHERE operation_id = @operation_id
   AND status IN ('Admitted', 'Unknown')
-  AND lease_until < statement_timestamp()
+  AND lease_until < clock_timestamp()
   AND owner_version = @expected_owner_version
 RETURNING owner_version;
 ```
@@ -505,9 +517,34 @@ Each lease has to cover everything its owner does while it owns the operation. T
 
 The owner version fences writes to your own records. It does not fence requests to billing. A billing timeout shorter than the lease reduces ordinary overlap, but a handler paused past its lease, for example by a long garbage collection or a suspended VM, can still send or complete its call while recovery acts, and billing may keep working after the client has given up. Any overlap is safe only if the provider documents that concurrent requests with the same idempotency key are handled atomically, not just that the key is retained. A pause has no upper bound, so waiting cannot prove the original call is finished. If the provider does not document atomic concurrent handling, recovery never sends a create request at all. It only looks up.
 
-That limit also applies to the original handler. If it pauses after admission and before its billing call, recovery may take over and finish, and the provider's retention window may pass before the handler resumes and sends its first request with the old key, which the provider may then treat as new. Re-checking ownership and a persisted latest-safe-submission deadline just before the call narrows that window, but nothing local can fence a process paused between the check and the call. So the provider's idempotency guarantee must cover every possible submission, including a delayed original one. Where pauses cannot be bounded, closing the gap needs an external deadline or fencing mechanism that billing enforces. Otherwise, duplicate-effect prevention remains conditional on the provider's retention window.
+That limit also applies to the original handler. If it pauses after admission and before its billing call, recovery may take over and finish, and the provider's retention window may pass before the handler resumes and sends its first request with the old key, which the provider may then treat as new. The operation's `submit_by` is the latest time any create request for it may be sent: admission time plus the provider's documented key retention, minus a safety margin, here `@submission_window`. The handler's `MaySubmitAsync` and recovery both check it, together with ownership, just before any create call:
+
+```sql
+SELECT 1
+FROM operations
+WHERE operation_id = @operation_id
+  AND status IN ('Admitted', 'Unknown')    -- the handler expects Admitted
+  AND owner_version = @expected_owner_version
+  AND clock_timestamp() < least(lease_until, submit_by);
+```
+
+That check narrows the window, but nothing local can fence a process paused between the check and the call. So the provider's idempotency guarantee must cover every possible submission, including a delayed original one. Where pauses cannot be bounded, closing the gap needs an external deadline or fencing mechanism that billing enforces. Otherwise, duplicate-effect prevention remains conditional on the provider's retention window.
 
 The recovery job asks billing whether a credit with that reference exists, which requires the provider to document a way to look it up by the original reference or idempotency key. A credit that is found is recorded as `Succeeded`. A lookup that finds nothing is not proof that nothing exists, so recovery never records `Failed` on that basis. Recovery resumes the create call with the same idempotency key only if the provider documents atomic handling of concurrent requests with that key, honors it with the same parameters, and keeps it longer than the operation has been open. Otherwise, or if the provider offers no reliable lookup, or once that window has passed and billing cannot say whether the credit exists, recovery sends no create request. It marks the operation `NeedsReconciliation` for manual or provider-assisted resolution. Some providers prune idempotency keys after a documented period, and a key reused after pruning is treated as a new request.
+
+### The timing values in one place
+
+The design now depends on several durations. They only work together if their relationships hold, so keep the application-side values in one configuration object, here `ExecutionTimings`, check the relationships at startup, and keep the database-side bounds in the admission role's settings:
+
+| Value | What it bounds | Must satisfy |
+| --- | --- | --- |
+| `@admission_leeway` | Clock tolerance on the admission deadline | One value in validation, admission, and retention; fixed or versioned while grants issued under it can still be admitted |
+| Billing call timeout | How long the handler waits for billing | Shorter than the execution lease minus its margin |
+| `@execution_lease` | The handler's ownership after admission | Covers the commit, the gap before billing, the billing timeout, recording, and a margin |
+| `@recovery_lease` | Recovery's ownership after a takeover | Covers the lookup, any create call, and recording, or is renewed before each step |
+| `@submission_window` | How long after admission a create may be sent (`submit_by`) | No longer than the provider's documented key retention, minus a safety margin |
+| Admission transaction bound | How long an admission can live, from statement start to commit | Finite and enforced by the server, for example by `transaction_timeout`, including any synchronous-replication wait |
+| `@cleanup_margin` | Extra time before cleanup deletes refusal records | Longer than the admission transaction bound, plus the largest clock step allowed |
 
 When the protected effect is a write to the same database, it can go in the admission transaction itself, and consumption and effect commit or roll back together. That is an alternative to "durable before execution", not a case of it. An ordinary HTTP API call is not enlisted in that local transaction. If the billing call ran inside the transaction and the transaction then rolled back, the grant would be un-consumed after its effect had already happened.
 
@@ -557,7 +594,9 @@ WHERE retain_until < statement_timestamp() - @cleanup_margin;
 
 `retain_until` is already the expiry plus the admission leeway, or, for a revocation row, the longest grant lifetime plus the leeway. `@cleanup_margin` must exceed the longest an admission transaction can live, from the start of its statement through its commit. That includes lock waits and any synchronous-replication wait at commit. That bound only holds under three conditions:
 
-- **The server enforces a bound on the whole admission transaction.** A client-side timeout is not enough, because the server can keep working after the client stops waiting. `statement_timeout` alone does not establish the bound either. PostgreSQL disables it by default, and with the extended query protocol most drivers use, it stops at the end of execution rather than at the end of the implicit transaction. From PostgreSQL 17, `transaction_timeout` bounds explicit transactions and implicit single-statement transactions alike. Set it on a dedicated admission role or connection, not server-wide or on a role that also runs other work, because it applies to everything that role or connection does. `SET LOCAL` is not an option here, since it only works inside an explicit transaction block, which the standalone admission statement does not use. On earlier versions, verify your driver's protocol behavior and add the unbounded time to the margin. In every version, add the longest synchronous-replication wait at commit: once the commit is written locally and is waiting for a replica, a timeout cannot cut it short.
+- **The server enforces a bound on the whole admission transaction.** A client-side timeout is not enough, because the server can keep working after the client stops waiting. `statement_timeout` alone does not establish the bound either. PostgreSQL disables it by default, and with the extended query protocol most drivers use, it stops at the end of execution rather than at the end of the implicit transaction. From PostgreSQL 17, `transaction_timeout` bounds explicit transactions and implicit single-statement transactions alike. With implicit autocommit, set it on a dedicated admission role or connection, not server-wide or on a role that also runs other work, because it applies to everything that role or connection does. `SET LOCAL` has no effect outside an explicit transaction block, so using it means wrapping the single admission statement in `BEGIN`, `SET LOCAL`, the statement, and an immediate `COMMIT`, which still keeps admission standalone. On earlier versions, verify your driver's protocol behavior and establish a finite upper bound on the whole admission transaction, including the commit acknowledgment.
+
+  The synchronous-replication wait at commit needs its own bound. Once the commit is written locally and is waiting for a replica, a timeout cannot cut it short. It must be bounded some other way, for example by standby failover policy, and that bound added to the margin. If any part of the admission transaction cannot be given a finite bound, time-based cleanup is not safe: keep the consumption records, or coordinate cleanup with admission explicitly.
 - **Admission runs as a standalone statement whose commit is part of it**, not inside an explicit transaction that could stay open afterwards.
 - **The database server's clock does not jump** forward or backward by more than the margin while cleanup runs. Clock synchronization should slew time rather than step it.
 
@@ -581,8 +620,8 @@ The original tests could not have found the bug, because each test constructed o
 [Fact]
 public async Task Separate_store_instances_cannot_both_admit_the_same_grant()
 {
-    // Two store objects with their own connections. They share only the
-    // database, as two application instances would.
+    // Two store objects, each opening a pooled connection per call. They
+    // share only the database, as two application instances would.
     await using var instanceA = new SqlGrantAdmissionStore(database.ConnectionString);
     await using var instanceB = new SqlGrantAdmissionStore(database.ConnectionString);
     ValidatedGrant grant = grants.IssueValid(expiresIn: TimeSpan.FromMinutes(15));
@@ -631,8 +670,10 @@ Additional tests should include:
 - **The original handler pauses past its lease.** Recovery takes ownership, then the handler resumes. Its late write changes nothing, and a late `Unknown` cannot overwrite a recovered `Succeeded`.
 - **Recovery after the provider's idempotency window.** If billing cannot confirm the outcome, recovery marks `NeedsReconciliation` and sends no create request.
 - **Recovery finds nothing while the original call may be in flight.** Recovery does not record `Failed`, and sends no create request unless the provider documents atomic handling of concurrent requests with the same key.
-- **Expiry and cleanup with a delayed admission.** The risk is a statement that starts before the deadline and is delayed before it reaches the unique-key check, while cleanup deletes the earlier, committed consumption row. Reproduce that with a lock the admission statement needs other than its own key, for example by holding `LOCK TABLE operations IN SHARE ROW EXCLUSIVE MODE` in another session. Start a production-style standalone admission just before the deadline, run cleanup past the boundary, then release the lock. The server-side bound must abort the delayed attempt first, and the aborted attempt must leave no consumption row, no operation row, and no billing call. Also run the attempt with the operation row archived, so the incidental second barrier does not hide a missing bound. A grant still within `retain_until` is still refused after cleanup. Separately, check that a deployment without the server-side bound is detected as unsupported, for example by a startup check of the admission role's settings.
+- **Expiry and cleanup with a delayed admission.** The risk is a statement that starts before the deadline and is delayed before it reaches the unique-key check, while cleanup deletes the earlier, committed consumption row. Reproduce that with a lock the admission statement must acquire before it evaluates the claim, for example by holding `LOCK TABLE operations IN SHARE ROW EXCLUSIVE MODE` in another session. Start a production-style standalone admission just before the deadline, run cleanup past the boundary, then release the lock. Confirm, for example in `pg_locks`, that the attempt waited before its claim ran. A delay placed after the claim lets the test pass without any bound, because the claim has already seen the old row. If you cannot place the delay reliably, split the test in two: one that the server-side bound aborts a delayed admission, and one that cleanup never removes a row before `retain_until` plus the margin. The server-side bound must abort the delayed attempt first, and the aborted attempt must leave no consumption row, no operation row, and no billing call. Also run the attempt with the operation row archived, so the incidental second barrier does not hide a missing bound. A grant still within `retain_until` is still refused after cleanup. Separately, check that a deployment without the server-side bound is detected as unsupported, for example by a startup check of the admission role's settings.
 - **Concurrent revocation and admission.** Exactly one of them wins, and a revocation after admission changes nothing.
+- **Revocation rules.** A revoker without the privilege is refused, a revocation for a grant ID with no proof of issuance is refused, and a revocation row survives cleanup until its `retain_until` plus the margin.
+- **Submission deadline.** A handler or recovery job that reaches `MaySubmitAsync` after `submit_by`, or after losing ownership, sends nothing to billing.
 - **Failover or restore.** Where the claim covers it, an admission acknowledged before a failover or a restore from backup is still present afterwards.
 
 For a deployment-level check, run two instances of the application behind a load balancer in a test environment, present one grant to each, and restart one instance between presentations. That catches routing and configuration problems, such as an accidental in-memory registration in one environment, that unit and integration tests cannot see.
@@ -664,7 +705,7 @@ It is the wrong choice whenever more than one instance can execute the operation
 9. **Falling back to memory when the store is down.** It reopens the cross-instance path during exactly the window the shared store cannot help.
 10. **Deleting refusal evidence while a qualifying admission can still finish.** A delayed statement that began before the deadline can then claim the grant again, even after the nominal deadline has passed.
 11. **Treating an operation ID as a credential.** Matching an ID does not show that the caller may see or resume that operation.
-12. **Letting recovery and the original executor race.** Unconditional status writes let a stale worker overwrite a newer result. Recording `Failed` because a lookup found nothing, or resubmitting outside the provider's documented idempotency guarantees, can leave a second effect or a false terminal state.
+12. **Letting recovery and the original executor race.** Unconditional status writes let a stale worker overwrite a newer result. Recording `Failed` because a lookup found nothing, resubmitting outside the provider's documented idempotency guarantees, or letting a delayed original handler submit after `submit_by`, can leave a second effect or a false terminal state.
 13. **Treating idempotency or admission as exactly-once.** An operation key does not stop a spent grant from being presented with a new key, and admission does not show whether, or how many times, the effect happened.
 
 ---
@@ -680,10 +721,12 @@ It is the wrong choice whenever more than one instance can execute the operation
 7. Is admission called at the execution boundary, after other validation and immediately before the effect?
 8. Does an unreachable store, a cancellation, or an ambiguous admission timeout result in no execution and a retryable response?
 9. Does a retry with the same operation ID, caller, and details get the original operation's status without executing, is everything else refused, and can the caller still reach the operation after the grant expires?
-10. Are status changes conditional on the expected status and owner version, does the lease cover the handler's whole ownership period, and does recovery stop at manual reconciliation rather than record `Failed` or resubmit outside the provider's documented guarantees?
-11. Are consumption records retained past the deadline by a margin longer than any admission transaction can live, enforced by the server, and are operation records retained for audit separately?
-12. Do integration tests use separate store instances and a recreated client against the real store engine, and cover a lost acknowledgment, a crash after admission, a paused executor, and delayed admission during cleanup?
-13. If the in-memory store remains, is it limited to tests, demos, a documented single-process host, or a refusal-only fast path?
+10. Are status changes conditional on the expected status and owner version, does each lease cover its owner's whole ownership period, is every create call preceded by a check of ownership and `submit_by`, and does recovery stop at manual reconciliation rather than record `Failed` or resubmit outside the provider's documented guarantees?
+11. Are consumption records retained past the deadline by a margin longer than a finite, server-enforced bound on the admission transaction, and are operation records retained for audit separately?
+12. Is revocation restricted, rate-limited, and limited to grants proven to have been issued, with its row retained through the grant's trusted expiry, or a validator-enforced maximum lifetime and issue-time skew?
+13. Are the timing values kept in one place, with their relationships checked at startup?
+14. Do integration tests use separate store instances and a recreated client against the real store engine, and cover a lost acknowledgment, a crash after admission, a paused executor, and delayed admission during cleanup?
+15. If the in-memory store remains, is it limited to tests, demos, a documented single-process host, or a refusal-only fast path?
 
 ---
 
@@ -716,4 +759,4 @@ Each source below was last verified on November 11, 2026.
 
 ## The Short Answer
 
-A `ConcurrentDictionary` makes a grant one-time for one process until it restarts. Across instances and restarts, admit the grant with one conditional write to a store every instance shares and no restart loses. Check expiry and revocation in that same write, and record the operation in the same statement. Run nothing without a confirmed admission, and let only one owner at a time move the operation forward. That limits who may run the operation. Provider-enforced idempotency suppresses duplicate effects within its contract, and operation records and reconciliation establish what happened when an outcome is uncertain.
+A `ConcurrentDictionary` makes a grant one-time for one process until it restarts. Across instances and restarts, admit the grant with one conditional write to a store every instance shares and no restart loses. Check expiry and revocation in that same write, and record the operation in the same statement. Run nothing without a confirmed admission. That limits who may run the operation. Everything after admission is a second problem: let only one owner at a time move the operation forward, check ownership and the submission deadline before any external call, and stop at manual reconciliation when the provider can no longer guarantee its idempotency key. Provider-enforced idempotency suppresses duplicate effects within its contract, and operation records and reconciliation establish what happened when an outcome is uncertain.
