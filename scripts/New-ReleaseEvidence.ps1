@@ -93,12 +93,12 @@ $manifest = [ordered]@{
         test = 'dotnet test samples/Samples.slnx --no-build'
         docs = 'dotnet tool run docfx docs/docfx.json --warningsAsErrors'
         verifyAssetHashPowerShell = '(Get-FileHash -Algorithm SHA256 <downloaded-file>).Hash.ToLowerInvariant()'
-        verifyProvenance = $(if ($GeneratedAfterRelease) { $null } else { "gh attestation verify <downloaded-file> --repo $Repository" })
+        verifyProvenance = $(if ($GeneratedAfterRelease) { $null } else { "gh attestation verify <downloaded-file> --bundle release-evidence.sigstore.json --repo $Repository --signer-workflow $Repository/.github/workflows/publish-release-evidence.yml --source-ref refs/tags/$TagName --source-digest $sourceCommit --cert-oidc-issuer https://token.actions.githubusercontent.com --deny-self-hosted-runners" })
     }
     trustBoundaries = [ordered]@{
         actionsArtifact = 'Temporary diagnostic workflow hand-off; not durable release evidence.'
         sbom = 'Inventory of tracked samples/ source and locked NuGet dependencies; not a vulnerability report or security guarantee.'
-        signing = 'No package, binary, archive, or container is released by Learning; signing is outside the current release scope.'
+        signing = 'The SBOM, release notes, and this manifest carry a Sigstore keyless GitHub provenance attestation from the release-evidence workflow, published as release-evidence.sigstore.json. No package, binary, standalone archive, or container is released by Learning, so nothing else is signed.'
         securityReports = 'Code scanning and dependency findings remain on GitHub security surfaces and are not release assets.'
     }
 }

@@ -14,6 +14,7 @@ on:
       - 'scripts/New-ReleaseEvidence.ps1'
       - 'scripts/New-LearningSamplesSbom.ps1'
       - 'scripts/Test-ReleaseEvidence.ps1'
+      - 'scripts/Test-ReleaseSignatures.ps1'
       - 'RELEASE.md'
       - 'SECURITY.md'
       - 'samples/**'
@@ -167,22 +168,37 @@ jobs:
           path: release-evidence
 
       - name: Attest durable release evidence
+        id: attest
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: release-evidence/*
 
-      - name: Verify generated provenance
+      # The attestation is a Sigstore keyless signature over the exact evidence bytes. Publishing its bundle next to
+      # the subjects keeps verification independent of the GitHub attestation API and of Actions artifact retention.
+      - name: Add durable Sigstore bundle
+        shell: pwsh
+        env:
+          BUNDLE_PATH: ${{ steps.attest.outputs.bundle-path }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:BUNDLE_PATH) -or -not (Test-Path -LiteralPath $env:BUNDLE_PATH -PathType Leaf)) {
+              throw 'The attestation step did not produce a Sigstore bundle.'
+          }
+          Copy-Item -LiteralPath $env:BUNDLE_PATH -Destination release-evidence/release-evidence.sigstore.json
+
+      - name: Verify generated provenance against the pinned signer identity
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
           REPOSITORY: ${{ github.repository }}
-        run: |
-          foreach ($asset in Get-ChildItem -LiteralPath release-evidence -File) {
-              gh attestation verify $asset.FullName --repo $env:REPOSITORY
-              if ($LASTEXITCODE -ne 0) {
-                  throw "Provenance verification failed for '$($asset.Name)'."
-              }
-          }
+        run: >-
+          ./scripts/Test-ReleaseSignatures.ps1
+          -TagName $env:RELEASE_TAG
+          -AssetDirectory release-evidence
+          -SourceCommit (git rev-parse HEAD)
+          -Repository $env:REPOSITORY
+          -RequireBundle
+          -IncludeNegativeTests
 
       - name: Upload durable evidence to GitHub release
         shell: pwsh
@@ -192,8 +208,8 @@ jobs:
           REPOSITORY: ${{ github.repository }}
         run: |
           $assets = @(Get-ChildItem -LiteralPath release-evidence -File | Sort-Object Name | Select-Object -ExpandProperty FullName)
-          if ($assets.Count -ne 3) {
-              throw "Expected exactly three durable evidence files, found $($assets.Count)."
+          if ($assets.Count -ne 4) {
+              throw "Expected exactly three durable evidence files and their Sigstore bundle, found $($assets.Count)."
           }
           gh release upload $env:RELEASE_TAG @assets --clobber --repo $env:REPOSITORY
           if ($LASTEXITCODE -ne 0) {
@@ -211,3 +227,17 @@ jobs:
           -TagName $env:RELEASE_TAG
           -EvidenceDirectory release-evidence
           -Repository $env:REPOSITORY
+
+      - name: Verify fresh public release download
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: >-
+          ./scripts/Test-ReleaseSignatures.ps1
+          -TagName $env:RELEASE_TAG
+          -SourceCommit (git rev-parse HEAD)
+          -Repository $env:REPOSITORY
+          -RequireBundle
+          -IncludeNegativeTests
