@@ -1,5 +1,5 @@
 ---
-description: A reference implementation for payment attempts whose outcome may be unknown: schema, checkout endpoint, notifications, outbox, recovery loop, and tests.
+description: A reference implementation for payment attempts whose outcome may be unknown, covering schema, checkout endpoint, notifications, outbox, recovery, and tests.
 ---
 
 # Payment Attempt Recovery in ASP.NET Core: An Implementation Reference
