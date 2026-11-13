@@ -25,9 +25,11 @@ Versioned release records support provenance and reproducibility. They do not im
 Stable release evidence is defined in [RELEASE.md](RELEASE.md). Each stable
 release attaches its exact release notes, a scoped SPDX inventory of the tracked
 sample source and locked NuGet dependencies, and a hash manifest directly to the
-GitHub Release. Current-workflow releases also carry GitHub provenance
-attestations for those files. Temporary Actions artifacts are diagnostic copies,
-not the durable record.
+GitHub Release. Current-workflow releases also carry Sigstore-signed GitHub
+provenance attestations for those files, verified against the pinned release
+workflow identity, and releases after 1.5.0 attach the attestation bundle as
+`release-evidence.sigstore.json`. Temporary Actions artifacts are diagnostic
+copies, not the durable record.
 
 The release SBOM is an inventory, not a vulnerability report or proof that the
 samples and dependencies are vulnerability-free. Code-scanning and dependency
