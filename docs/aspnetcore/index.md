@@ -28,6 +28,8 @@ Continue with the [Identify Middleware Ordering Problems lab](../labs/identify-m
 
 [Data-Access Boundaries and Transaction Reasoning with EF Core](data-access-boundaries-and-transaction-reasoning.md) continues from application behavior into durable state. It compares direct `DbContext` usage with meaningful persistence abstractions, explains default and explicit transaction boundaries, distinguishes generic database auditing from governance decision receipt, examines `SaveChanges` interceptors, and keeps local relational atomicity separate from external side effects, idempotency, outbox/inbox patterns, and recovery.
 
+[Payment Attempt Recovery in ASP.NET Core: An Implementation Reference](payment-attempt-recovery-implementation-reference.md) applies the same separation of local state from external effects to a payment provider whose response may be lost. It is the implementation companion to the article [A Payment API Timeout Leaves the Outcome Unknown](../articles/2026/payment-api-timeout-unknown-outcome.md): a schema that records each attempt before its first send, a checkout endpoint that sends each attempt at most once, a notification handler with deduplication, a transactional outbox, and durable escalations, a recovery loop with explicit ownership predicates, and a test matrix for the paths that rarely happen in development.
+
 [Retrofitting Governed Execution into an Existing ASP.NET Core Application](retrofit-governed-execution-into-an-existing-application.md) applies those boundaries to a live application. It is a phased playbook for introducing an explicit decision boundary into one consequential operation at a time: characterization tests first, one protected-execution seam for every route, shadow evaluation that cannot authorize anything, enforcement with zero-execution tests, deliberate handling of transactions, outbox, retries, and background jobs, and a rollback switch that cannot reopen an ungoverned path. It includes a stopping rule for when the simpler design should stay.
 
 [Architecture Decision Records Preserve Architectural Reasoning](architecture-decision-records-preserve-architectural-reasoning.md) then shifts from runtime structure to architectural memory. It explains when a decision deserves an ADR, what belongs in the record, how ADRs differ from other documentation, and how context, alternatives, consequences, and review conditions preserve reasoning that code alone cannot show.
@@ -54,6 +56,7 @@ This section will continue to expand into topics such as:
 - Rate limiting
 - Authentication-ready architecture
 - [Data-access boundaries and transaction reasoning](data-access-boundaries-and-transaction-reasoning.md)
+- [Payment attempt recovery after an unknown provider outcome](payment-attempt-recovery-implementation-reference.md)
 - [Retrofitting governed execution into an existing application](retrofit-governed-execution-into-an-existing-application.md)
 - [Architecture Decision Records and preserved reasoning](architecture-decision-records-preserve-architectural-reasoning.md)
 - [ADR lifecycle, review, deprecation, and supersession](architecture-decision-record-lifecycle-review-deprecation-and-supersession.md)

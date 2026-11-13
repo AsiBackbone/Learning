@@ -797,6 +797,40 @@ Lead to A Passing Agent Diff Is Not Project Authority for the broader proposal-t
 
 ---
 
+### 24. A Payment API Timeout Leaves the Outcome Unknown
+
+- **Priority:** P1
+- **Implementation issue:** [#477](https://github.com/AsiBackbone/Learning/issues/477); opened directly as an implementation issue rather than promoted from an earlier backlog entry
+- **Publication:** [Published November 13, 2026](../docs/articles/2026/payment-api-timeout-unknown-outcome.md)
+- **Permanent slug:** `payment-api-timeout-unknown-outcome`
+
+#### Reader / search problem
+
+A developer integrating a payment provider has to decide what the application does when the provider call times out after the provider may already have received the request. Typical questions include:
+
+- If the call timed out, was the customer charged?
+- Is it safe to retry, and with which idempotency key?
+- What should be stored before the request is sent, so that a lost response or a crashed process can still be resolved?
+- How long does the provider's idempotency guarantee last, and what happens after it ends?
+- What should the customer, fulfillment, and support see while the outcome is unknown?
+
+#### Existing Learning support
+
+- [Delayed Financial Payout and Ambiguous External Commit](../docs/case-studies/delayed-financial-payout-and-ambiguous-external-commit.md)
+- [An Allowed Decision Does Not Mean the Operation Succeeded](../docs/articles/2026/allowed-decision-does-not-mean-execution-succeeded.md)
+- [Idempotency Does Not Prevent Authority Replay](../docs/articles/2026/idempotency-does-not-prevent-authority-replay.md)
+- [Your Retry Logic May Be Replaying an Authorization Decision](../docs/articles/2026/retry-logic-may-replay-authorization-decision.md)
+
+#### Article / curriculum distinction
+
+The payout case study is the full treatment of an ambiguous external commit under scoped authority, atomic claims, leases, and a provider-enforced request expiry, while the decision/execution and idempotency articles separate decision truth, authority replay, and provider keys. This article should stay centered on recovery after an ambiguous external commit for a developer who has none of that vocabulary: a lost response, a persisted operation ID and idempotency key, provider lookup or reconciliation, and when resending with the original key is safe under the provider's contract, with an unknown outcome treated as its own state. It must not claim exactly-once payments, present one provider's retention or replay semantics as universal, treat "not found" as proof of no charge, or offer payment-processing, financial, or compliance advice.
+
+#### Natural deeper path
+
+Lead to An Allowed Decision Does Not Mean the Operation Succeeded for decision versus execution truth, the payout case study for the same ambiguity under delayed execution authority, Idempotency Does Not Prevent Authority Replay for provider keys versus authority, and Your Retry Logic May Be Replaying an Authorization Decision for retries that outlive the original request. Implementation detail that review showed would overwhelm the argument, such as the full schema, notification deduplication, the outbox, escalations, and the test matrix, lives in the companion [Payment Attempt Recovery in ASP.NET Core: An Implementation Reference](../docs/aspnetcore/payment-attempt-recovery-implementation-reference.md).
+
+---
+
 ## Promotion and Publication Workflow
 
 Keep planning, implementation, and publication as separate states:
