@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| A payment provider call that timed out, whether the customer was charged, idempotency keys after a lost response, and resending versus reconciling | [A Payment API Timeout Leaves the Outcome Unknown](2026/payment-api-timeout-unknown-outcome.md) |
 | One-time grants or capabilities accepted twice across application instances or after a restart, and what a shared, durable, atomic consumption store must guarantee | [An In-Memory Grant Store Is Not Distributed Replay Protection](2026/in-memory-grant-store-is-not-distributed-replay-protection.md) |
 | Reconstructing what happened across an API, queue, worker, and webhook, correlation IDs versus trace IDs, duplicate and out-of-order delivery, and sampled traces as evidence | [A Correlation ID Is Not a Distributed Audit Trail](2026/correlation-id-is-not-distributed-audit-trail.md) |
 | Authenticated requests whose account IDs, tenant values, prices, or status fields are still untrustworthy, over-posting, and object-level authorization | [Passing Authentication Does Not Make Input Trustworthy](2026/authentication-does-not-make-input-trustworthy.md) |
@@ -56,6 +57,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [A Payment API Timeout Leaves the Outcome Unknown](2026/payment-api-timeout-unknown-outcome.md)
+
+**Christopher D. Cavell** · **November 13, 2026**
+
+A store's checkout call to a payment provider timed out, the provider charged the card 1.8 seconds later, and the store told the customer the payment had failed; the customer paid again under a fresh idempotency key and was charged twice, while the provider's notification for the first charge was discarded because nothing could match it to the order. This guide explains what a timeout does and does not tell you; why an unknown outcome is its own state, separate from failure; what to persist before the first send; the order of operations that sends each attempt at most once and survives double clicks; classifying responses by the provider's documented semantics; resolving an unknown attempt through notifications, lookups by your own reference, and settlement records, and why "not found" is not "not charged"; the conditions under which resending with the original idempotency key is safe; resilience handlers and SDKs that already retry; what fulfillment, inventory, cancellation, and support do meanwhile; tests for the unknown path; and when a simpler design is enough. A companion [implementation reference](../aspnetcore/payment-attempt-recovery-implementation-reference.md) carries the full schema, endpoint, notification handler, recovery loop, and test matrix.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/payment-api-timeout-unknown-outcome.html`
 
 ### [An In-Memory Grant Store Is Not Distributed Replay Protection](2026/in-memory-grant-store-is-not-distributed-replay-protection.md)
 

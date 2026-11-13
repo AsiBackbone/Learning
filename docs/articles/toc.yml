@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: A Payment API Timeout Leaves the Outcome Unknown
+  href: 2026/payment-api-timeout-unknown-outcome.md
 - name: An In-Memory Grant Store Is Not Distributed Replay Protection
   href: 2026/in-memory-grant-store-is-not-distributed-replay-protection.md
 - name: A Correlation ID Is Not a Distributed Audit Trail
