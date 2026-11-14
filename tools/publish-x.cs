@@ -243,7 +243,9 @@ sealed class GitPublicationSelector(GitRepository git, Uri siteRoot)
                 change.NewPath,
                 today);
 
-            if (current is null || previous is not null)
+            bool newlyEligible = current is not null && previous is null;
+            bool deferredCopyAdded = current?.XPost is not null && previous is { XPost: null };
+            if (current is null || (!newlyEligible && !deferredCopyAdded))
             {
                 continue;
             }
@@ -267,6 +269,7 @@ sealed class GitPublicationSelector(GitRepository git, Uri siteRoot)
                 change.NewPath,
                 getBlobSha(change.NewPath),
                 canonicalUrl,
+                current.XPost,
                 current.XQuestion));
         }
 
@@ -285,7 +288,7 @@ static class PublicationMetadataReader
 {
     private static readonly HashSet<string> PublicationKeys = new(StringComparer.OrdinalIgnoreCase)
     {
-        "title", "author", "published", "summary", "feed", "x_question"
+        "title", "author", "published", "summary", "feed", "x_post", "x_question"
     };
 
     private static readonly HashSet<string> AllowedXHashtags = new(StringComparer.Ordinal)
@@ -399,6 +402,9 @@ static class PublicationMetadataReader
             throw new InvalidDataException($"{path}: future publication date '{published:yyyy-MM-dd}' is not allowed.");
         }
 
+        string? xPost = values.TryGetValue("x_post", out string? postText)
+            ? XPostRules.Validate(postText, path)
+            : null;
         string? xQuestion = values.TryGetValue("x_question", out string? questionText)
             ? XQuestionRules.Validate(questionText, path)
             : null;
@@ -409,6 +415,7 @@ static class PublicationMetadataReader
             published,
             Required("summary"),
             xHashtags,
+            xPost,
             xQuestion);
     }
 
@@ -611,75 +618,47 @@ sealed class GitRepository(string repositoryRoot)
 
 sealed class JackdawPatioPostComposer : IXPostComposer
 {
-    // tools/validate-doc-metadata.cs repeats this layout to reject an x_question that
+    // tools/validate-doc-metadata.cs repeats this layout to reject x_post copy that
     // cannot fit before publication. Keep the two in sync.
-    public const string Prefix = "New from AsiBackbone Learning:\n\n";
-
     public string Compose(LearningPublication publication)
     {
+        string xPost = publication.XPost ?? throw new InvalidDataException(
+            $"{publication.SourcePath}: missing 'x_post'; add reviewed engineering-takeaway copy before publication.");
         string hashtags = string.Join(' ', publication.XHashtags.Select(static hashtag => $"#{hashtag}"));
         string question = publication.XQuestion is { } value ? $"\n\n{value}" : string.Empty;
-        string beforeUrl = $"{question}\n\n{hashtags}\n\n";
-        int titleBudget = XTextLength.MaximumWeightedLength -
-            XTextLength.Weighted(Prefix) -
-            XTextLength.Weighted(beforeUrl) -
-            XTextLength.UrlWeight;
-
-        if (publication.XQuestion is not null)
-        {
-            // A question is never shortened, and neither is the title it accompanies.
-            int over = XTextLength.Weighted(publication.Title) - titleBudget;
-            if (over > 0)
-            {
-                throw new InvalidDataException(
-                    $"{publication.SourcePath}: 'x_question' makes the X post {over} character(s) too long; shorten the question or the title.");
-            }
-        }
-
-        if (titleBudget < 1)
-        {
-            throw new InvalidDataException("The post layout leaves no room for a title.");
-        }
-
-        string title = Truncate(publication.Title, titleBudget);
-        string text = Prefix + title + beforeUrl;
+        string text = $"{xPost}\n\n{publication.Title}{question}\n\n{hashtags}\n\n";
 
         if (XTextLength.Weighted(text) + XTextLength.UrlWeight > XTextLength.MaximumWeightedLength)
         {
-            throw new InvalidDataException("The composed X post exceeds X's 280-character weighted limit.");
+            int over = XTextLength.Weighted(text) + XTextLength.UrlWeight - XTextLength.MaximumWeightedLength;
+            throw new InvalidDataException(
+                $"{publication.SourcePath}: the composed X post is {over} character(s) too long; shorten 'x_post' or 'x_question'.");
         }
 
         return text + publication.CanonicalUrl;
     }
+}
 
-    private static string Truncate(string value, int maximumWeight)
+static class XPostRules
+{
+    // tools/validate-doc-metadata.cs applies the same rules. Keep the two in sync.
+    public static string Validate(string value, string path)
     {
-        if (XTextLength.Weighted(value) <= maximumWeight)
-        {
-            return value;
-        }
-
-        const string ellipsis = "…";
-        int budget = maximumWeight - XTextLength.Weighted(ellipsis);
-        var kept = new StringBuilder();
-        int used = 0;
-        TextElementEnumerator elements = StringInfo.GetTextElementEnumerator(value);
-
-        while (elements.MoveNext())
-        {
-            string element = elements.GetTextElement();
-            int weight = XTextLength.Weighted(element);
-            if (used + weight > budget)
-            {
-                break;
-            }
-
-            kept.Append(element);
-            used += weight;
-        }
-
-        return kept.Append(ellipsis).ToString();
+        string post = value.Trim();
+        string? problem = Problem(post);
+        return problem is null
+            ? post
+            : throw new InvalidDataException($"{path}: 'x_post' {problem}");
     }
+
+    public static string? Problem(string post) =>
+        post.Length == 0 ? "must not be empty." :
+        post.Any(char.IsControl) ? "must be a single line without control characters." :
+        post.Contains('#') || post.Contains('@')
+            ? "must not contain hashtags or mentions; use 'x_hashtags' for hashtags." :
+        post.Contains("://", StringComparison.Ordinal) || post.Contains("www.", StringComparison.OrdinalIgnoreCase)
+            ? "must not contain links; the publisher adds the canonical URL." :
+        null;
 }
 
 static class XQuestionRules
@@ -770,14 +749,36 @@ sealed class XPublisher(IXClient client, IPublisherStateStore store, IXPostCompo
             .OrderBy(static candidate => candidate.Published)
             .ThenBy(static candidate => candidate.CanonicalUrl, StringComparer.Ordinal)
             .ToArray();
+        HashSet<string> candidateUrls = pending
+            .Select(static candidate => candidate.CanonicalUrl)
+            .ToHashSet(StringComparer.Ordinal);
+        KeyValuePair<string, XPublicationDeferral>[] recordedDeferrals = state.DeferredPublications
+            .Where(pair => !candidateUrls.Contains(pair.Key))
+            .OrderBy(static pair => pair.Value.SourcePath, StringComparer.Ordinal)
+            .ToArray();
+        int publishableCount = pending.Count(static candidate => candidate.XPost is not null);
+        int deferredCount = pending.Length - publishableCount + recordedDeferrals.Length;
 
-        var lines = new List<string> { $"Dry run: {pending.Length} publication(s) pending." };
+        var lines = new List<string>
+        {
+            $"Dry run: {publishableCount} publication(s) pending; {deferredCount} missing 'x_post'."
+        };
         var composer = new JackdawPatioPostComposer();
 
         foreach (LearningPublication publication in pending)
         {
             lines.Add($"--- {publication.SourcePath}");
-            lines.Add(composer.Compose(publication));
+            lines.Add(publication.XPost is null
+                ? "DEFERRED: missing 'x_post'; add reviewed engineering-takeaway copy to publish this article later."
+                : composer.Compose(publication));
+        }
+
+        foreach (KeyValuePair<string, XPublicationDeferral> pair in recordedDeferrals)
+        {
+            XPublicationDeferral deferral = pair.Value;
+            lines.Add($"--- {deferral.SourcePath}");
+            lines.Add(
+                $"DEFERRED: missing 'x_post' since {deferral.DeferredAtUtc:u}; add reviewed engineering-takeaway copy to publish this article later.");
         }
 
         return lines;
@@ -795,6 +796,23 @@ sealed class XPublisher(IXClient client, IPublisherStateStore store, IXPostCompo
         {
             if (state.Receipts.ContainsKey(publication.CanonicalUrl))
             {
+                continue;
+            }
+
+            if (publication.XPost is null)
+            {
+                XPublicationDeferral deferral = state.DeferredPublications.GetValueOrDefault(publication.CanonicalUrl) is { } existingDeferral
+                    ? existingDeferral with
+                    {
+                        SourcePath = publication.SourcePath,
+                        SourceBlobSha = publication.SourceBlobSha
+                    }
+                    : new XPublicationDeferral(publication.SourcePath, publication.SourceBlobSha, DateTimeOffset.UtcNow);
+                PublisherState withDeferral = state.WithDeferral(publication.CanonicalUrl, deferral);
+                store.Save(withDeferral);
+                state = withDeferral;
+                Console.WriteLine(
+                    $"Deferred '{publication.SourcePath}': missing 'x_post'; later publications may continue.");
                 continue;
             }
 
@@ -1106,11 +1124,26 @@ sealed class FilePublisherStateStore(string path) : IPublisherStateStore
             XPublisherJsonContext.Default.PublisherState) ??
             throw new InvalidDataException("Publisher state is empty.");
 
-        if (state.SchemaVersion != 1 ||
+        if (state.SchemaVersion is not (1 or 2) ||
             string.IsNullOrWhiteSpace(state.Account) ||
-            string.IsNullOrWhiteSpace(state.CursorSha))
+            string.IsNullOrWhiteSpace(state.CursorSha) ||
+            state.Receipts is null ||
+            (state.SchemaVersion == 2 && state.DeferredPublications is null))
         {
             throw new InvalidDataException("Publisher state has an unsupported or incomplete schema.");
+        }
+
+        if (state.SchemaVersion == 1)
+        {
+            state = new PublisherState
+            {
+                Account = state.Account,
+                CursorSha = state.CursorSha,
+                Receipts = new Dictionary<string, XPublicationReceipt>(state.Receipts, StringComparer.Ordinal),
+                DeferredPublications = state.DeferredPublications is null
+                    ? new Dictionary<string, XPublicationDeferral>(StringComparer.Ordinal)
+                    : new Dictionary<string, XPublicationDeferral>(state.DeferredPublications, StringComparer.Ordinal)
+            };
         }
 
         return state;
@@ -1136,10 +1169,11 @@ sealed class FilePublisherStateStore(string path) : IPublisherStateStore
 
 sealed class PublisherState
 {
-    public int SchemaVersion { get; init; } = 1;
+    public int SchemaVersion { get; init; } = 2;
     public required string Account { get; init; }
     public required string CursorSha { get; init; }
     public Dictionary<string, XPublicationReceipt> Receipts { get; init; } = new(StringComparer.Ordinal);
+    public Dictionary<string, XPublicationDeferral> DeferredPublications { get; init; } = new(StringComparer.Ordinal);
 
     public static PublisherState Create(string account, string cursorSha) =>
         new() { Account = account, CursorSha = cursorSha };
@@ -1150,7 +1184,30 @@ sealed class PublisherState
         {
             [canonicalUrl] = receipt
         };
-        return new PublisherState { Account = Account, CursorSha = CursorSha, Receipts = receipts };
+        var deferred = new Dictionary<string, XPublicationDeferral>(DeferredPublications, StringComparer.Ordinal);
+        deferred.Remove(canonicalUrl);
+        return new PublisherState
+        {
+            Account = Account,
+            CursorSha = CursorSha,
+            Receipts = receipts,
+            DeferredPublications = deferred
+        };
+    }
+
+    public PublisherState WithDeferral(string canonicalUrl, XPublicationDeferral deferral)
+    {
+        var deferred = new Dictionary<string, XPublicationDeferral>(DeferredPublications, StringComparer.Ordinal)
+        {
+            [canonicalUrl] = deferral
+        };
+        return new PublisherState
+        {
+            Account = Account,
+            CursorSha = CursorSha,
+            Receipts = new Dictionary<string, XPublicationReceipt>(Receipts, StringComparer.Ordinal),
+            DeferredPublications = deferred
+        };
     }
 
     public PublisherState WithCursor(string cursorSha) =>
@@ -1158,7 +1215,8 @@ sealed class PublisherState
         {
             Account = Account,
             CursorSha = cursorSha,
-            Receipts = new Dictionary<string, XPublicationReceipt>(Receipts, StringComparer.Ordinal)
+            Receipts = new Dictionary<string, XPublicationReceipt>(Receipts, StringComparer.Ordinal),
+            DeferredPublications = new Dictionary<string, XPublicationDeferral>(DeferredPublications, StringComparer.Ordinal)
         };
 }
 
@@ -1194,15 +1252,17 @@ static class XPublisherSelfTest
         {
             TestSelection();
             TestInvalidMetadata();
-            TestXQuestionMetadata();
+            TestXMetadata();
             TestComposition();
             TestResponseClassification();
             TestRetryDelays();
             TestOAuthSignature();
             await TestApiResponsesAsync();
             await TestReceiptsAndReconciliationAsync();
+            await TestDeferralAsync();
             await TestAmbiguousDeliveryAsync();
             await TestReceiptFailureAsync();
+            TestStateMigration();
             TestDryRun();
             Console.WriteLine("X publisher self-test passed (selection, metadata, composition, delivery, and state contracts).");
             return 0;
@@ -1216,15 +1276,17 @@ static class XPublisherSelfTest
 
     private static void TestSelection()
     {
-        const string eligible = "---\ntitle: New article\nauthor: Test Author\npublished: 2026-09-12\nsummary: Summary.\nfeed: true\n---\n";
-        const string eligibleWithHashtags = "---\ntitle: New article\nauthor: Test Author\npublished: 2026-09-12\nsummary: Summary.\nfeed: true\nx_hashtags:\n  - DotNet\n  - AISecurity\n---\n";
+        const string eligible = "---\ntitle: New article\nauthor: Test Author\npublished: 2026-09-12\nsummary: Summary.\nfeed: true\nx_post: A reviewed engineering takeaway.\n---\n";
+        const string eligibleWithHashtags = "---\ntitle: New article\nauthor: Test Author\npublished: 2026-09-12\nsummary: Summary.\nfeed: true\nx_post: A reviewed engineering takeaway.\nx_hashtags:\n  - DotNet\n  - AISecurity\n---\n";
+        const string eligibleWithoutCopy = "---\ntitle: Deferred article\nauthor: Test Author\npublished: 2026-09-12\nsummary: Summary.\nfeed: true\n---\n";
         const string ineligible = "---\ntitle: Draft\nfeed: false\n---\n";
         var baseFiles = new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["docs/articles/enabled.md"] = ineligible,
             ["docs/articles/updated.md"] = eligible,
             ["docs/articles/old-name.md"] = eligible,
-            ["docs/articles/deleted.md"] = eligible
+            ["docs/articles/deleted.md"] = eligible,
+            ["docs/articles/deferred.md"] = eligibleWithoutCopy
         };
         var headFiles = new Dictionary<string, string>(StringComparer.Ordinal)
         {
@@ -1232,7 +1294,9 @@ static class XPublisherSelfTest
             ["docs/articles/enabled.md"] = eligible,
             ["docs/articles/updated.md"] = eligible.Replace("Summary.", "Updated summary.", StringComparison.Ordinal),
             ["docs/articles/new-name.md"] = eligible,
-            ["docs/articles/navigation.md"] = "# Navigation"
+            ["docs/articles/navigation.md"] = "# Navigation",
+            ["docs/articles/deferred.md"] = eligible,
+            ["docs/articles/missing-copy.md"] = eligibleWithoutCopy
         };
         GitChange[] changes =
         [
@@ -1241,12 +1305,16 @@ static class XPublisherSelfTest
             new(GitChangeKind.Modified, "docs/articles/updated.md", "docs/articles/updated.md"),
             new(GitChangeKind.Renamed, "docs/articles/old-name.md", "docs/articles/new-name.md"),
             new(GitChangeKind.Deleted, "docs/articles/deleted.md", "docs/articles/deleted.md"),
-            new(GitChangeKind.Added, null, "docs/articles/navigation.md")
+            new(GitChangeKind.Added, null, "docs/articles/navigation.md"),
+            new(GitChangeKind.Modified, "docs/articles/deferred.md", "docs/articles/deferred.md"),
+            new(GitChangeKind.Added, null, "docs/articles/missing-copy.md")
         ];
         var sitemap = new HashSet<string>(StringComparer.Ordinal)
         {
             new Uri(SiteRoot, "articles/new.html").AbsoluteUri,
-            new Uri(SiteRoot, "articles/enabled.html").AbsoluteUri
+            new Uri(SiteRoot, "articles/enabled.html").AbsoluteUri,
+            new Uri(SiteRoot, "articles/deferred.html").AbsoluteUri,
+            new Uri(SiteRoot, "articles/missing-copy.html").AbsoluteUri
         };
         IReadOnlyList<LearningPublication> selected = GitPublicationSelector.SelectChanges(
             changes,
@@ -1257,7 +1325,7 @@ static class XPublisherSelfTest
             Today,
             SiteRoot);
 
-        Assert(selected.Count == 2, "new and newly enabled documents should be selected exactly once.");
+        Assert(selected.Count == 4, "new, newly enabled, deferred, and copy-ready documents should be selected exactly once.");
         Assert(selected.Any(item => item.SourcePath.EndsWith("new.md", StringComparison.Ordinal)), "new document missing.");
         Assert(selected.Any(item => item.SourcePath.EndsWith("enabled.md", StringComparison.Ordinal)), "enabled transition missing.");
         Assert(
@@ -1268,15 +1336,25 @@ static class XPublisherSelfTest
             selected.Single(item => item.SourcePath.EndsWith("enabled.md", StringComparison.Ordinal))
                 .XHashtags.SequenceEqual(["DotNet"]),
             "default X hashtag was not applied.");
+        Assert(
+            selected.Single(item => item.SourcePath.EndsWith("missing-copy.md", StringComparison.Ordinal)).XPost is null,
+            "an eligible document without x_post should remain selectable for deferral.");
+        Assert(
+            selected.Single(item => item.SourcePath.EndsWith("deferred.md", StringComparison.Ordinal)).XPost is not null,
+            "adding x_post to a deferred document should make it selectable again.");
     }
 
-    private static void TestXQuestionMetadata()
+    private static void TestXMetadata()
     {
         const string header = "---\ntitle: Q\nauthor: Test\npublished: 2026-09-12\nsummary: S.\nfeed: true\n";
 
         Assert(
-            PublicationMetadataReader.Read(header + "---", "docs/none.md", Today)!.XQuestion is null,
-            "a missing x_question should be null.");
+            PublicationMetadataReader.Read(header + "---", "docs/none.md", Today) is { XPost: null, XQuestion: null },
+            "missing X copy should remain available for deferral.");
+        Assert(
+            PublicationMetadataReader.Read(header + "x_post: Keep unknown payment outcomes pending until reconciliation.\n---", "docs/post.md", Today)!
+                .XPost == "Keep unknown payment outcomes pending until reconciliation.",
+            "a plain x_post was not read.");
         Assert(
             PublicationMetadataReader.Read(header + "x_question: Ever been fooled by a log search?\n---", "docs/plain.md", Today)!
                 .XQuestion == "Ever been fooled by a log search?",
@@ -1289,12 +1367,26 @@ static class XPublisherSelfTest
         IReadOnlyList<LearningPublication> selected = GitPublicationSelector.SelectChanges(
             [new GitChange(GitChangeKind.Added, null, "docs/q.md")],
             _ => null,
-            _ => header + "x_question: Ever been fooled?\n---",
+            _ => header + "x_post: Treat a timeout as unknown until evidence resolves it.\nx_question: Ever been fooled?\n---",
             _ => "blob",
             new HashSet<string> { "https://asibackbone.github.io/Learning/q.html" },
             Today,
             SiteRoot);
         Assert(selected.Single().XQuestion == "Ever been fooled?", "x_question was not carried into the publication.");
+        Assert(selected.Single().XPost == "Treat a timeout as unknown until evidence resolves it.", "x_post was not carried into the publication.");
+
+        foreach (string line in new[]
+                 {
+                     "x_post: \"\"",
+                     "x_post: Use #DotNet.",
+                     "x_post: Ask @someone.",
+                     "x_post: Read https://example.com.",
+                     "x_post: |\n  Multi-line copy.",
+                     "x_post: One.\nx_post: Two."
+                 })
+        {
+            AssertThrows<InvalidDataException>(() => PublicationMetadataReader.Read(header + line + "\n---", "docs/invalid-post.md", Today));
+        }
 
         string[] invalid =
         [
@@ -1351,34 +1443,33 @@ static class XPublisherSelfTest
     {
         var composer = new JackdawPatioPostComposer();
 
-        string longTitle = string.Concat(Enumerable.Repeat("👩🏽‍💻", 300));
-        LearningPublication publication = Publication(longTitle, hashtags: ["DotNet", "AISecurity"]);
+        const string takeaway = "A timeout ends the caller's observation, not the provider's work.";
+        LearningPublication publication = Publication("Article title", hashtags: ["DotNet", "AISecurity"], post: takeaway);
         string post = composer.Compose(publication);
         Assert(WeightedPostLength(post, publication.CanonicalUrl) <= 280, "post exceeded the weighted limit.");
         Assert(post.Contains("\n\n#DotNet #AISecurity\n\n", StringComparison.Ordinal), "hashtags were not composed.");
         Assert(post.EndsWith(publication.CanonicalUrl, StringComparison.Ordinal), "canonical URL was not preserved.");
-        Assert(post.Contains('…'), "a long title was not truncated with an ellipsis.");
 
         Assert(
-            composer.Compose(Publication("Short title")) ==
-                "New from AsiBackbone Learning:\n\nShort title\n\n#DotNet\n\nhttps://asibackbone.github.io/Learning/article.html",
-            "a post without a question changed layout.");
+            composer.Compose(Publication("Short title", post: takeaway)) ==
+                $"{takeaway}\n\nShort title\n\n#DotNet\n\nhttps://asibackbone.github.io/Learning/article.html",
+            "x_post was not placed at the beginning of the post.");
 
         string question = "Has a correlation ID search ever told you the wrong story?";
         Assert(
-            composer.Compose(Publication("Short title", question: question)) ==
-                $"New from AsiBackbone Learning:\n\nShort title\n\n{question}\n\n#DotNet\n\nhttps://asibackbone.github.io/Learning/article.html",
-            "the question was not placed between the title and the hashtags.");
+            composer.Compose(Publication("Short title", post: takeaway, question: question)) ==
+                $"{takeaway}\n\nShort title\n\n{question}\n\n#DotNet\n\nhttps://asibackbone.github.io/Learning/article.html",
+            "the title and question were not placed after x_post.");
 
         string longUrl = "https://asibackbone.github.io/Learning/articles/2026/" + new string('a', 250) + ".html";
-        string fullTitle = new('t', 150);
+        string fullPost = new('t', 200);
         Assert(
-            composer.Compose(Publication(fullTitle, canonicalUrl: longUrl)).Contains(fullTitle, StringComparison.Ordinal),
-            "a long URL should count as 23 characters, not shorten the title.");
+            composer.Compose(Publication("Title", canonicalUrl: longUrl, post: fullPost)).Contains(fullPost, StringComparison.Ordinal),
+            "a long URL should count as 23 characters, not shorten x_post.");
 
-        // A question that does not fit must fail rather than truncate.
+        AssertThrows<InvalidDataException>(() => composer.Compose(Publication("Missing", post: null)));
         AssertThrows<InvalidDataException>(
-            () => composer.Compose(Publication(new string('t', 120), question: new string('q', 120) + "?")));
+            () => composer.Compose(Publication("Too long", post: new string('p', 240), question: new string('q', 30) + "?")));
 
         Assert(XTextLength.Weighted("abc") == 3, "Latin text should count 1 per character.");
         Assert(XTextLength.Weighted("日本") == 4, "CJK text should count 2 per character.");
@@ -1558,6 +1649,49 @@ static class XPublisherSelfTest
         Assert(duplicateClient.CreateCalls == 0, "existing receipt should prevent creation.");
     }
 
+    private static async Task TestDeferralAsync()
+    {
+        LearningPublication missingCopy = Publication(
+            "Deferred",
+            "https://asibackbone.github.io/Learning/deferred.html",
+            post: null);
+        LearningPublication ready = Publication(
+            "Ready",
+            "https://asibackbone.github.io/Learning/ready.html");
+        var client = new FakeXClient([]);
+        var store = new MemoryStateStore();
+        var publisher = new XPublisher(client, store, new JackdawPatioPostComposer());
+
+        PublisherState deferred = await publisher.PublishAsync(
+            [missingCopy, ready],
+            PublisherState.Create("test", "base"),
+            "head",
+            CancellationToken.None);
+
+        Assert(deferred.CursorSha == "head", "a missing x_post should not block cursor advancement.");
+        Assert(deferred.DeferredPublications.ContainsKey(missingCopy.CanonicalUrl), "missing x_post was not recorded durably.");
+        Assert(
+            deferred.DeferredPublications[missingCopy.CanonicalUrl].SourcePath == missingCopy.SourcePath,
+            "the deferral did not retain the source path for later review.");
+        Assert(deferred.Receipts.ContainsKey(ready.CanonicalUrl), "a later ready publication was not published.");
+        Assert(client.CreateCalls == 1, "only the ready publication should have been created.");
+
+        LearningPublication copyAdded = missingCopy with
+        {
+            SourceBlobSha = "copy-ready-blob",
+            XPost = "A deferred engineering takeaway is now ready."
+        };
+        PublisherState completed = await publisher.PublishAsync(
+            [copyAdded],
+            deferred,
+            "next",
+            CancellationToken.None);
+
+        Assert(completed.Receipts.ContainsKey(copyAdded.CanonicalUrl), "the deferred publication was not published when copy became ready.");
+        Assert(!completed.DeferredPublications.ContainsKey(copyAdded.CanonicalUrl), "the resolved deferral was not cleared.");
+        Assert(client.CreateCalls == 2, "the deferred publication should create exactly one later post.");
+    }
+
     private static async Task TestAmbiguousDeliveryAsync()
     {
         LearningPublication publication = Publication("Ambiguous");
@@ -1586,18 +1720,44 @@ static class XPublisherSelfTest
     {
         LearningPublication first = Publication("B title", "https://asibackbone.github.io/Learning/b.html");
         LearningPublication second = Publication("A title", "https://asibackbone.github.io/Learning/a.html");
-        IReadOnlyList<string> one = XPublisher.RenderDryRun([first, second], PublisherState.Create("test", "base"));
-        IReadOnlyList<string> two = XPublisher.RenderDryRun([second, first], PublisherState.Create("test", "base"));
+        LearningPublication deferred = Publication("Deferred", "https://asibackbone.github.io/Learning/deferred.html", post: null);
+        PublisherState state = PublisherState.Create("test", "base").WithDeferral(
+            "https://asibackbone.github.io/Learning/existing-deferral.html",
+            new XPublicationDeferral("docs/existing-deferral.md", "deferred-blob", new DateTimeOffset(2026, 9, 12, 0, 0, 0, TimeSpan.Zero)));
+        IReadOnlyList<string> one = XPublisher.RenderDryRun([first, second, deferred], state);
+        IReadOnlyList<string> two = XPublisher.RenderDryRun([deferred, second, first], state);
         Assert(one.SequenceEqual(two), "dry-run output was not deterministic.");
         Assert(!string.Join('\n', one).Contains("secret", StringComparison.OrdinalIgnoreCase), "dry run exposed secret text.");
+        Assert(string.Join('\n', one).Contains("DEFERRED: missing 'x_post'", StringComparison.Ordinal), "dry run did not surface missing copy.");
+        Assert(string.Join('\n', one).Contains("docs/existing-deferral.md", StringComparison.Ordinal), "dry run omitted a recorded deferral after cursor advancement.");
+    }
+
+    private static void TestStateMigration()
+    {
+        string path = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(
+                path,
+                "{\"schemaVersion\":1,\"account\":\"test\",\"cursorSha\":\"base\",\"receipts\":{}}");
+            PublisherState legacy = new FilePublisherStateStore(path).Load() ??
+                throw new InvalidOperationException("legacy state was not loaded.");
+            Assert(legacy.DeferredPublications.Count == 0, "legacy state should initialize an empty deferral set.");
+            Assert(legacy.WithCursor("next").SchemaVersion == 2, "saving legacy state should migrate it to schema version 2.");
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 
     private static LearningPublication Publication(
         string title,
         string canonicalUrl = "https://asibackbone.github.io/Learning/article.html",
         IReadOnlyList<string>? hashtags = null,
+        string? post = "A concise engineering takeaway.",
         string? question = null) =>
-        new(title, "Test Author", Today, "Summary", hashtags ?? ["DotNet"], "docs/article.md", "blob", canonicalUrl, question);
+        new(title, "Test Author", Today, "Summary", hashtags ?? ["DotNet"], "docs/article.md", "blob", canonicalUrl, post, question);
 
     private static void Assert(bool condition, string message)
     {
@@ -1751,6 +1911,7 @@ sealed record PublicationMetadata(
     DateOnly Published,
     string Summary,
     IReadOnlyList<string> XHashtags,
+    string? XPost = null,
     string? XQuestion = null);
 sealed record LearningPublication(
     string Title,
@@ -1761,9 +1922,11 @@ sealed record LearningPublication(
     string SourcePath,
     string SourceBlobSha,
     string CanonicalUrl,
+    string? XPost = null,
     string? XQuestion = null);
 sealed record XPost(string Id, string Text);
 sealed record XPublicationReceipt(string SourceBlobSha, string PostId, DateTimeOffset PostedAtUtc);
+sealed record XPublicationDeferral(string SourcePath, string SourceBlobSha, DateTimeOffset DeferredAtUtc);
 sealed record CreatePostRequest(string Text);
 
 [JsonSourceGenerationOptions(

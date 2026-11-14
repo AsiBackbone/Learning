@@ -95,8 +95,11 @@ static class MetadataValidator
         @"^x_question:[ \t]*(?<value>.*?)[ \t]*$",
         RegexOptions.Compiled);
 
+    private static readonly Regex XPostFrontMatterRegex = new(
+        @"^x_post:[ \t]*(?<value>.*?)[ \t]*$",
+        RegexOptions.Compiled);
+
     // These must match JackdawPatioPostComposer and XTextLength in tools/publish-x.cs.
-    private const string XPostPrefix = "New from AsiBackbone Learning:\n\n";
     private const int XUrlWeight = 23;
     private const int XMaximumWeightedLength = 280;
 
@@ -245,7 +248,7 @@ static class MetadataValidator
                 // The X publisher reads these keys from any feed-enabled page under docs/.
                 string[] sourceLines = File.ReadAllLines(path);
                 IReadOnlyList<string>? hashtags = ValidateXHashtagFrontMatter(relativePath, sourceLines, errors);
-                ValidateXQuestionFrontMatter(relativePath, sourceLines, hashtags, errors);
+                ValidateXPostFrontMatter(relativePath, sourceLines, hashtags, errors);
             }
 
             foreach (string line in File.ReadLines(path))
@@ -439,9 +442,9 @@ static class MetadataValidator
         return errors.Count == errorsBefore ? hashtags : null;
     }
 
-    // Mirrors XQuestionRules, XTextLength, and JackdawPatioPostComposer in tools/publish-x.cs,
-    // so that an x_question that the publisher would reject fails the pull request instead.
-    private static void ValidateXQuestionFrontMatter(
+    // Mirrors XPostRules, XQuestionRules, XTextLength, and JackdawPatioPostComposer in
+    // tools/publish-x.cs, so copy that the publisher would reject fails the pull request instead.
+    private static void ValidateXPostFrontMatter(
         string relativePath,
         IReadOnlyList<string> lines,
         IReadOnlyList<string>? hashtags,
@@ -453,6 +456,7 @@ static class MetadataValidator
         }
 
         string? title = null;
+        var posts = new List<(int Index, string RawValue)>();
         var questions = new List<(int Index, string RawValue)>();
 
         for (int index = 1; index < lines.Count; index++)
@@ -460,6 +464,12 @@ static class MetadataValidator
             if (string.Equals(lines[index].Trim(), "---", StringComparison.Ordinal))
             {
                 break;
+            }
+
+            Match postMatch = XPostFrontMatterRegex.Match(lines[index]);
+            if (postMatch.Success)
+            {
+                posts.Add((index, postMatch.Groups["value"].Value));
             }
 
             Match titleMatch = TitleFrontMatterRegex.Match(lines[index]);
@@ -475,9 +485,31 @@ static class MetadataValidator
             }
         }
 
-        if (questions.Count == 0)
+        if (posts.Count > 1)
         {
+            errors.Add($"{relativePath}: frontmatter key 'x_post' appears more than once.");
             return;
+        }
+
+        string? xPost = null;
+        int postIndex = -1;
+        if (posts.Count == 1)
+        {
+            (int currentPostIndex, string rawPost) = posts[0];
+            postIndex = currentPostIndex;
+            if (rawPost.StartsWith('|') || rawPost.StartsWith('>'))
+            {
+                errors.Add($"{relativePath}:{postIndex + 1}: 'x_post' must be single-line.");
+                return;
+            }
+
+            xPost = ParseScalar(rawPost).Trim();
+            string? postProblem = XPostProblem(xPost);
+            if (postProblem is not null)
+            {
+                errors.Add($"{relativePath}:{postIndex + 1}: 'x_post' {postProblem}");
+                return;
+            }
         }
 
         if (questions.Count > 1)
@@ -486,36 +518,53 @@ static class MetadataValidator
             return;
         }
 
-        (int questionIndex, string rawValue) = questions[0];
-        if (rawValue.StartsWith('|') || rawValue.StartsWith('>'))
+        string? question = null;
+        if (questions.Count == 1)
         {
-            errors.Add($"{relativePath}:{questionIndex + 1}: 'x_question' must be single-line.");
-            return;
+            (int questionIndex, string rawValue) = questions[0];
+            if (rawValue.StartsWith('|') || rawValue.StartsWith('>'))
+            {
+                errors.Add($"{relativePath}:{questionIndex + 1}: 'x_question' must be single-line.");
+                return;
+            }
+
+            question = ParseScalar(rawValue).Trim();
+            string? problem = XQuestionProblem(question);
+            if (problem is not null)
+            {
+                errors.Add($"{relativePath}:{questionIndex + 1}: 'x_question' {problem}");
+                return;
+            }
         }
 
-        string question = ParseScalar(rawValue).Trim();
-        string? problem = XQuestionProblem(question);
-        if (problem is not null)
-        {
-            errors.Add($"{relativePath}:{questionIndex + 1}: 'x_question' {problem}");
-            return;
-        }
-
-        if (title is null || hashtags is null)
+        // Missing x_post is intentionally allowed here. The deployment publisher records
+        // a durable deferral so later articles can continue and this one can publish when
+        // reviewed copy is added.
+        if (xPost is null || title is null || hashtags is null)
         {
             return;
         }
 
         string hashtagText = string.Join(' ', hashtags.Select(static hashtag => $"#{hashtag}"));
-        string withoutUrl = $"{XPostPrefix}{title}\n\n{question}\n\n{hashtagText}\n\n";
+        string questionBlock = question is null ? string.Empty : $"\n\n{question}";
+        string withoutUrl = $"{xPost}\n\n{title}{questionBlock}\n\n{hashtagText}\n\n";
         int over = XWeightedLength(withoutUrl) + XUrlWeight - XMaximumWeightedLength;
         if (over > 0)
         {
             errors.Add(
-                $"{relativePath}:{questionIndex + 1}: 'x_question' makes the X post {over} character(s) too long; " +
-                "shorten the question or the title.");
+                $"{relativePath}:{postIndex + 1}: the composed X post is {over} character(s) too long; " +
+                "shorten 'x_post' or 'x_question'.");
         }
     }
+
+    private static string? XPostProblem(string post) =>
+        post.Length == 0 ? "must not be empty." :
+        post.Any(char.IsControl) ? "must be a single line without control characters." :
+        post.Contains('#') || post.Contains('@')
+            ? "must not contain hashtags or mentions; use 'x_hashtags' for hashtags." :
+        post.Contains("://", StringComparison.Ordinal) || post.Contains("www.", StringComparison.OrdinalIgnoreCase)
+            ? "must not contain links; the publisher adds the canonical URL." :
+        null;
 
     private static string? XQuestionProblem(string question) =>
         question.Length == 0 ? "must not be empty." :
