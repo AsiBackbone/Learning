@@ -135,9 +135,45 @@ try {
     Remove-Item -LiteralPath (Join-Path $signatureAssets 'learning-9.8.7-release-notes.md')
     Assert-SignatureCheckRejects 'missing subject' 'is missing signed evidence subjects: learning-9.8.7-release-notes.md' $signatureArguments
 
+    # Stub gh so the complete verification path can run without network access or
+    # real attestations. The altered subject and untrusted source ref must fail,
+    # while every positive verification succeeds.
+    Copy-Item -LiteralPath (Join-Path $evidenceDirectory 'learning-9.8.7-release-notes.md') -Destination $signatureAssets
+    $global:LearningReleaseSignatureTestCalls = @()
+    function gh {
+        $subjectPath = [string]$args[2]
+        $sourceRefIndex = [Array]::IndexOf($args, '--source-ref')
+        $sourceRef = [string]$args[$sourceRefIndex + 1]
+        $global:LearningReleaseSignatureTestCalls += [pscustomobject]@{
+            SubjectPath = $subjectPath
+            SourceRef = $sourceRef
+        }
+
+        if ($subjectPath.Contains('tampered', [System.StringComparison]::OrdinalIgnoreCase) -or $sourceRef -eq 'refs/tags/v0.0.0') {
+            $global:LASTEXITCODE = 1
+            'expected verification rejection'
+            return
+        }
+
+        $global:LASTEXITCODE = 0
+        'verification succeeded'
+    }
+
+    & $signatureScript @signatureArguments -IncludeNegativeTests | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "Successful release-signature verification left native exit code '$LASTEXITCODE'."
+    }
+
+    $alteredSubjectCalls = @($global:LearningReleaseSignatureTestCalls | Where-Object { $_.SubjectPath.Contains('tampered', [System.StringComparison]::OrdinalIgnoreCase) })
+    $untrustedIdentityCalls = @($global:LearningReleaseSignatureTestCalls | Where-Object { $_.SourceRef -eq 'refs/tags/v0.0.0' })
+    if ($alteredSubjectCalls.Count -ne 1 -or $untrustedIdentityCalls.Count -ne 1) {
+        throw 'Release-signature verification did not exercise both fail-closed negative tests.'
+    }
+
     Write-Host 'Release evidence tests passed.'
 }
 finally {
+    Remove-Variable -Name LearningReleaseSignatureTestCalls -Scope Global -ErrorAction SilentlyContinue
     if (Test-Path -LiteralPath $testRoot) {
         Remove-Item -LiteralPath $testRoot -Recurse -Force
     }
