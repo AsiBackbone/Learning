@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Canceling a queued or running job, a cancellation that races the worker claiming it, stopping work already underway, and what to record when cancellation is too late | [Canceling a Queued Job Can Race With Execution](2026/revoke-job-after-it-enters-queue.md) |
 | A payment provider call that timed out, whether the customer was charged, idempotency keys after a lost response, and resending versus reconciling | [A Payment API Timeout Leaves the Outcome Unknown](2026/payment-api-timeout-unknown-outcome.md) |
 | One-time grants or capabilities accepted twice across application instances or after a restart, and what a shared, durable, atomic consumption store must guarantee | [An In-Memory Grant Store Is Not Distributed Replay Protection](2026/in-memory-grant-store-is-not-distributed-replay-protection.md) |
 | Reconstructing what happened across an API, queue, worker, and webhook, correlation IDs versus trace IDs, duplicate and out-of-order delivery, and sampled traces as evidence | [A Correlation ID Is Not a Distributed Audit Trail](2026/correlation-id-is-not-distributed-audit-trail.md) |
@@ -57,6 +58,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Canceling a Queued Job Can Race With Execution](2026/revoke-job-after-it-enters-queue.md)
+
+**Christopher D. Cavell** · **November 14, 2026**
+
+A support engineer canceled a queued contact export and was told it had been canceled, while a worker that had already read the job as queued overwrote the cancellation 21 milliseconds later and uploaded 48,112 contacts to a partner whose contract had ended. This guide separates broker delivery, the job's current state, the authority to start, and execution already underway; explains why re-reading the status, deleting the message, and disabling the button narrow the window without closing it; shows a conditional claim and a competing conditional cancellation on the same row, so exactly one wins and "canceled before it started" has a precise meaning; adds a second conditional write before the first effect that cannot be undone; treats cancellation after the claim as a request the worker honors only where stopping is safe; records every cancellation request with what it found and the attempt it lost to; covers recovery, tests that put both writers in a real race, and when one conditional update is the whole design.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/revoke-job-after-it-enters-queue.html`
 
 ### [A Payment API Timeout Leaves the Outcome Unknown](2026/payment-api-timeout-unknown-outcome.md)
 

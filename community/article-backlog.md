@@ -831,6 +831,40 @@ Lead to An Allowed Decision Does Not Mean the Operation Succeeded for decision v
 
 ---
 
+### 25. Canceling a Queued Job Can Race With Execution
+
+- **Priority:** P1
+- **Implementation issue:** [#478](https://github.com/AsiBackbone/Learning/issues/478); opened directly as an implementation issue rather than promoted from an earlier backlog entry
+- **Publication:** [Published November 14, 2026](../docs/articles/2026/revoke-job-after-it-enters-queue.md)
+- **Permanent slug:** `revoke-job-after-it-enters-queue`
+
+#### Reader / search problem
+
+An operator cancels a queued background job, such as an export, while a worker is already picking it up, and the job runs anyway. Typical questions include:
+
+- Why did a job run after the console said it was canceled?
+- Is deleting the queue message enough to cancel a job?
+- What decides whether cancellation or the worker's start wins when they happen at the same moment?
+- What can cancellation still do after the job has started, and when is it too late?
+- What should be recorded, and told to the operator, when cancellation loses?
+
+#### Existing Learning support
+
+- [A Background Job Should Not Inherit Everything the User Could Do](../docs/articles/2026/background-job-should-not-inherit-user-authority.md)
+- [Your Security Check Passed. Then the World Changed.](../docs/articles/2026/security-check-passed-then-world-changed.md)
+- [An In-Memory Grant Store Is Not Distributed Replay Protection](../docs/articles/2026/in-memory-grant-store-is-not-distributed-replay-protection.md) (#476), as related reading on distributed grant consumption
+- [Capability-Scoped Background Operation](../docs/case-studies/capability-scoped-background-operation.md)
+
+#### Article / curriculum distinction
+
+The background-job article establishes that a queue message is not authority and that the worker claims a job conditionally, and the security-check article develops check-then-claim against changing facts. The capability case study defines the revocation-versus-claim race for a portable grant. This article should stay centered on cancellation and claim ownership for an ordinary job row: a concrete race between an operator and a worker, the difference between broker delivery, current job state, authority to start, and execution already underway, a conditional claim that makes the pre-start cutoff explicit, a second cutoff before the first irreversible effect, and what to record when cancellation loses. It must not claim that broker message deletion cancels a job, that cancellation can recall an effect already delivered, that timestamps from different hosts decide the winner, or that every job needs stop requests and watchers.
+
+#### Natural deeper path
+
+Lead to A Background Job Should Not Inherit Everything the User Could Do for what the job carries and how the worker re-checks authority before it claims, Your Security Check Passed. Then the World Changed. for check-then-claim and facts outside the claimed row, An In-Memory Grant Store Is Not Distributed Replay Protection and the capability case study for revocation racing consumption of a grant, and A Payment API Timeout Leaves the Outcome Unknown for an external call interrupted after the point of no return.
+
+---
+
 ## Promotion and Publication Workflow
 
 Keep planning, implementation, and publication as separate states:

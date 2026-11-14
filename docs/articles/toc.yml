@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: Canceling a Queued Job Can Race With Execution
+  href: 2026/revoke-job-after-it-enters-queue.md
 - name: A Payment API Timeout Leaves the Outcome Unknown
   href: 2026/payment-api-timeout-unknown-outcome.md
 - name: An In-Memory Grant Store Is Not Distributed Replay Protection
