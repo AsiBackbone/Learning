@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "account": "jackdaw-patio",
-  "cursorSha": "7d2492bf9e6c598a1d297393caf0f3bbd8f1dab8",
+  "cursorSha": "e5b6a8d8e5e557a12559f25df56800a756f53bc8",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
@@ -102,6 +102,11 @@
       "sourceBlobSha": "e1ca8fead5b47d912d35b6ac67ea04c51b92baec",
       "postId": "2121346241581953263",
       "postedAtUtc": "2026-11-13T20:55:31.5124172+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/revoke-job-after-it-enters-queue.html": {
+      "sourceBlobSha": "feaf0b7ce4367d284fbf773434c4b2ac3982e3c1",
+      "postId": "2121724232677642644",
+      "postedAtUtc": "2026-11-14T21:57:31.6281444+00:00"
     }
   },
   "deferredPublications": {}
