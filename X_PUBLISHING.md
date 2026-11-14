@@ -13,14 +13,28 @@ then verifies that the deployed revision is a repository commit reachable from
 `main`. It compares that revision with the cursor stored on
 `automation/x-publisher-state`.
 
-A document is selected only when it is Markdown under `docs/`, changes from
-missing or `feed: false` to valid `feed: true` metadata, and has a canonical URL
-in the deployed sitemap. Content edits, metadata updates, deletions, and Git
-renames of already eligible documents do not create another post. RSS and X are
-sibling consumers of source frontmatter; the X publisher does not read or
-modify `feed.xml`.
+A document is selected when it is Markdown under `docs/`, has a canonical URL
+in the deployed sitemap, and either changes from missing or `feed: false` to
+valid `feed: true` metadata or adds `x_post` after a missing-copy deferral.
+Other content edits, metadata updates, deletions, and Git renames of already
+eligible documents do not create another post. RSS and X are sibling consumers
+of source frontmatter; the X publisher does not read or modify `feed.xml`.
 
-Feed-enabled articles may select hashtags with optional frontmatter:
+Feed-enabled articles may provide announcement copy with frontmatter:
+
+```yaml
+x_post: A timeout ends the caller's observation, not the provider's work. Keep the operation pending until evidence resolves the outcome.
+```
+
+`x_post` is the author-written engineering takeaway that leads the announcement.
+Keep it concrete and useful without the article, on one line, with no hashtags,
+mentions, or links. The documentation build validates the exact composed post
+against X's weighted limit. A missing `x_post` does not block deployment or later
+announcements: the publisher records a durable deferral and reports the page for
+manual review. Adding `x_post` later selects that page again without making other
+metadata edits eligible for reposting.
+
+Feed-enabled articles may also select hashtags with optional frontmatter:
 
 ```yaml
 x_hashtags:
@@ -41,13 +55,12 @@ Feed-enabled pages may also ask readers a question:
 x_question: Has a correlation ID search ever told you the wrong story?
 ```
 
-The question is optional and author-written, so it is reviewed in the same pull
-request as the page. Write one that readers can answer from their own
+The question remains optional and author-written, so it is reviewed in the same
+pull request as the page. Write one that readers can answer from their own
 experience, rather than a teaser for the article. It must be one line, end with
-`?`, and contain no hashtags, mentions, or links. The question is never
-truncated: the documentation build fails when the question, the full title, the
-hashtags, and the link do not fit in one post, and reports how many characters
-to remove.
+`?`, and contain no hashtags, mentions, or links. Neither the takeaway, title,
+nor question is truncated: the documentation build fails when the complete post
+does not fit and reports how many characters to remove.
 
 ## Initial setup
 
@@ -78,10 +91,10 @@ cannot be overridden by repository or workflow input.
 
 ## Delivery and retry behavior
 
-The post text is deterministic:
+The post text is deterministic and keeps the canonical URL in the main post:
 
 ```text
-New from AsiBackbone Learning:
+{x_post}
 
 {title}
 
@@ -95,14 +108,12 @@ New from AsiBackbone Learning:
 The question block appears only when `x_question` is present. Length follows
 X's weighted count: the link counts as 23 characters because X shortens it,
 emoji sequences count 2, and characters outside X's Latin and punctuation
-ranges count 2. Without a question, a long title is truncated at a Unicode
-text-element boundary, preserving the hashtags and link within the 280-character
-budget. With a question, nothing is truncated; a post that does not fit fails
+ranges count 2. No authored copy is truncated; a post that does not fit fails
 the documentation build before merge, and the publisher refuses it as a
-backstop. Before
-every create call, the publisher searches recent account posts for that URL. A
-successful create or reconciliation writes its post ID and source blob SHA
-immediately. The cursor advances only after every candidate succeeds.
+backstop. Before every create call, the publisher searches recent account posts
+for that URL. A successful create or reconciliation writes its post ID and
+source blob SHA immediately. The cursor advances only after every publishable
+candidate succeeds and every missing-copy candidate has a durable deferral.
 
 HTTP `400` is treated as a publisher/content defect; `401` and `403` indicate a
 credential or application-permission failure. `429`, `5xx`, and pre-response
@@ -112,8 +123,14 @@ idempotency key for this operation, so receipts plus URL reconciliation provide
 effectively-once behavior with a small residual duplicate risk if X accepts a
 post but neither its response nor the new post is observable during recovery.
 
-The workflow stops on the first unresolved candidate. A later successful Pages
-deployment or a controlled manual live run retries it because the durable cursor
+The workflow stops on the first unresolved delivery failure. Missing `x_post`
+copy is different: the publisher writes the canonical URL, source path, source
+blob SHA, and first deferral time to `deferredPublications`, continues with later candidates,
+and advances the cursor after all publishable candidates succeed. When reviewed
+copy is added, the missing-to-present `x_post` transition selects the article
+again; a successful create or URL reconciliation writes the normal receipt and
+removes the deferral. A later successful Pages deployment or controlled manual
+live run still retries unresolved delivery failures because their durable cursor
 has not advanced.
 
 ## Manual validation and recovery
@@ -124,10 +141,12 @@ Run the complete offline contract suite without secrets or network access:
 dotnet run --file tools/publish-x.cs -- --self-test
 ```
 
-Use the workflow's default manual dry run to inspect the candidates and exact
-post text for the deployed revision. If a post succeeded but state persistence
-failed, rerun the live workflow: recent-post reconciliation restores the missing
-receipt before attempting a create.
+Use the workflow's default manual dry run to inspect each candidate and its exact
+post text. New and previously recorded candidates without `x_post` appear as
+`DEFERRED` instead of being silently skipped. Add reviewed copy in a normal pull request; do not edit the
+state branch by hand merely to clear a deferral. If a post succeeded but state
+persistence failed, rerun the live workflow: recent-post reconciliation restores
+the missing receipt before attempting a create.
 
 For credential rotation, replace all four environment secrets as one coordinated
 change, keep the account ID fixed, then run a dry run followed by a controlled

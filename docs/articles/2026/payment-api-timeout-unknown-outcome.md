@@ -5,10 +5,10 @@ author: Christopher D. Cavell
 published: "2026-11-13"
 summary: When a call to a payment provider times out, your client has stopped waiting; the provider may still have taken the payment. Record the attempt as unknown rather than failed, persist the attempt with its own client reference, its idempotency key, and the exact request and context before the first send, find out what happened from the provider's own records, and resend only with the original key and unchanged parameters while the provider's contract says that is safe. Never mint a new key to get past an outcome you have not resolved.
 feed: true
+x_post: A payment API timeout leaves the outcome unknown. The provider may already have charged the customer. Keep the payment pending until you can reconcile it.
 x_hashtags:
   - DotNet
   - SoftwareArchitecture
-x_question: "What does your app do when a payment times out?"
 ---
 
 # A Payment API Timeout Leaves the Outcome Unknown
