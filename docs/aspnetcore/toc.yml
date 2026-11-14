@@ -19,6 +19,9 @@
 - name: "Payment Attempt Recovery in ASP.NET Core: An Implementation Reference"
   href: payment-attempt-recovery-implementation-reference.md
 
+- name: "Queued Job Cancellation and Recovery in ASP.NET Core: An Implementation Reference"
+  href: queued-job-cancellation-recovery-implementation-reference.md
+
 - name: Retrofitting Governed Execution into an Existing ASP.NET Core Application
   href: retrofit-governed-execution-into-an-existing-application.md
 

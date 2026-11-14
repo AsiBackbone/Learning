@@ -678,6 +678,8 @@ For the same report-generation scenario designed end to end, with portable autho
 
 If one worker serves many tenants, [Shared Multi-Tenant Worker and Delayed Execution Isolation](../../case-studies/shared-multi-tenant-worker-and-delayed-execution-isolation.md) separates stopping cross-tenant substitution from containing a compromised worker.
 
+If an operator can cancel the job while a worker is claiming it, [Canceling a Queued Job Can Race With Execution](revoke-job-after-it-enters-queue.md) shows how the conditional claim decides that race, and what to record when cancellation arrives after the work has begun.
+
 If your job can fail and run again, [Your Retry Logic May Be Replaying an Authorization Decision](retry-logic-may-replay-authorization-decision.md) covers what each retry layer can and cannot know, and [Should Authorization Fail Open, Fail Closed, or Defer?](fail-open-fail-closed-or-defer.md) covers what to do when the worker cannot reach the facts it needs.
 
 ### Related Work
