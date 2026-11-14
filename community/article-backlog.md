@@ -861,7 +861,7 @@ The background-job article establishes that a queue message is not authority and
 
 #### Natural deeper path
 
-Lead to A Background Job Should Not Inherit Everything the User Could Do for what the job carries and how the worker re-checks authority before it claims, Your Security Check Passed. Then the World Changed. for check-then-claim and facts outside the claimed row, An In-Memory Grant Store Is Not Distributed Replay Protection and the capability case study for revocation racing consumption of a grant, and A Payment API Timeout Leaves the Outcome Unknown for an external call interrupted after the point of no return.
+Lead to A Background Job Should Not Inherit Everything the User Could Do for what the job carries and how the worker re-checks authority before it claims, Your Security Check Passed. Then the World Changed. for check-then-claim and facts outside the claimed row, An In-Memory Grant Store Is Not Distributed Replay Protection and the capability case study for revocation racing consumption of a grant, and A Payment API Timeout Leaves the Outcome Unknown for an external call interrupted after the point of no return. Implementation detail that review showed would overwhelm the argument, such as single-statement claims, leases and recovery, the outbox and sweeper, the complete worker and cancellation methods, and the wider test matrix, lives in the companion [Queued Job Cancellation and Recovery in ASP.NET Core: An Implementation Reference](../docs/aspnetcore/queued-job-cancellation-recovery-implementation-reference.md).
 
 ---
 
