@@ -125,6 +125,12 @@ try {
         Write-Host 'Negative tests passed: an altered subject and an untrusted signer identity were rejected.'
     }
 
+    # Expected gh failures from the negative tests leave PowerShell's global
+    # native-command exit code nonzero even though every assertion passed. Clear it
+    # before returning so a successful `pwsh -File` invocation reports success to
+    # GitHub Actions and other callers.
+    $global:LASTEXITCODE = 0
+
     $mode = if ($hasBundle) { "the durable '$bundleName' bundle" } else { 'the GitHub attestation API' }
     Write-Host "Verified $($subjectNames.Count) signed evidence subjects of '$Repository' release '$TagName' using $mode."
 }
