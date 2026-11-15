@@ -150,7 +150,7 @@ The organization contains complementary projects with different responsibilities
 | [Learning](https://asibackbone.github.io/Learning/) | Teaches concepts, patterns, tradeoffs, samples, and labs |
 | [AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) | Working governance and policy-control implementation |
 | [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) | Secure-by-default ASP.NET Core application template and architecture specimen |
-| [ReferenceApplication](https://github.com/AsiBackbone/ReferenceApplication) | Runnable integration specimen that builds on NetCoreApplicationTemplate and adds AsiBackbone governance (stable `1.x`) |
+| [ReferenceApplication](https://github.com/AsiBackbone/ReferenceApplication) | The stable integration example, not a product: an NCAT-generated host that adopts AsiBackbone governance (stable `1.x`) |
 
 Learning connects to the implementation repositories when fuller examples are useful, but adoption of either implementation repository is not required to benefit from the educational material.
 
