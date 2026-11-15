@@ -1,115 +1,46 @@
-# Code of Conduct
+# AsiBackbone Code of Conduct
 
-## Our Commitment
+## Our Pledge
 
-The AsiBackbone Learning community is intended to be a constructive, technically rigorous, and welcoming place for people to learn, question, experiment, and contribute.
+We pledge to make participation in AsiBackbone projects a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socioeconomic status, nationality, personal appearance, race, caste, color, religion, or sexual identity and orientation.
 
-We are committed to providing a community environment that is respectful and free from harassment, intimidation, and discrimination for everyone, regardless of experience level, background, identity, disability, appearance, nationality, race, ethnicity, religion, age, sex, gender identity or expression, sexual orientation, or other personal characteristics.
-
-Participation in this project is based on the quality of ideas, contributions, reasoning, and collaboration.
+We will act in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.
 
 ## Our Standards
 
-Examples of behavior that contributes to a positive community include:
+Positive behavior includes:
 
-- Treating other participants with respect and professional courtesy.
-- Welcoming questions from beginners and experienced practitioners alike.
-- Giving technical criticism that addresses ideas, code, architecture, or evidence rather than the person presenting them.
-- Explaining disagreements clearly and, when practical, supporting claims with code, tests, documentation, measurements, or references.
-- Acknowledging tradeoffs and reasonable alternative approaches.
-- Accepting constructive feedback and being willing to revise one's own work.
-- Giving appropriate credit for ideas, examples, diagrams, code, and other contributions.
-- Respecting privacy and avoiding the disclosure of confidential, personal, or security-sensitive information.
-- Helping keep discussions focused, useful, and accessible to future readers.
+- showing empathy and respect for different viewpoints and experiences;
+- giving and accepting constructive feedback;
+- taking responsibility for mistakes and learning from them;
+- keeping technical criticism focused on code, documentation, behavior, evidence, and tradeoffs; and
+- supporting the long-term health of the community.
 
-Examples of unacceptable behavior include:
+Unacceptable behavior includes:
 
-- Harassment, threats, intimidation, or sustained personal attacks.
-- Insults, ridicule, or dismissive behavior directed at a contributor rather than their work.
-- Discriminatory or derogatory comments.
-- Sexualized language, imagery, or unwanted sexual attention.
-- Deliberate disruption of discussions, issues, pull requests, or other community spaces.
-- Bad-faith argument, repeated trolling, or knowingly misrepresenting another participant's position.
-- Publishing another person's private information without permission.
-- Encouraging unsafe, unlawful, or clearly abusive use of examples or architectural patterns.
-- Using the project to promote spam, scams, malware, credential theft, or other harmful activity.
+- sexualized language, imagery, attention, or advances;
+- trolling, insults, derogatory comments, or personal and political attacks;
+- public or private harassment, threats, or intimidation;
+- publishing another person's private information without explicit permission;
+- deliberately disrupting issues, pull requests, discussions, reviews, or other project spaces; and
+- other conduct that would reasonably be considered inappropriate in a professional setting.
 
-## Technical Disagreement Is Welcome
+## Enforcement Responsibilities
 
-`AsiBackbone/Learning` is a living tutorial and reference project. Architectural disagreement is expected and can be valuable.
-
-Contributors are encouraged to challenge assumptions, identify weaknesses, propose alternatives, and document tradeoffs.
-
-Disagreement should remain focused on the work.
-
-A useful standard is:
-
-> Critique the pattern, implementation, evidence, or reasoning — not the person.
-
-Canonical AsiBackbone patterns may be documented alongside alternative approaches when those alternatives are technically grounded and clearly identified.
+Project maintainers are responsible for clarifying and enforcing these standards. They may remove, edit, or reject comments, commits, code, documentation, issues, pull requests, and other contributions that do not align with this Code of Conduct.
 
 ## Scope
 
-This Code of Conduct applies to participation in project spaces, including:
+This Code of Conduct applies in AsiBackbone repositories and community spaces and when an individual officially represents an AsiBackbone project in public spaces.
 
-- Issues
-- Pull requests
-- Discussions
-- Code reviews
-- Documentation contributions
-- Repository-hosted community interactions
-- Other public spaces where a participant is representing the AsiBackbone Learning project or organization
+## Reporting
 
-It also applies when behavior outside the repository has a direct and material effect on the safety or effective participation of project contributors.
+Report abusive, harassing, or otherwise unacceptable behavior confidentially to **cdcavell@gmail.com**. Do not publish sensitive personal information in an issue or discussion.
 
-## Maintainer Responsibilities
+Include enough context to understand the report, such as relevant links, approximate dates, and a description of what occurred. Reports will be reviewed as promptly and fairly as practical, with respect for the privacy and security of the reporter.
 
-Project maintainers are responsible for clarifying and enforcing these standards.
-
-Maintainers may edit, hide, reject, or remove comments, commits, code, documentation, issues, pull requests, discussions, or other contributions that violate this Code of Conduct or materially interfere with the project's educational purpose.
-
-Enforcement decisions should be based on documented behavior rather than technical disagreement, popularity, status, or viewpoint.
-
-Whenever practical, maintainers should explain moderation decisions and provide a reasonable opportunity for correction.
-
-## Reporting a Problem
-
-If you experience or observe behavior that may violate this Code of Conduct, use [GitHub private vulnerability reporting](https://github.com/AsiBackbone/Learning/security/advisories/new) for a confidential report. If that form is unavailable, open a minimal public Issue asking for a private contact route without including sensitive details.
-
-Do not publicly disclose sensitive personal information, security information, or details that could place another person at risk.
-
-Reports should include enough information for maintainers to understand what occurred, such as:
-
-- A description of the behavior.
-- Relevant links, issue numbers, pull requests, discussion threads, or screenshots.
-- Approximate dates or times.
-- Any additional context that may help evaluate the situation.
-
-Reports will be reviewed as promptly and fairly as practical.
-
-## Enforcement
-
-Depending on the nature, severity, and history of the behavior, maintainers may take actions including:
-
-1. **Informal correction** — clarification of expectations or a request to change behavior.
-2. **Formal warning** — a documented warning that continued behavior may result in restrictions.
-3. **Temporary restriction** — temporary limits on participation in project spaces.
-4. **Permanent restriction** — removal or blocking from project participation when necessary to protect the community.
-
-Serious threats, harassment, disclosure of private information, malicious activity, or other severe misconduct may result in immediate restriction without intermediate steps.
-
-## Good-Faith Participation
-
-This Code of Conduct is not intended to suppress disagreement, criticism, skepticism, or unconventional ideas.
-
-Strong technical debate is compatible with respectful collaboration.
-
-The goal is to preserve an environment where participants can:
-
-**Read it. Run it. Question it. Improve it.**
+Maintainers may apply a correction, warning, temporary restriction, or permanent restriction based on the nature, impact, and pattern of the behavior. Serious threats, harassment, disclosure of private information, or other severe misconduct may result in immediate restriction.
 
 ## Attribution
 
-This Code of Conduct is maintained by the AsiBackbone Learning project and may evolve as the community grows.
-
-Suggestions for improving the Code of Conduct may be proposed through the repository's normal contribution process.
+This Code of Conduct is adapted from the [Contributor Covenant, version 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).

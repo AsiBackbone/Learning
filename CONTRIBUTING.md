@@ -970,11 +970,16 @@ the applicable license.
 
 ## Code of Conduct
 
-All participation is subject to the repository's [Code of Conduct](CODE_OF_CONDUCT.md).
+All participation is subject to the [Code of Conduct](CODE_OF_CONDUCT.md), which is the AsiBackbone organization's Contributor Covenant 2.1 text, kept identical to the [organization default](https://github.com/AsiBackbone/.github/blob/main/CODE_OF_CONDUCT.md). Report conduct concerns privately to the contact it names. Do not use the security-advisory form, which is reserved for vulnerabilities.
 
-Technical disagreement, skepticism, and architecture criticism are welcome.
+Technical disagreement, skepticism, and architecture criticism are welcome. Learning is a living tutorial and reference project, so challenging assumptions, identifying weaknesses, and proposing technically grounded alternatives are part of the work:
 
-Harassment, personal attacks, intimidation, discrimination, or deliberate disruption are not.
+> Critique the pattern, implementation, evidence, or reasoning — not the person.
+
+Harassment, personal attacks, intimidation, discrimination, or deliberate disruption are not welcome. Because Learning publishes examples that others copy, maintainers also treat the following as conduct problems and may remove the content:
+
+- encouraging unsafe, unlawful, or clearly abusive use of examples or architectural patterns; and
+- using the project to promote spam, scams, malware, credential theft, or other harmful activity.
 
 ## Recognition
 
