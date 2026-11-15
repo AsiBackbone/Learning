@@ -6,6 +6,10 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+### Security
+
+- The release-evidence jobs in `publish-release-evidence.yml` and the X publishing job in `publish-x.yml` (also used by `publish-docs.yml`) now start with `step-security/harden-runner` in egress audit mode, following the organization's release runner-hardening policy (AsiBackbone/.github#46). It records each run's network connections, processes, and file changes; it does not block them (#501).
+
 ### Changed
 
 - `CODE_OF_CONDUCT.md` is now the AsiBackbone organization's Contributor Covenant 2.1 text, identical to the [organization default](https://github.com/AsiBackbone/.github/blob/main/CODE_OF_CONDUCT.md). Conduct reports now go privately to the organization contact instead of through the security-advisory form, which creates a draft security advisory rather than a conduct report. The Learning-specific guidance on technical disagreement and on harmful use of examples moved to the Code of Conduct section of [CONTRIBUTING.md](CONTRIBUTING.md) (#493).
