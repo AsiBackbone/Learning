@@ -8,6 +8,9 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ### Changed
 
+- `CODE_OF_CONDUCT.md` is now the AsiBackbone organization's Contributor Covenant 2.1 text, identical to the [organization default](https://github.com/AsiBackbone/.github/blob/main/CODE_OF_CONDUCT.md). Conduct reports now go privately to the organization contact instead of through the security-advisory form, which creates a draft security advisory rather than a conduct report. The Learning-specific guidance on technical disagreement and on harmful use of examples moved to the Code of Conduct section of [CONTRIBUTING.md](CONTRIBUTING.md) (#493).
+### Changed
+
 - The samples now restore through package source mapping: `samples/nuget.config` (renamed from `NuGet.Config` to match the other AsiBackbone repositories) maps every package ID to nuget.org, so restore never consults a feed configured elsewhere on the machine. [Software Supply-Chain Integrity for .NET Repositories](docs/security/software-supply-chain-integrity-for-dotnet-repositories.md#package-sources-are-part-of-the-trust-model) explains what source mapping does and does not protect (#490).
 - `samples/Directory.Packages.props` now sets `CentralPackageTransitivePinningEnabled` explicitly to `false`, and it and the samples README explain why central versions use exact ranges and why transitive pinning is off. Resolved dependency graphs and lock files are unchanged (#491).
 ## [1.6.0] - 2026-11-14
