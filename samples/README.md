@@ -957,6 +957,11 @@ Common compiler settings are centralized in [`Directory.Build.props`](Directory.
 
 Shared NuGet versions are centralized in [`Directory.Packages.props`](Directory.Packages.props). Individual sample projects still declare which packages they use, but shared version numbers have one authoritative location.
 
+The samples make three deliberate package-management choices:
+
+- **Exact versions.** Each central version is an exact range, such as `[4.0.2]`. NuGet normally treats `4.0.2` as a minimum and, if that version is unavailable, resolves the next higher one with only a warning. An exact range makes that restore fail instead, so a sample, including one copied without its lock file, never runs against a dependency version nobody reviewed. The lock files record the same range as `[4.0.2, 4.0.2]`, and Dependabot updates the bracketed value in place.
+- **No transitive pinning.** `CentralPackageTransitivePinningEnabled` is explicitly `false`, so central versions apply only to packages a sample references directly. Transitive versions are still fixed, by each project's `packages.lock.json` and locked-mode restore. This keeps the samples' dependency policy small enough to read in one file. The [AsiBackbone central transitive pinning decision](https://asibackbone.github.io/AsiBackbone/articles/central-transitive-pinning-decision.html) explains when a repository should choose otherwise.
+- **One package source.** [`nuget.config`](nuget.config) clears inherited sources, adds only nuget.org, and uses package source mapping to route every package ID (`*`) to it, so a feed configured elsewhere on the machine is never consulted. [Package Sources Are Part of the Trust Model](../docs/security/software-supply-chain-integrity-for-dotnet-repositories.md#package-sources-are-part-of-the-trust-model) explains why.
 ### Sample Dependency Updates and Reproducibility
 
 When a shared sample dependency changes:

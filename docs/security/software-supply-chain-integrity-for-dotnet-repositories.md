@@ -527,6 +527,11 @@ Trust may depend on:
 
 Do not treat the network location alone as a complete publisher trust decision.
 
+Package source mapping is the NuGet control that answers "Can an unexpected feed satisfy a package ID?" directly. A `packageSourceMapping` section assigns package ID patterns to named sources, and restore then fetches each package only from a source whose pattern matches it. Without mapping, every configured source, including a feed added at machine or user level outside the repository, can satisfy any package ID, which is the opening that dependency-confusion attacks use.
+
+All four AsiBackbone .NET repositories, including this repository's samples, clear inherited sources, add only nuget.org, and map every package ID (`*`) to it. A repository that later adds a private feed keeps that baseline by mapping only its own package prefix, such as `Contoso.*`, to the private feed. NuGet chooses the most specific matching pattern, so `Contoso.Billing` resolves from the private feed while every other package still resolves only from nuget.org. Removing the mapping to make a private feed work removes the control.
+
+Source mapping constrains where a package can come from. It does not decide whether the publisher of that package is trustworthy, and it does not replace lock files, which constrain which version is accepted.
 ---
 
 ## Dependency Update Automation Is an Intake Mechanism

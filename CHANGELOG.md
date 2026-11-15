@@ -6,6 +6,10 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ## [Unreleased]
 
+### Changed
+
+- The samples now restore through package source mapping: `samples/nuget.config` (renamed from `NuGet.Config` to match the other AsiBackbone repositories) maps every package ID to nuget.org, so restore never consults a feed configured elsewhere on the machine. [Software Supply-Chain Integrity for .NET Repositories](docs/security/software-supply-chain-integrity-for-dotnet-repositories.md#package-sources-are-part-of-the-trust-model) explains what source mapping does and does not protect (#490).
+- `samples/Directory.Packages.props` now sets `CentralPackageTransitivePinningEnabled` explicitly to `false`, and it and the samples README explain why central versions use exact ranges and why transitive pinning is off. Resolved dependency graphs and lock files are unchanged (#491).
 ## [1.6.0] - 2026-11-14
 
 ### Added

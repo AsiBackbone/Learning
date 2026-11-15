@@ -1,7 +1,18 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <!--
+      Transitive pinning is deliberately off: these versions govern only the packages each sample references
+      directly. Transitive versions are still fixed by every project's packages.lock.json and locked-mode restore.
+    -->
+    <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
+
+  <!--
+    Versions use exact ranges such as [4.0.2], so restore fails instead of silently choosing a higher version when the
+    requested one is unavailable, including in a sample copied without its lock file. Dependabot updates the bracketed
+    value in place; see "Sample Dependency Updates and Reproducibility" in README.md.
+  -->
 
   <ItemGroup>
     <PackageVersion Include="FsCheck" Version="[3.6.0]" />
