@@ -5,7 +5,7 @@ author: Christopher D. Cavell
 published: "2026-11-17"
 summary: Starting work with Task.Run and returning 202 Accepted makes an ASP.NET Core endpoint fast, but the work still lives only in that process. Nothing in that design coordinates it with shutdown, a request-scoped service it captured may already be disposed, its failure goes unrecorded by the normal error path, and a crash or deployment can end it without a trace. Choose deliberately among finishing the work inside the request, handing it to a bounded in-memory queue that a hosted service processes, and recording it durably before you answer. Each gives a different guarantee, and the right choice depends on whether losing the work on restart is acceptable. State that guarantee, and test it.
 feed: true
-x_post: Task.Run plus 202 Accepted makes an endpoint fast, not durable. The work dies with the process. Decide if that loss is OK.
+x_post: Task.Run plus 202 Accepted makes an endpoint fast, not durable. Unfinished work dies with the process. Decide if that loss is OK.
 x_hashtags:
   - DotNet
   - AspNetCore
@@ -18,13 +18,13 @@ x_question: "What happens to your background work during a deploy?"
 
 **Difficulty:** Beginner to intermediate
 
-**Prerequisites:** Comfortable reading basic C# and ASP.NET Core minimal API code. Familiarity with `async` and `await` and dependency injection is helpful. Hosted services, channels, and durable job processing are introduced in the article. No AsiBackbone package or prior Learning material is required.
+**Prerequisites:** Comfortable reading basic C# and ASP.NET Core minimal API code. Familiarity with `async` and `await` and dependency injection is helpful. Hosted services, channels, and durable job processing are introduced in the article; the durable-job section and the appendix go further, as production notes. No AsiBackbone package or prior Learning material is required.
 
-**Sample scope:** The C# targets .NET 8 or later. The fire-and-forget endpoint, the bounded queue, the endpoints, the worker, and the tests in this article, together with the fakes and helpers in the [appendix](#appendix-types-fakes-and-test-helpers), were compiled and run on .NET 10 with xUnit v3 and `Microsoft.AspNetCore.TestHost`; all eleven test cases pass. The durable-job sketch compiles against EF Core 10 but was not run, and its duplicate-key check is a provider-specific placeholder. Statements about how long the server waits for in-flight requests during shutdown were also checked against Kestrel on .NET 10. The endpoints are focused samples: they omit the authorization a real statement endpoint needs, which is discussed where it matters. Framework behavior is described from Microsoft's documentation on the verification date below; check it for your version. The reporting application, the incident, the customers, and the timings are hypothetical. Original prose is licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/), and original code examples are additionally offered under the [MIT License](https://opensource.org/license/mit), as described in the repository's [licensing terms](https://github.com/AsiBackbone/Learning/blob/main/LICENSING.md). Third-party material, where identified, remains under its original license. External sources were last verified on November 17, 2026.
+**Sample scope:** The C# targets .NET 8 or later. The fire-and-forget endpoint, the bounded queue, the endpoints, the worker, and the tests in this article, together with the code in the [appendix](#appendix-types-fakes-and-test-helpers), were compiled and run on .NET 10 with xUnit v3 and `Microsoft.AspNetCore.TestHost`: the suite reports twelve passing test cases, counting each row of a parameterized theory separately. The durable-job sketch was compiled against EF Core 10 together with the supporting definitions in the appendix, but was not run against a database, and its duplicate-key check is a provider-specific placeholder. The shutdown ordering and timeout behavior described for Kestrel were observed on .NET 10 with the small program in the appendix; they are observations of that configuration, not documented guarantees for every server and host. The endpoints are focused samples: they omit the authorization a real statement endpoint needs, which is discussed where it matters. Framework behavior is described from Microsoft's documentation on the verification date below; check it for your version. The reporting application, the incident, the customers, and the timings are hypothetical. Original prose is licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/), and original code examples are additionally offered under the [MIT License](https://opensource.org/license/mit), as described in the repository's [licensing terms](https://github.com/AsiBackbone/Learning/blob/main/LICENSING.md). Third-party material, where identified, remains under its original license. External sources were last verified on November 17, 2026.
 
 **What this article covers:** an endpoint that returns `202 Accepted` while its work runs unobserved, and the month-end statements lost when its process exits; the difference between detached work, host-managed execution, and durable acceptance; why detached work must not use a request-scoped service, and how to create a scope for each work item; a bounded in-memory queue with backpressure, failure recording, and a shutdown that reports what it abandons; deterministic tests for a full queue, a failed work item, work still pending when the host stops, and admission closing at shutdown; what `202 Accepted` does and does not promise; a status resource with a stable identifier; storing the job before answering; when a separate worker or scheduler is worth it; and when losing the work on restart is an acceptable, documented tradeoff.
 
-**In plain terms:** a waiter takes your order and says "coming right up." If the waiter only memorized it, the order is gone when the waiter's shift ends early or they trip on the way to the kitchen, and nobody else ever knew about it. If the waiter pinned a ticket on the kitchen rail, the kitchen knows, works through tickets in order, and stops taking new ones when the rail is full, but the tickets still go in the bin if the kitchen closes or the power fails. If the order was entered into the till, it survives the shift change, and anyone can look it up. All three waiters said the same words. Only one of them made a promise that outlasts the kitchen.
+**In plain terms:** a waiter takes your order and says "coming right up." If the waiter only memorized it, the order is gone when the waiter's shift ends early or they trip on the way to the kitchen, and nobody else ever knew about it. If the waiter pinned a ticket on the kitchen rail, the kitchen knows, works through tickets in order, and stops taking new ones when the rail is full, but the tickets still go in the bin if the kitchen closes or the power fails. If the order was entered into the till, it survives the shift change, and anyone can look it up. All three waiters gave the same immediate answer, but the systems behind that answer made different promises. Only one recorded the order somewhere that outlasts the kitchen.
 
 Consider a hypothetical accounting application. At month-end close, staff request statements for their customers. Generating a statement means querying a few thousand ledger lines, rendering a PDF, and emailing it, which usually takes ten to forty seconds. The original endpoint did all of that inside the request, and the browser waited. A developer made it responsive with one change:
 
@@ -56,7 +56,7 @@ In this hypothetical incident, operations deploy a fix to an unrelated page at 1
 16:58:40.413  api-2   Process exited with code 0
 ```
 
-There is nothing more about `R-5521`, `R-5524`, or `R-5527`. The application did not track these tasks, so the log cannot say whether any of them finished before the process exited. There was no error, because nothing the application watched had failed: each request had completed the moment it returned `202`, so the shutdown had no in-flight request to wait for, and the process exited normally, ending any of those operations that had not already completed. Across the two replaced instances, fourteen accepted statement requests produced no delivered statement and no record of completion. Because the work was not tracked, nobody could reconstruct how far any of them had progressed. The application found out on November 3, when customers called.
+There is nothing more about `R-5521`, `R-5524`, or `R-5527`. The application did not track these tasks, so the log cannot say whether any of them finished before the process exited. There was no error, because nothing the application watched had failed: each request had completed the moment it returned `202`, so the shutdown had no in-flight request to wait for, and the process exited normally, ending any of those operations that had not already completed. The application found out on November 3, when customers called: across the two replaced instances, fourteen accepted statement requests had never reached them. The application had no record of completion for any of the fourteen, and because the work was not tracked, nobody could reconstruct how far any of them had progressed.
 
 The same week, a statement failed when the mail relay timed out. That task's exception was stored in a `Task` object that no code held, so the application's normal error handling never saw it: it was not logged, not retried, and not shown to the person who asked.
 
@@ -70,25 +70,25 @@ The same week, a statement failed when the mail relay timed out. That task's exc
 
 - **Scheduling.** `Task.Run` queues a delegate to the thread pool. Calling an `async` method is different: it runs synchronously on the calling thread until its first incomplete `await`, and then yields without blocking a thread. Neither says anything about who is responsible for the result.
 - **Tracking.** Code that keeps the returned `Task` and awaits it, now or later, observes its completion and its exception. Code that does not retain, await, or otherwise hand it to something that supervises it does not. This is what makes work *detached*, whether it was started with `Task.Run` or by calling an `async` method.
-- **Lifetime and memory.** Whether anything outside the code that started the work knows it exists: the host, during shutdown, or a store that survives the process.
+- **Lifetime and persistence.** Whether anything outside the code that started the work knows it exists: the host, during shutdown, or a store that survives the process.
 
-That gives three levels of guarantee that all return quickly:
+That gives three levels of guarantee an endpoint can use while returning before the work finishes:
 
 | Level | In .NET | Who knows the work exists | What can end it unfinished |
 | --- | --- | --- | --- |
 | **Detached work** | `_ = Task.Run(...)`, or an `async` method called and its `Task` discarded | No application component in this pattern, once the returned task is discarded | Process exit, for any reason. An exception faults the task and, with nobody observing it, goes unrecorded by the normal error path |
-| **Host-managed execution** | A `BackgroundService` or other `IHostedService` | The host, which starts it, signals it to stop, and waits for it during a graceful shutdown, up to a configurable timeout | Process exit without a graceful shutdown, a shutdown that exceeds the timeout, or work that ignores the stop signal |
+| **Host-managed execution** | A `BackgroundService` or other `IHostedService` | The host, which starts it, signals it to stop, and waits for it during a graceful shutdown, up to a configurable timeout | Process exit before the work completes, including an exit after the host has stopped waiting. The timeout ends the host's waiting, not the work |
 | **Durable acceptance** | A row in a database, a message in a durable broker, a job in a library with persistent storage | The store, which survives the process | The record survives within the store's guarantees. Processing can still fail permanently, be canceled, expire, or exhaust its retries |
 
-The first is about *how* the work is scheduled and whether anyone tracks it. The second is about *which lifetime* the work belongs to. The third is about *whether the request is remembered* outside the process that accepted it. `Task.Run` gives you thread-pool scheduling, and `async` and `await` let work yield without blocking a thread. Neither gives the work host ownership or durability.
+Scheduling decides how execution begins. Tracking decides who observes its completion. Host management decides which application lifetime owns it. Durable acceptance decides whether the request is remembered outside the process that accepted it. `Task.Run` gives you thread-pool scheduling, and `async` and `await` let work yield without blocking a thread. Neither gives the work host ownership or durability.
 
 The [ASP.NET Core hosted-services documentation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services) describes what host management adds: hosted services are started with the application, their `StopAsync` is called during a graceful shutdown, and the host waits for a `BackgroundService` to finish its `ExecuteAsync`, bounded by the host's [shutdown timeout](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host#shutdown-timeout), which is 30 seconds by default and configurable through `HostOptions.ShutdownTimeout`. The same page states the limit: if the process fails unexpectedly, `StopAsync` might not be called. Hosting platforms add their own limit, because an orchestrator or service manager that asks the process to stop will usually terminate it after its own grace period, whatever the host's timeout says. A host-managed worker is better owned than a detached task. It is not durable.
 
 ### What happens to detached work
 
-Detached work has three problems. The first is directly about durability. The other two are about observability and lifetime, but they produce the same result from the outside: accepted work that never completes, and nobody who knows.
+Detached work has three problems. The first is the absence of durability. The other two are about observability and lifetime, but they produce the same result from the outside: accepted work that never completes, and nobody who knows.
 
-**Nothing waits for it.** During a graceful shutdown, the [host stops the server](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host#ihostapplicationlifetime), which waits for in-flight requests for as long as the shutdown timeout allows, and stops hosted services. (With `WebApplication` and Kestrel on .NET 10, a twelve-second request completed during a default graceful stop, and was cut off at about three seconds when `HostOptions.ShutdownTimeout` was set to three.) The detached task in this example is neither an in-flight request nor work registered with a hosted service, so the host has nothing associated with it to wait for. When the process exits, execution ends regardless of how far the task had progressed: before the query, halfway through the PDF, or after the email went out but before anything recorded that it did.
+**Nothing waits for it.** During a graceful shutdown, the [host stops the server](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host#ihostapplicationlifetime), which, as that page puts it, waits for requests on existing connections for as long as the shutdown timeout allows, and stops hosted services. In the tested configuration, `WebApplication` with Kestrel on .NET 10, a twelve-second request completed during a default graceful stop. With the host's shutdown timeout set to three seconds, through either `HostOptions.ShutdownTimeout` or the web host's `UseShutdownTimeout` (both write the same `shutdownTimeoutSeconds` setting), the client's connection was closed without a response about four seconds after the stop began. The [harness](#shutdown-harness) in the appendix reproduces both runs. `KestrelServerOptions` has no shutdown timeout of its own in .NET 10. Other servers, IIS in-process hosting, and hosting platforms can impose different limits, so verify the behavior of the configuration you deploy. The detached task in this example is neither an in-flight request nor work registered with a hosted service, so the host has nothing associated with it to wait for. When the process exits, execution ends regardless of how far the task had progressed: before the query, halfway through the PDF, or after the email went out but before anything recorded that it did.
 
 **Nobody observes its failure.** An exception inside a task is stored on the task. If no code awaits it or reads it, the application's normal exception handling and logging never see it, and since .NET Framework 4.5 an unobserved task exception does not crash the process. If something subscribes to `TaskScheduler.UnobservedTaskException`, the runtime may raise that event later, typically after the faulted task becomes unreachable and the garbage collector processes it. The timing is nondeterministic, and it is no substitute for observing the task. The caller already has a `202`.
 
@@ -166,9 +166,9 @@ app.MapPost("/reports", async (ReportCommand command, IReportGenerator generator
 
 This version keeps the work inside the request's own execution and error-handling path, which every other option has to work to recover. The request's scope is valid throughout, so the scoped `DbContext` is fine. An exception reaches the normal ASP.NET Core error handling and logging. A `200` means the statement was generated and the configured mail service accepted it; that is an acknowledgment of submission, not proof that it reached the customer's inbox. An error response usually means it was not sent, although a failure during the send itself can leave that unknown.
 
-It is not immune to interruption. If the process dies, or the connection drops, mid-request, the caller typically sees a connection reset or a timeout rather than an error response, and cannot tell whether the email went out. During a graceful shutdown, the server waits for in-flight requests only for as long as the host's shutdown timeout allows, and a hosting platform may end the process sooner, so a forty-second statement started just before a deployment can still be cut off. The difference from the detached version is that the caller knows it did not get an answer.
+It is not immune to interruption. If the process dies, or the connection drops, mid-request, the caller typically sees a connection reset or a timeout rather than an error response, and cannot tell whether the email went out. During a graceful shutdown in the tested Kestrel configuration, the server waited for in-flight requests only for as long as the host's shutdown timeout allowed, and a hosting platform may end the process sooner, so a forty-second statement started just before a deployment can still be cut off. The difference from the detached version is that the caller knows it did not get an answer.
 
-The other costs are latency and capacity. The caller waits ten to forty seconds. A proxy, load balancer, or client may time out first, leaving an outcome that neither side knows. Each pending request keeps an HTTP connection and its request state alive. An asynchronous wait does not ordinarily occupy a thread, but a burst of month-end requests still becomes a burst of open connections, memory, proxy capacity, and concurrent load on the database and mail relay.
+The other costs are latency and capacity. The caller waits ten to forty seconds. A proxy, load balancer, or client may time out first, leaving an outcome that neither side knows. Each pending request keeps its request state alive and occupies an active request slot; depending on the HTTP version and the proxies in between, concurrent requests may or may not share connections. An asynchronous wait does not ordinarily occupy a thread, but a burst of month-end requests still consumes memory, server and proxy capacity, and concurrent load on the database and mail relay.
 
 Passing the request-aborted token, as this example does, lets the work observe cancellation when the client disconnects; the work stops only where it, and the code it calls, honor that token. Whether that is right is a business decision, not a technical default. A disconnect may mean the person gave up, or only that a phone changed networks or a proxy timed out. Decide separately whether generation and delivery should stop, continue, or move to durable work when the client goes away.
 
@@ -176,7 +176,7 @@ For work that typically finishes in a second or two, this is often the right ans
 
 ### Where `Task.Run` still belongs
 
-None of this makes `Task.Run` wrong. It is the right tool for running CPU-bound work on the thread pool when the caller *awaits* the result, for example, inside a hosted service or a desktop application, or for starting several independent computations and awaiting them together with `Task.WhenAll`. In those cases, the code that started the task owns it, waits for it, and observes its exceptions. The problem in the opening example is not `Task.Run`. It is discarding the returned task without handing it to anything that tracks its completion, failure, cancellation, and shutdown. The `_ =` only makes that discard explicit; calling an `async` method without awaiting it, or storing its task in a variable nobody reads, does the same. (In an ASP.NET Core request, awaiting `Task.Run` around ordinary asynchronous I/O usually adds a scheduling hop without making anything faster, because the request is already running on the thread pool.)
+None of this makes `Task.Run` wrong. It is the right tool for running CPU-bound work on the thread pool when the caller *awaits* the result, for example, inside a hosted service or a desktop application, or for starting several independent computations and awaiting them together with `Task.WhenAll`. Inside an ASP.NET Core request, `Task.Run` around CPU-bound work does not add CPU capacity or isolate that work from the server: it runs on the same shared thread pool that handles requests. In those cases, the code that started the task owns it, waits for it, and observes its exceptions. The problem in the opening example is not `Task.Run`. It is discarding the returned task without handing it to anything that tracks its completion, failure, cancellation, and shutdown. The `_ =` only makes that discard explicit; calling an `async` method without awaiting it, or storing its task in a variable nobody reads, does the same. (In an ASP.NET Core request, awaiting `Task.Run` around ordinary asynchronous I/O usually adds a scheduling hop without making anything faster, because the request is already running on the thread pool.)
 
 ---
 
@@ -206,11 +206,11 @@ public sealed class ReportQueue
 }
 ```
 
-The capacity is the backpressure. Without one, the queue grows until the process runs out of memory, and every item in it is another statement lost in the next restart. With one, the application has to decide what to do when it is full, and there are only a few honest answers:
+The capacity is the backpressure. Without one, a sustained period in which requests arrive faster than the worker finishes them can grow the queue until memory runs out, and every item in it is another statement lost in the next restart. With one, the application has to decide what to do when it is full, and there are only a few honest answers:
 
 - **Refuse the request.** With `BoundedChannelFullMode.Wait`, `TryWrite` never waits: it returns `false` immediately when the channel is full, or when it has been closed. The endpoint returns `503 Service Unavailable` with a `Retry-After` header, and the caller knows the statement was not accepted.
 - **Wait for space.** `WriteAsync` waits until the worker makes room, which is what the documentation's sample does. That pushes the backpressure onto the request, which is reasonable when the queue rarely fills, but under sustained load it reintroduces the long-held requests that Option 1 had.
-- **Drop something, deliberately.** The other [`BoundedChannelFullMode`](https://learn.microsoft.com/en-us/dotnet/api/system.threading.channels.boundedchannelfullmode) values discard the item being written (`DropWrite`), or an item already queued to make room for the new one (`DropNewest`, `DropOldest`). The documentation describes which item each mode discards; it is less explicit about the return value. On .NET 10, `TryWrite` returns `true` in all three modes even though an item was discarded, and a test in the appendix pins that behavior and which item survives. So the return value no longer means "this request will be processed." With `DropNewest` or `DropOldest`, the item that disappears was accepted earlier, and in this example its status would stay `Queued` forever. That suits telemetry samples or cache refreshes where the newest request supersedes older ones. It does not suit statements.
+- **Drop something, deliberately.** The other [`BoundedChannelFullMode`](https://learn.microsoft.com/en-us/dotnet/api/system.threading.channels.boundedchannelfullmode) values discard the item being written (`DropWrite`), or an item already queued to make room for the new one (`DropNewest`, `DropOldest`). The documentation describes which item each mode discards; it is less explicit about the return value. On .NET 10, `TryWrite` returns `true` in all three modes even though an item was discarded, and a test in the appendix pins that behavior and which items survive in each mode. So the return value no longer means "this request will be processed." With `DropNewest` or `DropOldest`, the item that disappears was accepted earlier, and in this example its status would stay `Queued` forever. That suits telemetry samples or cache refreshes where the newest request supersedes older ones. It does not suit statements.
 
 ### The endpoint and the status resource
 
@@ -241,11 +241,11 @@ The `202` now carries a `Location` header pointing at a status resource, and the
 
 That ordering avoids one race; it does not make the status and the queue one record. Writing a dictionary entry and writing to a channel are two separate operations, and nothing makes them atomic. When the acceptance record itself has to be authoritative, that is a job for Option 3.
 
-`TryEnqueue` returns `false` both when the queue is full and when it has been closed for shutdown, so the response describes the service as temporarily unavailable rather than claiming a reason. An application that wants different messages or retry guidance for the two cases can return a richer result than a `bool`.
+`TryEnqueue` returns `false` both when the queue is full and when it has been closed for shutdown, so the response describes the service as temporarily unavailable rather than claiming a reason. An application that wants different messages or retry guidance for the two cases can return a richer result than a `bool`. That matters for `Retry-After`: when the refusal comes from shutdown rather than capacity, a fixed delay is only honest if traffic is known to be moving to a healthy instance.
 
 These endpoints are focused on durability, so they leave out checks a real statement endpoint needs: that the caller may request statements for this customer, with a recipient address resolved or verified by the server rather than taken from the request, and that the caller may read this report's status. A report ID in a URL is an identifier, not a permission. A real status endpoint should also send cache headers that keep user-specific status out of shared caches and give polling clients a sensible freshness policy.
 
-`ReportStatusStore` is a singleton wrapping a `ConcurrentDictionary<Guid, ReportState>`. That is enough to show the pattern, and it has the same weakness as the queue: it lives in this process. Behind a load balancer, a status request that lands on a different instance gets `404`, and after a restart every status is gone, so the client cannot tell "never existed" from "forgotten." Entries also have to expire, or the dictionary grows without bound. If people depend on the status page, the status belongs in shared storage, and at that point you are most of the way to Option 3.
+`ReportStatusStore` is a singleton wrapping a `ConcurrentDictionary<Guid, ReportState>`. That is enough to show the pattern, and it has the same weakness as the queue: it lives in this process. Behind a load balancer, a status request that lands on a different instance gets `404`, and after a restart every status is gone, so the client cannot tell "never existed" from "forgotten." Entries also have to expire, or the dictionary grows without bound; this sample does not implement that. If people depend on the status page, the status belongs in shared storage, and at that point you are most of the way to Option 3.
 
 ### The worker
 
@@ -279,7 +279,8 @@ public sealed class ReportWorker(
         finally
         {
             // Runs when ExecuteAsync unwinds, which can be after the host has stopped waiting for it.
-            // A crash, a kill, or work that never returns prevents it from running at all.
+            // If the process exits first, or the work never returns, it gets no chance to run.
+            // Closing here also covers a worker that exits for any other reason: no consumer, no admission.
             queue.Close();
             while (queue.Reader.TryRead(out ReportRequest? pending))
             {
@@ -292,11 +293,13 @@ public sealed class ReportWorker(
     private async Task ProcessAsync(ReportRequest request, CancellationToken stoppingToken)
     {
         statuses.Set(request.ReportId, ReportState.Running);
-        AsyncServiceScope scope = scopes.CreateAsyncScope();   // one scope per work item
+        AsyncServiceScope? scope = null;
         try
         {
-            var generator = scope.ServiceProvider.GetRequiredService<IReportGenerator>();
-            var email = scope.ServiceProvider.GetRequiredService<IEmailSender>();
+            scope = scopes.CreateAsyncScope();   // one scope per work item, created inside the item boundary
+            IServiceProvider services = scope.Value.ServiceProvider;
+            var generator = services.GetRequiredService<IReportGenerator>();
+            var email = services.GetRequiredService<IEmailSender>();
 
             byte[] pdf = await generator.GenerateAsync(request, stoppingToken);
             await email.SendAsync(request.Email, pdf, stoppingToken);
@@ -316,13 +319,16 @@ public sealed class ReportWorker(
         finally
         {
             // Dispose on its own, so a cleanup failure cannot hide the work's exception or change its status.
-            try
+            if (scope is { } created)
             {
-                await scope.DisposeAsync();
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(ex, "Report {ReportId} cleanup failed", request.ReportId);
+                try
+                {
+                    await created.DisposeAsync();
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex, "Report {ReportId} cleanup failed", request.ReportId);
+                }
             }
         }
     }
@@ -334,16 +340,16 @@ Register it with `builder.Services.AddSingleton(new ReportQueue(capacity: 100))`
 These details carry the design:
 
 - **One scope per item.** Each statement gets a fresh scope, so it gets a fresh `DbContext`, and a failure in one statement cannot leave a broken context behind for the next.
-- **Every item's failure is caught, recorded, and logged, and the loop continues.** This is deliberate. Since .NET 6, an exception that escapes a `BackgroundService`'s `ExecuteAsync` is logged and, by default, [stops the whole host](https://learn.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/hosting-exception-handling). One bad customer record should not take the web application down with it. The worker catches at the item boundary, so a failure becomes an observable `Failed` status instead.
+- **Every item's failure is caught, recorded, and logged, and the loop continues.** That includes a failure to create the item's scope, which is why the scope is created inside the `try`; outside it, a scope-creation failure would escape `ProcessAsync`, leave the item `Running`, and end the worker. This is deliberate. Since .NET 6, an exception that escapes a `BackgroundService`'s `ExecuteAsync` is logged and, by default, [stops the whole host](https://learn.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/hosting-exception-handling). One bad customer record should not take the web application down with it. The worker catches at the item boundary, so a failure becomes an observable `Failed` status instead.
 - **Disposing the scope is kept apart from the work.** The scope is disposed in its own `try` block, so an exception from cleanup is logged as a cleanup problem and cannot replace the work's own exception, turn `Interrupted` into `Failed`, or turn `Sent` into `Failed`. With `await using`, a disposal exception thrown after the body has already failed would replace the body's exception.
-- **Admission closes when the worker is told to stop.** The registration on the worker's stopping token closes the queue when that token is canceled. From then on, `TryEnqueue` fails and the endpoint returns `503`, even while a long statement is still running. Two qualifications apply. In a `WebApplication` on .NET 10, the host signaled `ApplicationStopping`, then let the server finish its in-flight requests, and only then canceled this worker's token, so requests still finishing during that drain can enqueue work, and the worker keeps processing in the meantime. An application that must refuse new work from the first shutdown signal can also close the queue from `IHostApplicationLifetime.ApplicationStopping`. And an enqueue that races the close can still succeed just before it; the item is then drained and reported with the others.
-- **The loop checks the stopping token before taking each item.** A channel that already holds items hands them out without waiting, so a loop like `await foreach (var item in reader.ReadAllAsync(stoppingToken))` can keep returning buffered items after shutdown has begun, and each one would start and be interrupted immediately. A draft of this worker had exactly that bug, and the shutdown test below caught it. The checks narrow the window rather than close it. An item taken just before cancellation still enters `ProcessAsync` with a token that is already canceled. If a dependency observes the token and throws, the item is recorded as `Interrupted`; if not, it may finish as `Sent` or `Failed`.
+- **Admission closes when the worker is told to stop.** The registration on the worker's stopping token closes the queue when that token is canceled. From then on, `TryEnqueue` fails and the endpoint returns `503`, even while a long statement is still running. Two qualifications apply. First, the documented contracts differ: [`ApplicationStopping`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.ihostapplicationlifetime.applicationstopping) is the application-wide signal that graceful shutdown has begun, while a `BackgroundService`'s token is canceled when the host stops that service. In the tested `WebApplication` on .NET 10, `ApplicationStopping` fired first, the server then finished its in-flight requests, and only then was this worker's token canceled, so requests still finishing during that drain could enqueue work while the worker kept processing. An application that must refuse new work from the first shutdown signal should also register `queue.Close` with `IHostApplicationLifetime.ApplicationStopping`. Second, an enqueue that races the close can still succeed just before it; that item is then either taken and processed by the worker or reported as `NotStarted` with the others.
+- **The loop checks the stopping token before taking each item.** A channel that already holds items hands them out without waiting, so a loop like `await foreach (var item in reader.ReadAllAsync(stoppingToken))` can keep returning buffered items after shutdown has begun, and each one would start and be interrupted immediately. That bug is easy to write, and the shutdown test below catches it. The checks narrow the window rather than close it. An item taken just before cancellation still enters `ProcessAsync` with a token that is already canceled. If a dependency observes the token and throws, the item is recorded as `Interrupted`; if not, it may finish as `Sent` or `Failed`.
 - **Shutdown reports what it abandons.** When the stopping token fires, the running item receives it, and once the worker unwinds, the `finally` block records every item that never started. This worker chooses prompt shutdown over draining its backlog. Another application could drain for a few seconds instead, but that is still bounded by the shutdown timeout and still does not survive a crash.
 - **It processes one statement at a time**, to keep ownership and shutdown easy to see. A production worker might run several items concurrently; each concurrent item still needs its own scope and its own failure handling.
 
 The capacity bounds the number of waiting items, not the process's memory. The status dictionary still grows until entries expire, and each item's own work can use memory too.
 
-`Failed` means processing ended with an exception and no confirmed submission. It does not prove that no email was sent: if the mail relay accepted the message and the acknowledgment was lost, the send throws and the statement is recorded as `Failed`. Treat `Failed` as "check before resending," not "safe to resend." A design that needs to tell the two apart can record a separate `OutcomeUnknown` state for exceptions thrown during submission.
+`Failed` means processing ended with an exception and no confirmed submission. It does not prove that no email was sent: if the mail relay accepted the message and the acknowledgment was lost, the send throws and the statement is recorded as `Failed`. `Interrupted` has the same limit when cancellation arrives during the send. Treat both as "check before resending," not "safe to resend." A design that needs to tell these cases apart can record a separate `OutcomeUnknown` state for anything that ends during submission.
 
 The `NotStarted` and `Interrupted` records go to the logging pipeline and to the in-memory status store. The status store disappears with the process. The log entries outlive it only if the configured logging provider sends them somewhere outside the process; console output from a container that is being replaced may not survive.
 
@@ -353,9 +359,9 @@ Stated plainly, so it can go in the API documentation:
 
 **Under this design:**
 
-- the queue holds at most 100 waiting statements, plus the one being processed. An enqueue attempt is refused with `503` while all 100 slots are full, and once the queue has been closed for shutdown;
+- the channel buffers at most 100 statements, and the worker can hold one more that it is processing. An enqueue attempt is refused with `503` while all 100 slots are full, and once the queue has been closed for shutdown;
 - each statement runs in its own dependency-injection scope;
-- a statement that fails is logged with its exception and marked `Failed`, and the worker continues with the next one; a cleanup failure is logged separately and does not change the statement's status;
+- a statement whose processing ends with an exception and no confirmed submission, including a failure to create its scope, is logged and marked `Failed`, and the worker continues with the next one; a cleanup failure is logged separately and does not change the statement's status;
 - `Sent` means the configured mail service accepted the message;
 - when the worker is told to stop, the queue stops accepting work, no further buffered statement is started except in the narrow races described above, and the running statement is signaled to stop.
 
@@ -364,7 +370,7 @@ Stated plainly, so it can go in the API documentation:
 - the running statement is marked `Interrupted` if cancellation aborted it, `Sent` if submission completed, or `Failed` if another exception occurred;
 - every queued statement that never started is logged by ID and marked `NotStarted`.
 
-That proviso matters. If a dependency ignores the token, the statement runs on, and the host waits for it only until the shutdown timeout. The timeout ends the host's waiting; it does not stop the work. If the process then exits, the `finally` block never runs and the statement's status stays `Running`. If the process stays alive and the work eventually returns, the cleanup can still run later.
+That proviso matters. If a dependency ignores the token, the statement runs on, and the host waits for it only until its shutdown timeout elapses or the token passed to `StopAsync` is canceled. That ends the host's waiting; it does not stop the work. If the process exits before `ExecuteAsync` unwinds, the `finally` block gets no chance to run and the statement's status stays `Running`. If the process stays alive and the work eventually returns, the cleanup can still run later.
 
 **It may lose:**
 
@@ -373,7 +379,7 @@ That proviso matters. If a dependency ignores the token, the statement runs on, 
 - everything, with no record or only a partial one, if the process crashes, is killed, runs out of memory, or exceeds the shutdown timeout;
 - all statuses, on any restart, and any status requested from a different instance.
 
-It never retries. A `Failed` statement stays failed until someone asks again, and whoever asks should first check whether the earlier attempt reached the mail service.
+It never retries. A `Failed` or `Interrupted` statement stays that way until someone asks again, and whoever asks should first check whether the earlier attempt reached the mail service.
 
 That is a real improvement over the opening example: losses are bounded and, on the graceful path, reported, and the caller has an identifier to ask about. But nothing about it survives the process. Using `BackgroundService` and `Channel<T>` makes the work *host-managed*. It does not make it durable.
 
@@ -387,7 +393,7 @@ The guarantees above are claims about failures, so the tests have to cause those
 - `RecordingEmailSender` records each address it was asked to send to. It completes immediately and does not check the token.
 - `CapturingLoggerProvider` keeps every log entry in memory.
 
-None of the tests sleep or poll. Each test that involves the host waits on a signal from a fake, with a timeout that fails the test if the signal never arrives; the channel tests in the appendix need no waiting at all.
+None of the tests sleep or poll. The tests that coordinate with the worker or with detached work wait on a signal from a fake, with a timeout that fails the test if the signal never arrives; the endpoint test waits only for its HTTP responses, and the channel tests in the appendix need no waiting at all.
 
 ### A full queue
 
@@ -490,7 +496,7 @@ Several outcomes depend on the running statement honoring the token. This test c
 
 ```csharp
 [Fact]
-public async Task Admission_closes_when_shutdown_begins_even_if_the_running_item_ignores_the_token()
+public async Task Admission_closes_when_the_worker_is_stopped_even_if_the_running_item_ignores_cancellation()
 {
     var (host, queue, statuses, behavior, email, logs) = CreateHost();
     behavior.WaitForRelease = true;
@@ -515,11 +521,11 @@ public async Task Admission_closes_when_shutdown_begins_even_if_the_running_item
 }
 ```
 
-The appendix adds two tests that a failure while disposing the scope neither erases a successful send nor hides the work's own exception, and tests of what `TryWrite` returns, and which item survives, in each full mode.
+The appendix adds tests that a failure while disposing the scope neither erases a successful send nor hides the work's own exception, that a failure to create a scope becomes one item's `Failed` status rather than ending the worker, and of what `TryWrite` returns, and which items survive, in each full mode.
 
 ### What these tests cannot show
 
-These are in-process tests, and they exercise the graceful path only. No in-process test can show what happens when the process is killed, because nothing inside the process runs afterward. That needs an external, process-level test: start the application, submit work, terminate the process, restart it, and check what clients can observe. For this design, the answer to that test is already known and should be written down: everything in memory is gone, and nothing may have been logged.
+These are in-process tests, and they exercise the graceful path only. A test running inside the application's process cannot check what happens after that process is killed, because it is killed too. That needs an external, process-level test: start the application, submit work, terminate the process, restart it, and check what clients can observe. For this design, the answer to that test is already known and should be written down: everything in memory is gone, and nothing may have been logged.
 
 [How to Test That a Denied Operation Never Executes](test-denied-operation-never-executes.md#async-fire-and-forget-and-cancellation-hazards) develops the related technique of asserting that a side effect did *not* happen, including for work dispatched asynchronously.
 
@@ -547,19 +553,24 @@ Stable identifiers matter in the other direction too. If the client's `POST` tim
 When a lost statement is not acceptable, the request must be remembered somewhere that outlives the process before the endpoint says it was accepted. One durable acceptance mechanism, often the simplest, is a job row committed to the database the application already has. The table has a unique index on `(CallerId, IdempotencyKey)`; that index, not any check in the endpoint, is what stops two jobs being created for one request:
 
 ```csharp
-// Illustrative sketch: compiles against EF Core 10, but was not run. Assumes authentication has run and the
-// caller is authorized for command.CustomerId. ReportJobs has a unique index on (CallerId, IdempotencyKey).
+// Illustrative sketch: compiled against EF Core 10 with the supporting definitions in the appendix, but not
+// run against a database. Assumes the caller is authorized for command.CustomerId.
 app.MapPost("/reports", async (ReportCommand command, [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey,
     ClaimsPrincipal user, ReportsDbContext db, CancellationToken cancellationToken) =>
 {
-    if (string.IsNullOrWhiteSpace(idempotencyKey) || idempotencyKey.Length > 100)   // 100 is an example limit
+    if (!IdempotencyKeys.IsValid(idempotencyKey))
     {
         return Results.BadRequest("A valid Idempotency-Key header is required.");
     }
 
-    string callerId = user.FindFirstValue(ClaimTypes.NameIdentifier)
-        ?? throw new InvalidOperationException("Authentication must run first.");   // never from the body
-    string fingerprint = ReportFingerprint.Create(command);
+    if (user.FindFirst(ClaimTypes.NameIdentifier) is not { } subject)
+    {
+        return Results.Unauthorized();
+    }
+
+    string callerId = $"{subject.Issuer}|{subject.Value}";   // from authentication, never from the body
+    string email = command.Email.Trim();                       // normalize once; store what you hash
+    string fingerprint = ReportFingerprint.Create(command.CustomerId, email);
 
     var job = new ReportJob
     {
@@ -568,7 +579,7 @@ app.MapPost("/reports", async (ReportCommand command, [FromHeader(Name = "Idempo
         IdempotencyKey = idempotencyKey,
         Fingerprint = fingerprint,
         CustomerId = command.CustomerId,
-        Email = command.Email,
+        Email = email,
         Status = ReportJobStatus.Pending,
         CreatedAt = DateTimeOffset.UtcNow,
     };
@@ -579,7 +590,7 @@ app.MapPost("/reports", async (ReportCommand command, [FromHeader(Name = "Idempo
         await db.SaveChangesAsync(cancellationToken);   // the 202 is sent only after this commits
         return Results.Accepted($"/reports/{job.Id}", new { ReportId = job.Id, Status = "Pending" });
     }
-    catch (DbUpdateException ex) when (IsDuplicateIdempotencyKey(ex))
+    catch (DbUpdateException ex) when (DuplicateKeys.IsIdempotencyKeyViolation(ex))
     {
         // Another request with this key committed first: a retry, or a concurrent duplicate.
         db.ChangeTracker.Clear();
@@ -587,29 +598,39 @@ app.MapPost("/reports", async (ReportCommand command, [FromHeader(Name = "Idempo
             j => j.CallerId == callerId && j.IdempotencyKey == idempotencyKey, cancellationToken);
 
         return existing.Fingerprint == fingerprint
-            ? Existing(existing)        // 202 while pending or running, 200 once it has finished
-            : Results.Conflict();       // the same key reused for a different request
+            ? ReplayContract.Existing(existing)   // this API's choice: 202 while pending or running, 200 once finished
+            : Results.Conflict();                 // the same key reused for a different request
     }
-});
+}).RequireAuthorization();
 
-static class ReportFingerprint
+public static class ReportFingerprint
 {
-    // A stable digest of the fields that define the operation, in a fixed, documented form. Not GetHashCode().
-    public static string Create(ReportCommand command) =>
-        Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(
-            $"customer={command.CustomerId}\nemail={command.Email.Trim()}")));
+    // Versioned, structured, and built from the normalized values the job stores. Not GetHashCode().
+    public static string Create(string customerId, string email) =>
+        Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(
+            new FingerprintV1(Version: 1, CustomerId: customerId, Email: email))));
+
+    private sealed record FingerprintV1(int Version, string CustomerId, string Email);
+}
+
+public static class IdempotencyKeys
+{
+    // Opaque: compared exactly as sent. Validate it; do not trim or case-fold it.
+    public static bool IsValid([NotNullWhen(true)] string? key) =>
+        key is { Length: > 0 and <= 100 } && key.All(c => c is >= '!' and <= '~');   // printable ASCII, no spaces
 }
 ```
 
 A few details in that sketch carry the guarantee:
 
-- **The caller comes from authentication, not the request body.** A key is unique per authenticated caller (and per tenant, where there is one). Taking the caller from the body would let a client choose whose keys it collides with.
-- **The key is validated.** A missing or empty key would otherwise become one key shared by unrelated requests. Decide whether keys are case-sensitive and make the index's collation agree.
-- **The insert is tried first, and only the duplicate-key violation is handled.** `IsDuplicateIdempotencyKey` is provider-specific, for example, checking for PostgreSQL error `23505` on that index's name. Never treat every `DbUpdateException` as a duplicate: a deadlock, a timeout, or another constraint means something else. A check-then-insert without the index would let two concurrent requests both find nothing and both insert.
-- **The fingerprint is a stable digest of a canonical form of the fields that define the operation.** It lets the endpoint tell a retry from a different request that reused the key. `GetHashCode()` is not stable across processes and must not be used for it.
-- **A repeated request gets the current state of the original job.** `Existing` returns `202` with the status location while the job is pending or running, and `200` with its outcome once it has finished.
+- **The caller comes from authentication, not the request body.** The endpoint requires authorization, and the caller is the token's issuer plus its subject, because a subject value alone is not necessarily unique across identity providers. In a multi-tenant system, include the tenant too, in both the unique index and the lookup. Taking the caller from the body would let a client choose whose keys it collides with.
+- **The key is opaque and validated.** A missing or empty key would otherwise become one key shared by unrelated requests. The sample accepts up to 100 printable ASCII characters, an example limit, and compares keys exactly as sent; it does not trim or case-fold them, and the index's collation has to agree.
+- **The insert is tried first, and only the duplicate-key violation is handled.** `DuplicateKeys.IsIdempotencyKeyViolation` is provider-specific, for example, checking for PostgreSQL error `23505` on that index's name. Never treat every `DbUpdateException` as a duplicate: a deadlock, a timeout, or another constraint means something else. A check-then-insert without the index would let two concurrent requests both find nothing and both insert.
+- **The fingerprint is a versioned digest of a structured encoding of the normalized fields that define the operation.** It lets the endpoint tell a retry from a different request that reused the key. The email is normalized once, and the same value is hashed and stored. JSON serialization of a fixed record keeps the encoding unambiguous; it is not a general canonical-JSON algorithm, so keep the record, its field order, and the serializer options fixed, and bump the version if they change. Apply whatever further normalization the business operation uses, such as rules for customer identifiers, before hashing. `GetHashCode()` is not stable across processes and must not be used for it.
+- **A repeated request gets the current state of the original job.** In this illustrative contract, `ReplayContract.Existing` returns `202` with the status location while the job is pending or running, and `200` with its outcome once it has finished. Other APIs replay the original response instead; either is fine if it is documented and consistent.
+- **Deduplication lasts only as long as the key is kept.** Define an idempotency retention window, and keep the key, the fingerprint, and a reference to the original outcome for at least that long, even if the rest of the job is archived. Once the row is deleted, the same key can create a new job.
 
-The row supplies durable *recording*. Reliable *processing* comes from the worker: it finds pending jobs, claims each one with a conditional update so that two instances cannot both take it, generates and sends the statement, and records the outcome on the same row. The status endpoint reads that row, from any instance, after any restart.
+The row supplies durable *recording*. Reliable *processing* comes from the worker: it finds pending jobs, claims each one with a conditional update so that two instances cannot both take it, generates and sends the statement, and records the outcome on the same row. Any application instance connected to the same database can read the status after a restart, subject to that database's consistency and availability.
 
 A failure before the response is not always a clean "not accepted." If the database is unavailable, the endpoint fails before it says `202`. But if the connection drops while the commit is in progress, or the response is lost on the way back, the row may exist even though the caller saw an error. The caller then has no confirmation either way, which is exactly why the job is keyed by the caller's idempotency key: a retry with the same key hits the unique index and is answered with the existing job instead of creating a second one.
 
@@ -658,9 +679,9 @@ Two questions decide most cases. **Must the caller know the outcome before movin
 
 Plenty of background work can disappear without harm: refreshing a cache entry that the next request would rebuild anyway, recalculating a dashboard aggregate that a scheduled job also recalculates, sending a "someone viewed your profile" notification, or warming a search index. For work like that, durable storage may add more complexity than the loss tolerance justifies, and recommending it by reflex would be bad advice.
 
-The simplest valid design for disposable work is still not `_ = Task.Run(...)`. It is the bounded channel and `BackgroundService` above, possibly without the status resource:
+The simplest valid design for disposable work is still not `_ = Task.Run(...)`, because nothing supervises that. For work accepted by an ASP.NET Core application, the simplest supervised design is the bounded channel and `BackgroundService` above, possibly without the status resource:
 
-- a **bounded** queue, so a burst cannot exhaust memory, with a full mode chosen on purpose; for a cache refresh, dropping an item may be exactly right;
+- a **bounded** queue, so the number of buffered items cannot grow without limit, with a full mode chosen on purpose; for a cache refresh, dropping an item may be exactly right;
 - **a scope per item**, so nothing uses a disposed service;
 - **failures caught, logged, and counted** at the item boundary, so a broken item is visible and does not stop the host;
 - **the stopping token honored**, so shutdown is prompt and does not start new work;
@@ -736,7 +757,7 @@ Pick one of three guarantees on purpose. If the caller needs the outcome, finish
 
 ## Appendix: Types, Fakes, and Test Helpers
 
-These supply the supporting code the tests use. To reproduce the suite, put the listings in an xUnit v3 test project (`OutputType` `Exe`, the `Microsoft.Testing.Platform` runner) with a framework reference to `Microsoft.AspNetCore.App` and a package reference to `Microsoft.AspNetCore.TestHost`, add the usual `using` directives, and place the tests in test classes. That is how the eleven test cases were run.
+These are the remaining definitions the examples use. To reproduce the suite, put the article's listings and these in an xUnit v3 test project (`OutputType` `Exe`, the `Microsoft.Testing.Platform` runner) with a framework reference to `Microsoft.AspNetCore.App` and package references to `Microsoft.AspNetCore.TestHost` and, for the durable sketch, `Microsoft.EntityFrameworkCore`; add the usual `using` directives, and place the tests in test classes. That is how the twelve test cases were run and the sketch was compiled.
 
 ### Application types
 
@@ -769,20 +790,97 @@ public sealed class ReportStatusStore
 }
 ```
 
-The two route-mapping helpers wrap the endpoints shown earlier, unchanged:
+The two route-mapping helpers contain the endpoints shown earlier, unchanged:
 
 ```csharp
 public static class ReportEndpoints
 {
     public static void MapFireAndForgetReports(this WebApplication app)
     {
-        // app.MapPost("/reports", ...): the fire-and-forget endpoint from the opening example
+        app.MapPost("/reports", (ReportCommand command, IReportGenerator generator, IEmailSender email) =>
+        {
+            var request = new ReportRequest(Guid.NewGuid(), command.CustomerId, command.Email);
+
+            _ = Task.Run(async () =>
+            {
+                byte[] pdf = await generator.GenerateAsync(request, CancellationToken.None);
+                await email.SendAsync(request.Email, pdf, CancellationToken.None);
+            });
+
+            return Results.Accepted(value: new { request.ReportId });
+        });
     }
 
     public static void MapQueuedReports(this WebApplication app)
     {
-        // app.MapPost("/reports", ...) and app.MapGet("/reports/{reportId:guid}", ...) from Option 2
+        app.MapPost("/reports", (ReportCommand command, ReportQueue queue, ReportStatusStore statuses, HttpResponse response) =>
+        {
+            var request = new ReportRequest(Guid.NewGuid(), command.CustomerId, command.Email);
+
+            statuses.Set(request.ReportId, ReportState.Queued);   // before the worker can see it
+            if (!queue.TryEnqueue(request))
+            {
+                statuses.Remove(request.ReportId);   // full, or closed for shutdown: not accepted
+                response.Headers.RetryAfter = "30";   // illustrative; base it on how quickly capacity returns
+                return Results.Problem(statusCode: StatusCodes.Status503ServiceUnavailable,
+                    title: "Report processing is temporarily unavailable. Try again shortly.");
+            }
+
+            return Results.Accepted($"/reports/{request.ReportId}", new { request.ReportId, Status = "Queued" });
+        });
+
+        app.MapGet("/reports/{reportId:guid}", (Guid reportId, ReportStatusStore statuses) =>
+            statuses.Get(reportId) is { } state
+                ? Results.Ok(new { reportId, Status = state.ToString() })
+                : Results.NotFound());
     }
+}
+```
+
+### Durable-sketch definitions
+
+These complete the Option 3 sketch for compilation. The duplicate-key check is deliberately left for your database provider.
+
+```csharp
+public enum ReportJobStatus { Pending, Running, Sent, Failed }
+
+public sealed class ReportJob
+{
+    public Guid Id { get; set; }
+    public required string CallerId { get; set; }
+    public required string IdempotencyKey { get; set; }
+    public required string Fingerprint { get; set; }
+    public required string CustomerId { get; set; }
+    public required string Email { get; set; }
+    public ReportJobStatus Status { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
+public sealed class ReportsDbContext(DbContextOptions<ReportsDbContext> options) : DbContext(options)
+{
+    public DbSet<ReportJob> ReportJobs => Set<ReportJob>();
+
+    protected override void OnModelCreating(ModelBuilder model) =>
+        model.Entity<ReportJob>()
+            .HasIndex(j => new { j.CallerId, j.IdempotencyKey }, "UX_ReportJobs_Caller_IdempotencyKey")
+            .IsUnique();   // the database enforces uniqueness
+}
+
+public static class ReplayContract
+{
+    public static IResult Existing(ReportJob job) =>
+        job.Status is ReportJobStatus.Pending or ReportJobStatus.Running
+            ? Results.Accepted($"/reports/{job.Id}", new { ReportId = job.Id, Status = job.Status.ToString() })
+            : Results.Ok(new { ReportId = job.Id, Status = job.Status.ToString() });
+}
+
+public static class DuplicateKeys
+{
+    // Provider-specific. For PostgreSQL with Npgsql, for example: the inner PostgresException has
+    // SqlState "23505" and ConstraintName "UX_ReportJobs_Caller_IdempotencyKey". Never treat every
+    // DbUpdateException as a duplicate.
+    public static bool IsIdempotencyKeyViolation(DbUpdateException ex) =>
+        throw new NotImplementedException("Supply the check for your database provider.");
 }
 ```
 
@@ -949,19 +1047,66 @@ public async Task A_cleanup_failure_does_not_hide_the_work_failure()
     Assert.Contains(logs.Entries, e => e.Level == LogLevel.Warning && e.Message.Contains("cleanup failed"));
 }
 
-[Theory]
-[InlineData(BoundedChannelFullMode.DropWrite, 1)]    // the incoming item is discarded
-[InlineData(BoundedChannelFullMode.DropNewest, 2)]   // the newest queued item makes room
-[InlineData(BoundedChannelFullMode.DropOldest, 2)]   // the oldest queued item makes room
-public void Every_drop_mode_reports_success_while_discarding_an_item(BoundedChannelFullMode mode, int survivor)
+[Fact]
+public async Task A_scope_creation_failure_is_one_item_failure_and_the_worker_keeps_going()
 {
-    var channel = Channel.CreateBounded<int>(new BoundedChannelOptions(1) { FullMode = mode });
+    var behavior = new ReportBehavior();
+    var email = new RecordingEmailSender();
+    var logs = new CapturingLoggerProvider();
+    using ServiceProvider root = new ServiceCollection()
+        .AddSingleton(behavior)
+        .AddScoped<IReportGenerator, FakeReportGenerator>()
+        .AddSingleton<IEmailSender>(email)
+        .BuildServiceProvider();
+    var scopes = new FailingOnceScopeFactory(root.GetRequiredService<IServiceScopeFactory>());
+    var queue = new ReportQueue(capacity: 10);
+    var statuses = new ReportStatusStore();
+    using var loggerFactory = new LoggerFactory([logs]);
+    using var worker = new ReportWorker(queue, scopes, statuses, loggerFactory.CreateLogger<ReportWorker>());
+
+    ReportRequest first = Report("C-1");
+    ReportRequest second = Report("C-2");
+    Assert.True(queue.TryEnqueue(first));
+    Assert.True(queue.TryEnqueue(second));
+
+    await worker.StartAsync(TestContext.Current.CancellationToken);
+    await email.FirstSent.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+    await worker.StopAsync(TestContext.Current.CancellationToken);
+
+    Assert.Equal(ReportState.Failed, statuses.Get(first.ReportId));    // not left Running
+    Assert.Equal(ReportState.Sent, statuses.Get(second.ReportId));     // and the worker survived it
+}
+
+public sealed class FailingOnceScopeFactory(IServiceScopeFactory inner) : IServiceScopeFactory
+{
+    private int calls;
+
+    public IServiceScope CreateScope() =>
+        Interlocked.Increment(ref calls) == 1
+            ? throw new ObjectDisposedException("IServiceProvider")   // as during a provider teardown
+            : inner.CreateScope();
+}
+
+[Theory]
+[InlineData(BoundedChannelFullMode.DropWrite, new[] { 1, 2 })]    // the incoming item is discarded
+[InlineData(BoundedChannelFullMode.DropNewest, new[] { 1, 3 })]   // the newest queued item makes room
+[InlineData(BoundedChannelFullMode.DropOldest, new[] { 2, 3 })]   // the oldest queued item makes room
+public void Every_drop_mode_reports_success_while_discarding_an_item(BoundedChannelFullMode mode, int[] survivors)
+{
+    var channel = Channel.CreateBounded<int>(new BoundedChannelOptions(2) { FullMode = mode });
 
     Assert.True(channel.Writer.TryWrite(1));
-    Assert.True(channel.Writer.TryWrite(2));   // "accepted"...
-    Assert.Equal(1, channel.Reader.Count);     // ...but one of the two items is gone
-    Assert.True(channel.Reader.TryRead(out int remaining));
-    Assert.Equal(survivor, remaining);
+    Assert.True(channel.Writer.TryWrite(2));
+    Assert.True(channel.Writer.TryWrite(3));   // "accepted"...
+    channel.Writer.Complete();
+
+    List<int> remaining = [];
+    while (channel.Reader.TryRead(out int item))
+    {
+        remaining.Add(item);
+    }
+
+    Assert.Equal(survivors, remaining);        // ...but one of the three items is gone
 }
 
 [Fact]
@@ -973,3 +1118,55 @@ public void Wait_mode_refuses_immediately_when_full()
     Assert.False(channel.Writer.TryWrite(2));  // TryWrite never waits; WriteAsync would
 }
 ```
+
+### Shutdown harness
+
+This file-based program (`dotnet run --file harness.cs`, .NET 10 SDK) produced the shutdown observations in the article. It runs real Kestrel, not `TestServer`, starts a twelve-second request, and calls `StopAsync` directly one second later. Pass a number of seconds to set `HostOptions.ShutdownTimeout`; omit it for the default.
+
+```csharp
+#:sdk Microsoft.NET.Sdk.Web
+#:property TargetFramework=net10.0
+using System.Diagnostics;
+
+var stopwatch = Stopwatch.StartNew();
+void Log(string message) => Console.WriteLine($"{stopwatch.Elapsed.TotalSeconds,6:F2}s  {message}");
+
+var builder = WebApplication.CreateBuilder();
+builder.Logging.ClearProviders();
+builder.WebHost.UseUrls("http://127.0.0.1:0");
+if (args.Length > 0)
+{
+    builder.Services.Configure<HostOptions>(o => o.ShutdownTimeout = TimeSpan.FromSeconds(int.Parse(args[0])));
+}
+builder.Services.AddSingleton<Action<string>>(Log);
+builder.Services.AddHostedService<ProbeWorker>();
+
+var app = builder.Build();
+app.Lifetime.ApplicationStopping.Register(() => Log("ApplicationStopping"));
+app.MapGet("/slow", async () => { await Task.Delay(TimeSpan.FromSeconds(12)); Log("request finished"); return "done"; });
+await app.StartAsync();
+
+using var client = new HttpClient();
+Task<string> request = Task.Run(async () =>
+{
+    try { return $"HTTP {(int)(await client.GetAsync(app.Urls.First() + "/slow")).StatusCode}"; }
+    catch (HttpRequestException) { return "connection closed before a response"; }
+});
+
+await Task.Delay(TimeSpan.FromSeconds(1));
+Log("StopAsync called");
+await app.StopAsync();
+Log("StopAsync returned");
+Log($"client saw: {await request}");
+
+sealed class ProbeWorker(Action<string> log) : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        stoppingToken.Register(() => log("worker stopping token canceled"));
+        try { await Task.Delay(Timeout.Infinite, stoppingToken); } catch (OperationCanceledException) { }
+    }
+}
+```
+
+With the default timeout on .NET 10, it printed `ApplicationStopping` at once, `request finished` and `HTTP 200` about eleven seconds later, and the worker's token was canceled only after that. With `3`, the worker's token was canceled and the client saw the connection close about four seconds after `StopAsync` was called. Signal-based shutdown (SIGTERM, a container stop) runs the same host shutdown, but your platform's own grace period then also applies.
