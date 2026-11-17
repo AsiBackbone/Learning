@@ -863,6 +863,38 @@ The background-job article establishes that a queue message is not authority and
 
 Lead to A Background Job Should Not Inherit Everything the User Could Do for what the job carries and how the worker re-checks authority before it claims, Your Security Check Passed. Then the World Changed. for check-then-claim and facts outside the claimed row, An In-Memory Grant Store Is Not Distributed Replay Protection and the capability case study for revocation racing consumption of a grant, and A Payment API Timeout Leaves the Outcome Unknown for an external call interrupted after the point of no return. Implementation detail that review showed would overwhelm the argument, such as single-statement claims, leases and recovery, the outbox and sweeper, the complete worker and cancellation methods, and the wider test matrix, lives in the companion [Queued Job Cancellation and Recovery in ASP.NET Core: An Implementation Reference](../docs/aspnetcore/queued-job-cancellation-recovery-implementation-reference.md).
 
+### 26. Task.Run Does Not Make ASP.NET Core Work Durable
+
+- **Priority:** P1
+- **Implementation issue:** [#503](https://github.com/AsiBackbone/Learning/issues/503); opened directly as an implementation issue rather than promoted from an earlier backlog entry
+- **Publication:** [Published November 17, 2026](../docs/articles/2026/task-run-does-not-make-aspnet-core-work-durable.md)
+- **Permanent slug:** `task-run-does-not-make-aspnet-core-work-durable`
+
+#### Reader / search problem
+
+An ASP.NET Core endpoint starts slow work with `Task.Run`, discards the task, and returns a response, and some of that work silently never happens. Typical questions include:
+
+- Is fire-and-forget `Task.Run` safe in an ASP.NET Core controller or minimal API endpoint?
+- Why does my background code throw `ObjectDisposedException` for the `DbContext`?
+- What happens to background work during a deployment, recycle, or crash?
+- Is a `BackgroundService` with a `Channel<T>` durable?
+- What does returning `202 Accepted` actually promise?
+
+#### Existing Learning support
+
+- [How to Test That a Denied Operation Never Executes](../docs/articles/2026/test-denied-operation-never-executes.md), which identifies fire-and-forget dispatch as a side effect but does not teach background-work durability
+- [A Background Job Should Not Inherit Everything the User Could Do](../docs/articles/2026/background-job-should-not-inherit-user-authority.md)
+- [Canceling a Queued Job Can Race With Execution](../docs/articles/2026/revoke-job-after-it-enters-queue.md)
+- [Your Retry Logic May Be Replaying an Authorization Decision](../docs/articles/2026/retry-logic-may-replay-authorization-decision.md)
+
+#### Article / curriculum distinction
+
+Existing material assumes the reader already has a durable job and asks about authority, cancellation, and retries after the asynchronous boundary. This article is the beginner-to-intermediate step before those: it separates thread-pool scheduling, host-managed execution, and durable acceptance; shows why detached work needs its own dependency-injection scope; builds a bounded in-memory queue with backpressure, failure recording, and an honest shutdown; tests a full queue, a failed item, and work pending at shutdown; and explains what `202 Accepted` promises. It must not claim that `Task.Run` is universally wrong, that a `BackgroundService` or in-memory channel is durable, that graceful shutdown runs after every failure, or that every piece of background work needs a durable queue, and it must not become a broker comparison.
+
+#### Natural deeper path
+
+Lead to A Background Job Should Not Inherit Everything the User Could Do for the identity a job should carry, Canceling a Queued Job Can Race With Execution for conditional claims and recovery once the job is durable, and A Payment API Timeout Leaves the Outcome Unknown and Your Retry Logic May Be Replaying an Authorization Decision for interrupted external calls and retries.
+
 ---
 
 ## Promotion and Publication Workflow
