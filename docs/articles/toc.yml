@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: Task.Run Does Not Make ASP.NET Core Work Durable
+  href: 2026/task-run-does-not-make-aspnet-core-work-durable.md
 - name: Canceling a Queued Job Can Race With Execution
   href: 2026/revoke-job-after-it-enters-queue.md
 - name: A Payment API Timeout Leaves the Outcome Unknown

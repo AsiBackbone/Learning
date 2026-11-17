@@ -868,6 +868,7 @@ For consequential operations, design the code so the protected boundary is visib
 - [Decision Before Execution runnable sample](https://github.com/AsiBackbone/Learning/blob/main/samples/decision-before-execution/README.md) provides executable invariant tests using small framework-neutral .NET types.
 - [Decision Before Execution lab](../../labs/decision-before-execution.md) asks you to break, observe, and repair the host execution boundary yourself.
 - [Your Authorization Check Runs Too Late](authorization-check-runs-too-late.md) starts from the related production failure mode where a blocking rule is discovered only after protected work begins.
+- [Task.Run Does Not Make ASP.NET Core Work Durable](task-run-does-not-make-aspnet-core-work-durable.md) covers what happens to fire-and-forget work after the response: who owns it, what a shutdown or crash loses, and how to test a full queue, a failed work item, and work still pending when the host stops.
 
 ---
 

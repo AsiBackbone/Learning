@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Fire-and-forget `Task.Run` in an endpoint, `BackgroundService` and bounded channels, request-scoped services in background work, shutdown and restart losses, and what `202 Accepted` promises | [Task.Run Does Not Make ASP.NET Core Work Durable](2026/task-run-does-not-make-aspnet-core-work-durable.md) |
 | Canceling a queued or running job, a cancellation that races the worker claiming it, stopping work already underway, and what to record when cancellation is too late | [Canceling a Queued Job Can Race With Execution](2026/revoke-job-after-it-enters-queue.md) |
 | A payment provider call that timed out, whether the customer was charged, idempotency keys after a lost response, and resending versus reconciling | [A Payment API Timeout Leaves the Outcome Unknown](2026/payment-api-timeout-unknown-outcome.md) |
 | One-time grants or capabilities accepted twice across application instances or after a restart, and what a shared, durable, atomic consumption store must guarantee | [An In-Memory Grant Store Is Not Distributed Replay Protection](2026/in-memory-grant-store-is-not-distributed-replay-protection.md) |
@@ -58,6 +59,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Task.Run Does Not Make ASP.NET Core Work Durable](2026/task-run-does-not-make-aspnet-core-work-durable.md)
+
+**Christopher D. Cavell** · **November 17, 2026**
+
+An accounting application made a slow month-end statement endpoint responsive by starting the work with `Task.Run`, discarding the task, and returning `202 Accepted`. A routine deployment then ended fourteen statements without an error or a log line, and a later change made statements fail with an unlogged `ObjectDisposedException` because the detached work used the request's `DbContext`. This guide separates detached work, host-managed execution, and durable acceptance; explains why detached work must resolve its services in a scope created for each work item; builds a bounded in-memory queue processed by a `BackgroundService` that refuses work when full, records each item's failure without letting cleanup errors hide it or stopping the host, closes admission when the worker is told to stop, and reports what it never started; states what that design guarantees, under which conditions, and what it may lose; gives deterministic tests for a full queue, a failed work item, work still pending when the host stops, and admission closing at shutdown, with every fake and helper in an appendix; explains what `202 Accepted` does and does not promise and why the response needs a stable identifier and a status resource; sketches storing the job before answering and when a separate worker or scheduler is justified; compares the options by completion, restart survival, latency, backpressure, and operational cost; and describes the simplest valid design for work that can safely be lost.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/task-run-does-not-make-aspnet-core-work-durable.html`
 
 ### [Canceling a Queued Job Can Race With Execution](2026/revoke-job-after-it-enters-queue.md)
 
