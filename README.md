@@ -215,7 +215,7 @@ Issues are best used for concrete repository work; organization Discussions are 
 
 ## Project Status
 
-**Learning 1.6 is the current documentation baseline aligned with the reviewed AsiBackbone 7.0.0 and NetCoreApplicationTemplate 2.11.2 boundaries. The dated implementation-currentness review records why Learning retains those archival pins after reviewing AsiBackbone 7.5.4 and NetCoreApplicationTemplate 2.11.10. Learning 1.0 / AsiBackbone 6.0 remains available as immutable history.**
+**[Learning 1.6.0](https://github.com/AsiBackbone/Learning/releases/tag/v1.6.0) is the published archival release; the documentation site follows `main` and may include material added after that snapshot.** The [2026-11-14 implementation-currentness review](docs/getting-started/implementation-currentness-review-2026-11-14.md) deliberately retains AsiBackbone `v7.0.0` and NCAT `v2.11.2` as teaching baselines after reviewing releases `v7.5.4` and `v2.11.10`. Those pins are not current production installation advice. Learning 1.0 / AsiBackbone 6.0 remains historical.
 
 The foundational tutorial, sample, test, and lab path is established. See the [AsiBackbone 7.0 Compatibility and API Boundary](docs/getting-started/asibackbone-7-api-boundary.md) for the selected implementation references, the [2026-11-14 Implementation Currentness Review](docs/getting-started/implementation-currentness-review-2026-11-14.md) for the retain decision, the [Learning 1.6.0 Release Readiness record](docs/getting-started/learning-1-6-release-readiness.md) for the current release review, and [ROADMAP.md](ROADMAP.md) for the maintained direction.
 

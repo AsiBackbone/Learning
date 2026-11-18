@@ -164,7 +164,9 @@ The goal is to make the reasoning visible—not to prove that one framework or a
 
 ## Recently added
 
-Learning 1.6 is the current documentation baseline aligned with its reviewed AsiBackbone 7.0.0 and NetCoreApplicationTemplate 2.11.2 boundaries. The dated [implementation-currentness review](getting-started/implementation-currentness-review-2026-11-14.md) records why Learning retains those archival pins after reviewing AsiBackbone 7.5.4 and NetCoreApplicationTemplate 2.11.10. The [compatibility and API boundary](getting-started/asibackbone-7-api-boundary.md) pins the selected implementation references; earlier Learning snapshots remain available as historical guidance. Recent publications include:
+**Published Learning archive:** [1.6.0](https://github.com/AsiBackbone/Learning/releases/tag/v1.6.0) ([release notes](https://github.com/AsiBackbone/Learning/blob/v1.6.0/RELEASE-NOTES-1.6.0.md)). This site follows `main` and may publish additional articles after the archived tag; its contents are not an immutable copy of 1.6.0. Use the tag for reproducible citations.
+
+The [2026-11-14 implementation-currentness review](getting-started/implementation-currentness-review-2026-11-14.md) retains the deliberately reviewed **teaching snapshots** AsiBackbone `v7.0.0` and NCAT `v2.11.2`, after examining published releases AsiBackbone `v7.5.4` and NCAT `v2.11.10`. These are **not** recommendations to install older packages in new production applications. For current implementation releases and migration guidance, use the [AsiBackbone releases](https://github.com/AsiBackbone/AsiBackbone/releases/latest) and [NCAT releases](https://github.com/AsiBackbone/NetCoreApplicationTemplate/releases/latest). The [compatibility/API boundary](getting-started/asibackbone-7-api-boundary.md) documents the selected teaching contracts. Recent publications include:
 
 - [Task.Run Does Not Make ASP.NET Core Work Durable](articles/2026/task-run-does-not-make-aspnet-core-work-durable.md)
 - [Canceling a Queued Job Can Race With Execution](articles/2026/revoke-job-after-it-enters-queue.md)

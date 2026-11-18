@@ -27,7 +27,7 @@ static partial class ImplementationCurrentnessValidator
     private const string BaselineManifestRelativePath = "eng/implementation-baseline.json";
 
     // Front-matter key prefix for each implementation repository a page can declare a review of.
-    private static readonly IReadOnlyDictionary<string, string> RepositoryPrefixes =
+    private static readonly Dictionary<string, string> RepositoryPrefixes =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["AsiBackbone"] = "asibackbone",
@@ -35,7 +35,7 @@ static partial class ImplementationCurrentnessValidator
         };
 
     // Existing pin and status keys owned by tools/validate-asibackbone-api-references.cs.
-    private static readonly IReadOnlyDictionary<string, string[]> PinKeySuffixes =
+    private static readonly Dictionary<string, string[]> PinKeySuffixes =
         new Dictionary<string, string[]>(StringComparer.Ordinal)
         {
             ["AsiBackbone"] = ["ref", "status"],
@@ -523,7 +523,7 @@ static partial class ImplementationCurrentnessValidator
         string relativePath,
         string repository,
         string prefix,
-        IReadOnlyDictionary<string, string> frontMatter,
+        Dictionary<string, string> frontMatter,
         LearningBaseline baseline,
         DateOnly today,
         List<string> errors)
@@ -629,7 +629,7 @@ static partial class ImplementationCurrentnessValidator
     private static void ValidateImplementationLinks(
         string relativePath,
         string text,
-        IReadOnlyDictionary<string, string> frontMatter,
+        Dictionary<string, string> frontMatter,
         List<PageReview> reviews,
         List<string> errors)
     {
@@ -766,7 +766,7 @@ static partial class ImplementationCurrentnessValidator
 
     // Release-readiness records and pages marked asibackbone_status: historical record what was true when they were
     // written. They are exempt from currentness review and keep their original pins.
-    private static bool IsHistorical(string relativePath, IReadOnlyDictionary<string, string> frontMatter)
+    private static bool IsHistorical(string relativePath, Dictionary<string, string> frontMatter)
     {
         return ReleaseReadinessRecordRegex().IsMatch(relativePath) ||
                (frontMatter.TryGetValue("asibackbone_status", out string? status) &&
