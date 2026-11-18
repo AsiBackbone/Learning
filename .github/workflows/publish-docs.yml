@@ -14,6 +14,8 @@ on:
       - 'tools/validate-doc-metadata.cs'
       - 'tools/validate-docfx-template-baseline.cs'
       - 'scripts/Ensure-PublishedHtmlMetadata.ps1'
+      - 'scripts/Validate-LearningReleaseMarkers.ps1'
+      - 'eng/published-learning-baseline.json'
       - '.config/dotnet-tools.json'
       - '.github/workflows/publish-docs.yml'
       - '.github/workflows/publish-x.yml'
@@ -67,6 +69,10 @@ jobs:
       - name: Ensure published HTML metadata
         shell: pwsh
         run: ./scripts/Ensure-PublishedHtmlMetadata.ps1 -SiteDirectory ./docs/_site
+
+      - name: Validate archive and review markers in generated HTML
+        shell: pwsh
+        run: ./scripts/Validate-LearningReleaseMarkers.ps1 -SiteDirectory ./docs/_site
 
       - name: Validate XML sitemap generator contract
         run: dotnet run --file tools/generate-sitemap.cs -- --self-test
@@ -180,6 +186,73 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
 
+  # Runs as its own job so a slow Pages/CDN refresh cannot fail deploy-docs and
+  # block the IndexNow and X jobs that depend on it.
+  verify-live-docs:
+    name: Verify live documentation
+    needs: deploy-docs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout publication verification inputs
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: eng/published-learning-baseline.json
+          sparse-checkout-cone-mode: false
+
+      # Fetch the deployed HTML directly, not a search index. The query string
+      # bypasses cached copies; GitHub Pages can still take several minutes to
+      # serve a new deployment, so retry for up to about ten minutes.
+      - name: Verify live archive and review markers
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          version="$(jq -er '.publishedArchive' eng/published-learning-baseline.json)"
+          review="$(jq -er '.currentnessReview' eng/published-learning-baseline.json)"
+          base='https://asibackbone.github.io/Learning'
+          release_url="https://github.com/AsiBackbone/Learning/releases/tag/v$version"
+          review_path="implementation-currentness-review-$review"
+          revision_file="$RUNNER_TEMP/live-revision.txt"
+          home_file="$RUNNER_TEMP/live-home.html"
+          start_file="$RUNNER_TEMP/live-start.html"
+
+          fetch() {
+            curl --fail --silent --show-error --location --max-time 15 \
+              --header 'Cache-Control: no-cache' \
+              "$1?verify=$GITHUB_SHA-$attempt" -o "$2"
+          }
+
+          reason='no attempt completed'
+          for attempt in $(seq 1 30); do
+            if ! fetch "$base/deployment-revision.txt" "$revision_file"; then
+              reason='deployment-revision.txt could not be fetched'
+            elif [[ "$(tr -d '\r\n' < "$revision_file")" != "$GITHUB_SHA" ]]; then
+              reason="live site still serves revision $(tr -d '\r\n' < "$revision_file")"
+            elif ! fetch "$base/" "$home_file" || ! fetch "$base/getting-started/" "$start_file"; then
+              reason='the home or Getting Started page could not be fetched'
+            elif ! grep -Fq "$release_url" "$home_file" || ! grep -Fq "$review_path" "$home_file"; then
+              echo "::error::Live revision $GITHUB_SHA is deployed, but the home page does not link Learning v$version and review $review."
+              exit 1
+            elif ! grep -Fq "$release_url" "$start_file" || ! grep -Fq "$review_path" "$start_file"; then
+              echo "::error::Live revision $GITHUB_SHA is deployed, but Getting Started does not link Learning v$version and review $review."
+              exit 1
+            else
+              echo "Verified deployed revision $GITHUB_SHA and Learning archive v$version with review $review."
+              exit 0
+            fi
+
+            echo "Attempt $attempt: $reason; retrying."
+            sleep 20
+          done
+
+          echo "::error::The live site did not serve revision $GITHUB_SHA after propagation retries: $reason."
+          exit 1
 
   notify-indexnow:
     name: Notify IndexNow

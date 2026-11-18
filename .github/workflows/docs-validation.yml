@@ -23,6 +23,8 @@ on:
       - 'tools/validate-asibackbone-api-references.cs'
       - 'tools/validate-doc-metadata.cs'
       - 'tools/validate-implementation-currentness.cs'
+      - 'scripts/Validate-LearningReleaseMarkers.ps1'
+      - 'eng/published-learning-baseline.json'
       - 'tools/validate-docfx-template-baseline.cs'
       - 'tools/validate-landing-page.cs'
       - 'eng/implementation-baseline.json'
@@ -80,6 +82,12 @@ jobs:
       - name: Validate AsiBackbone API references
         run: dotnet run --file tools/validate-asibackbone-api-references.cs
 
+      - name: Validate published archive marker guard
+        shell: pwsh
+        run: |
+          ./scripts/Validate-LearningReleaseMarkers.ps1 -SelfTest
+          ./scripts/Validate-LearningReleaseMarkers.ps1
+
       - name: Validate implementation-currentness validator contract
         run: dotnet run --file tools/validate-implementation-currentness.cs -- --self-test
 
@@ -96,6 +104,10 @@ jobs:
 
       - name: Validate built landing page
         run: dotnet run --file tools/validate-landing-page.cs -- --site
+
+      - name: Validate rendered archive and review references
+        shell: pwsh
+        run: ./scripts/Validate-LearningReleaseMarkers.ps1 -SiteDirectory ./docs/_site
 
       - name: Test published HTML metadata tooling
         shell: pwsh

@@ -16,6 +16,7 @@ Learning releases are archival and citation snapshots of educational material. T
 
 ### Changed
 
+- The home page, Getting Started, and README now link the published [Learning 1.6.0](https://github.com/AsiBackbone/Learning/releases/tag/v1.6.0) archive tag, state that the documentation site is published from `main` and can contain newer material, and describe the retained AsiBackbone `v7.0.0` and NetCoreApplicationTemplate `v2.11.2` pins as teaching snapshots rather than production installation advice, with links to each repository's latest releases. `eng/published-learning-baseline.json` records the archive and selected currentness review; `scripts/Validate-LearningReleaseMarkers.ps1` checks those entry-page links in source and rendered HTML, and a `verify-live-docs` job confirms them on the live site after deployment. The [2026-11-18 Documentation Currency Review](docs/getting-started/documentation-currency-review-2026-11-18.md) records the inventory and decisions (#507).
 - `CODE_OF_CONDUCT.md` is now the AsiBackbone organization's Contributor Covenant 2.1 text, identical to the [organization default](https://github.com/AsiBackbone/.github/blob/main/CODE_OF_CONDUCT.md). Conduct reports now go privately to the organization contact instead of through the security-advisory form, which creates a draft security advisory rather than a conduct report. The Learning-specific guidance on technical disagreement and on harmful use of examples moved to the Code of Conduct section of [CONTRIBUTING.md](CONTRIBUTING.md) (#493).
 ### Changed
 

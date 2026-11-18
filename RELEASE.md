@@ -14,6 +14,8 @@ dotnet run --file tools/validate-implementation-currentness.cs -- --require-curr
 
 Normal documentation validation only reports stale reviews; this release check fails on them. Re-review each stale page against the selected baseline and update its review metadata, or keep the previous baseline selected for the release. Record the resulting report in the release-readiness record. See [Implementation Currentness Metadata](CONTRIBUTING.md#implementation-currentness-metadata).
 
+After the GitHub Release is published, or after a new dated currentness review is merged, advance `eng/published-learning-baseline.json` and the matching links on `docs/index.md`, `docs/getting-started/index.md`, and `README.md` in the same pull request. `scripts/Validate-LearningReleaseMarkers.ps1` fails until the manifest and the entry pages agree. Do not advance `publishedArchive` before the release tag exists.
+
 The `Publish Stable Release Evidence` workflow runs again when the GitHub Release is published. It checks out the exact tag and fails unless all of these operations succeed:
 
 The repository-level `global.json` makes `Microsoft.Testing.Platform` the canonical test runner for these commands, matching the runner posture used across the AsiBackbone repositories.

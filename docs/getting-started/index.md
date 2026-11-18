@@ -10,7 +10,7 @@ This repository teaches governance and controlled-execution architecture through
 
 > **Read it. Run it. Question it. Improve it.**
 
-> **Version boundary:** Learning 1.0 remains the historical AsiBackbone 6.0 baseline. Learning 1.6 retains reviewed AsiBackbone 7.0.0 and NetCoreApplicationTemplate 2.11.2 boundaries after checking the latest published 7.5.4 and 2.11.10 releases. Use the [7.0 Compatibility and API Boundary](asibackbone-7-api-boundary.md) for the selected package syntax, the [2026-11-14 Implementation Currentness Review](implementation-currentness-review-2026-11-14.md) for the dated retain decision, and the [Learning 1.0 and AsiBackbone 6.0 Compatibility Guide](learning-1-asibackbone-6-compatibility.md) for the versioned 6.0 record.
+> **Release and teaching boundaries:** [Learning 1.6.0](https://github.com/AsiBackbone/Learning/releases/tag/v1.6.0) is the most recently published archival snapshot reviewed here; this `main`-published site can contain newer material. The deliberately pinned AsiBackbone `v7.0.0` and NCAT `v2.11.2` **teaching baselines** remain distinct from current implementation releases. See the [2026-11-14 Implementation Currentness Review](implementation-currentness-review-2026-11-14.md) for the retain decision, the [7.0 Compatibility and API Boundary](asibackbone-7-api-boundary.md) for snapshot-specific API syntax, and the [Learning 1.0 / AsiBackbone 6.0 compatibility record](learning-1-asibackbone-6-compatibility.md) for older history. Follow the owning repositories' [AsiBackbone](https://github.com/AsiBackbone/AsiBackbone/releases/latest) and [NCAT](https://github.com/AsiBackbone/NetCoreApplicationTemplate/releases/latest) releases when adopting production dependencies.
 
 ## Start Here
 
