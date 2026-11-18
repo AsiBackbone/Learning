@@ -692,6 +692,7 @@ The link-validation workflow performs two complementary checks:
 
 1. `tools/validate-organization-links.cs` resolves every `blob` and `tree` link into `AsiBackbone/AsiBackbone` against a fetched Git repository, including tagged historical references. This makes a missing organization-owned source path fail without relying on an HTTP response.
 2. Lychee checks the remaining local and external links. The pinned action receives `github.token` through its `token` input, exports it as `GITHUB_TOKEN`, and retries transient responses. HTTP 429 is not accepted as success.
+3. Zenodo archive DOIs are excluded from Lychee and resolved by a separate step with its own retries. Zenodo intermittently times out or returns HTTP 500 to automated requests, so that step fails scheduled and manual runs but only warns on pull request and push runs. `tools/validate-landing-page.cs` independently pins each DOI's exact value, so a mistyped DOI still fails offline.
 
 With the AsiBackbone repository checked out next to Learning, run the deterministic check locally from the Learning repository root:
 
@@ -705,7 +706,7 @@ The self-test includes a valid source link, a deliberately nonexistent path, and
 lychee './**/*.md'
 ```
 
-A missing object reported by the repository-local validator is link rot: update or remove the link. An isolated HTTP 429 from Lychee is GitHub throttling: rerun the failed job after the limit recovers. If 429 responses persist, verify that the workflow still grants `contents: read` and passes `github.token` to the pinned action. Do not add 429 to `accept`; persistent throttling must remain a visible, retryable failure rather than a passing check. Pull request and push runs accept HTTP 503, because a transient third-party outage says nothing about the change under review. The weekly scheduled run keeps the strict accept list, so a link that stays unavailable is still reported.
+A missing object reported by the repository-local validator is link rot: update or remove the link. An isolated HTTP 429 from Lychee is GitHub throttling: rerun the failed job after the limit recovers. If 429 responses persist, verify that the workflow still grants `contents: read` and passes `github.token` to the pinned action. Do not add 429 to `accept`; persistent throttling must remain a visible, retryable failure rather than a passing check. Pull request and push runs accept HTTP 503, because a transient third-party outage says nothing about the change under review. The weekly scheduled run keeps the strict accept list, so a link that stays unavailable is still reported. An unresolved Zenodo DOI on a scheduled run is reported the same way: rerun the job, and if it still fails, check the record on Zenodo before changing the link.
 
 ## Diagrams
 
