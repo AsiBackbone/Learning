@@ -895,6 +895,38 @@ Existing material assumes the reader already has a durable job and asks about au
 
 Lead to A Background Job Should Not Inherit Everything the User Could Do for the identity a job should carry, Canceling a Queued Job Can Race With Execution for conditional claims and recovery once the job is durable, and A Payment API Timeout Leaves the Outcome Unknown and Your Retry Logic May Be Replaying an Authorization Decision for interrupted external calls and retries.
 
+### 27. Your Dependency Injection Lifetime Is an Ownership Decision
+
+- **Priority:** P1
+- **Implementation issue:** [#504](https://github.com/AsiBackbone/Learning/issues/504); opened directly as an implementation issue rather than promoted from an earlier backlog entry
+- **Publication:** [Published November 19, 2026](../docs/articles/2026/dependency-injection-lifetime-is-ownership-decision.md)
+- **Permanent slug:** `dependency-injection-lifetime-is-ownership-decision`
+
+#### Reader / search problem
+
+ASP.NET Core makes `AddTransient`, `AddScoped`, and `AddSingleton` easy to write, so lifetime selection is often treated as registration syntax or a performance toggle. Typical questions include:
+
+- Should this service be transient, scoped, or singleton?
+- What does "Cannot consume scoped service from singleton" mean, and why does it appear only in Development?
+- Why does my singleton's `DbContext` return stale data or throw "a second operation was started on this context"?
+- How do I use a `DbContext` from a `BackgroundService`?
+- Who disposes injected services, and should I dispose them myself?
+
+#### Existing Learning support
+
+- [Data-Access Boundaries and Transaction Reasoning with EF Core](../docs/aspnetcore/data-access-boundaries-and-transaction-reasoning.md), which states that a `DbContext` is not a singleton cache and is not thread-safe
+- [A Background Job Should Not Inherit Everything the User Could Do](../docs/articles/2026/background-job-should-not-inherit-user-authority.md), which creates an explicit scope inside a `BackgroundService`
+- [Policy as Code in ASP.NET Core Without Overengineering](../docs/articles/2026/policy-as-code-aspnet-core-without-overengineering.md), which warns that an authorization handler using a scoped `DbContext` must not be a singleton
+- [Task.Run Does Not Make ASP.NET Core Work Durable](../docs/articles/2026/task-run-does-not-make-aspnet-core-work-durable.md), which shows detached work failing on the request's disposed `DbContext`
+
+#### Article / curriculum distinction
+
+Existing material contains local cautions about lifetimes, not an explanation of why the rules exist. This article connects service lifetime to sharing, request boundaries, mutable state, thread safety, disposal, hosted services, and tests, and gives readers a decision guide based on state ownership. It must not present one lifetime as the default answer, become a general dependency-injection tutorial or container comparison, claim that singleton means global business state or that transient means thread-safe, recommend resolving arbitrary services from `IServiceProvider`, imply that creating a scope makes background work durable, or make unmeasured performance claims.
+
+#### Natural deeper path
+
+Lead to Task.Run Does Not Make ASP.NET Core Work Durable for work that outlives the request, A Background Job Should Not Inherit Everything the User Could Do for the identity a job's scope should carry, Data-Access Boundaries and Transaction Reasoning with EF Core for the `DbContext` as a unit of work, and Policy as Code in ASP.NET Core Without Overengineering for authorization handler lifetimes.
+
 ---
 
 ## Promotion and Publication Workflow
