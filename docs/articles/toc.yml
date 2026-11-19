@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: Your Dependency Injection Lifetime Is an Ownership Decision
+  href: 2026/dependency-injection-lifetime-is-ownership-decision.md
 - name: Task.Run Does Not Make ASP.NET Core Work Durable
   href: 2026/task-run-does-not-make-aspnet-core-work-durable.md
 - name: Canceling a Queued Job Can Race With Execution

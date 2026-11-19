@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Choosing `AddTransient`, `AddScoped`, or `AddSingleton`, captive dependencies, a singleton holding a `DbContext`, scope validation, scopes in a `BackgroundService`, disposal, and `IDbContextFactory` | [Your Dependency Injection Lifetime Is an Ownership Decision](2026/dependency-injection-lifetime-is-ownership-decision.md) |
 | Fire-and-forget `Task.Run` in an endpoint, `BackgroundService` and bounded channels, request-scoped services in background work, shutdown and restart losses, and what `202 Accepted` promises | [Task.Run Does Not Make ASP.NET Core Work Durable](2026/task-run-does-not-make-aspnet-core-work-durable.md) |
 | Canceling a queued or running job, a cancellation that races the worker claiming it, stopping work already underway, and what to record when cancellation is too late | [Canceling a Queued Job Can Race With Execution](2026/revoke-job-after-it-enters-queue.md) |
 | A payment provider call that timed out, whether the customer was charged, idempotency keys after a lost response, and resending versus reconciling | [A Payment API Timeout Leaves the Outcome Unknown](2026/payment-api-timeout-unknown-outcome.md) |
@@ -59,6 +60,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Your Dependency Injection Lifetime Is an Ownership Decision](2026/dependency-injection-lifetime-is-ownership-decision.md)
+
+**Christopher D. Cavell** · **November 19, 2026**
+
+An online store cached exchange rates in a singleton that received the request-scoped EF Core `DbContext`, and for most of a day its two instances showed the same cart at different prices, while some requests failed with an EF Core concurrency error that nobody could reproduce. Scope validation would have refused the registration, but the team's environment was not named `Development`. This guide describes transient, scoped, and singleton by who shares an instance, how long it and everything it holds stay alive, whether concurrent requests reach it, and who disposes it; separates an instance's lifetime from the lifetime of the data it holds; shows what scope validation catches and what it cannot see; rejects two opposite repairs, making everything scoped and promoting services to singleton to save allocations; gives one small application a stateless mapper, a request-scoped service and `DbContext`, a thread-safe singleton cache built on immutable snapshots, and a `BackgroundService` that creates and disposes a scope for each refresh without becoming a service locator; explains request and explicit scopes, disposal ownership, and when `IDbContextFactory<TContext>` is the right tool; tests the real registrations with validation on and checks only the instance identities the design depends on; offers a six-question decision guide with a reasonable case for each lifetime; and states what a lifetime does not provide: durability, authorization, caching semantics, or coordination between instances.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/dependency-injection-lifetime-is-ownership-decision.html`
 
 ### [Task.Run Does Not Make ASP.NET Core Work Durable](2026/task-run-does-not-make-aspnet-core-work-durable.md)
 

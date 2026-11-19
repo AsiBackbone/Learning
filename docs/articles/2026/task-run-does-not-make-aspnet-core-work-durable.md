@@ -737,6 +737,8 @@ That sentence is the difference between a tradeoff and an accident. The opening 
 
 ## Continue Deeper
 
+The scope rule in this article is one case of a broader one: a service must not outlive what it depends on. [Your Dependency Injection Lifetime Is an Ownership Decision](dependency-injection-lifetime-is-ownership-decision.md) explains how transient, scoped, and singleton decide sharing, concurrency, and disposal, what scope validation catches, and how to test the instance identities a design depends on.
+
 When the work crosses from the request into a job, the job also needs to carry the right identity. [A Background Job Should Not Inherit Everything the User Could Do](background-job-should-not-inherit-user-authority.md) covers what the job should record about who asked, and how the worker re-checks that before it starts.
 
 Once the job is durable, two workers can race to claim it, and an operator may try to cancel it. [Canceling a Queued Job Can Race With Execution](revoke-job-after-it-enters-queue.md) shows the conditional claim that decides those races and what recovery must not do after a crash.
