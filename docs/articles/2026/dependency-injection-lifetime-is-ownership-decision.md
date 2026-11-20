@@ -870,6 +870,8 @@ A background job's scope should carry the right identity as well as the right se
 
 If a `DbContext` is the unit of work, its lifetime is part of the data-access design. [Data-Access Boundaries and Transaction Reasoning with EF Core](../../aspnetcore/data-access-boundaries-and-transaction-reasoning.md) explains why a context is one intentionally owned unit of work, when a repository adds a boundary, and how local transactions differ from effects outside the database.
 
+Typed HTTP clients are transient, so a singleton that receives one captures it, together with the connection pool beneath it. [Stop Creating an HttpClient for Every Request](stop-creating-httpclient-for-every-request.md) explains how `HttpClient`, its handler, and its connections each have their own lifetime, and how a long-lived service should use a factory client per unit of work instead.
+
 Authorization handlers are resolved from the container too, and their lifetime follows the same rules. [Policy as Code in ASP.NET Core Without Overengineering](policy-as-code-aspnet-core-without-overengineering.md) shows where a handler's decision belongs and what it may depend on.
 
 ### Related Work

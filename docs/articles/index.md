@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| `new HttpClient()` in every request, port exhaustion, a static client that misses DNS changes, `PooledConnectionLifetime`, `IHttpClientFactory`, named and typed clients, per-request headers, and cookies under pooled handlers | [Stop Creating an HttpClient for Every Request](2026/stop-creating-httpclient-for-every-request.md) |
 | Choosing `AddTransient`, `AddScoped`, or `AddSingleton`, captive dependencies, a singleton holding a `DbContext`, scope validation, scopes in a `BackgroundService`, disposal, and `IDbContextFactory` | [Your Dependency Injection Lifetime Is an Ownership Decision](2026/dependency-injection-lifetime-is-ownership-decision.md) |
 | Fire-and-forget `Task.Run` in an endpoint, `BackgroundService` and bounded channels, request-scoped services in background work, shutdown and restart losses, and what `202 Accepted` promises | [Task.Run Does Not Make ASP.NET Core Work Durable](2026/task-run-does-not-make-aspnet-core-work-durable.md) |
 | Canceling a queued or running job, a cancellation that races the worker claiming it, stopping work already underway, and what to record when cancellation is too late | [Canceling a Queued Job Can Race With Execution](2026/revoke-job-after-it-enters-queue.md) |
@@ -60,6 +61,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Stop Creating an HttpClient for Every Request](2026/stop-creating-httpclient-for-every-request.md)
+
+**Christopher D. Cavell** · **November 20, 2026**
+
+A storefront created and disposed an `HttpClient` in every product-page request, and during a sale its hosts ran out of local ports while the inventory API it called was healthy. The replacement, one static client, stopped the port exhaustion but kept sending traffic to a drained inventory cluster for half an hour after a deployment, and occasionally sent one shopper's store identifier with another shopper's request. This guide separates the lifetimes of a client, its handler, its pooled connections, the DNS answers behind them, and a single request; explains why a per-request client throws away a connection pool and why one static client with default settings never retires a busy connection; presents both supported strategies, a long-lived client with an intentional `PooledConnectionLifetime` and short-lived clients from `IHttpClientFactory`, and when each is proportionate; introduces named and typed clients without a class for every call, and shows how a hosted service uses a factory client per unit of work instead of capturing one; puts request-specific headers on the request rather than on shared defaults; keeps timeouts, caller cancellation, resilience, and authorization as separate decisions; explains why pooled handlers share and lose cookies; says when one dependency needs more than one client; and tests request construction, cancellation, the real registration, and the endpoint's failure mapping through a fake handler without asserting anything about connections or timing.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/stop-creating-httpclient-for-every-request.html`
 
 ### [Your Dependency Injection Lifetime Is an Ownership Decision](2026/dependency-injection-lifetime-is-ownership-decision.md)
 
