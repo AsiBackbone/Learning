@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "account": "jackdaw-patio",
-  "cursorSha": "bdd9b746a23523316004d9bf865fac334f427f65",
+  "cursorSha": "ccea6e057933af5df6e6c21a4c508469b4681043",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
@@ -117,6 +117,11 @@
       "sourceBlobSha": "36b0a93c420a476d8698470df47cdf2bf89059e4",
       "postId": "2123434484037025982",
       "postedAtUtc": "2026-11-19T15:13:27.3207655+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/stop-creating-httpclient-for-every-request.html": {
+      "sourceBlobSha": "1e67da267d952ff451620b53215ec4c8610adefb",
+      "postId": "2123814460641149233",
+      "postedAtUtc": "2026-11-20T16:23:20.7852333+00:00"
     }
   },
   "deferredPublications": {}
