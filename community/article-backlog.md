@@ -927,6 +927,38 @@ Existing material contains local cautions about lifetimes, not an explanation of
 
 Lead to Task.Run Does Not Make ASP.NET Core Work Durable for work that outlives the request, A Background Job Should Not Inherit Everything the User Could Do for the identity a job's scope should carry, Data-Access Boundaries and Transaction Reasoning with EF Core for the `DbContext` as a unit of work, and Policy as Code in ASP.NET Core Without Overengineering for authorization handler lifetimes.
 
+### 28. Stop Creating an HttpClient for Every Request
+
+- **Priority:** P1
+- **Implementation issue:** [#505](https://github.com/AsiBackbone/Learning/issues/505); opened directly as an implementation issue rather than promoted from an earlier backlog entry
+- **Publication:** [Published November 20, 2026](../docs/articles/2026/stop-creating-httpclient-for-every-request.md)
+- **Permanent slug:** `stop-creating-httpclient-for-every-request`
+
+#### Reader / search problem
+
+`HttpClient` implements `IDisposable`, so developers create and dispose one per operation, and the common correction, one static client, has its own failure. Typical questions include:
+
+- Should `HttpClient` be created per request, or be static or a singleton?
+- Why does my service throw `SocketException` or run out of ports under load when the remote API is healthy?
+- Why does my static `HttpClient` keep calling old servers after a DNS change?
+- What is the difference between `IHttpClientFactory`, named clients, and typed clients, and can I inject a typed client into a singleton?
+- Is it safe to change `DefaultRequestHeaders` for each request, and why do pooled handlers lose cookies?
+
+#### Existing Learning support
+
+- [Your Retry Logic May Be Replaying an Authorization Decision](../docs/articles/2026/retry-logic-may-replay-authorization-decision.md), which configures an `HttpClient` resilience handler and separates resends from current permission
+- [Should Authorization Fail Open, Fail Closed, or Defer?](../docs/articles/2026/fail-open-fail-closed-or-defer.md), which uses a typed policy client with a standard resilience pipeline
+- [Payment Attempt Recovery Implementation Reference](../docs/aspnetcore/payment-attempt-recovery-implementation-reference.md), which registers a typed provider client and replaces `HttpClient.Timeout` with a per-call budget
+- [Your Dependency Injection Lifetime Is an Ownership Decision](../docs/articles/2026/dependency-injection-lifetime-is-ownership-decision.md), which explains captive dependencies and scopes in hosted services
+
+#### Article / curriculum distinction
+
+Existing material uses typed clients and `AddHttpClient` without explaining the connection-lifetime model behind them. This article separates client, handler, connection, DNS, and request lifetimes, presents both supported strategies, a long-lived client with an intentional `PooledConnectionLifetime` and short-lived clients from `IHttpClientFactory`, and covers request-specific headers, cookie behavior under pooled handlers, separate clients for separate trust configurations, and handler-based tests. It must not claim that `IHttpClientFactory` is the only correct strategy or that a static client with default settings follows DNS changes, share one client across unrelated trust, proxy, certificate, or cookie boundaries, put caller-specific values in shared defaults, become a resilience or Polly guide, or present lifetime values as more than illustrative.
+
+#### Natural deeper path
+
+Lead to Your Dependency Injection Lifetime Is an Ownership Decision for typed clients captured by singletons, Your Retry Logic May Be Replaying an Authorization Decision for resilience handlers, Should Authorization Fail Open, Fail Closed, or Defer? for transport failures of an authorization dependency, and A Payment API Timeout Leaves the Outcome Unknown with its implementation reference for timeouts on calls with side effects.
+
 ---
 
 ## Promotion and Publication Workflow

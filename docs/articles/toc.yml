@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: Stop Creating an HttpClient for Every Request
+  href: 2026/stop-creating-httpclient-for-every-request.md
 - name: Your Dependency Injection Lifetime Is an Ownership Decision
   href: 2026/dependency-injection-lifetime-is-ownership-decision.md
 - name: Task.Run Does Not Make ASP.NET Core Work Durable
