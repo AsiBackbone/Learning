@@ -10,7 +10,7 @@ This repository teaches governance and controlled-execution architecture through
 
 > **Read it. Run it. Question it. Improve it.**
 
-> **Release and teaching boundaries:** [Learning 1.6.0](https://github.com/AsiBackbone/Learning/releases/tag/v1.6.0) is the most recently published archival snapshot reviewed here; this `main`-published site can contain newer material. The deliberately pinned AsiBackbone `v7.0.0` and NCAT `v2.11.2` **teaching baselines** remain distinct from current implementation releases. See the [2026-11-14 Implementation Currentness Review](implementation-currentness-review-2026-11-14.md) for the retain decision, the [7.0 Compatibility and API Boundary](asibackbone-7-api-boundary.md) for snapshot-specific API syntax, and the [Learning 1.0 / AsiBackbone 6.0 compatibility record](learning-1-asibackbone-6-compatibility.md) for older history. Follow the owning repositories' [AsiBackbone](https://github.com/AsiBackbone/AsiBackbone/releases/latest) and [NCAT](https://github.com/AsiBackbone/NetCoreApplicationTemplate/releases/latest) releases when adopting production dependencies.
+> **Release and teaching boundaries:** [Learning 1.6.0](https://github.com/AsiBackbone/Learning/releases/tag/v1.6.0) is the most recently published archival snapshot reviewed here; this `main`-published site can contain newer material. The deliberately pinned AsiBackbone `v7.0.0` and NCAT `v2.11.2` **teaching baselines** remain distinct from current implementation releases. See the [2026-11-21 Implementation Currentness Review](implementation-currentness-review-2026-11-21.md) for the retain decision, the [7.0 Compatibility and API Boundary](asibackbone-7-api-boundary.md) for snapshot-specific API syntax, and the [Learning 1.0 / AsiBackbone 6.0 compatibility record](learning-1-asibackbone-6-compatibility.md) for older history. Follow the owning repositories' [AsiBackbone](https://github.com/AsiBackbone/AsiBackbone/releases/latest) and [NCAT](https://github.com/AsiBackbone/NetCoreApplicationTemplate/releases/latest) releases when adopting production dependencies.
 
 ## Start Here
 
@@ -23,7 +23,7 @@ Choose the shortest path that matches how you want to learn:
 | See the complete curriculum visually | [**Learning Path Map**](learning-path-map.md) |
 | Learn by running code | [**Executable Samples**](../samples/index.md) |
 | Move from the five teaching samples into a released ASP.NET Core host | [**From Learning Samples to a Production Host**](from-learning-samples-to-production-host.md) |
-| Copy or prepare package syntax against Learning 1.6's reviewed AsiBackbone 7.0 baseline | [**AsiBackbone 7.0 Compatibility and API Boundary**](asibackbone-7-api-boundary.md) |
+| Copy or prepare package syntax against Learning 1.7's reviewed AsiBackbone 7.0 baseline | [**AsiBackbone 7.0 Compatibility and API Boundary**](asibackbone-7-api-boundary.md) |
 | Maintain the historical Learning 1.0 / 6.0 contract or translate older 5.x material | [**Learning 1.0 and AsiBackbone 6.0 Compatibility Guide**](learning-1-asibackbone-6-compatibility.md) |
 | Practice by changing or challenging the design | [**Hands-On Labs**](../labs/index.md) |
 | Compare a simpler alternative | [**When ASP.NET Core Authorization Is Enough**](../architecture/when-aspnet-core-authorization-is-enough.md) |
@@ -111,7 +111,7 @@ The [`samples/`](../samples/index.md) area contains intentionally small .NET tea
 
 They are teaching artifacts rather than production frameworks.
 
-Their local types are not package API signatures. Use the [AsiBackbone 7.0 Compatibility and API Boundary](asibackbone-7-api-boundary.md) when you need the exact namespaces, supported construction paths, security changes, or migration guidance for Learning 1.6's reviewed implementation baseline. Package consumers moving to a newer release should also read the [2026-11-14 Implementation Currentness Review](implementation-currentness-review-2026-11-14.md) and the owning repository's migration guidance.
+Their local types are not package API signatures. Use the [AsiBackbone 7.0 Compatibility and API Boundary](asibackbone-7-api-boundary.md) when you need the exact namespaces, supported construction paths, security changes, or migration guidance for Learning 1.7's reviewed implementation baseline. Package consumers moving to a newer release should also read the [2026-11-21 Implementation Currentness Review](implementation-currentness-review-2026-11-21.md) and the owning repository's migration guidance.
 
 ### Tests
 
