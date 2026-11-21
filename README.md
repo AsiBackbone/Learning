@@ -100,7 +100,7 @@ Want to understand why this boundary exists or experiment with it?
 | Learn the foundational governed-execution boundary | [Decision Before Execution](docs/tutorials/decision-before-execution.md) |
 | Route from a problem you already recognize | [Find Your Path](docs/getting-started/find-your-path.md) |
 | See the curriculum and prerequisites at a glance | [Learning Path Map](docs/getting-started/learning-path-map.md) |
-| Copy or prepare package syntax against Learning 1.6's reviewed AsiBackbone 7.0 baseline | [AsiBackbone 7.0 Compatibility and API Boundary](docs/getting-started/asibackbone-7-api-boundary.md) |
+| Copy or prepare package syntax against Learning 1.7's reviewed AsiBackbone 7.0 baseline | [AsiBackbone 7.0 Compatibility and API Boundary](docs/getting-started/asibackbone-7-api-boundary.md) |
 | Maintain the historical Learning 1.0 / AsiBackbone 6.0 contract or interpret 5.x material | [Learning 1.0 and AsiBackbone 6.0 Compatibility Guide](docs/getting-started/learning-1-asibackbone-6-compatibility.md) |
 | Decide whether ASP.NET Core authorization is already enough | [When ASP.NET Core Authorization Is Enough](docs/architecture/when-aspnet-core-authorization-is-enough.md) |
 
@@ -174,7 +174,7 @@ Use the canonical project surfaces for deeper information rather than treating t
 
 ### Feedback That Helps Most Now
 
-The Learning 1.6 foundational path is established, so the most useful feedback now comes from first-time readers: unclear prerequisites, confusing terminology, commands that failed, missing counterexamples, and cases where the pattern is unnecessary for your application.
+The Learning 1.7 foundational path is established, so the most useful feedback now comes from first-time readers: unclear prerequisites, confusing terminology, commands that failed, missing counterexamples, and cases where the pattern is unnecessary for your application.
 
 Start a discussion in the category that fits, and name `AsiBackbone/Learning` in it:
 
@@ -215,9 +215,9 @@ Issues are best used for concrete repository work; organization Discussions are 
 
 ## Project Status
 
-**[Learning 1.6.0](https://github.com/AsiBackbone/Learning/releases/tag/v1.6.0) is the published archival release; the documentation site follows `main` and may include material added after that snapshot.** The [2026-11-14 implementation-currentness review](docs/getting-started/implementation-currentness-review-2026-11-14.md) deliberately retains AsiBackbone `v7.0.0` and NCAT `v2.11.2` as teaching baselines after reviewing releases `v7.5.4` and `v2.11.10`. Those pins are not current production installation advice. Learning 1.0 / AsiBackbone 6.0 remains historical.
+**[Learning 1.6.0](https://github.com/AsiBackbone/Learning/releases/tag/v1.6.0) is the published archival release; the documentation site follows `main` and may include material added after that snapshot.** The [2026-11-21 implementation-currentness review](docs/getting-started/implementation-currentness-review-2026-11-21.md) deliberately retains AsiBackbone `v7.0.0` and NCAT `v2.11.2` as teaching baselines after reviewing releases `v7.5.4` and `v2.11.11`. Those pins are not current production installation advice. Learning 1.0 / AsiBackbone 6.0 remains historical.
 
-The foundational tutorial, sample, test, and lab path is established. See the [AsiBackbone 7.0 Compatibility and API Boundary](docs/getting-started/asibackbone-7-api-boundary.md) for the selected implementation references, the [2026-11-14 Implementation Currentness Review](docs/getting-started/implementation-currentness-review-2026-11-14.md) for the retain decision, the [Learning 1.6.0 Release Readiness record](docs/getting-started/learning-1-6-release-readiness.md) for the current release review, and [ROADMAP.md](ROADMAP.md) for the maintained direction.
+The foundational tutorial, sample, test, and lab path is established. See the [AsiBackbone 7.0 Compatibility and API Boundary](docs/getting-started/asibackbone-7-api-boundary.md) for the selected implementation references, the [2026-11-21 Implementation Currentness Review](docs/getting-started/implementation-currentness-review-2026-11-21.md) for the retain decision, the [Learning 1.7.0 Release Readiness record](docs/getting-started/learning-1-7-release-readiness.md) for the current release review, and [ROADMAP.md](ROADMAP.md) for the maintained direction.
 
 ## Citing a Release
 

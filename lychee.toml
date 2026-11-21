@@ -50,9 +50,9 @@ exclude = [
   '^https://github\.com/AsiBackbone/Learning/security/advisories/new$',
 
   # These comparisons become resolvable only after the approved merge commit
-  # is tagged v1.6.0. Keep the canonical changelog targets during PR checks.
-  '^https://github\.com/AsiBackbone/Learning/compare/v1\.5\.0\.\.\.v1\.6\.0$',
-  '^https://github\.com/AsiBackbone/Learning/compare/v1\.6\.0\.\.\.HEAD$',
+  # is tagged v1.7.0. Keep the canonical changelog targets during PR checks.
+  '^https://github\.com/AsiBackbone/Learning/compare/v1\.6\.0\.\.\.v1\.7\.0$',
+  '^https://github\.com/AsiBackbone/Learning/compare/v1\.7\.0\.\.\.HEAD$',
 
   # Zenodo archive DOIs (Learning, AsiBackbone, and NCAT) intermittently time
   # out or return HTTP 500 to automated checkers even though they resolve, which
