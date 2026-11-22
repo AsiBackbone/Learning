@@ -579,6 +579,7 @@ Before moving on, you should be able to answer:
 ## Related Content
 
 - [ASP.NET Core learning area](index.md)
+- [Why Moving ASP.NET Core Middleware Breaks Your Endpoint](../articles/2026/moving-aspnet-core-middleware-breaks-endpoint.md), a standalone article that follows one endpoint through a moved exception handler and an authorization ordering failure, with integration tests that pin the trace
 - [Identify Middleware Ordering Problems lab](../labs/identify-middleware-ordering-problems.md)
 - [When ASP.NET Core Authorization Is Enough](../architecture/when-aspnet-core-authorization-is-enough.md)
 - [Decision Before Execution](../tutorials/decision-before-execution.md)
