@@ -963,13 +963,14 @@ Lead to Your Dependency Injection Lifetime Is an Ownership Decision for typed cl
 
 ## Outstanding Candidates — Basic to Intermediate
 
-All candidates 1–28 above are marked published. The six candidates below extend the practical ASP.NET Core foundations introduced by articles 26–28. They are editorial candidates, not implementation tickets; each should receive a dedicated issue when selected. The proposed order moves from request behavior and public errors to configuration, diagnostics, persistence, and testing.
+All candidates 1–28 above are marked published. The six candidates below extend the practical ASP.NET Core foundations introduced by articles 26–28. Each candidate now has a dedicated implementation issue linked below. The proposed order moves from request behavior and public errors to configuration, diagnostics, persistence, and testing.
 
 ### 29. Why Moving ASP.NET Core Middleware Breaks Your Endpoint
 
 - **Priority:** P0
 - **Level:** Basic to intermediate
-- **Implementation issue:** Not opened
+- **Implementation issue:** [#518](https://github.com/AsiBackbone/Learning/issues/518)
+- **Publication order:** 1 of 6
 - **Candidate slug:** `moving-aspnet-core-middleware-breaks-endpoint`
 
 #### Reader / search problem
@@ -995,7 +996,8 @@ Lead to Middleware Ordering Changes Behavior for the complete dependency graph a
 
 - **Priority:** P0
 - **Level:** Basic to intermediate
-- **Implementation issue:** Not opened
+- **Implementation issue:** [#519](https://github.com/AsiBackbone/Learning/issues/519)
+- **Publication order:** 2 of 6
 - **Candidate slug:** `useful-api-errors-without-exception-details`
 
 #### Reader / search problem
@@ -1021,7 +1023,8 @@ Lead to Centralized Error Handling and Problem Details for mapping choices and S
 
 - **Priority:** P0
 - **Level:** Basic to intermediate
-- **Implementation issue:** Not opened
+- **Implementation issue:** [#520](https://github.com/AsiBackbone/Learning/issues/520)
+- **Publication order:** 3 of 6
 - **Candidate slug:** `validate-aspnet-core-configuration-before-first-request`
 
 #### Reader / search problem
@@ -1046,7 +1049,8 @@ Lead to Secure-by-Default ASP.NET Core Configuration for failure-mode selection,
 
 - **Priority:** P1
 - **Level:** Basic to intermediate
-- **Implementation issue:** Not opened
+- **Implementation issue:** [#521](https://github.com/AsiBackbone/Learning/issues/521)
+- **Publication order:** 4 of 6
 - **Candidate slug:** `stop-logging-entire-request-objects`
 
 #### Reader / search problem
@@ -1072,7 +1076,8 @@ Lead to Structured Logging Without Sensitive-Data Sprawl for the complete event 
 
 - **Priority:** P1
 - **Level:** Intermediate
-- **Implementation issue:** Not opened
+- **Implementation issue:** [#522](https://github.com/AsiBackbone/Learning/issues/522)
+- **Publication order:** 5 of 6
 - **Candidate slug:** `when-explicit-ef-core-transaction-needed`
 
 #### Reader / search problem
@@ -1098,7 +1103,8 @@ Lead to Data-Access Boundaries and Transaction Reasoning with EF Core for wider 
 
 - **Priority:** P1
 - **Level:** Intermediate
-- **Implementation issue:** Not opened
+- **Implementation issue:** [#523](https://github.com/AsiBackbone/Learning/issues/523)
+- **Publication order:** 6 of 6
 - **Candidate slug:** `ef-core-inmemory-test-what-it-proves`
 
 #### Reader / search problem
