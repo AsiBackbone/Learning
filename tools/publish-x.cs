@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 #pragma warning disable IDE0040 // File-based application helper types are intentionally file-local.
@@ -625,8 +626,8 @@ sealed class JackdawPatioPostComposer : IXPostComposer
         string xPost = publication.XPost ?? throw new InvalidDataException(
             $"{publication.SourcePath}: missing 'x_post'; add reviewed engineering-takeaway copy before publication.");
         string hashtags = string.Join(' ', publication.XHashtags.Select(static hashtag => $"#{hashtag}"));
-        string question = publication.XQuestion is { } value ? $"\n\n{value}" : string.Empty;
-        string text = $"{xPost}\n\n{publication.Title}{question}\n\n{hashtags}\n\n";
+        string question = publication.XQuestion is { } value ? $"\n\n{XAutoLinkGuard.Apply(value)}" : string.Empty;
+        string text = $"{XAutoLinkGuard.Apply(xPost)}\n\n{XAutoLinkGuard.Apply(publication.Title)}{question}\n\n{hashtags}\n\n";
 
         if (XTextLength.Weighted(text) + XTextLength.UrlWeight > XTextLength.MaximumWeightedLength)
         {
@@ -637,6 +638,24 @@ sealed class JackdawPatioPostComposer : IXPostComposer
 
         return text + publication.CanonicalUrl;
     }
+}
+
+static class XAutoLinkGuard
+{
+    // X turns any token shaped like a domain into a link: "ASP.NET" becomes asp.net and
+    // "Task.Run" becomes task.run. The link then counts 23 characters, and X may build
+    // the post's link card from it instead of from the canonical URL. A LEFT-TO-RIGHT
+    // MARK (U+200E) before the dot is invisible in left-to-right text, and X's
+    // twitter-text rules do not allow directional marks inside a domain, so the token
+    // is no longer linked. Every letter-or-digit, dot, letter sequence is broken, not
+    // only known top-level domains, because X recognizes hundreds of them; a false
+    // positive such as "e.g" costs two weighted characters and changes nothing visible.
+    // tools/validate-doc-metadata.cs applies the same transformation. Keep the two in sync.
+    public const char Mark = '‎';
+
+    private static readonly Regex DomainDot = new(@"(?<=[\p{L}\p{N}])\.(?=\p{L})", RegexOptions.Compiled);
+
+    public static string Apply(string text) => DomainDot.Replace(text, $"{Mark}.");
 }
 
 static class XPostRules
@@ -1475,6 +1494,45 @@ static class XPublisherSelfTest
         Assert(XTextLength.Weighted("日本") == 4, "CJK text should count 2 per character.");
         Assert(XTextLength.Weighted("👩🏽‍💻") == 2, "an emoji sequence should count 2.");
         Assert(XTextLength.Weighted("…") == 2, "the ellipsis is outside X's light ranges.");
+
+        TestAutoLinkGuard(composer);
+    }
+
+    private static void TestAutoLinkGuard(JackdawPatioPostComposer composer)
+    {
+        const char mark = XAutoLinkGuard.Mark;
+        Assert(XAutoLinkGuard.Apply("Why Moving ASP.NET Core Middleware Breaks Your Endpoint") ==
+                $"Why Moving ASP{mark}.NET Core Middleware Breaks Your Endpoint",
+            "ASP.NET should be broken so X does not link it.");
+        Assert(XAutoLinkGuard.Apply("Task.Run Does Not Make Work Durable") == $"Task{mark}.Run Does Not Make Work Durable",
+            "Task.Run should be broken so X does not link it.");
+        Assert(XAutoLinkGuard.Apply("Version 1.5 shipped. Then it failed.") == "Version 1.5 shipped. Then it failed.",
+            "numbers and sentence punctuation should be unchanged.");
+        Assert(XAutoLinkGuard.Apply("Plain words only") == "Plain words only", "text without dots should be unchanged.");
+        Assert(XTextLength.Weighted(mark.ToString()) == 2, "U+200E is outside X's light ranges and should count 2.");
+
+        const string title = "Why Moving ASP.NET Core Middleware Breaks Your Endpoint";
+        const string takeaway = "Middleware order is behavior; HttpContext.User comes from authentication.";
+        LearningPublication publication = Publication(title, post: takeaway, question: "Have you used ASP.NET Core?");
+        string post = composer.Compose(publication);
+        Assert(post.Contains($"ASP{mark}.NET Core Middleware", StringComparison.Ordinal), "the title was not guarded.");
+        Assert(post.Contains($"HttpContext{mark}.User", StringComparison.Ordinal), "x_post was not guarded.");
+        Assert(post.Contains($"used ASP{mark}.NET Core?", StringComparison.Ordinal), "x_question was not guarded.");
+        Assert(post.EndsWith("\n\n" + publication.CanonicalUrl, StringComparison.Ordinal) &&
+                !publication.CanonicalUrl.Contains(mark),
+            "the canonical URL must be appended unchanged.");
+        Assert(post.Count(static c => c == mark) == 3, "each guarded token should receive exactly one mark.");
+
+        // The weighted check includes the marks: a post that fits without them can be too long with them.
+        string unguardedText = post[..^publication.CanonicalUrl.Length].Replace(mark.ToString(), string.Empty, StringComparison.Ordinal);
+        Assert(WeightedPostLength(post, publication.CanonicalUrl) ==
+                XTextLength.Weighted(unguardedText) + XTextLength.UrlWeight + 6,
+            "the weighted length should count 2 for each mark.");
+        int room = 280 - XTextLength.UrlWeight - XTextLength.Weighted($"\n\n{title}\n\n#DotNet\n\n");
+        string fitsOnlyWithoutMark = new('p', room);
+        AssertThrows<InvalidDataException>(() => composer.Compose(Publication(title, post: fitsOnlyWithoutMark)));
+        Assert(composer.Compose(Publication(title, post: new string('p', room - 2))).EndsWith(publication.CanonicalUrl, StringComparison.Ordinal),
+            "a post that fits including the mark should compose.");
     }
 
     private static int WeightedPostLength(string post, string canonicalUrl) =>
