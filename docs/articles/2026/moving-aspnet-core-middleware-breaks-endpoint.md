@@ -3,7 +3,7 @@ description: Moving one ASP.NET Core middleware line can let exceptions escape o
 title: Why Moving ASP.NET Core Middleware Breaks Your Endpoint
 author: Christopher D. Cavell
 published: "2026-11-22"
-summary: ASP.NET Core middleware is not a list of independent filters. Each component wraps everything registered after it, so it runs before that work on the way in and after it on the way out, and it can stop the request without calling the rest at all. Moving one registration therefore changes what a component can see, what it can catch, and what it can still change. Trace a small endpoint to see the wrapping, the reverse response order, and a short-circuit; break and repair an exception handler that no longer wraps the code that throws and an authorization step that runs before authentication; account for the middleware WebApplication adds on its own; and pin the order you depend on with focused integration tests.
+summary: ASP.NET Core middleware is not a list of independent filters. Each component that calls the rest of the pipeline wraps it, running before that work on the way in and after it on the way out, and a component can also answer a request without calling the rest at all. Moving one registration therefore changes what a component can see and what it can catch. Trace a small endpoint to see the wrapping, the reverse response order, and a short-circuit; break and repair an exception handler that no longer wraps the code that throws and an authorization step that runs before authentication; account for the middleware WebApplication adds on its own; and pin the order you depend on with focused integration tests.
 feed: true
 x_post: Middleware order is behavior. Each component wraps what follows it, so moving one line changes what it can see and catch.
 x_hashtags:
@@ -20,29 +20,35 @@ x_question: "Which middleware move surprised you the most?"
 
 **Prerequisites:** Comfortable reading basic C# and ASP.NET Core minimal API code, and registering services with `builder.Services`. Middleware, endpoint routing, authentication, and integration tests with `TestServer` are introduced in the article. No AsiBackbone package or prior Learning material is required.
 
-**Sample scope:** The C# targets .NET 8 or later and uses the `WebApplication` hosting model with minimal APIs. The application code, the test helpers, and the eleven tests in the [appendix](#appendix-complete-code) were compiled and run on .NET 10 (SDK 10.0.404, `net10.0`) with xUnit v3 and `Microsoft.AspNetCore.TestHost` under Microsoft.Testing.Platform, with warnings treated as errors; all eleven passed. The tests run in the `Production` environment and use a deterministic test authentication handler, so neither the developer exception page nor a real identity provider takes part. Statements about how a real server answers an unhandled exception describe Kestrel's usual behavior and were not part of the test run. Framework behavior is described from Microsoft's documentation on the verification date below; check it for your version. The order API and its incident are hypothetical. Original prose is licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/), and original code examples are additionally offered under the [MIT License](https://opensource.org/license/mit), as described in the repository's [licensing terms](https://github.com/AsiBackbone/Learning/blob/main/LICENSING.md). Third-party material, where identified, remains under its original license. External sources were last verified on November 22, 2026.
+**Sample scope:** The C# targets .NET 8 or later and uses the `WebApplication` hosting model with minimal APIs. The application code, project files, and fourteen integration tests in the [appendix](#appendix-complete-code) were compiled and run on .NET 10; the appendix records the [environment and command](#environment-used-for-verification). Behavior marked as observed on .NET 10 comes from those tests. Other framework behavior is described from Microsoft's documentation on the verification date below; check it for your version. The order API and its incident are hypothetical. Original prose is licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/), and original code examples are additionally offered under the [MIT License](https://opensource.org/license/mit), as described in the repository's [licensing terms](https://github.com/AsiBackbone/Learning/blob/main/LICENSING.md). Third-party material, where identified, remains under its original license. External sources were last verified on November 22, 2026.
 
-**What this article covers:** an order endpoint whose error responses changed after one line moved; how middleware wraps the components registered after it, why responses unwind in reverse order, and what a short-circuit removes from the trace; an exception handler that stopped covering the middleware that throws, and the repair; why authorization depends on routing and authentication having run first, and what happens when it does not; the middleware `WebApplication` inserts automatically and why it can hide or repair an ordering mistake; focused integration tests that pin the order you depend on; and a [four-question diagnostic](#four-questions-before-you-move-a-registration) for the next time a registration moves.
+**What this article covers:** an order endpoint whose error responses changed after one line moved; how middleware wraps the components registered after it, why responses unwind in reverse order, and what a short-circuit removes from the trace; an exception handler that stopped covering the middleware that throws, and the repair; why authorization depends on routing and authentication having run first, and what happens when it does not; the middleware `WebApplication` inserts automatically and how it can hide an ordering mistake or supply a missing component; focused integration tests that pin the order you depend on; and a [four-question diagnostic](#four-questions-before-you-move-a-registration) for the next time a registration moves.
 
 **In plain terms:** think of a set of nesting boxes. Each box you add goes inside the previous one. A request is a marble dropped into the outermost box: it passes through every lid on the way down to the endpoint at the bottom, and back out through every lid in reverse on the way up. A box can catch something only if that something happens inside it, and a box can decide to send the marble straight back up without opening the next lid. Moving a line in `Program.cs` moves a box, and with it everything the box contains.
 
-Consider a hypothetical order API. Every request carries an `X-Store` header, and a small middleware looks the store up in a directory service before the endpoint runs. The pipeline looked like this, and when anything failed, clients received a tidy [problem details](https://www.rfc-editor.org/rfc/rfc9457) response with status `500`:
+Consider a hypothetical order API. Every request carries an `X-Store` header, and a small middleware looks the store up in a directory service before the endpoint runs. The pipeline looked like this, and when an unhandled exception occurred, the API's JSON clients received a [problem details](https://www.rfc-editor.org/rfc/rfc9457) response with status `500`:
 
 ```csharp
 app.UseRequestLog();
 app.UseExceptionHandler();   // wraps the store lookup and the endpoint
 app.UseStoreLookup();
+app.UseAuthentication();
+app.UseAuthorization();
 ```
 
-During a cleanup, a developer moved `UseExceptionHandler()` down a line, so that it sat just above the endpoints "where error handling belongs":
+During a cleanup, a developer moved `UseExceptionHandler()` down a line, so that it sat closer to the endpoints "where error handling belongs":
 
 ```csharp
 app.UseRequestLog();
 app.UseStoreLookup();
 app.UseExceptionHandler();   // moved: now inside the store lookup
+app.UseAuthentication();
+app.UseAuthorization();
 ```
 
-They checked the change by calling an order that makes the endpoint throw, and still got the same problem details response. The change shipped. Two weeks later the store directory timed out for a few minutes. Clients that had always received a problem details body now received an empty `500`, the client library's error parser failed on it, and the request log, which normally records every request's status code, had no outcome at all for those requests.
+They checked the change by calling an order that makes the endpoint throw, and still got the same problem details response. The change shipped.
+
+Two weeks later, the store directory timed out for a few minutes. Clients that had always received a problem details body received a `500` with no body instead, and the client library's error parser failed on it. The request log, which normally records every request's status code, had no outcome at all for those requests.
 
 Nothing in the exception handler changed. Nothing in the store lookup changed. One line moved, and the handler stopped wrapping the code that threw. To see why, you need one idea: middleware wraps.
 
@@ -50,7 +56,7 @@ Nothing in the exception handler changed. Nothing in the store lookup changed. O
 
 An ASP.NET Core middleware component is a function that receives the current `HttpContext` and a delegate, usually called `next`, that runs the rest of the pipeline. Microsoft's [middleware documentation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/#middleware-order) describes the consequence: components run in registration order on the way in, and in reverse order on the way out.
 
-Two tiny components make that visible. Each writes to a shared `RequestTrace`, a thread-safe list of strings registered as a singleton:
+Two tiny components make that visible. Each writes to a shared `RequestTrace`, a thread-safe queue of strings registered as a singleton. A single shared trace is a teaching aid for tests that send one request at a time; its entries carry no request identifier, so concurrent requests would interleave.
 
 ```csharp
 // Tracer A: records the request on the way in, and the status code on the way out.
@@ -84,11 +90,13 @@ public static IApplicationBuilder UseMaintenanceGate(this IApplicationBuilder ap
     });
 ```
 
-The endpoint adds `"endpoint"` to the same trace. Register the two components in this order:
+The endpoint adds `"endpoint"` to the same trace. Register the two components first, followed by authentication and authorization:
 
 ```csharp
 app.UseRequestLog();
 app.UseMaintenanceGate();
+app.UseAuthentication();
+app.UseAuthorization();
 ```
 
 A successful request to `GET /orders/42` produces this trace:
@@ -101,13 +109,14 @@ Maintenance: out
 RequestLog: out 200
 ```
 
-Everything a component does before `await next(context)` happens on the way in. Everything after it happens on the way out, once all the inner components and the endpoint have finished. The request log was registered first, so it is the outermost box: it is the first to see the request and the last to see the response, which is why it can record the final status code.
+Everything a component does before `await next(context)` happens on the way in. Everything after it happens on the way out, once all the inner components and the endpoint have finished, provided that `next` completes without throwing. The request log was registered first, so it is the outermost of the components shown: it is the first of them to see the request and the last to see the response, which is why it can record the final status code. (`WebApplication` also adds routing in front of all of them; [What WebApplication Adds for You](#what-webapplication-adds-for-you) explains why that matters.)
 
 ```text
 RequestLog ──────────────────────────────────────────┐
 │  in                                                │
 │   Maintenance gate ─────────────────────────────┐  │
 │   │  in                                         │  │
+│   │      authentication, authorization          │  │
 │   │      endpoint                               │  │
 │   │  out                                        │  │
 │   └─────────────────────────────────────────────┘  │
@@ -115,7 +124,7 @@ RequestLog ───────────────────────
 └────────────────────────────────────────────────────┘
 ```
 
-The response does not travel back through a separate "response pipeline". It is the same chain of method calls returning. That is the whole reason order matters: a component can only observe, catch, or change what happens inside its own call to `next`.
+The response does not travel back through a separate "response pipeline". It is the same chain of method calls returning. A component's position decides what earlier components have already established when it runs, which later components it can stop, and which exceptions it can catch: only those thrown while the work inside its call to `next` is running.
 
 ### What a short-circuit changes
 
@@ -136,6 +145,8 @@ Now move the gate above the log, the kind of change that looks harmless in revie
 ```csharp
 app.UseMaintenanceGate();
 app.UseRequestLog();
+app.UseAuthentication();
+app.UseAuthorization();
 ```
 
 With maintenance mode on, the trace becomes:
@@ -146,12 +157,12 @@ Maintenance: answered 503
 Maintenance: out
 ```
 
-The request log never ran for these requests. Nothing failed and nothing was reported; the log simply has no record of any request the gate answered. This is the "request logging disappeared" version of the same problem. Short-circuits are common and legitimate: static files, health checks, CORS preflight responses, authentication challenges, rate limiting, and response caching can all answer without calling the rest of the pipeline. A component placed after one of them only ever sees the requests that component lets through.
+The request log never ran for these requests. Nothing failed and nothing was reported; the log simply has no record of any request the gate answered. This is the "request logging disappeared" version of the same problem. Short-circuits are common and legitimate: static-file middleware, health-check endpoints, CORS preflight handling, authorization challenges and forbids, rate limiting, response caching, and application-specific gates like this one can all produce a response without running the rest of the pipeline. A component placed after one of them only ever sees the requests that component lets through.
 
 Two practical consequences follow:
 
 - A component that must see every request, such as request logging or a correlation identifier, has to be outside every short-circuit it must observe.
-- A component that sets something on the response on the way out, such as a header, must be outside the component that produces the response, or it must register its change before the response starts, for example with `context.Response.OnStarting`. Once the response has started, status codes and headers can no longer be changed.
+- A component that adds a response header must do so before the response starts. Once the first byte of the body is sent, the status code and headers can no longer be changed, and being outside the component that wrote the body does not help: by the time `await next(context)` returns, the response may already have started. Set the header before calling `next`, or register a callback with `context.Response.OnStarting` before calling `next`; the callback runs just before the headers are sent.
 
 ## Breaking and Repairing the Exception Boundary
 
@@ -169,9 +180,12 @@ public static IApplicationBuilder UseStoreLookup(this IApplicationBuilder app) =
     });
 ```
 
-The application registers `builder.Services.AddProblemDetails()`, and `app.UseExceptionHandler()` with no arguments then writes a problem details response for an unhandled exception. Microsoft's [error-handling documentation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling#problem-details) describes this combination. Without `AddProblemDetails()` or another handler configuration, the parameterless `UseExceptionHandler()` throws at startup.
+The application registers `builder.Services.AddProblemDetails()`. With that service available, the parameterless `app.UseExceptionHandler()` writes a problem details response for an unhandled exception from the components inside it, provided the response has not started and the client accepts a media type the problem details writer can produce, such as JSON. Microsoft's [error-handling documentation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling#problem-details) describes this combination. Two limits are worth knowing:
 
-The exception handler middleware is a `try`/`catch` around its call to `next`. It can catch only exceptions thrown inside that call. Draw both orders as boxes:
+- The parameterless overload needs something to produce the response. Without an error-handling path, a handler lambda, or `AddProblemDetails()`, it throws at startup. On .NET 10, registering an `IExceptionHandler` by itself does not satisfy it; the startup check still fails.
+- The problem details body depends on content negotiation. On .NET 10, a request whose `Accept` header allows only `text/html` received a `500` with no body from this configuration.
+
+The exception handler middleware is, in effect, a `try`/`catch` around its call to `next`. It can catch only exceptions thrown inside that call. Draw both orders as boxes (authentication and authorization sit inside the store lookup in both, next to the endpoint, and are omitted here):
 
 ```text
 Broken order                                  Repaired order
@@ -182,9 +196,9 @@ RequestLog                                    RequestLog
       └─ endpoint                                   └─ endpoint
 ```
 
-In the broken order, the endpoint is still inside the handler, so an endpoint failure still becomes problem details. That is why the developer's manual check passed. The store lookup, however, is outside the handler. When it throws, the exception passes straight through the request log, which never reaches its "out" line, and leaves the application. A real Kestrel server then normally logs the exception and, because nothing has been written yet, sends an empty `500` response. That is the response the clients' error parser rejected.
+In the broken order, the endpoint is still inside the handler, so an endpoint failure still becomes problem details. That is why the developer's manual check passed. The store lookup, however, is outside the handler. When it throws, the exception passes straight through the request log, which never reaches its "out" line, and leaves the application. When a server catches an exception before the response has started, Microsoft's [server exception handling documentation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling#server-exception-handling) says it sends a `500` response without a body, and Kestrel logs the exception. A reverse proxy or gateway in front of the application can replace that response with its own. That bodiless `500` is the response the clients' error parser rejected.
 
-The tests make each path observable. The helper `TestApp.StartAsync` builds the application with whatever pipeline a test passes in; it is shown in the [testing section](#a-test-helper-that-builds-the-real-hosting-model). The test client sends a store header and a test user, and the fake store directory can be switched to "down".
+The tests make each path observable. The helper `TestApp.StartAsync` builds the application with whatever pipeline a test passes in; it is shown in the [testing section](#a-test-helper-that-builds-the-actual-pipeline). The test client sends a store header and a test user, and the fake store directory can be switched to "down".
 
 ```csharp
 private static void BrokenOrder(WebApplication app)
@@ -192,6 +206,8 @@ private static void BrokenOrder(WebApplication app)
     app.UseRequestLog();
     app.UseStoreLookup();
     app.UseExceptionHandler();   // moved: now inside the store lookup
+    app.UseAuthentication();
+    app.UseAuthorization();
 }
 
 private static void RepairedOrder(WebApplication app)
@@ -199,6 +215,8 @@ private static void RepairedOrder(WebApplication app)
     app.UseRequestLog();
     app.UseExceptionHandler();   // wraps the store lookup and the endpoint
     app.UseStoreLookup();
+    app.UseAuthentication();
+    app.UseAuthorization();
 }
 
 [Fact]
@@ -241,7 +259,7 @@ public async Task RepairedOrderTurnsAStoreLookupFailureIntoProblemDetails()
 }
 ```
 
-Read the three traces together; they say which handler was reached:
+Read the three traces together; they say which handler was reached. The store lookup writes no trace entries of its own, so it does not appear in them.
 
 | Case | Response | Trace | Who handled the exception |
 | --- | --- | --- | --- |
@@ -251,7 +269,7 @@ Read the three traces together; they say which handler was reached:
 
 `TestServer` rethrows an exception that escapes the application into the test, which is what `Assert.ThrowsAsync<TimeoutException>` observes. That is a feature for this test: it proves the exception left the pipeline unhandled, instead of inferring it from an empty response. The repaired test also checks that the exception's message does not appear in the body, because the default problem details response describes the failure generically rather than exposing it.
 
-Notice what the repaired order still does not do. The request log is outside the handler, so it records the final `500`. If the log were inside the handler, an exception would pass through it on the way to the handler and the log would never reach its "out" line, even in the repaired pipeline. A logging component that writes after `await next(context)` records only the requests that come back to it normally; if it must record failures too, place it outside the exception handler or write its "out" entry in a `finally` block.
+Notice where the request log sits in the repaired order. It is outside the handler, so when the handler turns the exception into a response, the log records the final `500`. If the log were inside the handler, the exception would pass through it on the way to the handler, and the log would never reach its "out" line. Moving the "out" entry into a `finally` block would make it run, but would not make it accurate: while an exception is still unwinding, `Response.StatusCode` usually still holds `200`, because no handler has set the error status yet. A log that must record failures should record the exception itself when one passes through it, and should sit outside the exception handler when it must see the handler's final response.
 
 The rule is not "the exception handler goes first". It is: **the exception handler must wrap every component whose failures it is expected to turn into a response.** In most applications that means near the start of the pipeline, which is where Microsoft's documentation places it. A component deliberately placed outside it, like this request log, should be simple enough not to throw.
 
@@ -273,7 +291,7 @@ Three middleware components cooperate to enforce that, and each has one job:
 | --- | --- | --- |
 | Routing (`UseRouting`) | Matches the URL to an endpoint | The selected endpoint and its metadata, including `.RequireAuthorization()` |
 | Authentication (`UseAuthentication`) | Reads credentials, such as a cookie or bearer token | `HttpContext.User`, the identity of the caller |
-| Authorization (`UseAuthorization`) | Decides whether this caller may use this endpoint | Lets the request continue, or answers `401` or `403` |
+| Authorization (`UseAuthorization`) | Decides whether this caller may use this endpoint | Lets the request continue, or asks the authentication scheme to challenge or forbid. With this article's test scheme that is a `401` or `403`; a cookie scheme, for example, can redirect instead |
 
 Authorization consumes what the other two produce: it needs the endpoint's metadata to know which policy applies, and it needs the identity to evaluate that policy. If it runs before either one, it is deciding without the information the decision depends on.
 
@@ -286,7 +304,7 @@ app.UseAuthorization();
 app.UseAuthentication();
 ```
 
-A request from a valid user, `alice`, now receives `401 Unauthorized`. Authorization runs first, finds the endpoint's requirement for an authenticated user, and looks at `HttpContext.User`, which is still anonymous because authentication has not run yet. It challenges, and the request never reaches the endpoint. Authentication would have recognized `alice`, but it sits inside a component that has already answered.
+In this sample, a request carrying the otherwise valid test user `alice` now receives `401 Unauthorized`. Authorization runs first and finds the endpoint's requirement for an authenticated user. The default policy names no authentication scheme, so authorization evaluates whatever identity is already on `HttpContext.User`, and that identity is still anonymous because authentication has not run. Authorization challenges, and the request never reaches the endpoint. Authentication would have recognized `alice`, but it is downstream of a component that has already answered. (A policy that names its authentication schemes asks those schemes to authenticate during authorization, so with such a policy this particular mistake can be masked.)
 
 Swapping the two lines repairs it. The tests pin both outcomes, and a third confirms that the repaired order still rejects a caller with no credentials, so the fix does not simply turn authorization off:
 
@@ -342,7 +360,7 @@ public async Task AuthenticationBeforeAuthorizationStillRejectsAnonymousCallers(
 
 ### Authorization before routing
 
-The other dependency, endpoint metadata, fails differently. If authorization runs before routing has selected an endpoint, it has no endpoint and therefore no policy to apply:
+The other dependency, endpoint metadata, fails differently. If authorization runs before routing has selected an endpoint, it cannot see the endpoint's authorization metadata, so it has no endpoint-specific policy to apply:
 
 ```csharp
 app.UseAuthentication();
@@ -350,38 +368,91 @@ app.UseAuthorization();   // ASP0001: runs before an endpoint is selected
 app.UseRouting();
 ```
 
-The ASP.NET Core analyzer reports this as [ASP0001](https://learn.microsoft.com/en-us/aspnet/core/diagnostics/asp0001). The analyzer is a warning, and the companion test has to suppress it to build at all under warnings-as-errors. At run time, on .NET 10, the endpoint middleware notices that the selected endpoint carries authorization metadata that no authorization middleware evaluated, and throws an `InvalidOperationException` instead of running the endpoint. In this configuration the mistake fails closed: the order is not returned. Do not rely on that as a safety net. An application with a fallback authorization policy, or a resource that is not an endpoint, can behave differently, which is why the analyzer warning should be fixed rather than suppressed.
+Two different mechanisms report this mistake:
+
+- **At build time,** the ASP.NET Core analyzer warns with [ASP0001](https://learn.microsoft.com/en-us/aspnet/core/diagnostics/asp0001) because `UseAuthorization` is not between routing and endpoint execution. The companion test has to suppress the warning to build at all under warnings-as-errors.
+- **At run time,** observed on .NET 10, the endpoint middleware notices that the selected endpoint carries authorization metadata that no authorization middleware evaluated, and throws an `InvalidOperationException` instead of running the endpoint.
+
+In this tested configuration the mistake fails closed: the order is not returned. Do not rely on that as a safety net. ASP0001's documentation notes that when authorization is out of place, a configured fallback policy is used to authorize all requests, and resources that are not endpoints can behave differently. Fix the analyzer warning rather than suppressing it.
 
 ## What WebApplication Adds for You
 
-Most of the pipelines above are only a few lines long, yet authorization still ran. That is because the `WebApplication` hosting model adds some middleware on its own. Microsoft's [middleware documentation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/#middleware-added-automatically-by-webapplication) lists it:
+Some pipelines in this article are only a line or two long, yet authorization still ran. That is because the `WebApplication` hosting model adds some middleware on its own. Microsoft's [middleware documentation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/#middleware-added-automatically-by-webapplication) lists it:
 
 | Middleware | Added automatically when | Where |
 | --- | --- | --- |
 | Developer exception page | The environment is `Development` | First |
 | `UseRouting` | Endpoints are mapped and your code did not call `UseRouting` | Next |
-| `UseAuthentication` | Authentication services are registered and your code did not call `UseAuthentication` | Immediately after routing |
-| `UseAuthorization` | Authorization services are registered and your code did not call `UseAuthorization` | Next |
+| `UseAuthentication` | `AddAuthentication` registered its services and your code did not call `UseAuthentication` | After the automatic routing |
+| `UseAuthorization` | `AddAuthorization` registered its services and your code did not call `UseAuthorization` | Next |
 | Your middleware | Always | In the order you register it |
 | `UseEndpoints` | Endpoints are mapped | Last |
 
-This has three effects that matter when you move a line.
+The automatic components run before everything you register. This has four effects that matter when you move a line.
 
-**An omitted call can be silently repaired.** If you call only `app.UseAuthorization()` and never call `app.UseAuthentication()`, `WebApplication` inserts authentication right after routing, which is before your authorization call. The request from `alice` succeeds. A test in the appendix pins that behavior, `OmittingUseAuthenticationIsRepairedByWebApplication`. The broken example above reproduces only because both calls are explicit, which also turns off both automatic insertions. In other words, the moment you write one of these calls yourself, you own its position.
+**An omitted call can be supplied automatically.** If you call only `app.UseAuthorization()` and never call `app.UseAuthentication()`, `WebApplication` adds authentication itself, because the test helper registered authentication services, and puts it at the start of the pipeline, before your authorization call. The request from `alice` succeeds. A test in the appendix pins that behavior, `OmittedUseAuthenticationIsSuppliedByWebApplication`. The framework is not detecting your mistake; it is filling in a component you did not place, in its conventional position. The broken example above reproduces only because both calls are explicit. Each explicit call fixes the position of that one component; a component whose call you omit can still be added automatically.
 
-**Automatic routing runs before your first middleware.** Unless you call `UseRouting` yourself, route matching happens before any middleware you register, so even your first component can read the selected endpoint with `context.GetEndpoint()`. If you call `UseRouting` explicitly, components registered before that call no longer can. That is useful when middleware must run before route matching, and it is also a way to move routing by accident.
+**Automatic authorization runs before your own middleware.** In the earlier sections, every pipeline that should observe rejections calls `UseAuthentication()` and `UseAuthorization()` explicitly after the request log. Leave them out and the automatic versions run first, outside the log, so a rejected request never reaches the log at all:
 
-**The development environment can hide an escaping exception.** In `Development`, the developer exception page is the outermost component, so an exception that escapes your own exception handler still produces a detailed error page on a developer's machine. The store-lookup failure from the opening would look "handled" locally and produce an empty `500` in production. The tests in this article set the environment to `Production` explicitly for that reason.
+```csharp
+[Fact]
+public async Task AutomaticAuthorizationRunsBeforeTheRequestLog()
+{
+    await using WebApplication app = await TestApp.StartAsync(app => app.UseRequestLog());
+
+    HttpResponseMessage response = await app.CreateClient(user: null).GetAsync("/orders/42", TestContext.Current.CancellationToken);
+
+    Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    Assert.Empty(app.Trace());
+}
+
+[Fact]
+public async Task ExplicitAuthorizationAfterTheLogLetsTheLogRecordRejections()
+{
+    await using WebApplication app = await TestApp.StartAsync(app =>
+    {
+        app.UseRequestLog();
+        app.UseAuthentication();
+        app.UseAuthorization();
+    });
+
+    HttpResponseMessage response = await app.CreateClient(user: null).GetAsync("/orders/42", TestContext.Current.CancellationToken);
+
+    Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    Assert.Equal(["RequestLog: in", "RequestLog: out 401"], app.Trace());
+}
+```
+
+The same applies to an exception handler: automatically added authentication and authorization run outside it.
+
+**Calling `UseRouting` yourself moves routing, but not the automatic authorization.** Unless you call `UseRouting`, route matching happens before any middleware you register, so even your first component can read the selected endpoint with `context.GetEndpoint()`. If you call `UseRouting` explicitly, routing runs at that position instead, which is useful when middleware must run before route matching. On .NET 10, though, automatically added authentication and authorization still run at the start of the pipeline, before your explicit routing call. The result is the authorization-before-routing failure from the previous section, without any authorization call in your code:
+
+```csharp
+[Fact]
+public async Task ExplicitUseRoutingAloneLeavesAutomaticAuthorizationBeforeRouting()
+{
+    await using WebApplication app = await TestApp.StartAsync(app => app.UseRouting());
+
+    InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(
+        () => app.CreateClient(user: "alice").GetAsync("/orders/42", TestContext.Current.CancellationToken));
+
+    Assert.Contains("authorization metadata", exception.Message, StringComparison.Ordinal);
+}
+```
+
+If you call `UseRouting` explicitly, call `UseAuthentication` and `UseAuthorization` explicitly after it as well. Later framework versions may place the automatic components differently; the test tells you what your version does.
+
+**The development environment can hide an escaping exception.** In `Development`, the developer exception page is the outermost component. The store-lookup failure from the opening would escape the application's own exception handler and be caught by the developer exception page instead, which turns it into a detailed error page on a developer's machine. Locally the failure looks covered; in production the same request produces a bodiless `500`. The tests in this article set the environment to `Production` explicitly for that reason.
 
 Whether to rely on the automatic placement or write every call yourself is a judgment call. The automatic defaults are reasonable for many minimal APIs. Writing the calls out makes the order visible in review, and it is required when you need something between them, such as CORS, which the documentation says must run before authentication and authorization. Either way, test the behavior you depend on rather than the lines you wrote.
 
 ## Testing the Order You Depend On
 
-Comments such as `// must stay before UseAuthorization` are easy to miss in a diff. An integration test that sends a request through the real pipeline and asserts what happened is much harder to break by accident.
+Comments such as `// must stay before UseAuthorization` are easy to miss in a diff. An integration test that sends a request through the actual pipeline and asserts what happened is much harder to break by accident.
 
-### A test helper that builds the real hosting model
+### A test helper that builds the actual pipeline
 
-The tests build a real `WebApplication`, including its automatic middleware, and replace Kestrel with an in-memory `TestServer`:
+The tests build a real `WebApplication`, including its automatic middleware, and host it in an in-memory `TestServer` instead of Kestrel:
 
 ```csharp
 public static async Task<WebApplication> StartAsync(Action<WebApplication> configurePipeline)
@@ -430,6 +501,8 @@ public async Task CompletedRequestEntersInOrderAndLeavesInReverse()
     {
         app.UseRequestLog();
         app.UseMaintenanceGate();
+        app.UseAuthentication();
+        app.UseAuthorization();
     });
 
     HttpResponseMessage response = await app.CreateClient().GetAsync("/orders/42", TestContext.Current.CancellationToken);
@@ -447,6 +520,8 @@ public async Task ShortCircuitedRequestNeverReachesTheEndpoint()
     {
         app.UseRequestLog();
         app.UseMaintenanceGate();
+        app.UseAuthentication();
+        app.UseAuthorization();
     });
     app.Services.GetRequiredService<MaintenanceMode>().IsOn = true;
 
@@ -459,7 +534,7 @@ public async Task ShortCircuitedRequestNeverReachesTheEndpoint()
 }
 ```
 
-These assertions are about order, not about time. They contain no delays, stopwatches, or timestamps, so they do not become flaky on a slow build agent. `GetAsync` reads the whole response body before it returns, and with `TestServer` that body ends when the pipeline finishes, so every "out" entry has been recorded by the time the test reads the trace. In this suite of eleven tests the traces were identical on every run.
+These assertions are about order, not about time. They contain no delays, stopwatches, or elapsed-time thresholds, so differences in build-agent speed do not change the expected sequence. `GetAsync` reads the whole response body before it returns, and in these tests `TestServer` ended the body only when the pipeline finished, so every "out" entry had been recorded by the time the test read the trace. The suite produced the same traces on each of several consecutive runs.
 
 ### What these tests deliberately do not assert
 
@@ -472,9 +547,9 @@ These assertions are about order, not about time. They contain no delays, stopwa
 When a registration moves, or when an endpoint starts misbehaving after a pipeline change, ask these four questions about the component that moved and about its neighbors:
 
 1. **What does it need from earlier components?** Authorization needs the selected endpoint and the caller's identity. A component that reads `context.GetEndpoint()` needs routing. A component that reads `context.User` needs authentication. A component that reads the store from `context.Items` needs the store lookup. If any of those producers would now run later, the component is reading state that does not exist yet.
-2. **What does it wrap?** Everything registered after it runs inside its call to `next`. An exception handler catches only what is inside it. A request log measures only what is inside it. Moving a component down shrinks what it wraps; moving it up enlarges it.
-3. **Does it always call `next`?** Many components do not: static files, health checks, authentication challenges, CORS preflight responses, rate limiters, response caches, and gates like the maintenance check can all answer the request themselves. Anything registered after a short-circuiting component never sees the requests it answers.
-4. **What response state can it still change?** On the way out, a component can change the status code and headers only if the response has not started. A component that sets a header after the endpoint has written its body is too late, and a component that catches an exception after the response has started can no longer replace it with an error response.
+2. **What does it wrap?** Everything registered after it runs inside its call to `next`, if it makes that call. An exception handler catches only what is inside it. A request log measures only what is inside it. Moving a component down shrinks what it wraps; moving it up enlarges it. Remember that automatically added middleware runs before everything you register.
+3. **Does it always call `next`?** Many components do not: static files, health checks, CORS preflight handling, authorization challenges and forbids, rate limiters, response caches, and gates like the maintenance check can all answer the request themselves. Anything registered after a short-circuiting component never sees the requests it answers.
+4. **What response state can it still change?** A component can change the status code and headers only until the response starts. A component that sets a header after the endpoint has written its body is too late, and a component that catches an exception after the response has started can no longer replace it with an error response.
 
 These questions do not produce one universal pipeline. Different applications reasonably order logging, CORS, rate limiting, and forwarded headers differently, depending on what each component needs and what it must see. They do tell you, for one specific move, what the move changes.
 
@@ -488,26 +563,116 @@ Placing the exception handler correctly decides whether failures become a consis
 
 - [ASP.NET Core Middleware](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/), in the ASP.NET Core documentation, describes request and reverse response order, short-circuiting and terminal middleware, the recommended order of built-in middleware, and the middleware `WebApplication` adds automatically.
 - [Routing in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/routing), in the ASP.NET Core documentation, explains how `WebApplication` wraps your middleware with `UseRouting` and `UseEndpoints`, why authentication and authorization run between them, and how calling `UseRouting` explicitly changes what runs before route matching.
-- [Handle errors in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling), in the ASP.NET Core documentation, covers the exception handler middleware, problem details, and the developer exception page that `WebApplication` enables in `Development`.
-- [ASP0001: Authorization middleware is incorrectly configured](https://learn.microsoft.com/en-us/aspnet/core/diagnostics/asp0001), in the ASP.NET Core analyzer documentation, explains the warning for `UseAuthorization` outside the routing and endpoint middleware.
+- [Handle errors in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling), in the ASP.NET Core documentation, covers the exception handler middleware, problem details and their content negotiation, server exception handling, and the developer exception page that `WebApplication` enables in `Development`.
+- [ASP0001: Authorization middleware is incorrectly configured](https://learn.microsoft.com/en-us/aspnet/core/diagnostics/asp0001), in the ASP.NET Core analyzer documentation, explains the warning for `UseAuthorization` outside the routing and endpoint middleware and its effect on a fallback policy.
 - [Integration tests in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests), in the ASP.NET Core documentation, introduces `TestServer`, `WebApplicationFactory`, and test authentication handlers.
-- [RFC 9457: Problem Details for HTTP APIs](https://www.rfc-editor.org/rfc/rfc9457) defines the `application/problem+json` format the exception handler produces.
+- [RFC 9457: Problem Details for HTTP APIs](https://www.rfc-editor.org/rfc/rfc9457) defines the problem details representation for HTTP APIs and the `application/problem+json` media type the exception handler produces.
 
 ---
 
 ## The Short Answer
 
-Middleware is not a list of filters that each look at a request independently. Each component wraps everything registered after it: it runs before that work on the way in, after it on the way out, and it may decide not to call it at all. Moving a registration changes what the component can see, what it can catch, and what it can still change.
+Middleware is not a list of filters that each look at a request independently. A component that calls `next` wraps everything registered after it: it runs before that work on the way in and after it on the way out. A component can also answer the request without calling `next` at all. Moving a registration changes what the component can see and what it can catch.
 
-An exception handler catches only what runs inside it, so it must wrap every component whose failures should become an error response. Authorization needs the endpoint that routing selected and the identity that authentication established, so it must run after both. `WebApplication` adds routing, authentication, authorization, and, in `Development`, the developer exception page on its own, which can hide or repair an ordering mistake until you write the calls yourself. Before moving a line, ask what the component needs, what it wraps, whether it always calls `next`, and what response state it can still change. Then pin the behavior you depend on with integration tests that run in `Production`, use deterministic authentication, and assert the sequence of events rather than their timing.
+An exception handler catches only what runs inside it, so it must wrap every component whose failures should become an error response. Authorization needs the endpoint that routing selected and the identity that authentication established, so it must run after both. `WebApplication` adds routing, authentication, authorization, and, in `Development`, the developer exception page ahead of your own middleware, which can supply a call you omitted or hide a mistake you made. Ask the four questions before moving a line, and pin the behavior you depend on with integration tests that run in `Production`, use deterministic authentication, and assert the sequence of events rather than their timing.
 
 ---
 
 ## Appendix: Complete Code
 
-The application code belongs in an ASP.NET Core project (`Microsoft.NET.Sdk.Web`), which supplies the ASP.NET Core implicit usings. The tests belong in a test project that references `xunit.v3`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`, and `Microsoft.AspNetCore.TestHost`, has a framework reference to `Microsoft.AspNetCore.App`, references the application project, and declares `global using Xunit;`.
+The sample has two projects: an ASP.NET Core application project and a test project. Every file below was compiled and run as shown.
+
+### Environment used for verification
+
+- .NET SDK 10.0.404, target framework `net10.0`, on Windows x64.
+- xUnit v3 4.0.3, `Microsoft.AspNetCore.TestHost` 10.0.15, `Microsoft.NET.Test.Sdk` 18.12.0, and `xunit.runner.visualstudio` 4.0.1. The two VSTest packages keep Visual Studio's Test Explorer working; the recorded run used Microsoft.Testing.Platform, selected by `global.json`.
+- Warnings treated as errors, with the `latest-recommended` .NET analyzers.
+- The command `dotnet test --project Tests/OrderApi.Tests.csproj`, run from the folder that contains `global.json`, built both projects and reported 14 passing tests, with the same result on three consecutive runs.
+
+### Project files
+
+```text
+global.json
+App/OrderApi.csproj
+App/OrderApi.cs
+Tests/OrderApi.Tests.csproj
+Tests/Usings.cs
+Tests/TestSupport.cs
+Tests/PipelineOrderTests.cs
+```
+
+`global.json`:
+
+```json
+{
+  "test": {
+    "runner": "Microsoft.Testing.Platform"
+  }
+}
+```
+
+`App/OrderApi.csproj`:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>
+```
+
+`Tests/OrderApi.Tests.csproj`:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="10.0.15" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.12.0" />
+    <PackageReference Include="xunit.v3" Version="4.0.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="../App/OrderApi.csproj" />
+  </ItemGroup>
+
+</Project>
+```
+
+`Tests/Usings.cs`:
+
+```csharp
+global using Xunit;
+```
+
+The application project is a library here because the tests start it themselves. In a real application, `Program.cs` would register `AddProblemDetails()`, `AddAuthorization()`, a real `IStoreDirectory` implementation, and a production authentication scheme, never `TestAuthHandler`, and then build one pipeline, for example `UseRequestLog`, `UseExceptionHandler`, `UseStoreLookup`, `UseAuthentication`, and `UseAuthorization`, followed by `MapOrders`. That order is illustrative: where CORS, forwarded headers, HTTPS redirection, static files, or rate limiting belong depends on your application.
 
 ### Application code
+
+`App/OrderApi.cs`:
 
 ```csharp
 using System.Collections.Concurrent;
@@ -588,7 +753,8 @@ public static class OrderPipeline
                 throw new InvalidOperationException("Order 0 cannot be loaded.");
             }
 
-            return TypedResults.Ok(new OrderSummary(id, context.Items["Store"] as string, context.User.Identity!.Name!));
+            string viewedBy = context.User.Identity?.Name ?? "(unnamed)";
+            return TypedResults.Ok(new OrderSummary(id, context.Items["Store"] as string, viewedBy));
         })
         .RequireAuthorization();
 
@@ -597,9 +763,9 @@ public static class OrderPipeline
 }
 ```
 
-In a real application, `IStoreDirectory` would query a database or another service, and `Program.cs` would register the services shown in the test helper and one fixed pipeline, for example `UseRequestLog`, `UseExceptionHandler`, `UseStoreLookup`, `UseAuthentication`, and `UseAuthorization`, followed by `MapOrders`.
-
 ### Test support
+
+`Tests/TestSupport.cs`:
 
 ```csharp
 using System.Security.Claims;
@@ -698,6 +864,8 @@ public static class TestApp
 
 ### Tests
 
+`Tests/PipelineOrderTests.cs`:
+
 ```csharp
 using System.Net;
 using System.Net.Http.Json;
@@ -716,6 +884,8 @@ public sealed class TraceTests
         {
             app.UseRequestLog();
             app.UseMaintenanceGate();
+            app.UseAuthentication();
+            app.UseAuthorization();
         });
 
         HttpResponseMessage response = await app.CreateClient().GetAsync("/orders/42", TestContext.Current.CancellationToken);
@@ -733,6 +903,8 @@ public sealed class TraceTests
         {
             app.UseRequestLog();
             app.UseMaintenanceGate();
+            app.UseAuthentication();
+            app.UseAuthorization();
         });
         app.Services.GetRequiredService<MaintenanceMode>().IsOn = true;
 
@@ -751,6 +923,8 @@ public sealed class TraceTests
         {
             app.UseMaintenanceGate();
             app.UseRequestLog();
+            app.UseAuthentication();
+            app.UseAuthorization();
         });
         app.Services.GetRequiredService<MaintenanceMode>().IsOn = true;
 
@@ -768,6 +942,8 @@ public sealed class ExceptionHandlerPlacementTests
         app.UseRequestLog();
         app.UseStoreLookup();
         app.UseExceptionHandler();   // moved: now inside the store lookup
+        app.UseAuthentication();
+        app.UseAuthorization();
     }
 
     private static void RepairedOrder(WebApplication app)
@@ -775,6 +951,8 @@ public sealed class ExceptionHandlerPlacementTests
         app.UseRequestLog();
         app.UseExceptionHandler();   // wraps the store lookup and the endpoint
         app.UseStoreLookup();
+        app.UseAuthentication();
+        app.UseAuthorization();
     }
 
     [Fact]
@@ -866,16 +1044,6 @@ public sealed class AuthorizationOrderTests
     }
 
     [Fact]
-    public async Task OmittingUseAuthenticationIsRepairedByWebApplication()
-    {
-        await using WebApplication app = await TestApp.StartAsync(app => app.UseAuthorization());
-
-        HttpResponseMessage response = await app.CreateClient(user: "alice").GetAsync("/orders/42", TestContext.Current.CancellationToken);
-
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-    }
-
-    [Fact]
     public async Task AuthorizationBeforeRoutingFailsClosedWithAnException()
     {
         await using WebApplication app = await TestApp.StartAsync(app =>
@@ -892,6 +1060,57 @@ public sealed class AuthorizationOrderTests
 
         Assert.Contains("authorization metadata", exception.Message, StringComparison.Ordinal);
         Assert.Empty(app.Trace());
+    }
+}
+
+public sealed class AutomaticMiddlewareTests
+{
+    [Fact]
+    public async Task OmittedUseAuthenticationIsSuppliedByWebApplication()
+    {
+        await using WebApplication app = await TestApp.StartAsync(app => app.UseAuthorization());
+
+        HttpResponseMessage response = await app.CreateClient(user: "alice").GetAsync("/orders/42", TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task AutomaticAuthorizationRunsBeforeTheRequestLog()
+    {
+        await using WebApplication app = await TestApp.StartAsync(app => app.UseRequestLog());
+
+        HttpResponseMessage response = await app.CreateClient(user: null).GetAsync("/orders/42", TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Empty(app.Trace());
+    }
+
+    [Fact]
+    public async Task ExplicitAuthorizationAfterTheLogLetsTheLogRecordRejections()
+    {
+        await using WebApplication app = await TestApp.StartAsync(app =>
+        {
+            app.UseRequestLog();
+            app.UseAuthentication();
+            app.UseAuthorization();
+        });
+
+        HttpResponseMessage response = await app.CreateClient(user: null).GetAsync("/orders/42", TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(["RequestLog: in", "RequestLog: out 401"], app.Trace());
+    }
+
+    [Fact]
+    public async Task ExplicitUseRoutingAloneLeavesAutomaticAuthorizationBeforeRouting()
+    {
+        await using WebApplication app = await TestApp.StartAsync(app => app.UseRouting());
+
+        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => app.CreateClient(user: "alice").GetAsync("/orders/42", TestContext.Current.CancellationToken));
+
+        Assert.Contains("authorization metadata", exception.Message, StringComparison.Ordinal);
     }
 }
 ```
