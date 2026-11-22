@@ -961,6 +961,165 @@ Lead to Your Dependency Injection Lifetime Is an Ownership Decision for typed cl
 
 ---
 
+## Outstanding Candidates — Basic to Intermediate
+
+All candidates 1–28 above are marked published. The six candidates below extend the practical ASP.NET Core foundations introduced by articles 26–28. They are editorial candidates, not implementation tickets; each should receive a dedicated issue when selected. The proposed order moves from request behavior and public errors to configuration, diagnostics, persistence, and testing.
+
+### 29. Why Moving ASP.NET Core Middleware Breaks Your Endpoint
+
+- **Priority:** P0
+- **Level:** Basic to intermediate
+- **Implementation issue:** Not opened
+- **Candidate slug:** `moving-aspnet-core-middleware-breaks-endpoint`
+
+#### Reader / search problem
+
+An endpoint works until a middleware registration moves, and now authorization fails, an exception escapes, or request logging disappears. Why does the same middleware behave differently in a different position, and how can a developer find the ordering dependency?
+
+#### Existing Learning support
+
+- [Middleware Ordering Changes Behavior](../docs/aspnetcore/middleware-ordering-changes-behavior.md)
+- [Centralized Error Handling and Problem Details](../docs/aspnetcore/centralized-error-handling-and-problem-details.md)
+
+#### Article / curriculum distinction
+
+The tutorial covers the full dependency model and several middleware categories. This article should use one small endpoint and a visible request/response trace to explain wrapping, reverse response order, and short-circuiting. Break and repair an exception-handler placement and an authorization dependency, then show focused integration assertions for the observed behavior. Account for Minimal API automatic middleware where relevant. It must not prescribe one universal pipeline, imply that every middleware always calls the next delegate, or grow into a reverse-proxy, CORS, or rate-limiting survey.
+
+#### Natural deeper path
+
+Lead to Middleware Ordering Changes Behavior for the complete dependency graph and Centralized Error Handling and Problem Details for the public error boundary.
+
+---
+
+### 30. Return Useful API Errors Without Leaking Exception Details
+
+- **Priority:** P0
+- **Level:** Basic to intermediate
+- **Implementation issue:** Not opened
+- **Candidate slug:** `useful-api-errors-without-exception-details`
+
+#### Reader / search problem
+
+An API returns either an unhelpful generic error or a stack trace containing internal details. How can clients receive a stable, actionable error while operators retain enough information to diagnose the failure?
+
+#### Existing Learning support
+
+- [Centralized Error Handling and Problem Details](../docs/aspnetcore/centralized-error-handling-and-problem-details.md)
+- [Structured Logging Without Sensitive-Data Sprawl](../docs/aspnetcore/structured-logging-without-sensitive-data-sprawl.md)
+
+#### Article / curriculum distinction
+
+The tutorial defines the broader application and governance error boundary. This article should build a small public error contract: distinguish an expected validation or not-found result from an unexpected exception, return safe Problem Details, and connect a public trace identifier to one internal diagnostic event. Test status, content type, stable fields, and the absence of a deliberately planted sensitive value. Explain that an HTTP error can occur without an exception and that a started response cannot simply be replaced. It must not turn every domain outcome into an exception, expose exception messages by default, claim Problem Details automatically standardizes application error codes, or become a full error taxonomy.
+
+#### Natural deeper path
+
+Lead to Centralized Error Handling and Problem Details for mapping choices and Structured Logging Without Sensitive-Data Sprawl for internal diagnostics.
+
+---
+
+### 31. Catch Broken ASP.NET Core Configuration Before the First Request
+
+- **Priority:** P0
+- **Level:** Basic to intermediate
+- **Implementation issue:** Not opened
+- **Candidate slug:** `validate-aspnet-core-configuration-before-first-request`
+
+#### Reader / search problem
+
+An application deploys successfully but fails only when a user reaches a feature whose setting is missing or malformed. Why did startup succeed, which configuration value actually won, and which settings should be validated before serving traffic?
+
+#### Existing Learning support
+
+- [Secure-by-Default ASP.NET Core Configuration](../docs/aspnetcore/secure-by-default-configuration.md)
+
+#### Article / curriculum distinction
+
+The tutorial treats configuration as a broad architectural trust boundary. This article should follow one optional outbound integration from layered providers to typed options, conditional validation, and `ValidateOnStart`. Demonstrate a higher-precedence override, a disabled feature that can start without its endpoint, and an enabled feature that fails startup when its required endpoint is invalid. Keep diagnostics free of secret values. It must not fail startup for every optional setting, imply startup validation governs later reloads automatically, treat successful shape validation as proof that a remote service is reachable or trustworthy, or present environment variables or development Secret Manager as production secret vaults.
+
+#### Natural deeper path
+
+Lead to Secure-by-Default ASP.NET Core Configuration for failure-mode selection, secret custody, and ownership of configuration invariants.
+
+---
+
+### 32. Stop Logging Entire Request Objects to Debug One Failure
+
+- **Priority:** P1
+- **Level:** Basic to intermediate
+- **Implementation issue:** Not opened
+- **Candidate slug:** `stop-logging-entire-request-objects`
+
+#### Reader / search problem
+
+A developer adds a request-object dump to investigate a failure and starts collecting credentials, personal data, or large payloads. How can the same diagnostic question be answered with a small, searchable event?
+
+#### Existing Learning support
+
+- [Structured Logging Without Sensitive-Data Sprawl](../docs/aspnetcore/structured-logging-without-sensitive-data-sprawl.md)
+- [A Correlation ID Is Not a Distributed Audit Trail](../docs/articles/2026/correlation-id-is-not-distributed-audit-trail.md)
+
+#### Article / curriculum distinction
+
+The logging tutorial covers event design, levels, cardinality, retention, and multiple diagnostic boundaries. This article should replace one unsafe object dump with an explicit allowlist of useful properties, a stable message template, and an appropriate scope. Show that structured properties support queries but do not make their values safe; identifiers can still be sensitive. Use a captured-log assertion with a sentinel secret to demonstrate the intended omission without claiming comprehensive leak detection. Keep the focus on collection minimization rather than the existing correlation article's evidence model. It must not claim redaction makes arbitrary body logging safe, introduce a logging-provider comparison, or imply operational logs establish authorization or compliance.
+
+#### Natural deeper path
+
+Lead to Structured Logging Without Sensitive-Data Sprawl for the complete event policy and A Correlation ID Is Not a Distributed Audit Trail for the limits of diagnostic linkage.
+
+---
+
+### 33. Do You Need an Explicit EF Core Transaction for This Save?
+
+- **Priority:** P1
+- **Level:** Intermediate
+- **Implementation issue:** Not opened
+- **Candidate slug:** `when-explicit-ef-core-transaction-needed`
+
+#### Reader / search problem
+
+An application saves a parent and its children, or makes two separate saves, and the developer is unsure whether to add `BeginTransactionAsync`. Which writes already succeed or fail together, and where should the unit of work end?
+
+#### Existing Learning support
+
+- [Data-Access Boundaries and Transaction Reasoning with EF Core](../docs/aspnetcore/data-access-boundaries-and-transaction-reasoning.md)
+- [Your Dependency Injection Lifetime Is an Ownership Decision](../docs/articles/2026/dependency-injection-lifetime-is-ownership-decision.md)
+
+#### Article / curriculum distinction
+
+The data-access tutorial spans governance stores, interceptors, distributed effects, and recovery. This article should stay with an ordinary relational parent/child mutation: state the invariant, prefer one `SaveChangesAsync` where sufficient, contrast two independent saves, and introduce an explicit transaction only when the local invariant requires it. Show a forced second-write failure and assert persisted state using a fresh context. Make provider transaction support and execution-strategy interaction explicit. It must not equate a request scope with a transaction, claim atomic writes prevent every concurrency race, hold a transaction open during human review or an HTTP call, or imply a database rollback undoes a remote side effect.
+
+#### Natural deeper path
+
+Lead to Data-Access Boundaries and Transaction Reasoning with EF Core for wider persistence ownership and external failure windows, and the dependency-injection article for context lifetime.
+
+---
+
+### 34. Your EF Core InMemory Test Passed. What Did It Prove?
+
+- **Priority:** P1
+- **Level:** Intermediate
+- **Implementation issue:** Not opened
+- **Candidate slug:** `ef-core-inmemory-test-what-it-proves`
+
+#### Reader / search problem
+
+A repository test passes against EF Core InMemory, but production rejects a write, translates a query differently, or leaves partial state. Which tests need relational behavior, and when is SQLite still insufficient?
+
+#### Existing Learning support
+
+- [Data-Access Boundaries and Transaction Reasoning with EF Core](../docs/aspnetcore/data-access-boundaries-and-transaction-reasoning.md)
+- [How to Test That a Denied Operation Never Executes](../docs/articles/2026/test-denied-operation-never-executes.md)
+
+#### Article / curriculum distinction
+
+The data-access tutorial includes provider-testing guidance within a much wider architecture treatment. This article should choose a test double from the invariant being asserted: keep pure application-rule tests small, demonstrate one relational constraint or rollback invariant with SQLite, and identify a query, concurrency, or migration behavior that requires the production provider. Explain SQLite in-memory connection lifetime and isolate test databases. Candidate 33 teaches transaction ownership; this candidate teaches what a test environment can substantiate. It must not call SQLite equivalent to the production database, require containers for every test, claim an object mock proves database behavior, or become a general EF Core testing course.
+
+#### Natural deeper path
+
+Lead to Data-Access Boundaries and Transaction Reasoning with EF Core for provider-specific guarantees and How to Test That a Denied Operation Never Executes for choosing assertions that prove the intended invariant.
+
+---
+
 ## Promotion and Publication Workflow
 
 Keep planning, implementation, and publication as separate states:
