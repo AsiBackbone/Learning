@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Moving `UseExceptionHandler`, `UseAuthentication`, or `UseAuthorization` and an endpoint changing behavior, request and response order, short-circuiting middleware, exceptions that escape the handler, the middleware `WebApplication` adds automatically, and testing pipeline order | [Why Moving ASP.NET Core Middleware Breaks Your Endpoint](2026/moving-aspnet-core-middleware-breaks-endpoint.md) |
 | `new HttpClient()` in every request, port exhaustion, a static client that misses DNS changes, `PooledConnectionLifetime`, `IHttpClientFactory`, named and typed clients, per-request headers, and cookies under pooled handlers | [Stop Creating an HttpClient for Every Request](2026/stop-creating-httpclient-for-every-request.md) |
 | Choosing `AddTransient`, `AddScoped`, or `AddSingleton`, captive dependencies, a singleton holding a `DbContext`, scope validation, scopes in a `BackgroundService`, disposal, and `IDbContextFactory` | [Your Dependency Injection Lifetime Is an Ownership Decision](2026/dependency-injection-lifetime-is-ownership-decision.md) |
 | Fire-and-forget `Task.Run` in an endpoint, `BackgroundService` and bounded channels, request-scoped services in background work, shutdown and restart losses, and what `202 Accepted` promises | [Task.Run Does Not Make ASP.NET Core Work Durable](2026/task-run-does-not-make-aspnet-core-work-durable.md) |
@@ -61,6 +62,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Why Moving ASP.NET Core Middleware Breaks Your Endpoint](2026/moving-aspnet-core-middleware-breaks-endpoint.md)
+
+**Christopher D. Cavell** · **November 22, 2026**
+
+An order API returned problem details for every failure until a developer moved `UseExceptionHandler()` one line down during a cleanup. A failing endpoint still produced the same response, so the change looked safe, but when the store-lookup middleware timed out, its exception escaped the handler, clients received an empty `500`, and the request log recorded no outcome. This beginner-to-intermediate guide uses two tiny tracing middleware components to show how each component wraps everything registered after it, why responses unwind in reverse order, and what a short-circuit removes from the trace, including a request log that loses every request a gate answers once the gate moves above it; breaks and repairs the exception handler's placement; separates the responsibilities of routing, authentication, and authorization and shows a valid user rejected with `401` when authorization runs first, and the exception that follows when it runs before routing; explains the middleware `WebApplication` adds automatically, including how it silently repairs an omitted `UseAuthentication` call and how the developer exception page can hide an escaping exception in `Development`; pins the behavior with eleven integration tests that run in `Production`, use deterministic test authentication, and assert exact event sequences rather than timing; and closes with four questions to ask before moving a registration.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/moving-aspnet-core-middleware-breaks-endpoint.html`
 
 ### [Stop Creating an HttpClient for Every Request](2026/stop-creating-httpclient-for-every-request.md)
 

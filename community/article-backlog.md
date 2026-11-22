@@ -963,7 +963,7 @@ Lead to Your Dependency Injection Lifetime Is an Ownership Decision for typed cl
 
 ## Outstanding Candidates — Basic to Intermediate
 
-All candidates 1–28 above are marked published. The six candidates below extend the practical ASP.NET Core foundations introduced by articles 26–28. Each candidate now has a dedicated implementation issue linked below. The proposed order moves from request behavior and public errors to configuration, diagnostics, persistence, and testing.
+All candidates 1–28 above are marked published, and candidate 29 is now published as well. The six candidates below extend the practical ASP.NET Core foundations introduced by articles 26–28. Each candidate now has a dedicated implementation issue linked below. The proposed order moves from request behavior and public errors to configuration, diagnostics, persistence, and testing.
 
 ### 29. Why Moving ASP.NET Core Middleware Breaks Your Endpoint
 
@@ -971,7 +971,8 @@ All candidates 1–28 above are marked published. The six candidates below exten
 - **Level:** Basic to intermediate
 - **Implementation issue:** [#518](https://github.com/AsiBackbone/Learning/issues/518)
 - **Publication order:** 1 of 6
-- **Candidate slug:** `moving-aspnet-core-middleware-breaks-endpoint`
+- **Publication:** [Published November 22, 2026](../docs/articles/2026/moving-aspnet-core-middleware-breaks-endpoint.md)
+- **Permanent slug:** `moving-aspnet-core-middleware-breaks-endpoint`
 
 #### Reader / search problem
 
