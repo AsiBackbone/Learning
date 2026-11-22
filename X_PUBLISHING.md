@@ -105,7 +105,20 @@ The post text is deterministic and keeps the canonical URL in the main post:
 {canonicalUrl}
 ```
 
-The question block appears only when `x_question` is present. Length follows
+The question block appears only when `x_question` is present.
+
+X turns any token shaped like a domain into a link, so `ASP.NET` would become a
+link to asp.net and `Task.Run` a link to task.run. Such a link counts 23
+characters, and X may build the post's link card from it instead of from the
+canonical URL. To prevent that, the publisher inserts an invisible LEFT-TO-RIGHT
+MARK (U+200E) before the dot in every letter-or-digit, dot, letter sequence of
+`x_post`, the title, and `x_question`. Authors write normal text; the canonical
+URL is appended unchanged. Each mark counts 2 weighted characters, and the
+documentation build includes them in its length check. The transformation is
+covered by the publisher self-test; whether X honors it is confirmed only by
+the first live post that contains such a token.
+
+Length follows
 X's weighted count: the link counts as 23 characters because X shortens it,
 emoji sequences count 2, and characters outside X's Latin and punctuation
 ranges count 2. No authored copy is truncated; a post that does not fit fails

@@ -546,8 +546,8 @@ static class MetadataValidator
         }
 
         string hashtagText = string.Join(' ', hashtags.Select(static hashtag => $"#{hashtag}"));
-        string questionBlock = question is null ? string.Empty : $"\n\n{question}";
-        string withoutUrl = $"{xPost}\n\n{title}{questionBlock}\n\n{hashtagText}\n\n";
+        string questionBlock = question is null ? string.Empty : $"\n\n{XAutoLinkGuard(question)}";
+        string withoutUrl = $"{XAutoLinkGuard(xPost)}\n\n{XAutoLinkGuard(title)}{questionBlock}\n\n{hashtagText}\n\n";
         int over = XWeightedLength(withoutUrl) + XUrlWeight - XMaximumWeightedLength;
         if (over > 0)
         {
@@ -575,6 +575,13 @@ static class MetadataValidator
         question.Contains("://", StringComparison.Ordinal) || question.Contains("www.", StringComparison.OrdinalIgnoreCase)
             ? "must not contain links; the publisher adds the canonical URL." :
         null;
+
+    // Mirrors XAutoLinkGuard in tools/publish-x.cs: a LEFT-TO-RIGHT MARK before the dot in
+    // a letter-or-digit, dot, letter sequence keeps X from linking tokens such as "ASP.NET".
+    // Each mark counts 2 weighted characters, so the length check must include it.
+    private static readonly Regex XDomainDotRegex = new(@"(?<=[\p{L}\p{N}])\.(?=\p{L})", RegexOptions.Compiled);
+
+    private static string XAutoLinkGuard(string text) => XDomainDotRegex.Replace(text, "‎.");
 
     private static int XWeightedLength(string text)
     {

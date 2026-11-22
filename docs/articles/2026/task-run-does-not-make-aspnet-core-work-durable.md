@@ -5,7 +5,7 @@ author: Christopher D. Cavell
 published: "2026-11-17"
 summary: Starting work with Task.Run and returning 202 Accepted makes an ASP.NET Core endpoint fast, but the work still lives only in that process. Nothing in that design coordinates it with shutdown, a request-scoped service it captured may already be disposed, its failure goes unrecorded by the normal error path, and a crash or deployment can end it without a trace. Choose deliberately among finishing the work inside the request, handing it to a bounded in-memory queue that a hosted service processes, and recording it durably before you answer. Each gives a different guarantee, and the right choice depends on whether losing the work on restart is acceptable. State that guarantee, and test it.
 feed: true
-x_post: Task.Run plus 202 Accepted makes an endpoint fast, not durable. Unfinished work dies with the process. Decide if that loss is OK.
+x_post: Task.Run plus 202 Accepted makes an endpoint fast, not durable. Unfinished work dies with the process. Decide if that's OK.
 x_hashtags:
   - DotNet
   - AspNetCore
