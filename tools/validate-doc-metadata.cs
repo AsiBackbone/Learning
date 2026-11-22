@@ -576,12 +576,12 @@ static class MetadataValidator
             ? "must not contain links; the publisher adds the canonical URL." :
         null;
 
-    // Mirrors XAutoLinkGuard in tools/publish-x.cs: a LEFT-TO-RIGHT MARK before the dot in
-    // a letter-or-digit, dot, letter sequence keeps X from linking tokens such as "ASP.NET".
-    // Each mark counts 2 weighted characters, so the length check must include it.
+    // Mirrors XAutoLinkGuard in tools/publish-x.cs: replacing the dot in a letter-or-digit,
+    // dot, letter sequence with ONE DOT LEADER (U+2024) keeps X from linking tokens such as
+    // "ASP.NET". U+2024 counts 2 weighted characters instead of 1, so the length check must include it.
     private static readonly Regex XDomainDotRegex = new(@"(?<=[\p{L}\p{N}])\.(?=\p{L})", RegexOptions.Compiled);
 
-    private static string XAutoLinkGuard(string text) => XDomainDotRegex.Replace(text, "‎.");
+    private static string XAutoLinkGuard(string text) => XDomainDotRegex.Replace(text, "\u2024");
 
     private static int XWeightedLength(string text)
     {

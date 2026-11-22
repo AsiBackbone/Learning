@@ -643,19 +643,22 @@ sealed class JackdawPatioPostComposer : IXPostComposer
 static class XAutoLinkGuard
 {
     // X turns any token shaped like a domain into a link: "ASP.NET" becomes asp.net and
-    // "Task.Run" becomes task.run. The link then counts 23 characters, and X may build
-    // the post's link card from it instead of from the canonical URL. A LEFT-TO-RIGHT
-    // MARK (U+200E) before the dot is invisible in left-to-right text, and X's
-    // twitter-text rules do not allow directional marks inside a domain, so the token
-    // is no longer linked. Every letter-or-digit, dot, letter sequence is broken, not
-    // only known top-level domains, because X recognizes hundreds of them; a false
-    // positive such as "e.g" costs two weighted characters and changes nothing visible.
+    // "Task.Run" becomes task.run. The link then counts 23 characters, and X builds the
+    // post's link card from it instead of from the canonical URL. X recognizes a domain
+    // only with an ASCII full stop, so the dot in such a token is replaced with ONE DOT
+    // LEADER (U+2024), which looks the same in common fonts. An invisible LEFT-TO-RIGHT
+    // MARK before the dot was tried first and does not work: X's composer showed the
+    // token unlinked, but the published post linked it again. A manual post using U+2024
+    // stayed unlinked and showed the article's card (November 22, 2026).
+    // Every letter-or-digit, dot, letter sequence is replaced, not only known top-level
+    // domains, because X recognizes hundreds of them. The cost is one extra weighted
+    // character per token and posts that X search will not match on the literal "ASP.NET".
     // tools/validate-doc-metadata.cs applies the same transformation. Keep the two in sync.
-    public const char Mark = '‎';
+    public const char Dot = '\u2024';
 
     private static readonly Regex DomainDot = new(@"(?<=[\p{L}\p{N}])\.(?=\p{L})", RegexOptions.Compiled);
 
-    public static string Apply(string text) => DomainDot.Replace(text, $"{Mark}.");
+    public static string Apply(string text) => DomainDot.Replace(text, Dot.ToString());
 }
 
 static class XPostRules
@@ -1500,39 +1503,40 @@ static class XPublisherSelfTest
 
     private static void TestAutoLinkGuard(JackdawPatioPostComposer composer)
     {
-        const char mark = XAutoLinkGuard.Mark;
+        const char dot = XAutoLinkGuard.Dot;
         Assert(XAutoLinkGuard.Apply("Why Moving ASP.NET Core Middleware Breaks Your Endpoint") ==
-                $"Why Moving ASP{mark}.NET Core Middleware Breaks Your Endpoint",
-            "ASP.NET should be broken so X does not link it.");
-        Assert(XAutoLinkGuard.Apply("Task.Run Does Not Make Work Durable") == $"Task{mark}.Run Does Not Make Work Durable",
-            "Task.Run should be broken so X does not link it.");
+                $"Why Moving ASP{dot}NET Core Middleware Breaks Your Endpoint",
+            "ASP.NET should use the lookalike dot so X does not link it.");
+        Assert(XAutoLinkGuard.Apply("Task.Run Does Not Make Work Durable") == $"Task{dot}Run Does Not Make Work Durable",
+            "Task.Run should use the lookalike dot so X does not link it.");
         Assert(XAutoLinkGuard.Apply("Version 1.5 shipped. Then it failed.") == "Version 1.5 shipped. Then it failed.",
             "numbers and sentence punctuation should be unchanged.");
         Assert(XAutoLinkGuard.Apply("Plain words only") == "Plain words only", "text without dots should be unchanged.");
-        Assert(XTextLength.Weighted(mark.ToString()) == 2, "U+200E is outside X's light ranges and should count 2.");
+        Assert(!XAutoLinkGuard.Apply("ASP.NET").Contains('\u200E'), "the ineffective LEFT-TO-RIGHT MARK must not be used.");
+        Assert(XTextLength.Weighted(dot.ToString()) == 2, "U+2024 is outside X's light ranges and should count 2.");
 
         const string title = "Why Moving ASP.NET Core Middleware Breaks Your Endpoint";
         const string takeaway = "Middleware order is behavior; HttpContext.User comes from authentication.";
         LearningPublication publication = Publication(title, post: takeaway, question: "Have you used ASP.NET Core?");
         string post = composer.Compose(publication);
-        Assert(post.Contains($"ASP{mark}.NET Core Middleware", StringComparison.Ordinal), "the title was not guarded.");
-        Assert(post.Contains($"HttpContext{mark}.User", StringComparison.Ordinal), "x_post was not guarded.");
-        Assert(post.Contains($"used ASP{mark}.NET Core?", StringComparison.Ordinal), "x_question was not guarded.");
+        Assert(post.Contains($"ASP{dot}NET Core Middleware", StringComparison.Ordinal), "the title was not guarded.");
+        Assert(post.Contains($"HttpContext{dot}User", StringComparison.Ordinal), "x_post was not guarded.");
+        Assert(post.Contains($"used ASP{dot}NET Core?", StringComparison.Ordinal), "x_question was not guarded.");
         Assert(post.EndsWith("\n\n" + publication.CanonicalUrl, StringComparison.Ordinal) &&
-                !publication.CanonicalUrl.Contains(mark),
+                publication.CanonicalUrl.Contains('.') && !publication.CanonicalUrl.Contains(dot),
             "the canonical URL must be appended unchanged.");
-        Assert(post.Count(static c => c == mark) == 3, "each guarded token should receive exactly one mark.");
+        Assert(post.Count(static c => c == dot) == 3, "each guarded token should receive exactly one lookalike dot.");
 
-        // The weighted check includes the marks: a post that fits without them can be too long with them.
-        string unguardedText = post[..^publication.CanonicalUrl.Length].Replace(mark.ToString(), string.Empty, StringComparison.Ordinal);
+        // The weighted check includes the replacement: each lookalike dot counts 2 instead of 1.
+        string unguardedText = post[..^publication.CanonicalUrl.Length].Replace(dot, '.');
         Assert(WeightedPostLength(post, publication.CanonicalUrl) ==
-                XTextLength.Weighted(unguardedText) + XTextLength.UrlWeight + 6,
-            "the weighted length should count 2 for each mark.");
+                XTextLength.Weighted(unguardedText) + XTextLength.UrlWeight + 3,
+            "the weighted length should count one extra character per replaced dot.");
         int room = 280 - XTextLength.UrlWeight - XTextLength.Weighted($"\n\n{title}\n\n#DotNet\n\n");
-        string fitsOnlyWithoutMark = new('p', room);
-        AssertThrows<InvalidDataException>(() => composer.Compose(Publication(title, post: fitsOnlyWithoutMark)));
-        Assert(composer.Compose(Publication(title, post: new string('p', room - 2))).EndsWith(publication.CanonicalUrl, StringComparison.Ordinal),
-            "a post that fits including the mark should compose.");
+        string fitsOnlyWithPlainDot = new('p', room);
+        AssertThrows<InvalidDataException>(() => composer.Compose(Publication(title, post: fitsOnlyWithPlainDot)));
+        Assert(composer.Compose(Publication(title, post: new string('p', room - 1))).EndsWith(publication.CanonicalUrl, StringComparison.Ordinal),
+            "a post that fits including the lookalike dot should compose.");
     }
 
     private static int WeightedPostLength(string post, string canonicalUrl) =>
