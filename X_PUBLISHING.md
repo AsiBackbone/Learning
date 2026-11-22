@@ -110,13 +110,19 @@ The question block appears only when `x_question` is present.
 X turns any token shaped like a domain into a link, so `ASP.NET` would become a
 link to asp.net and `Task.Run` a link to task.run. Such a link counts 23
 characters, and X may build the post's link card from it instead of from the
-canonical URL. To prevent that, the publisher inserts an invisible LEFT-TO-RIGHT
-MARK (U+200E) before the dot in every letter-or-digit, dot, letter sequence of
-`x_post`, the title, and `x_question`. Authors write normal text; the canonical
-URL is appended unchanged. Each mark counts 2 weighted characters, and the
-documentation build includes them in its length check. The transformation is
-covered by the publisher self-test; whether X honors it is confirmed only by
-the first live post that contains such a token.
+canonical URL. X recognizes a domain only with an ASCII full stop, so the
+publisher replaces the dot in every letter-or-digit, dot, letter sequence of
+`x_post`, the title, and `x_question` with ONE DOT LEADER (U+2024), which looks
+the same in common fonts. Authors write normal text; the canonical URL is
+appended unchanged. Each replaced dot counts 2 weighted characters instead of 1,
+and the documentation build includes that in its length check. X search does not
+match the replaced token against a literal `ASP.NET`.
+
+A manual post on November 22, 2026 confirmed the approach: `ASP․NET` stayed
+plain text after publication and X built the card from the article. An earlier
+attempt that inserted an invisible LEFT-TO-RIGHT MARK (U+200E) before the dot
+does not work: X's composer showed the token unlinked, but the published post
+linked it again.
 
 Length follows
 X's weighted count: the link counts as 23 characters because X shortens it,
