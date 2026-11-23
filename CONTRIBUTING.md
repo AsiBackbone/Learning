@@ -73,7 +73,7 @@ Small contributions are welcome.
 
 ## Before You Start
 
-For a small correction, typo, broken link, or narrow improvement, opening a pull request directly is usually appropriate.
+For a small correction, typo, broken link, or narrow improvement, open an issue describing the proposed change before beginning implementation. Once the maintainer agrees with the proposed approach, the contribution may proceed through an approved patch, pull request, or other agreed submission mechanism. Proposal acceptance does not automatically grant collaborator access or guarantee integration.
 
 For larger work, such as:
 
@@ -84,9 +84,9 @@ For larger work, such as:
 - a new category of examples,
 - or a proposal that changes the project's learning model,
 
-please consider opening an Issue or Discussion first.
+Open an Issue or Discussion before beginning implementation. Maintainer agreement on the proposed scope and approach is required before proceeding through an approved contribution mechanism.
 
-This helps avoid duplicated work and gives contributors an opportunity to refine the idea before investing significant effort.
+This helps avoid duplicated work, supports architectural consistency, and gives contributors an opportunity to refine proposals before investing significant effort.
 
 ## Issues vs. Discussions
 
