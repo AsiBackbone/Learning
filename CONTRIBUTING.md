@@ -2,16 +2,28 @@
 
 Thank you for your interest in contributing to `AsiBackbone/Learning`.
 
-This repository is intended to be a community-maintained living tutorial for practical .NET architecture, governed execution, policy-driven systems, secure application design, AI integration, and related architectural patterns.
+This repository is intended to be a publicly accessible, community-informed living tutorial for practical .NET architecture, governed execution, policy-driven systems, secure application design, AI integration, and related architectural patterns.
 
 Contributions do not need to be large to be useful. A clearer explanation, corrected example, improved diagram, new lab, alternative implementation, or well-reasoned architecture critique can all materially improve the project.
+
+## Contribution and Pull Request Policy
+
+AsiBackbone projects use a controlled-contribution model to preserve architectural consistency, security boundaries, and sustainable maintainer review capacity. Public source code remains available under each repository's applicable license; pull request permissions govern contributions to the official repository, not independent forks or use of the licensed work.
+
+- **Start with a proposal.** Open an issue for a reproducible defect or a focused improvement. For larger features or architectural changes, use [organization Discussions](https://github.com/orgs/AsiBackbone/discussions) before undertaking substantial implementation. Follow the repository's security policy for vulnerabilities; do not disclose sensitive details publicly.
+- **Explain the change.** Include the problem, intended outcome, affected components, relevant compatibility and security considerations, and a proposed validation approach. A concise proposal is sufficient for minor documentation defects.
+- **Maintainer review comes first.** Maintainers evaluate scope, project direction, technical risk, compatibility, testing requirements, and available review capacity. Acknowledgment of an issue or proposal does not constitute approval to implement or a commitment to review within a specific timeframe.
+- **Contribution is by agreement.** When a proposal is accepted, maintainers may invite implementation through an appropriate mechanism, such as a patch, a focused pull request where permitted, or time-limited collaborator access. Acceptance of a proposal does not automatically confer repository write access.
+- **Integration remains controlled.** Contributions are subject to the affected repository's existing testing, review, licensing, and governance requirements. Maintainers retain final integration and release authority.
+
+Some repositories restrict pull request creation to authorized collaborators. These restrictions do not prevent independent forks or modifications permitted by the applicable license. Unsolicited changes developed without prior agreement may not be reviewed or accepted. Public issues and discussions remain the preferred starting point for outside participation.
 
 ## Quick Contribution
 
 For a typo, broken link, or narrow wording fix, the contribution path is intentionally short:
 
-1. Edit the affected file directly on GitHub or in a short-lived branch.
-2. Open a focused pull request describing the correction.
+1. Open an issue describing the typo, broken link, or narrow wording fix; obtain maintainer agreement before preparing a change.
+2. If invited, submit a focused patch or pull request using the agreed contribution mechanism.
 3. Let the automated checks run:
    - **Documentation Validation (`docs-validation`)** builds the DocFX site with warnings treated as errors.
    - **Link Validation (`link-validation`)** checks Markdown links for broken or invalid targets, including the `#anchor` part, so renaming a heading also means updating the links that point at it.
@@ -994,7 +1006,7 @@ If you are unsure whether an idea belongs in the repository, start an [AsiBackbo
 
 If you have identified a concrete problem, open an Issue.
 
-If you already have a focused improvement, a pull request is welcome.
+If you already have a focused improvement, propose it in an issue first; maintainers can invite a patch or pull request once the scope is agreed.
 
 The project is intended to evolve through exactly this kind of participation.
 
