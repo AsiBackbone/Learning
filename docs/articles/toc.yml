@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: Updating .NET Did Not Fix the Code Your Template Generated
+  href: 2026/updating-dotnet-does-not-fix-generated-code.md
 - name: Why Moving ASP.NET Core Middleware Breaks Your Endpoint
   href: 2026/moving-aspnet-core-middleware-breaks-endpoint.md
 - name: Stop Creating an HttpClient for Every Request

@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Declaring a security advisory remediated after a runtime or SDK update, previously generated or scaffolded source, app-local NuGet packages, self-contained deployments, reading an advisory by affected component, and remediation evidence | [Updating .NET Did Not Fix the Code Your Template Generated](2026/updating-dotnet-does-not-fix-generated-code.md) |
 | Moving `UseExceptionHandler`, `UseAuthentication`, or `UseAuthorization` and an endpoint changing behavior, request and response order, short-circuiting middleware, exceptions that escape the handler, the middleware `WebApplication` adds automatically, and testing pipeline order | [Why Moving ASP.NET Core Middleware Breaks Your Endpoint](2026/moving-aspnet-core-middleware-breaks-endpoint.md) |
 | `new HttpClient()` in every request, port exhaustion, a static client that misses DNS changes, `PooledConnectionLifetime`, `IHttpClientFactory`, named and typed clients, per-request headers, and cookies under pooled handlers | [Stop Creating an HttpClient for Every Request](2026/stop-creating-httpclient-for-every-request.md) |
 | Choosing `AddTransient`, `AddScoped`, or `AddSingleton`, captive dependencies, a singleton holding a `DbContext`, scope validation, scopes in a `BackgroundService`, disposal, and `IDbContextFactory` | [Your Dependency Injection Lifetime Is an Ownership Decision](2026/dependency-injection-lifetime-is-ownership-decision.md) |
@@ -62,6 +63,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [Updating .NET Did Not Fix the Code Your Template Generated](2026/updating-dotnet-does-not-fix-generated-code.md)
+
+**Christopher D. Cavell** · **November 24, 2026**
+
+A team updates its ASP.NET Core runtime on patch day, every version check and package scan passes, and the change is closed as remediated, while account-recovery pages scaffolded two years earlier remain exactly as they were generated. This intermediate article explains the ownership boundary: a runtime or SDK update repairs what ships in that runtime or SDK, but not app-local NuGet packages in an already published application, the runtime inside a self-contained deployment, or source that a template or scaffolder generated into the application. It shows how to inventory what an application actually owns and how to read an advisory by affected component rather than by one version number, using three advisories from Microsoft's November 2026 release cycle as a case study: a runtime fix with a standalone package exception (CVE-2026-114146), a standalone package fixed outside the runtime release (CVE-2026-118747), and scaffolding templates whose previously generated code needs a manual repair (CVE-2026-118741, with the CVE-2026-70175 follow-up). A component, owner, remediation, and evidence table says when patching alone is enough. A small, fictional generated handler is repaired with a focused change and three tests, two of which fail against the generated version. The article explains why NuGet auditing, lock files, SBOMs, and image scanners may not see a defect in first-party generated source, when a clean template baseline helps and why a focused fix is usually safer than regenerating, and why verified remediation is a scoped claim rather than a promise that an application is secure.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/updating-dotnet-does-not-fix-generated-code.html`
 
 ### [Why Moving ASP.NET Core Middleware Breaks Your Endpoint](2026/moving-aspnet-core-middleware-breaks-endpoint.md)
 
