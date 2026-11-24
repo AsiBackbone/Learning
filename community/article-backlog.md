@@ -1127,6 +1127,38 @@ Lead to Data-Access Boundaries and Transaction Reasoning with EF Core for provid
 
 ---
 
+## Advisory-Driven Publications
+
+Candidates in this section were opened directly as implementation issues because current servicing guidance made them urgent. Their priority is editorial; it does not claim that Learning or any organization repository contains the vulnerability being discussed.
+
+### 35. Updating .NET Did Not Fix the Code Your Template Generated
+
+- **Priority:** P1 (publish first)
+- **Level:** Intermediate
+- **Implementation issue:** [#531](https://github.com/AsiBackbone/Learning/issues/531)
+- **Publication:** [Published November 24, 2026](../docs/articles/2026/updating-dotnet-does-not-fix-generated-code.md)
+- **Permanent slug:** `updating-dotnet-does-not-fix-generated-code`
+
+#### Reader / search problem
+
+A team applies the latest .NET runtime or SDK update and reports its service as remediated, but the application contains previously generated Identity, UI, or scaffolded code, app-local packages, or customized template output that need separate repair, rebuild, and redeployment. Who owns each repair, and what evidence shows it reached production?
+
+#### Existing Learning support
+
+- [Software Supply-Chain Integrity for .NET Repositories](../docs/security/software-supply-chain-integrity-for-dotnet-repositories.md)
+- [A Green CI Badge Does Not Prove Your .NET Package Is Trustworthy](../docs/articles/2026/ci-badge-does-not-prove-package-integrity.md)
+- [You Don't Need to Roll Back What You Never Merged](../docs/articles/2026/you-dont-need-to-roll-back-what-you-never-merged.md)
+
+#### Article / curriculum distinction
+
+The migration article covers isolating a platform-generation change, not servicing evidence, and [#530](https://github.com/AsiBackbone/Learning/issues/530) covers file-level reconciliation of old and new generated baselines. This article covers security ownership, remediation classification, and evidence when a vendor patch does not modify application-owned source, using the November 2026 ASP.NET Core advisories as a per-CVE case study. It must not claim that every advisory or every template is affected, imply that a runtime-only fix is always insufficient, recommend overwriting customized source, or present passing CI as a security certification.
+
+#### Natural deeper path
+
+Lead to Software Supply-Chain Integrity for .NET Repositories for what dependency tooling can establish, A Green CI Badge Does Not Prove Your .NET Package Is Trustworthy for evidence discipline, and You Don't Need to Roll Back What You Never Merged for planned baseline reconciliation.
+
+---
+
 ## Promotion and Publication Workflow
 
 Keep planning, implementation, and publication as separate states:
