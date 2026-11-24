@@ -22,7 +22,7 @@ x_question: How does your team find code a template generated years ago?
 
 **Prerequisites:** No formal prerequisites. Familiarity with how a .NET application is built and deployed, NuGet package references, and `dotnet new` or a scaffolding tool is helpful. No AsiBackbone package, NetCoreApplicationTemplate, or prior Learning material is required.
 
-**Sample scope:** The patch-day scenario, its team and service, the Cedarline template, and the Cedarline advisory are fictional. The Microsoft advisories are real and are cited as the November 2026 case study; version numbers come only from those advisories and Microsoft's servicing post. The code example is a small, non-exploitable illustration of a generated handler and its repair, not a copy of Microsoft's templates. This article does not claim that every 2026 ASP.NET Core advisory affects generated source, that every `dotnet new` template or scaffolding release is affected, or that a runtime update is never sufficient. In this article, the **owner** of a component is the team or role responsible for maintaining and remediating it, not necessarily the holder of any copyright in it.
+**Sample scope:** The patch-day scenario, its team and service, the Cedarline template, and the Cedarline advisory are fictional. The Microsoft advisories are real and are cited as the November 2026 case study; Microsoft version numbers come only from those advisories and Microsoft's servicing post. The code example is a small, non-exploitable illustration of a generated handler and its repair, not a copy of Microsoft's templates. This article does not claim that every 2026 ASP.NET Core advisory affects generated source, that every `dotnet new` template or scaffolding release is affected, or that a runtime update is never sufficient. In this article, the **owner** of a component is the team or role responsible for maintaining and remediating it, not necessarily the holder of any copyright in it.
 
 **Verification:** The handler and its three tests in the [appendix](#appendix-complete-code) were compiled and run on .NET 10; the appendix records the [environment and command](#environment-used-for-verification). The unrepaired handler shown in the article fails two of those tests. Advisory content is summarized in the article's own words, with links, and each advisory remains the authority for its own affected versions and remediation. External sources were last verified on November 24, 2026.
 
@@ -32,13 +32,13 @@ x_question: How does your team find code a template generated years ago?
 
 **In plain terms:** a car manufacturer issues a recall for a brake part. Your dealer replaces that part during the next service. If, years earlier, you had a local mechanic fabricate a copy of the old part for a trailer you built yourself, the dealer never sees the trailer and never touches it. The recall notice may even say so. The trailer is yours to inspect and repair.
 
-Consider a fictional patch-day scenario. A team runs a customer-facing order service on ASP.NET Core 10. Its platform engineer updates the base container image to the current ASP.NET Core runtime, rebuilds the image, and redeploys. The pipeline's runtime check reports the new patch version installed on every node. The package scan reports no vulnerable packages. The change ticket is closed as "remediated: runtime updated."
+Consider a fictional patch-day scenario. A team runs a customer-facing order service on ASP.NET Core 10. Its platform engineer updates the base container image to the current ASP.NET Core runtime, rebuilds the image, and redeploys. The pipeline's runtime check reports the corrected shared-framework version present in every deployed application instance. The package scan reports no vulnerable packages. The change ticket is closed as "remediated: runtime updated."
 
-Two days later a reviewer reads one of the month's advisories more carefully. It concerns code that a scaffolding tool *generates into applications*, and it says that a tool update leaves already generated code as it was. The order service's account-recovery pages were scaffolded two years ago, on .NET 8, and later customized. They live in the team's repository, compile into the team's assembly, and have not changed in eighteen months. Nothing in the patch-day work touched them, and nothing in the pipeline was designed to notice.
+Two days later a reviewer reads one of the month's advisories more carefully. It concerns code that a scaffolding tool *generates into applications*, and it says that a tool update leaves already generated code as it was. The order service's account-recovery pages were scaffolded two years ago and later customized. The project has since moved to .NET 10, but that upgrade changed project files and package references, not those pages. They live in the team's repository, compile into the team's assembly, and have not changed in eighteen months. Nothing in the patch-day work touched them, and nothing in the pipeline was designed to notice.
 
 > **A runtime or SDK update repairs what ships inside that runtime or SDK. Source that a template or scaffolder generated into your repository becomes application-maintained source. Updating the generator does not change that committed copy. Repairing the deployed application requires correcting that source, rebuilding, and deploying the corrected artifact.**
 
-For many advisories, installing the corrected runtime and restarting a framework-dependent application is the complete remediation. What decides it is the component the advisory names and how the application is built and deployed, not an installed or selected version that `dotnet --info` happens to display.
+For many advisories, installing the corrected runtime and restarting a framework-dependent application is the complete remediation. What decides it is the component the advisory names and how the application is built and deployed, not an SDK or runtime version that `dotnet --info` reports outside the deployed process.
 
 ---
 
@@ -49,7 +49,7 @@ Servicing is usually discussed in terms of versions: the runtime moved from one 
 A .NET application, though, is assembled from parts that are serviced in different ways:
 
 - some code arrives from a **shared runtime** that the host or container supplies when the application starts;
-- some arrives from **NuGet packages** that the project references and the build copies into the output;
+- some arrives from **NuGet packages** that the project references, whose applicable assets the build includes in its output;
 - some is **embedded in the deployment** itself, as when a self-contained application carries its own copy of the runtime;
 - and some was **generated once** by `dotnet new`, a scaffolder, or an internal template, then committed and edited like any other source.
 
@@ -63,11 +63,11 @@ Return to the order service. Here is what the patch-day evidence actually showed
 
 | Check | Result | What it actually proves |
 | --- | --- | --- |
-| Base image updated and rebuilt | New image digest | A different image exists; it proves the repair reached production only once that digest is tied to a verified runtime version and the rollout is confirmed to be running it |
-| Runtime inventory on every node | Corrected runtime installed | The corrected shared framework is *available*; on its own this does not show that the running process loaded it |
+| Base image updated and rebuilt | New image digest | A different image was built. That is not production remediation until the image's contents are verified and the same digest is confirmed as deployed and running |
+| Runtime inventory in each deployed instance | Corrected shared framework present | The corrected shared framework is *available* in the container or host environment; separate process-level evidence shows which version the application loaded |
 | Package vulnerability scan | No findings | Within the scanner's configured sources and advisory data at scan time, no resolved package version it examined matched a reported vulnerability |
 | Smoke tests | Passing | The service starts and its tested paths behave as before |
-| `git log` for the account-recovery pages | No change in 18 months | The generated source is exactly what it was before the patch |
+| Account-recovery pages compared at the source commits of the old and new deployed images | Identical | The generated source in production is exactly what it was before the patch |
 
 Every row is true, and each is evidence for the components it covers. A clean package scan, for example, is evidence about the package identifiers and versions the scanner recognized; it is not evidence that application-maintained source is unaffected. None of the first four rows says anything about the last one. The account-recovery handlers are not part of the runtime, are not a package, and are not something the scanner enumerates. They are part of the application's own assembly, generated from a template version that predates the fix.
 
@@ -81,17 +81,17 @@ Before reading any advisory, list the components that end up in the deployed art
 | --- | --- | --- |
 | Shared runtime (`Microsoft.NETCore.App`, `Microsoft.AspNetCore.App`) | Host machine or base container image, for framework-dependent apps | Whoever patches the host or rebuilds the image |
 | Embedded runtime | Copied into a self-contained deployment, including a self-contained single-file publish | The application team, by republishing and redeploying |
-| App-local NuGet packages | `PackageReference` and transitive dependencies, restored at build time | The application team, by updating references and rebuilding |
+| App-local NuGet packages | `PackageReference` and transitive dependencies, resolved at restore and build time; applicable runtime assets are included in the output | The application team, by updating references and rebuilding |
 | Generated or scaffolded source | `dotnet new`, a scaffolding tool, or an internal template, committed to the repository | The application team, by editing source |
 | Copied templates and custom forks | Files copied from samples, an internal starter kit, or a vendored framework | The team that took the copy |
 | SDK and build tooling | Developer machines and CI agents; selected by `global.json` | Whoever maintains build environments |
-| Container and deployment artifacts | Image, package, or bundle that actually runs | The release process, which must rebuild from the corrected inputs |
+| Container and deployment artifacts | Image, package, or bundle deployed to the running environment | The release process, which must rebuild from the corrected inputs |
 
 Three details matter in that table.
 
 First, single-file and self-contained are different choices. A single-file application can be framework-dependent, in which case it uses the shared runtime like any other framework-dependent app. Only a self-contained publish carries its own runtime.
 
-Second, a generated file has different provenance from handwritten application code, but once it is committed it is maintained by the application team. The generator has no further relationship with it. Record its provenance anyway: which generator, which version, and when. Without that record, the team may have to reconstruct provenance from commit history, manifests, dependency records, or baseline comparisons before it can reliably answer an advisory's first scoping question.
+Second, a generated file has different provenance from handwritten application code, but once it is committed it is maintained by the application team. The generator no longer controls or updates that committed copy. Record its provenance anyway: which generator, which version, and when. Without that record, the team may have to reconstruct provenance from commit history, manifests, dependency records, or baseline comparisons before it can reliably answer an advisory's first scoping question.
 
 Third, the SDK appears in the inventory even though it does not run in production. It can bundle the templates that generate code, and `global.json` can keep an older SDK selected after a newer one is installed. For a self-contained publish, the SDK also determines which runtime pack is embedded, unless the project pins one with `RuntimeFrameworkVersion`. None of this reaches back into code generated earlier.
 
@@ -99,7 +99,7 @@ Third, the SDK appears in the inventory even though it does not run in productio
 
 ## 3. Read the Advisory by Component, Not by Version Number
 
-A security advisory for .NET usually lists affected **packages**, not just one product version. Read each row as a statement about one component:
+A .NET security advisory identifies affected **components** and versions, which may include runtime packs, standalone NuGet packages, SDK templates, tools, or generated application code, rather than one product-wide version. Read each row as a statement about one component:
 
 - **What component is affected?** A runtime pack, a standalone NuGet package, a scaffolding package, a template package, or a tool.
 - **What is the fixed version of that component?** Not the runtime version, unless the row is a runtime pack.
@@ -114,23 +114,25 @@ On November 10, 2026, Microsoft released .NET servicing updates. [Microsoft's No
 
 **A runtime fix, with a standalone package exception: CVE-2026-114146.** This [SignalR advisory](https://github.com/dotnet/aspnetcore/security/advisories/GHSA-67wp-ghc2-fw2g), one of the thirteen, lists ASP.NET Core runtime packs for .NET 8, 9, 10, and 11 with their patched runtime versions. It separately lists one standalone ASP.NET Core 2.3 package, `Microsoft.AspNetCore.Http.Connections`, fixed in version 1.2.14. Its remediation section directs teams to install the applicable runtime or update each independently referenced package. After a standalone package update, the application must be rebuilt and redeployed, because restarting does not replace app-local packages. A self-contained application must also be rebuilt and redeployed, because a machine-wide runtime update leaves its embedded runtime as it was. An SDK update by itself does not change an application's standalone package references. For a framework-dependent .NET 10 application with no standalone reference to the affected package, the corrected runtime and a restart are what this advisory asks for.
 
-**A standalone package fixed outside the runtime release: CVE-2026-118747.** This [.NET advisory](https://github.com/dotnet/runtime/security/advisories/GHSA-vmv3-wvjp-wqpj) concerns the independently versioned `System.Formats.Cbor` NuGet package. For the .NET 9 package line the fix is package version 9.0.24, which is not delivered by the 9.0.23 runtime; the advisory also names the fixed 10.0.15 package, which includes a `net9.0` target, as an alternative. The servicing post likewise says that installing the 9.0.23 runtime does not address this CVE, and directs teams to update the package, rebuild, and redeploy. A team that compares only its runtime version with the month's runtime release would record this one as fixed when it is not.
+**A standalone package fixed outside the runtime release: CVE-2026-118747.** This [.NET advisory](https://github.com/dotnet/runtime/security/advisories/GHSA-vmv3-wvjp-wqpj), with its own [announcement](https://github.com/dotnet/announcements/issues/501), concerns the independently versioned `System.Formats.Cbor` NuGet package. For the .NET 9 package line the fix is package version 9.0.24, which is not delivered by the 9.0.23 runtime. The advisory also lists a fixed 10.0.15 package, which includes a `net9.0` target, as an alternative; follow the advisory and your own compatibility policy when choosing a package line. The servicing post likewise says that installing the 9.0.23 runtime does not address this CVE, and directs teams to update the package, rebuild, and redeploy. A team that compares only its runtime version with the month's runtime release would record this one as fixed when it is not.
 
-**Generated application code: CVE-2026-118741.** This [scaffolding advisory](https://github.com/dotnet/Scaffolding/security/advisories/GHSA-jxmf-523q-f7r7) has its own [announcement](https://github.com/dotnet/announcements/issues/525). Its revision history dates it November 10; the GitHub pages are timestamped early on November 11 (UTC). It concerns ASP.NET Core Identity scaffolding templates that, in password-reset and email-confirmation flows, address the message to the email supplied in the request rather than the address stored on the located account. The affected components include:
+**Generated application code: CVE-2026-118741.** This [scaffolding advisory](https://github.com/dotnet/Scaffolding/security/advisories/GHSA-jxmf-523q-f7r7) has its own [announcement](https://github.com/dotnet/announcements/issues/525). It concerns ASP.NET Core Identity scaffolding templates that, in password-reset and email-confirmation flows, address the message to the email supplied in the request rather than the address stored on the located account. For the stable .NET 8, 9, and 10 lines, the affected components include:
 
-- the scaffolding packages `Microsoft.VisualStudio.Web.CodeGenerators.Mvc` and its parent `Microsoft.VisualStudio.Web.CodeGeneration.Design` (fixed in 8.0.24, 9.0.13, and 10.0.3);
-- the standalone `Microsoft.DotNet.Web.ProjectTemplates` packages (fixed in 8.0.34, 9.0.23, and 10.0.15);
-- and the `dotnet-scaffold` tools. Installations of `Microsoft.dotnet-scaffold` are updated to 20.3.0, and installations of the older `Microsoft.dotnet-scaffold-aspnet` are replaced by `Microsoft.dotnet-scaffold` 20.3.0 rather than updated in place.
+- the scaffolding package `Microsoft.VisualStudio.Web.CodeGenerators.Mvc`, which contains the affected templates, and `Microsoft.VisualStudio.Web.CodeGeneration.Design`, which brings it in through a minimum-version dependency (both affected from the first release of each line through 8.0.23, 9.0.12, and 10.0.2, and fixed in 8.0.24, 9.0.13, and 10.0.3). The advisory notes that a project whose resolved MVC generator is already fixed is not vulnerable merely because it keeps an older Design reference, so assess the resolved `CodeGenerators.Mvc` version, then inspect the committed handlers separately;
+- the standalone `Microsoft.DotNet.Web.ProjectTemplates` packages (affected from the first release of each line through 8.0.33, 9.0.22, and 10.0.14, and fixed in 8.0.34, 9.0.23, and 10.0.15);
+- and the `dotnet-scaffold` tools. The advisory directs `Microsoft.dotnet-scaffold` installations to update to 20.3.0, and installations of the older `Microsoft.dotnet-scaffold-aspnet` to be uninstalled in favor of `Microsoft.dotnet-scaffold` 20.3.0.
+
+The servicing post lists this CVE against .NET 8, 9, and 10; the advisory additionally names specific .NET 11 prerelease packages and the 20.x scaffolding tool. It also notes that Visual Studio installs its updated scaffolding tool automatically, while Visual Studio 17.14 uses the legacy code-generation packages, so project dependencies still need checking.
 
 The advisory then draws three distinctions that this article depends on:
 
-- A new scaffolding package or tool affects only what is generated from then on. An application generated with an affected template stays affected until its handlers are corrected.
+- Updating a scaffolding package or tool changes later scaffolding operations; it does not modify source already generated into an application. An application generated with an affected template stays affected until its handlers are corrected.
 - Exposure depends on two facts: the scaffolding package or tool version, *and the code that version generated*. The `dotnet-aspnet-codegenerator` command loads generators from the project's own dependencies, so a newer command-line tool alone leaves those references unchanged. For `dotnet new`, the selected SDK and any separately installed template packs matter, and a package reference alone does not reveal which template produced an application.
 - Existing applications need a described manual repair. In the generated `ForgotPassword` and `ResendEmailConfirmation` handlers, including Blazor equivalents, keep the existing user lookup and checks, obtain the stored email for the located user, reject a missing stored address, send only to that stored address, then rebuild and redeploy. If an affected template generates the handlers again, the repair has to be applied again.
 
-The advisory's ranges start with the .NET 8 scaffolding and template lines. Code generated by older templates is outside its stated scope, which means it needs its own review against whatever generated it, not that it is known to be safe.
+The advisory's ranges start with the .NET 8 scaffolding and template lines. Code generated by older templates is outside its stated affected ranges. That does not establish that such code is safe; if comparable handlers exist, reviewing them is a prudent separate assessment, not a step the advisory requires.
 
-The consolidated announcement also notes that an earlier advisory, [CVE-2026-70175](https://github.com/dotnet/aspnetcore/security/advisories/GHSA-x3vp-85cm-q97r), received updated guidance in November and is separate from the thirteen. That advisory was first published on October 13 with runtime and `Microsoft.AspNetCore.Identity.UI` package fixes. Its November 10 revision lists corrected SDK templates for the Blazor account-recovery handlers, with a separate affected range and fixed SDK version for each SDK feature band (for example, 10.0.115 for the 10.0.1xx band and 10.0.404 for the 10.0.4xx band), and adds guidance for repairing previously generated code. Its remediation has three separate steps: install the corrected runtime or SDK and update package references; independently repair existing generated handlers; and rebuild and redeploy. It is explicit that the second step is never performed by installing a runtime, SDK, Identity UI package, or template package.
+The consolidated announcement also notes that an earlier advisory, [CVE-2026-70175](https://github.com/dotnet/aspnetcore/security/advisories/GHSA-x3vp-85cm-q97r), received updated guidance in November and is separate from the thirteen. That advisory was first published on October 13 with runtime and `Microsoft.AspNetCore.Identity.UI` package fixes. Its November 10 revision (V1.1) lists corrected SDK templates for the Blazor account-recovery handlers, with a separate affected range and fixed SDK version for each SDK feature band (for example, 10.0.115 for the 10.0.1xx band and 10.0.404 for the 10.0.4xx band), and adds guidance for repairing previously generated code. Its remediation has three separate steps: install the corrected runtime or SDK and update package references; independently repair existing generated handlers; and rebuild and redeploy. It states that installing a runtime, SDK, Identity UI package, or template package does not perform the second step.
 
 Read together, these advisories show why "we installed the November runtime" can be complete evidence for one CVE, incomplete for another, and irrelevant to a third.
 
@@ -143,12 +145,12 @@ Once the inventory and the advisory are side by side, each affected row maps to 
 | Component named by the advisory | Owner | Remediation | When patching alone is enough | Evidence of remediation |
 | --- | --- | --- | --- | --- |
 | Shared runtime pack (framework-dependent app) | Host or image maintainer | Install the corrected runtime or rebuild the base image; restart the application | Often, when the advisory names only runtime packs and the app references no affected standalone package | Exact shared-framework version resolved by the deployed process, collected from the running environment or deployment diagnostics, with the image digest or host patch record |
-| Embedded runtime (self-contained app, including self-contained single-file) | Application team | Republish with an SDK that bundles the corrected runtime pack, or pin it with `RuntimeFrameworkVersion`; verify the resolved runtime pack version; redeploy | Never by patching the host: the runtime is inside the deployment | Runtime pack version resolved at publish, and the deployed artifact's identifier |
-| App-local NuGet package | Application team | Update the reference to the fixed package version, restore, rebuild, redeploy | Never by installing a runtime: the package is resolved at build time and copied into the output | Resolved version in `packages.lock.json` or the build's dependency output, and the deployed artifact's identifier |
+| Embedded runtime (self-contained app, including self-contained single-file) | Application team | Republish so that the corrected runtime pack is resolved, updating `RuntimeFrameworkVersion` if the project pins it; verify the resolved version; redeploy | Never by patching the host: the runtime is inside the deployment | Runtime version recorded in the publish output (for example, `includedFrameworks` in the published `*.runtimeconfig.json`), and the deployed artifact's identifier |
+| App-local NuGet package | Application team | Update the reference to the fixed package version, restore, rebuild, redeploy | Never by installing a runtime: the package is resolved through the application's dependency graph, and its applicable assets are built into the output | Resolved version in `packages.lock.json` when lock files are enabled, or in versioned restore or build dependency output, and the deployed artifact's identifier |
 | Scaffolding package, template pack, or tool | Developers and build-environment maintainers | Update the tool, project dependency, template pack, or SDK before generating more code; check which SDK `global.json` selects | Only for code generated *after* the update | Resolved tool, project dependency, template pack, and selected SDK versions in the environment that performs generation, with a clean-generation check where practical |
 | Previously generated or copied source | Application team | Locate every affected file, apply the advisory's source repair, add a test, rebuild, redeploy | Never through a runtime, SDK, tool, or package installation alone; the committed source must be corrected or replaced | Commit that changes the file, a test that fails before and passes after, and the deployed artifact built from that commit |
 
-The "enough" column is a reading aid, not a substitute for the advisory, and it depends on deployment mode: a framework-dependent application and a self-contained one can need different actions for the same CVE. "Rebuild and redeploy" means the artifact that runs in production is replaced by one built from the corrected inputs. A rebuild that is never deployed changes nothing that users reach.
+Each row's evidence should also name the advisory identifier and revision that was evaluated, because guidance can change after publication. The "enough" column is a reading aid, not a substitute for the advisory, and it depends on deployment mode: a framework-dependent application and a self-contained one can need different actions for the same CVE. "Rebuild and redeploy" means the artifact that runs in production is replaced by one built from the corrected inputs. A rebuild that is never deployed changes nothing that users reach.
 
 ---
 
@@ -156,7 +158,7 @@ The "enough" column is a reading aid, not a substitute for the advisory, and it 
 
 To keep the example small and independent of Microsoft's templates, this section does not reproduce the Identity handlers. It uses a fictional internal template, *Cedarline.Templates.Web*, which generates a team-invitation feature into new services. Cedarline's template team later publishes a fictional advisory: version 3.2.0 of the template generated a handler that resends an invitation to the address supplied in the request, rather than to the invitee address stored on the invitation. Template version 3.2.1 fixes the template. The advisory says that services already generated from 3.2.0 keep the old handler until someone changes it.
 
-The order service was generated from version 3.2.0. Its handler, as generated:
+Suppose the same order service also contains a team-invitation feature generated from Cedarline 3.2.0. This is a separate, smaller illustration of the same ownership problem, not a model of the account-recovery pages. The handler, as generated:
 
 ```csharp
 namespace Cedarline.Orders.TeamInvitations;
@@ -179,7 +181,7 @@ public sealed class ResendInvitationHandler(IInvitationStore store, IMessageSend
 }
 ```
 
-The defect is one argument: the recipient comes from the request rather than from the record that was located. Installing a newer runtime, SDK, or template pack leaves this file byte-for-byte unchanged.
+The central defect is one argument: the recipient comes from the request rather than from the record that was located. The repair also has to define what happens when that stored address is absent. Installing a newer runtime, SDK, or template pack leaves this file byte-for-byte unchanged.
 
 ### Make the focused repair
 
@@ -216,7 +218,7 @@ public sealed class ResendInvitationHandler(IInvitationStore store, IMessageSend
 
 The header comment is deliberate. It records where the file came from and why it now differs from what its generator produced. The next person to compare the service with a template baseline will see a difference and know it is intended.
 
-The exception keeps the sample small and makes the invariant testable: an invitation without a stored address is treated as corrupt application state, and the handler fails after ensuring that nothing is sent. Microsoft's Identity repair takes the same approach for a missing stored email. That is one policy, not the only one. A public-facing endpoint would normally keep its outward response uniform, record the invalid state internally, and send nothing, so that the branch neither surfaces as a server error nor reveals whether an account or address exists. If missing addresses can occur legitimately, for example in legacy records, treat that as a separate design decision and test whichever behavior you choose.
+The sample treats a missing stored address as corrupt application state and throws, having sent nothing; the repair snippet in the CVE-2026-118741 advisory also throws `InvalidOperationException` in that case. That is not the only valid policy. A public-facing endpoint may instead keep its outward response uniform, record the invalid state internally, and send nothing. Whichever policy applies, test it explicitly and make sure the branch does not reveal whether an account or stored address exists.
 
 ### Prove the repair with a test
 
@@ -258,14 +260,14 @@ Item 5 closes the loop. Items 1–4 show the repair exists; item 5 shows that th
 
 ## 6. Why Scanners May Not See This
 
-Dependency tooling is valuable, and every remediation workflow should use it. It answers a specific question: *which identified third-party components, at which versions, does this application depend on?* A defect generated into first-party source falls outside that question.
+Dependency tooling remains valuable wherever packages, runtimes, or other identifiable components are within an advisory's scope, but it answers a narrower question than source review: *which identified third-party components, at which versions, does this application depend on?* A defect generated into first-party source falls outside that question.
 
-- **NuGet vulnerability auditing** (restore-time auditing, or `dotnet package list --vulnerable --include-transitive` with the .NET 10 SDK; earlier SDKs use `dotnet list package`) compares package identifiers and versions with advisory data. Generated source is not a package. A project may not even reference the scaffolding package anymore; many teams remove it after generation.
+- **NuGet vulnerability auditing** (restore-time auditing, or `dotnet package list --vulnerable --include-transitive`, also available in the older `dotnet list package` form) compares package identifiers and versions with advisory data. Generated source is not a package. A project may not even reference the scaffolding package anymore; many teams remove it after generation.
 - **Lock files** record the resolved versions of packages. They say nothing about what source a template wrote into the repository.
 - **A typical automatically generated SBOM** inventories the application and its identified dependencies by component identity and version. Generated source ordinarily appears only as part of the application's own component. The SBOM can record which template produced it only if the organization adds generator or source-provenance metadata; package resolution alone does not discover that relationship.
 - **Conventional container image scanning** inspects operating-system packages, runtimes, and identifiable libraries in an image. It may confirm that a corrected runtime is present, but on its own it does not establish an application-level behavior such as a handler sending mail only to the stored address. A product that also performs source or binary analysis may detect some such patterns, but that is a different kind of evidence.
 
-A code search for the handler names an advisory lists is often the fastest first pass. It is not a guarantee. That is why the advisory's own instruction, to check the generated code itself, is part of the remediation rather than a formality, and why the provenance in your inventory matters: you can search only for code you know you have.
+A code search for the handler names an advisory lists is often the fastest first pass. It is not a guarantee. That is why the advisory's own instruction, to check the generated code itself, is part of the remediation rather than a formality, and why the provenance in your inventory matters: it makes a complete search far easier to design, and without it a team may not know every generated pattern or location it needs to examine.
 
 ---
 
@@ -291,7 +293,7 @@ It does not say:
 
 - that the application has no other vulnerabilities;
 - that every copy of the generated code everywhere in the organization was found, unless the search is recorded and its scope stated;
-- that the advisory's description of the defect is complete, or that a later revision will not add components or steps (CVE-2026-70175's November revision is an example of guidance changing after initial publication);
+- that the advisory's description of the defect is complete, or that a later revision will not add components or steps (CVE-2026-70175's November 10 revision is an example of guidance changing after initial publication);
 - or that a passing CI pipeline amounts to a security assessment.
 
 Keeping the claim narrow is what makes it trustworthy. A record that says "remediated" without saying *what* was remediated, *where*, and *how it was verified* invites exactly the mistake that opened this article.
@@ -343,7 +345,7 @@ The sample has two projects: a class library containing the repaired handler and
 ### Environment used for verification
 
 - .NET SDK 10.0.404, target framework `net10.0`, on Windows x64.
-- xUnit v3 4.0.3, run through Microsoft.Testing.Platform, which `global.json` selects for `dotnet test` on the .NET 10 SDK.
+- xUnit v3 4.0.3, run through Microsoft.Testing.Platform, which `global.json` selects for `dotnet test` on the .NET 10 SDK. The restore resolved Microsoft.Testing.Platform 2.5.2 through `xunit.v3.mtp-v2`.
 - `global.json` requests SDK 10.0.100 with `rollForward: latestFeature`, which accepts the highest installed .NET 10 SDK feature band and patch, including the 10.0.404 used for the recorded run.
 - Warnings treated as errors, with the `latest-recommended` .NET analyzers.
 - The command `dotnet test --project Tests/Invitations.Tests.csproj`, run from the folder that contains `global.json`, built both projects and reported 3 passing tests. With the generated handler from [section 5](#5-a-small-generated-file-its-repair-and-its-evidence) substituted for the repaired one, the same command reported 2 failing tests and 1 passing test.
