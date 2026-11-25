@@ -82,6 +82,8 @@ class ResearchClient:
             raise ResearchError("A reviewed skill response digest is required")
         self._digest = reviewed_digest
         self._model = header(model_name)
+        if self._key in self._model:
+            raise ResearchError("Credential must not appear in metadata")
         self._session = None
 
     def _call(self, operation, value=None):
@@ -105,7 +107,8 @@ class ResearchClient:
                 path = routes[operation]
             elif operation == "search":
                 if (not isinstance(value, str) or not value.strip()
-                        or len(value) > 300 or any(ord(c) < 32 or ord(c) == 127 for c in value)):
+                        or len(value) > 300 or any(ord(c) < 32 or ord(c) == 127 for c in value)
+                        or self._key in value or self._session in value):
                     raise ResearchError("Invalid public search term")
                 path = "/api/posts?" + urlencode({"search": value, "page": 1, "per_page": 20})
             elif operation == "post":
@@ -135,6 +138,7 @@ class ResearchClient:
             response = connection.getresponse()
             if response.status not in expected:
                 if response.status in (401, 403, 429):
+                    self._session = None  # Stop all requests, including cleanup.
                     raise ResearchError("SOFA rejected request (HTTP %d); stop and review" % response.status)
                 if 300 <= response.status < 400:
                     raise ResearchError("Unexpected redirect rejected")
@@ -227,8 +231,11 @@ def main():
         print(json.dumps({"untrustedResearch": result, "sessionSummary": summary},
                          ensure_ascii=True, indent=2, allow_nan=False))
         return 0
-    except (ResearchError, getpass.GetPassWarning, EOFError, KeyboardInterrupt, OSError):
-        print("SOFA research stopped; review scope, digest, authentication or transport.", file=sys.stderr)
+    except ResearchError as error:
+        print(str(error), file=sys.stderr)
+        return 1
+    except (getpass.GetPassWarning, EOFError, KeyboardInterrupt, OSError):
+        print("SOFA research stopped before completion.", file=sys.stderr)
         return 1
     finally:
         if client is not None:
