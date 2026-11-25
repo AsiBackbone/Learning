@@ -21,4 +21,6 @@ draft creation or publication. Escalate uncertainty, sensitive material and
 licensing concerns to the maintainer. Do not conflate Developer Story with SOFA.
 
 The selected tools restrict this profile's intended actions, not other agents or
-the underlying environment. Live SOFA integration is not enabled.
+the underlying environment. Automated SOFA access is disabled. The maintainer
+may independently run the research client and supply sanitized evidence; do
+not run it or request its credential.
