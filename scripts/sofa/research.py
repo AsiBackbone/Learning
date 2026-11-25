@@ -17,6 +17,20 @@ TIMEOUT = 15
 MAX_RESPONSE = 1024 * 1024
 DIGEST = re.compile(r"[0-9a-f]{64}")
 HEADER = re.compile(r"[!-~]{1,512}")
+DIAGNOSTIC_OPERATIONS = {
+    "skill": ("retrieve-skill", "GET /skill.md"),
+    "start": ("initialize-session", "POST /api/sessions"),
+    "identity": ("retrieve-identity", "GET /api/me/agents"),
+    "attention": ("retrieve-attention", "GET /api/me/attention"),
+    "search": ("search-posts", "GET /api/posts?search=<term>&page=1&per_page=20"),
+    "post": ("retrieve-post", "GET /api/posts/{post_id}"),
+    "summary": ("retrieve-session-summary", "GET /api/sessions/current/summary"),
+    "close": ("close-session", "DELETE /api/sessions/{session_id}"),
+}
+SOFA_ERROR_CODES = frozenset({
+    "missing_request_metadata", "invalid_request_metadata", "invalid_skill_digest",
+    "missing_session", "invalid_session", "unsupported_query_parameters",
+})
 
 
 class ResearchError(Exception):
@@ -76,7 +90,8 @@ def safe_result(data, *secrets):
 
 
 class ResearchClient:
-    def __init__(self, key, reviewed_digest, model_name):
+    def __init__(self, key, reviewed_digest, model_name, diagnostics=False):
+        self._diagnostics = diagnostics is True
         self._key = header(key)
         if not isinstance(reviewed_digest, str) or not DIGEST.fullmatch(reviewed_digest):
             raise ResearchError("A reviewed skill response digest is required")
@@ -85,6 +100,36 @@ class ResearchClient:
         if self._key in self._model:
             raise ResearchError("Credential must not appear in metadata")
         self._session = None
+        self._diagnostic("credential-input=accepted")
+
+    def _diagnostic(self, message):
+        if self._diagnostics:
+            print("[SOFA diagnostics] " + message, file=sys.stderr)
+
+    def _diagnostic_error_code(self, response):
+        """Emit only a documented machine code, never an error body or field value."""
+        try:
+            if response.getheader("Content-Encoding", "identity").lower() != "identity":
+                return
+            if response.getheader("Content-Type", "").split(";")[0].strip().lower() != "application/json":
+                return
+            length = response.getheader("Content-Length")
+            if length is not None and (not length.isascii() or not length.isdecimal()
+                                       or int(length) > MAX_RESPONSE):
+                return
+            raw = response.read(MAX_RESPONSE + 1)
+            if len(raw) > MAX_RESPONSE:
+                return
+            data = decode(raw)
+            if not isinstance(data, dict):
+                return
+            code = data.get("error")
+            if isinstance(data.get("detail"), dict):
+                code = data["detail"].get("error", code)
+            if code in SOFA_ERROR_CODES:
+                self._diagnostic("error-code=" + code)
+        except (ResearchError, AttributeError, TypeError, ValueError, OverflowError):
+            return
 
     def _call(self, operation, value=None):
         # No caller-supplied method, origin, path, headers or request body.
@@ -118,6 +163,9 @@ class ResearchClient:
             else:
                 raise ResearchError("Operation not allowed")
 
+        diagnostic_name, diagnostic_template = DIAGNOSTIC_OPERATIONS[operation]
+        self._diagnostic("operation=%s request=%s" % (diagnostic_name, diagnostic_template))
+
         headers = {"Accept": "text/plain" if operation == "skill" else "application/json",
                    "Accept-Encoding": "identity"}
         if operation != "skill":
@@ -136,7 +184,11 @@ class ResearchClient:
                 HOST, 443, timeout=TIMEOUT, context=ssl.create_default_context())
             connection.request(method, path, headers=headers)
             response = connection.getresponse()
+            self._diagnostic("operation=%s status=HTTP %d" %
+                             (diagnostic_name, response.status))
             if response.status not in expected:
+                if self._diagnostics:
+                    self._diagnostic_error_code(response)
                 if response.status in (401, 403, 429):
                     self._session = None  # Stop all requests, including cleanup.
                     raise ResearchError("SOFA rejected request (HTTP %d); stop and review" % response.status)
@@ -155,6 +207,7 @@ class ResearchClient:
             if operation == "skill":
                 if response.getheader("X-Sofa-Skill-Digest") != self._digest:
                     raise ResearchError("Skill digest changed or missing; review current contract")
+                self._diagnostic("skill-digest=accepted")
                 return None
             if operation == "close":
                 return None
@@ -174,6 +227,7 @@ class ResearchClient:
                     raise ResearchError("Invalid session expiry") from None
                 if data.get("activation_next_step"):
                     raise ResearchError("Unexpected activation handoff; verify agent scope")
+                self._diagnostic("session-initialization=succeeded")
                 return None
             return safe_result(data, self._key, self._session)
         except (OSError, http.client.HTTPException, ValueError, OverflowError):
@@ -208,6 +262,8 @@ def main():
                         help="Confirm separate key and dashboard scope were reviewed")
     parser.add_argument("--skill-digest", required=True)
     parser.add_argument("--model-name", required=True, help="Actual requesting agent model")
+    parser.add_argument("--diagnostics", action="store_true",
+                        help="Emit sanitized operation diagnostics to stderr")
     parser.add_argument("operation", choices=["identity", "attention", "search", "post"])
     parser.add_argument("value", nargs="?")
     args = parser.parse_args()
@@ -220,7 +276,7 @@ def main():
         with warnings.catch_warnings():
             warnings.simplefilter("error", getpass.GetPassWarning)
             key = getpass.getpass("Separate Observe only SOFA API key: ")
-        client = ResearchClient(key, args.skill_digest, args.model_name)
+        client = ResearchClient(key, args.skill_digest, args.model_name, args.diagnostics)
         client.start()
         result = client.research(args.operation, args.value)
         try:

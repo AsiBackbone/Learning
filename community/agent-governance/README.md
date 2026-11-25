@@ -181,13 +181,17 @@ links are a separate workflow.
    ```powershell
    $digest = 'REVIEWED_64_CHARACTER_DIGEST'
    $model = 'ACTUAL_REQUESTING_MODEL_NAME'
-   py -3 scripts/sofa/research.py --confirm-observe-only --skill-digest $digest --model-name $model identity
+   py -3 scripts/sofa/research.py --confirm-observe-only --skill-digest $digest --model-name $model --diagnostics identity
    ```
 
    The key is prompted for without echo. Inspect the returned agent metadata
    privately. Verify the intended agent and its effective privileges against
    the dashboard; stop if the identity or restrictions are ambiguous. The
    response may include metadata for other owned agents; do not share it.
+   The optional diagnostics report only fixed operation templates, HTTP status,
+   successful digest/session gates and documented allowlisted error codes. They
+   never print credentials, session IDs, dynamic paths, search terms or response
+   bodies. Omit `--diagnostics` to retain the original quiet behavior.
 4. Only after scope validation, run the following operations individually.
    Each invocation starts a new session, fetches an advisory summary when
    possible, and attempts cleanup. Use a real public post UUID from the search

@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
 import json
+from contextlib import redirect_stderr
+from io import StringIO
 import unittest
 from unittest.mock import MagicMock, patch
 from urllib.parse import parse_qs, urlsplit
@@ -170,6 +172,77 @@ class ResearchTests(unittest.TestCase):
                 self.client.research("attention")
             self.assertNotIn(KEY, str(error.exception))
             self.assertNotIn(SESSION, str(error.exception))
+
+    def test_diagnostics_are_opt_in_and_report_sanitized_progress(self):
+        self.queue(skill(), session(), response(data=[]))
+        quiet = StringIO()
+        with redirect_stderr(quiet):
+            self.client.start()
+            self.client.research("identity")
+        self.assertEqual(quiet.getvalue(), "")
+
+        self.queue(skill(), session(), response(data=[]))
+        output = StringIO()
+        with redirect_stderr(output):
+            self.client = ResearchClient(KEY, DIGEST, "test-model", diagnostics=True)
+            self.client.start()
+            self.client.research("identity")
+        diagnostics = output.getvalue()
+        for expected in (
+            "credential-input=accepted",
+            "operation=retrieve-skill request=GET /skill.md",
+            "operation=retrieve-skill status=HTTP 200",
+            "skill-digest=accepted",
+            "operation=initialize-session request=POST /api/sessions",
+            "operation=initialize-session status=HTTP 201",
+            "session-initialization=succeeded",
+            "operation=retrieve-identity request=GET /api/me/agents",
+            "operation=retrieve-identity status=HTTP 200",
+        ):
+            self.assertIn(expected, diagnostics)
+        self.assertNotIn(KEY, diagnostics)
+        self.assertNotIn(SESSION, diagnostics)
+
+    def test_diagnostics_use_templates_without_dynamic_values(self):
+        term = "SENSITIVE_SEARCH_TERM"
+        self.queue(skill(), session(), response(data=[]), response(data={}))
+        output = StringIO()
+        with redirect_stderr(output):
+            self.client = ResearchClient(KEY, DIGEST, "test-model", diagnostics=True)
+            self.client.start()
+            self.client.research("search", term)
+            self.client.research("post", POST)
+        diagnostics = output.getvalue()
+        self.assertIn("GET /api/posts?search=<term>&page=1&per_page=20", diagnostics)
+        self.assertIn("GET /api/posts/{post_id}", diagnostics)
+        for sensitive in (KEY, SESSION, POST, term):
+            self.assertNotIn(sensitive, diagnostics)
+
+    def test_diagnostics_emit_only_allowlisted_error_codes(self):
+        secret = "RAW_ERROR_DETAIL_DO_NOT_DISCLOSE"
+        self.queue(skill(), session(), response(
+            403, data={"detail": {"error": "invalid_session", "message": secret}}))
+        output = StringIO()
+        with redirect_stderr(output), self.assertRaises(ResearchError):
+            self.client = ResearchClient(KEY, DIGEST, "test-model", diagnostics=True)
+            self.client.start()
+            self.client.research("identity")
+        diagnostics = output.getvalue()
+        self.assertIn("error-code=invalid_session", diagnostics)
+        self.assertNotIn(secret, diagnostics)
+        self.assertNotIn(KEY, diagnostics)
+        self.assertNotIn(SESSION, diagnostics)
+
+        self.queue(skill(), session(), response(
+            403, data={"error": "private_unknown_code", "message": secret}))
+        output = StringIO()
+        with redirect_stderr(output), self.assertRaises(ResearchError):
+            self.client = ResearchClient(KEY, DIGEST, "test-model", diagnostics=True)
+            self.client.start()
+            self.client.research("identity")
+        diagnostics = output.getvalue()
+        self.assertNotIn("private_unknown_code", diagnostics)
+        self.assertNotIn(secret, diagnostics)
 
     def test_retrieved_content_is_data_only(self):
         self.started()
