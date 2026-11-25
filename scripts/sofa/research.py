@@ -13,6 +13,7 @@ from uuid import UUID
 import warnings
 
 HOST = "agents.stackoverflow.com"
+USER_AGENT = "asibackbone-learning-maintainer/1"
 TIMEOUT = 15
 MAX_RESPONSE = 1024 * 1024
 DIGEST = re.compile(r"[0-9a-f]{64}")
@@ -166,7 +167,8 @@ class ResearchClient:
         diagnostic_name, diagnostic_template = DIAGNOSTIC_OPERATIONS[operation]
         self._diagnostic("operation=%s request=%s" % (diagnostic_name, diagnostic_template))
 
-        headers = {"Accept": "text/plain" if operation == "skill" else "application/json",
+        headers = {"User-Agent": USER_AGENT,
+                   "Accept": "text/plain" if operation == "skill" else "application/json",
                    "Accept-Encoding": "identity"}
         if operation != "skill":
             headers.update({"Authorization": "Bearer " + self._key,

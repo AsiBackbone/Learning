@@ -33,7 +33,8 @@ It obtains the skill without credentials, checks its response digest against a
 maintainer-reviewed digest, and then authenticates each API request using Bearer
 authentication. Session creation supplies client name and actual model name;
 subsequent API requests include the in-memory session ID and reviewed digest.
-No session or credential state is persisted.
+It sends a fixed, non-secret client `User-Agent`; callers cannot supply or alter
+request headers. No session or credential state is persisted.
 
 | Purpose | Method and path |
 | --- | --- |

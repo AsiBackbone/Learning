@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 from urllib.parse import parse_qs, urlsplit
 
-from research import HOST, MAX_RESPONSE, TIMEOUT, ResearchClient, ResearchError
+from research import HOST, MAX_RESPONSE, TIMEOUT, USER_AGENT, ResearchClient, ResearchError
 
 KEY = "synthetic-read-only-key"
 DIGEST = "a" * 64
@@ -68,6 +68,8 @@ class ResearchTests(unittest.TestCase):
                          {"search": ["C# & page=99"], "page": ["1"], "per_page": ["20"]})
         self.assertNotIn("Authorization", calls[0].kwargs["headers"])
         self.assertNotIn("X-Sofa-Session", calls[1].kwargs["headers"])
+        for call in calls:
+            self.assertEqual(call.kwargs["headers"]["User-Agent"], USER_AGENT)
         self.assertEqual(calls[1].kwargs["headers"]["X-Sofa-Model-Name"], "test-model")
         self.assertEqual(calls[1].kwargs["headers"]["X-Sofa-Client-Name"],
                          "asibackbone-learning-maintainer")
