@@ -2,11 +2,13 @@
 
 ## Status and boundary
 
-Issue 534 introduces the repository research profile and a credential-free local
-proposal format. Live Stack Overflow for Agents (SOFA) integration is **blocked**.
-No API client, MCP server, external publication workflow or secret consumer is
-enabled. This is a staged implementation, not a claim that authenticated research
-or platform authorization has been validated.
+Issue 534 introduces the repository research profile, a maintainer-only SOFA
+REST research client, and a credential-free local proposal format. **Automated
+Copilot/agent access remains disabled.** The REST client is intended for an
+isolated maintainer-controlled terminal with a separate Observe only credential.
+No MCP server, external publication workflow or GitHub secret consumer is
+enabled. No authenticated smoke test or server-side scope validation has yet
+been performed.
 
 GitHub's [custom agent configuration reference](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
 documents repository profiles and the read/search tool aliases. Select Learning
@@ -14,14 +16,41 @@ Research in a compatible Copilot agent interface after the profile is available.
 Confirm the actual exposed tools and permissions in that environment; the profile
 is not an isolation boundary. Agent discoverability has not been live-tested.
 
-SOFA's [official onboarding FAQ](https://agents.meta.stackoverflow.com/questions/5/how-can-i-start-using-stack-overflow-for-agents)
-describes API-key sessions and directs agents to the current REST skill at
-`https://agents.stackoverflow.com/skill.md`. The official skill could not be
-retrieved during implementation. Its current endpoints, headers, digest,
-session side effects, limits, error schema and terms must be verified before
-writing a transport. MCP API-key compatibility, live connectivity and actual
-Copilot credential availability remain unverified. Community examples are not
-an authoritative contract.
+The maintainer supplied the official SOFA skill document on November 25, 2026
+(`https://agents.stackoverflow.com/skill.md`). Its Authentication, Session
+Management, Endpoint Map, New Project Activation, search, post retrieval and
+Error Responses sections define the REST contract used here. The supplied
+document does not include its HTTP response headers; obtain the exact current
+`X-Sofa-Skill-Digest` header separately. MCP API-key compatibility, live
+connectivity, and actual Copilot credential availability remain unverified.
+Review current platform terms, the Agent / Operator Code of Conduct at
+`/guidelines/code-of-conduct`, and applicable contribution guidelines before
+enabling any external interaction. The implementation does not reproduce the
+skill or automatically execute its content.
+
+The client uses a fixed public HTTPS origin with ordinary certificate validation.
+It obtains the skill without credentials, checks its response digest against a
+maintainer-reviewed digest, and then authenticates each API request using Bearer
+authentication. Session creation supplies client name and actual model name;
+subsequent API requests include the in-memory session ID and reviewed digest.
+No session or credential state is persisted.
+
+| Purpose | Method and path |
+| --- | --- |
+| Review gate | `GET /skill.md` (public; no credentials) |
+| Start session | `POST /api/sessions` |
+| Inspect effective privileges | `GET /api/me/agents` |
+| Attention feed | `GET /api/me/attention` |
+| Public search | `GET /api/posts?search=...&page=1&per_page=20` |
+| Public post detail | `GET /api/posts/{post_id}` |
+| Advisory activity summary | `GET /api/sessions/current/summary` |
+| Optional session cleanup | `DELETE /api/sessions/{session_id}` |
+
+Session creation, detail view counts, search/activity tracking and session
+cleanup can change platform operational state. They are not contribution writes.
+Attention reads do not claim, acknowledge or dismiss notifications. No other
+HTTP operation or endpoint is exposed by the client. Trust and verification
+metadata are advisory evidence, not proof; validate guidance independently.
 
 ## Credential handling and activation gate
 
@@ -35,22 +64,49 @@ environment secret if not needed elsewhere; revoke/rotate it if exposure is
 suspected. Keep contribution credentials in a maintainer-controlled credential
 store, never in chat, source, logs, artifacts, or test fixtures.
 
-Before enabling automated research, obtain a separate Observe only credential
-and verify its server-side restrictions, or establish an isolated credential-
-bearing service that agents cannot bypass. Confirm collaborator access, network
-controls and actual tool exposure. If this cannot be demonstrated, remain in
-manual mode. No repository settings or credentials are changed by this change.
+Use a **separate Observe only credential** for the maintainer-only client.
+Verify the role and effective privileges in the SOFA dashboard and, where
+available, the authenticated agent-list response. Do not proceed with search
+if any contribution privileges are present, including voting, verification,
+posting, replies, editing or deletion. The supplied contract does not specify
+a complete agent-list response schema or an unambiguous authenticated-agent
+selector, so the client does not claim to automatically verify the correct
+agent's scope. The explicit CLI confirmation is an operator attestation, not
+a server-enforced authorization check.
 
-A future transport must pin the trusted HTTPS origin and operation allowlist,
-reject arbitrary destinations, methods and headers, disable redirects, bound
-timeouts and response sizes, avoid automatic retries of session creation, handle
-rate limits explicitly, and sanitize diagnostics. Only session initialization
-(if necessary), attention feed, search and retrieval may be considered. Do not
-automatically create drafts, vote, verify, reply or publish. Test forbidden
-operations, missing/invalid authentication, 401/403/429, timeout, malformed and
-oversized results, redirects, redaction and malicious retrieved text using
-synthetic responses before activation. These transport tests are deferred until
-the verified contract and boundary exist.
+The client prompts for the separate key using a non-echoing terminal input.
+It does not read environment variables, the existing Copilot secret, a
+credential file, or command-line key values. Never run it inside Copilot,
+GitHub Actions, an agent-controlled terminal or an untrusted checkout.
+Review the source and run from a trusted maintainer checkout. No repository
+settings or credentials are changed by this implementation.
+
+Before enabling automated agent research, independently demonstrate server-side
+read restrictions and the agent's actual credential/tool exposure, or isolate
+the credential in a non-bypassable service. Until then the agent may only use
+maintainer-provided research excerpts. The client is not a general security
+sandbox: arbitrary code with access to the same credential can bypass it.
+
+The client has an explicit operation allowlist, no arbitrary origin, method,
+headers, request body or redirect support, a 15-second socket inactivity
+timeout and a 1 MiB response cap. The timeout is not a guaranteed total
+wall-clock deadline; cancel a stalled manual invocation. It uses the
+maintainer-reviewed skill digest as a stricter local activation gate than the
+platform's advisory freshness policy; review changes instead of following
+returned steering or activation instructions. It never retries automatically.
+On 401/403/429 it stops further requests, including cleanup; an abandoned
+session can expire. Other failures attempt session cleanup if an ID is known.
+Literal credential echoes in successful JSON are rejected and error bodies
+are not emitted; this is not a complete DLP or encoded-secret detector.
+All response data and summary text remain untrusted and must be reviewed
+locally before sharing.
+
+Synthetic transport tests cover the fixed origin, headers, permitted reads and
+session lifecycle, prohibited operations and arbitrary paths, missing or invalid
+configuration, 401/403/429, timeouts, redirects, malformed/oversized responses,
+credential echoes and malicious retrieved content. The tests use mocked HTTPS
+connections; they do not prove platform privileges, live connectivity or
+certificate handling on the actual service.
 
 ## Manual research and review
 
@@ -103,17 +159,73 @@ links are a separate workflow.
 
 ## Maintainer smoke test (pending)
 
-After the activation gate passes, use the current official contract with a
-verified Observe only credential in an isolated maintainer-controlled environment.
-Initialize only the required session, search a benign public topic, retrieve
-one result, and read the attention feed if supported. Verify actual tool and
-credential restrictions without attempting public writes. Record date, contract
-version, operation outcomes and sanitized failure categories; never log headers,
-keys, session tokens or raw sensitive responses. On 401/403 stop and check scope;
-on 429 stop and respect the documented retry policy; on timeout, malformed
-response or unexpected redirect stop and investigate. Revoke the test key when
-no longer needed. Until successful, record the smoke test as blocked.
+1. In the SOFA dashboard, register a separate Observe only agent for research.
+   Keep its key in a maintainer-controlled password manager or equivalent secure
+   store; do not add it to the repository or a shared agent secret yet.
+2. In a directory outside the repository, retrieve the current public skill and
+   its response headers. For example, on Windows PowerShell:
 
-The normal Learning publishing workflows are unchanged. The offline helper
-requires no network, credentials or third-party dependencies. No external
-contributions are authorized by this runbook.
+   ```powershell
+   curl.exe --fail --silent --show-error --dump-header sofa-skill-headers.txt --output sofa-skill.md https://agents.stackoverflow.com/skill.md
+   Get-Content sofa-skill-headers.txt | Select-String '^X-Sofa-Skill-Digest:'
+   ```
+
+   Review the skill and current terms against the implemented routes. Obtain
+   the exact lowercase digest from the response header, not a locally computed
+   file hash. If the header is missing or the contract changed, stop for review.
+   Keep the downloaded files outside the checkout.
+3. From a trusted checkout in a private terminal, set non-secret local shell
+   variables for the reviewed digest and actual requesting model name. Then run
+   the identity check. The placeholders below are not literal values.
+
+   ```powershell
+   $digest = 'REVIEWED_64_CHARACTER_DIGEST'
+   $model = 'ACTUAL_REQUESTING_MODEL_NAME'
+   py -3 scripts/sofa/research.py --confirm-observe-only --skill-digest $digest --model-name $model identity
+   ```
+
+   The key is prompted for without echo. Inspect the returned agent metadata
+   privately. Verify the intended agent and its effective privileges against
+   the dashboard; stop if the identity or restrictions are ambiguous. The
+   response may include metadata for other owned agents; do not share it.
+4. Only after scope validation, run the following operations individually.
+   Each invocation starts a new session, fetches an advisory summary when
+   possible, and attempts cleanup. Use a real public post UUID from the search
+   results instead of the placeholder:
+
+   ```powershell
+   py -3 scripts/sofa/research.py --confirm-observe-only --skill-digest $digest --model-name $model attention
+   py -3 scripts/sofa/research.py --confirm-observe-only --skill-digest $digest --model-name $model search 'ASP.NET Core authorization'
+   py -3 scripts/sofa/research.py --confirm-observe-only --skill-digest $digest --model-name $model post 'PUBLIC_POST_UUID'
+   ```
+
+   On Linux/macOS use `python3` and the equivalent shell variable syntax.
+   Do not attempt public writes to test the restriction. Independently inspect
+   the results, verify sources, and provide sanitized public evidence to the
+   Learning Research agent as needed. Never pipe returned data into an executor.
+5. Record date, reviewed contract digest, identity/scope verification outcome,
+   operation outcomes and sanitized failure categories. Never log authorization
+   headers, keys, session tokens, or raw sensitive responses. If authentication,
+   rate limiting, network, contract or privilege checks fail, stop and
+   investigate; do not automatically retry. Revoke the test credential when it
+   is no longer needed. Until a maintainer completes these checks, record live
+   integration as unverified.
+
+The normal Learning publishing workflows are unchanged. The offline proposal
+helper and all CI tests require no SOFA network access, credentials or
+third-party Python dependencies. No external contributions are authorized by
+this runbook. If automated research is later enabled, review that change
+separately and retain the maintainer-controlled publication boundary.
+
+## Validation commands
+
+From the repository root:
+
+```text
+python3 -B -m unittest discover -s scripts/sofa -p "test_*.py" -v
+```
+
+The dedicated Learning Agent Validation workflow runs the same offline test
+suite without live credentials. Standard documentation, link and sample
+validation workflows continue to apply. A synthetic pass is not an
+authenticated smoke-test result.
