@@ -200,9 +200,12 @@ reordering is reviewable rather than hidden.
 In addition to the ranking metadata described above, output includes only UUID,
 title, tags, projected trust score and the public question URL. It omits body
 excerpts, steering content and all other response fields. Titles and tags remain
-untrusted public data and require independent review. The allowlisted project
-signals are maintained in `ranking.py`; update them only when repository scope
-changes and add regression coverage for the intended match.
+untrusted public data and require independent review. Malformed individual tag
+values are omitted from the bounded output rather than disclosed or allowed to
+abort an otherwise valid listing; an oversized tag collection still fails
+closed. The allowlisted project signals are maintained in `ranking.py`; update
+them only when repository scope changes and add regression coverage for the
+intended match.
 
 After obtaining the current reviewed digest as described in the smoke-test
 procedure, run from a trusted private terminal. For example, on Windows:

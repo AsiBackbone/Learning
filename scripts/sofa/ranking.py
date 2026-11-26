@@ -62,6 +62,20 @@ def _trust_score(summary):
     return score
 
 
+def _normalized_tags(values):
+    if not isinstance(values, list) or len(values) > MAX_TAGS:
+        raise ResearchError("Invalid ranked question tags")
+    result = []
+    for value in values:
+        if (not isinstance(value, str) or not value.strip() or len(value) > MAX_TAG
+                or any(ord(character) < 32 or ord(character) == 127
+                       for character in value)):
+            continue
+        if value not in result:
+            result.append(value)
+    return result
+
+
 def _project_matches(title, tags):
     normalized_title = " " + re.sub(r"[^a-z0-9+#.]+", " ", title.casefold()).strip() + " "
     normalized_tags = {value.casefold() for value in tags}
@@ -107,10 +121,7 @@ def normalize_listing(data, ranking, candidate_limit, result_limit=10, tag=None)
         if post_id in identifiers:
             raise ResearchError("Duplicate ranked question identifier")
         identifiers.add(post_id)
-        tags = item.get("tags", [])
-        if not isinstance(tags, list) or len(tags) > MAX_TAGS:
-            raise ResearchError("Invalid ranked question tags")
-        clean_tags = [_text(value, "tag", MAX_TAG) for value in tags]
+        clean_tags = _normalized_tags(item.get("tags", []))
         title = _text(item.get("title"), "title", MAX_TITLE)
         projects, signals = _project_matches(title, clean_tags)
         organization_weight = ORGANIZATION_WEIGHT if projects else 0
