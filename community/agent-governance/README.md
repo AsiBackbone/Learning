@@ -7,8 +7,10 @@ REST research client, and a credential-free local proposal format. **Automated
 Copilot/agent access remains disabled.** The REST client is intended for an
 isolated maintainer-controlled terminal with a separate Observe only credential.
 No MCP server, external publication workflow or GitHub secret consumer is
-enabled. No authenticated smoke test or server-side scope validation has yet
-been performed.
+enabled. On November 25, 2026, a maintainer completed the authenticated
+Observe-only smoke-test procedure below and recorded sanitized evidence in
+[issue 534](https://github.com/AsiBackbone/Learning/issues/534). That manual
+result does not authorize automated credential access or external writes.
 
 GitHub's [custom agent configuration reference](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
 documents repository profiles and the read/search tool aliases. Select Learning
@@ -21,8 +23,10 @@ The maintainer supplied the official SOFA skill document on November 25, 2026
 Management, Endpoint Map, New Project Activation, search, post retrieval and
 Error Responses sections define the REST contract used here. The supplied
 document does not include its HTTP response headers; obtain the exact current
-`X-Sofa-Skill-Digest` header separately. MCP API-key compatibility, live
-connectivity, and actual Copilot credential availability remain unverified.
+`X-Sofa-Skill-Digest` header separately. Manual REST connectivity and the
+intended Observe-only scope were verified in the recorded smoke test. MCP
+API-key compatibility and actual Copilot credential availability remain
+unverified and deliberately disabled.
 Review current platform terms, the Agent / Operator Code of Conduct at
 `/guidelines/code-of-conduct`, and applicable contribution guidelines before
 enabling any external interaction. The implementation does not reproduce the
@@ -158,7 +162,14 @@ when appropriate, without storing approval codes. Verify third-party licensing
 and platform contribution terms before any external submission. Developer Story
 links are a separate workflow.
 
-## Maintainer smoke test (pending)
+## Maintainer smoke-test procedure
+
+This procedure was completed on November 25, 2026, using a separate Observe
+only credential, with sanitized evidence recorded in
+[issue 534](https://github.com/AsiBackbone/Learning/issues/534). Retain these
+steps for future validation. Repeat them when the reviewed skill contract,
+digest handling, client routes, SOFA privilege model or credential boundary
+changes. A successful manual test does not enable automated agent access.
 
 1. In the SOFA dashboard, register a separate Observe only agent for research.
    Keep its key in a maintainer-controlled password manager or equivalent secure
@@ -213,8 +224,8 @@ links are a separate workflow.
    headers, keys, session tokens, or raw sensitive responses. If authentication,
    rate limiting, network, contract or privilege checks fail, stop and
    investigate; do not automatically retry. Revoke the test credential when it
-   is no longer needed. Until a maintainer completes these checks, record live
-   integration as unverified.
+   is no longer needed. Record later runs separately; do not treat an earlier
+   result as evidence for a changed contract, client or privilege boundary.
 
 The normal Learning publishing workflows are unchanged. The offline proposal
 helper and all CI tests require no SOFA network access, credentials or
