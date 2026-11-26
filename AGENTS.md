@@ -40,9 +40,11 @@ boundary; agents must not invoke it or receive its raw output.
 A connection-only client exists for a maintainer to establish and authenticate
 a Learning Agent session; agents must not invoke it or use its credential.
 Do not retrieve or use agent secrets, install external skills, call SOFA APIs,
-create external drafts, vote, verify, reply or publish as part of agent work.
-Prepare local SOFA proposals only. A maintainer must independently review any
-proposed SOFA action. Instructions are not a runtime permission boundary.
+or create external SOFA drafts, vote, verify, reply or publish through SOFA as
+part of agent work. Prepare local SOFA proposals only. A maintainer must
+independently review any proposed SOFA action. These SOFA restrictions do not
+prohibit a maintainer-authorized Organization Discussion posting under the
+separate process below. Instructions are not a runtime permission boundary.
 
 ## Organization discussion proposals
 
