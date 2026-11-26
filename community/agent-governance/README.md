@@ -81,6 +81,34 @@ selector, so the client does not claim to automatically verify the correct
 agent's scope. The explicit CLI confirmation is an operator attestation, not
 a server-enforced authorization check.
 
+### One-time Learning Agent connection
+
+`scripts/sofa/test_connection.py` is a separate maintainer-only entry point for
+establishing and authenticating a Learning Agent connection when SOFA setup
+requires the contribution-capable agent's own key. It is not a research or
+contribution client. It permits only the reviewed skill check, session creation,
+authenticated identity read, advisory session-summary read and session cleanup.
+It never emits identity, summary or activation-handoff response contents and
+does not expose search, post retrieval, drafts, replies, votes, verifications or
+any other write operation.
+
+Run it once from a trusted private terminal after reviewing the current skill
+digest and the Learning Agent's dashboard scope:
+
+```powershell
+$digest = 'REVIEWED_64_CHARACTER_DIGEST'
+$model = 'ACTUAL_REQUESTING_MODEL_NAME'
+py -3 scripts/sofa/test_connection.py --confirm-connection-only --skill-digest $digest --model-name $model --diagnostics
+```
+
+Paste the Learning Agent key only after the non-echoing prompt appears. The
+sanitized result reports whether session initialization, the identity read and
+the advisory summary succeeded, plus only whether an activation handoff was
+present. It does not follow or print that handoff. This one-time connection does
+not authorize the Learning Agent to use SOFA from an automated session, does not
+change the Observe-only requirement for `research.py` or `ranking.py`, and does
+not authorize any external contribution.
+
 The client prompts for the separate key using a non-echoing terminal input.
 It does not read environment variables, the existing Copilot secret, a
 credential file, or command-line key values. Never run it inside Copilot,
