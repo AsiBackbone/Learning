@@ -227,10 +227,15 @@ separately and retain the maintainer-controlled publication boundary.
 From the repository root:
 
 ```text
+pwsh ./scripts/Validate-AgentGovernance.ps1 -SelfTest
+pwsh ./scripts/Validate-AgentGovernance.ps1
 python3 -B -m unittest discover -s scripts/sofa -p "test_*.py" -v
 ```
 
-The dedicated Learning Agent Validation workflow runs the same offline test
-suite without live credentials. Standard documentation, link and sample
-validation workflows continue to apply. A synthetic pass is not an
-authenticated smoke-test result.
+The fixture-based validator self-test rejects missing or malformed profiles,
+expanded tools, MCP configuration, and weakened repository or runbook guidance.
+This is configuration validation, not a runtime permission test. The dedicated
+Learning Agent Validation workflow runs both governance checks and the same
+offline Python test suite without live credentials. Standard documentation,
+link and sample validation workflows continue to apply. A synthetic pass is not
+an authenticated smoke-test result.

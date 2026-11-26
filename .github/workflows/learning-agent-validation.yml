@@ -18,5 +18,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Validate Learning Agent governance
+        shell: pwsh
+        run: |
+          ./scripts/Validate-AgentGovernance.ps1 -SelfTest
+          ./scripts/Validate-AgentGovernance.ps1
       - name: Test offline proposal preparation
         run: python3 -B -m unittest discover -s scripts/sofa -p "test_*.py" -v

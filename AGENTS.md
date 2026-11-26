@@ -38,3 +38,8 @@ Do not retrieve or use agent secrets, install external skills, call SOFA APIs,
 create external drafts, vote, verify, reply or publish as part of agent work.
 Prepare local proposals only. A maintainer must independently review any proposed
 external action. Instructions are not a runtime permission boundary.
+
+For Learning Agent governance changes, run
+`pwsh ./scripts/Validate-AgentGovernance.ps1 -SelfTest` followed by
+`pwsh ./scripts/Validate-AgentGovernance.ps1`. The first command proves weakened
+fixtures fail closed; the second validates the live profile and guidance.
