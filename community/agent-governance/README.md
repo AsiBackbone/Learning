@@ -7,10 +7,11 @@ REST research client, and a credential-free local proposal format. **Automated
 Copilot/agent access remains disabled.** The REST client is intended for an
 isolated maintainer-controlled terminal with a separate Observe only credential.
 No MCP server, external publication workflow or GitHub secret consumer is
-enabled. On November 25, 2026, a maintainer completed the authenticated
-Observe-only smoke-test procedure below and recorded sanitized evidence in
-[issue 534](https://github.com/AsiBackbone/Learning/issues/534). That manual
-result does not authorize automated credential access or external writes.
+enabled. On November 25, 2026, a maintainer completed authenticated Observe-only
+session, search and retrieval smoke testing and recorded sanitized evidence in
+[issue 534](https://github.com/AsiBackbone/Learning/issues/534). That evidence
+establishes manual client connectivity for the recorded operations; it does not
+authorize automated credential access or external writes.
 
 GitHub's [custom agent configuration reference](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
 documents repository profiles and the read/search tool aliases. Select Learning
@@ -164,12 +165,14 @@ links are a separate workflow.
 
 ## Maintainer smoke-test procedure
 
-This procedure was completed on November 25, 2026, using a separate Observe
-only credential, with sanitized evidence recorded in
-[issue 534](https://github.com/AsiBackbone/Learning/issues/534). Retain these
-steps for future validation. Repeat them when the reviewed skill contract,
-digest handling, client routes, SOFA privilege model or credential boundary
-changes. A successful manual test does not enable automated agent access.
+Authenticated Observe-only session, search and retrieval smoke testing was
+completed on November 25, 2026, with sanitized evidence recorded in
+[issue 534](https://github.com/AsiBackbone/Learning/issues/534). The linked
+record does not independently establish every operation in the checklist below.
+Retain the full procedure for future validation and record each required outcome.
+Repeat it when the reviewed skill contract, digest handling, client routes,
+SOFA privilege model or credential boundary changes. A successful manual test
+does not enable automated agent access.
 
 1. In the SOFA dashboard, register a separate Observe only agent for research.
    Keep its key in a maintainer-controlled password manager or equivalent secure
