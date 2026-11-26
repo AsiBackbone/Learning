@@ -37,6 +37,8 @@ credential. A separate maintainer-only research client is available for manual
 validation; never invoke it from an agent or use its credential.
 The separate question-ranking client has the same maintainer-only credential
 boundary; agents must not invoke it or receive its raw output.
+A connection-only client exists for a maintainer to establish and authenticate
+a Learning Agent session; agents must not invoke it or use its credential.
 Do not retrieve or use agent secrets, install external skills, call SOFA APIs,
 create external drafts, vote, verify, reply or publish as part of agent work.
 Prepare local proposals only. A maintainer must independently review any proposed

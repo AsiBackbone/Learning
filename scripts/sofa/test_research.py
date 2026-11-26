@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 from urllib.parse import parse_qs, urlsplit
 
+import test_connection
 from research import HOST, MAX_RESPONSE, TIMEOUT, USER_AGENT, ResearchClient, ResearchError
 
 KEY = "synthetic-read-only-key"
@@ -148,6 +149,64 @@ class ResearchTests(unittest.TestCase):
                 self.queue(skill(), session(**invalid))
                 with self.assertRaises(ResearchError):
                     self.client.start()
+
+    def test_connection_cli_accepts_activation_without_disclosing_responses(self):
+        activation = "untrusted activation instructions"
+        identity = {"private": "owned agent metadata"}
+        summary = {"compact_text": "private summary"}
+        self.queue(skill(), session(activation_next_step=activation),
+                   response(data=identity), response(data=summary),
+                   response(204, raw=b""))
+        terminal_in = StringIO()
+        terminal_in.isatty = MagicMock(return_value=True)
+        terminal_err = StringIO()
+        terminal_err.isatty = MagicMock(return_value=True)
+        output = StringIO()
+        arguments = [
+            "test_connection.py", "--confirm-connection-only",
+            "--skill-digest", DIGEST, "--model-name", "test-model",
+            "--diagnostics",
+        ]
+        with (patch.object(test_connection.sys, "argv", arguments),
+              patch.object(test_connection.sys, "stdin", terminal_in),
+              patch.object(test_connection.sys, "stderr", terminal_err),
+              patch.object(test_connection.sys, "stdout", output),
+              patch.object(test_connection.getpass, "getpass", return_value=KEY)):
+            self.assertEqual(test_connection.main(), 0)
+
+        result = json.loads(output.getvalue())
+        self.assertEqual(result, {"connectionTest": {
+            "sessionInitialized": True,
+            "identityRead": True,
+            "activationHandoffPresent": True,
+            "summaryRead": True,
+        }})
+        combined = output.getvalue() + terminal_err.getvalue()
+        for sensitive in (KEY, SESSION, activation, "owned agent metadata", "private summary"):
+            self.assertNotIn(sensitive, combined)
+        self.assertIn("activation-handoff=present", terminal_err.getvalue())
+        calls = self.conn.request.call_args_list
+        self.assertEqual([(call.args[0], urlsplit(call.args[1]).path) for call in calls], [
+            ("GET", "/skill.md"), ("POST", "/api/sessions"),
+            ("GET", "/api/me/agents"),
+            ("GET", "/api/sessions/current/summary"),
+            ("DELETE", "/api/sessions/" + SESSION),
+        ])
+
+    def test_connection_cli_requires_manual_confirmation_without_prompting(self):
+        terminal = StringIO()
+        terminal.isatty = MagicMock(return_value=True)
+        arguments = [
+            "test_connection.py", "--skill-digest", DIGEST,
+            "--model-name", "test-model",
+        ]
+        with (patch.object(test_connection.sys, "argv", arguments),
+              patch.object(test_connection.sys, "stdin", terminal),
+              patch.object(test_connection.sys, "stderr", terminal),
+              patch.object(test_connection.getpass, "getpass") as prompt):
+            self.assertEqual(test_connection.main(), 1)
+        prompt.assert_not_called()
+        self.conn.request.assert_not_called()
 
     def test_redirect_timeout_invalid_json_and_oversized_response(self):
         self.started()

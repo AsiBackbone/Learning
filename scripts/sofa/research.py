@@ -252,10 +252,13 @@ class ResearchClient:
                         raise ValueError()
                 except (KeyError, TypeError, AttributeError, ValueError, OverflowError):
                     raise ResearchError("Invalid session expiry") from None
-                if data.get("activation_next_step"):
+                activation_handoff = bool(data.get("activation_next_step"))
+                if activation_handoff and value is not True:
                     raise ResearchError("Unexpected activation handoff; verify agent scope")
                 self._diagnostic("session-initialization=succeeded")
-                return None
+                if activation_handoff:
+                    self._diagnostic("activation-handoff=present")
+                return activation_handoff
             return safe_result(data, self._key, self._session)
         except (OSError, http.client.HTTPException, ValueError, OverflowError):
             raise ResearchError("SOFA transport or response failure") from None
@@ -263,9 +266,9 @@ class ResearchClient:
             if connection is not None:
                 connection.close()
 
-    def start(self):
+    def start(self, allow_activation_handoff=False):
         self._call("skill")
-        self._call("start")
+        return self._call("start", allow_activation_handoff is True)
 
     def research(self, operation, value=None):
         if operation not in {"identity", "attention", "search", "post"}:
