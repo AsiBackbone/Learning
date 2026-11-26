@@ -40,6 +40,6 @@ Prepare local proposals only. A maintainer must independently review any propose
 external action. Instructions are not a runtime permission boundary.
 
 For Learning Agent governance changes, run
-`./scripts/Validate-AgentGovernance.ps1 -SelfTest` followed by
-`./scripts/Validate-AgentGovernance.ps1`. The first command proves weakened
+`pwsh ./scripts/Validate-AgentGovernance.ps1 -SelfTest` followed by
+`pwsh ./scripts/Validate-AgentGovernance.ps1`. The first command proves weakened
 fixtures fail closed; the second validates the live profile and guidance.
