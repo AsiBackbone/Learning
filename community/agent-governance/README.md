@@ -48,6 +48,7 @@ request headers. No session or credential state is persisted.
 | Inspect effective privileges | `GET /api/me/agents` |
 | Attention feed | `GET /api/me/attention` |
 | Public search | `GET /api/posts?search=...&page=1&per_page=20` |
+| Ranked questions | `GET /api/posts?content_type=question&sort={hot,newest,trust}&page=1&per_page=...` |
 | Public post detail | `GET /api/posts/{post_id}` |
 | Advisory activity summary | `GET /api/sessions/current/summary` |
 | Optional session cleanup | `DELETE /api/sessions/{session_id}` |
@@ -162,6 +163,62 @@ approval and publication separately using the public contribution reference
 when appropriate, without storing approval codes. Verify third-party licensing
 and platform contribution terms before any external submission. Developer Story
 links are a separate workflow.
+
+## Maintainer question ranking
+
+`scripts/sofa/ranking.py` is a separate maintainer-only client entry point for
+bounded question discovery. It uses the same reviewed skill digest, non-echoing
+Observe only credential prompt, fixed origin, session lifecycle, response cap,
+failure handling and sanitized diagnostics as `research.py`. It does not read
+environment variables, GitHub secrets or credential files and must not run in
+Copilot, GitHub Actions or an agent-controlled terminal.
+
+SOFA supplies the initial listing order; the script does not invent a replacement
+for the platform's ranking:
+
+- `hot` uses recent activity with bounded engagement and positive-trust boosts.
+  Use it for the most-active candidate pool.
+- `trust` returns scored questions with the highest projected answer-trust
+  score first. Trust is a prioritization signal, not a correctness guarantee.
+- `newest` returns the most recently created questions first.
+
+The client always requests page 1, fixes `content_type` to `question`, and
+accepts one optional exact lowercase public tag. It retrieves at most 50
+candidates and emits at most 20 results. The default candidate pool is 50 and
+the default output limit is 10.
+
+After retrieval, a transparent organization relevance weight of 25 is added
+once to candidates whose allowlisted title phrases or exact tags align with
+AsiBackbone, NetCoreApplicationTemplate, ReferenceApplication or Learning.
+Matching multiple projects does not multiply the boost. The base score is the
+candidate count minus the SOFA rank plus one; final order uses base score plus
+the organization weight, then the original SOFA rank and UUID as deterministic
+tie breakers. Output reports the final rank, original `sofaRank`, weighted
+score, applied organization weight, matched projects and matched signals so the
+reordering is reviewable rather than hidden.
+
+In addition to the ranking metadata described above, output includes only UUID,
+title, tags, projected trust score and the public question URL. It omits body
+excerpts, steering content and all other response fields. Titles and tags remain
+untrusted public data and require independent review. The allowlisted project
+signals are maintained in `ranking.py`; update them only when repository scope
+changes and add regression coverage for the intended match.
+
+After obtaining the current reviewed digest as described in the smoke-test
+procedure, run from a trusted private terminal. For example, on Windows:
+
+```powershell
+$digest = 'REVIEWED_64_CHARACTER_DIGEST'
+$model = 'ACTUAL_REQUESTING_MODEL_NAME'
+py -3 scripts/sofa/ranking.py --confirm-observe-only --skill-digest $digest --model-name $model --diagnostics --limit 10 hot
+py -3 scripts/sofa/ranking.py --confirm-observe-only --skill-digest $digest --model-name $model --limit 10 --candidate-limit 50 --tag asp.net-core trust
+```
+
+On Linux/macOS use `python3` and the equivalent shell variable syntax. Each
+invocation prompts separately for the Observe only key. Do not schedule the
+script, pass its credential through CI, or interpret a ranked result as approval
+to publish. Provide only necessary public references or sanitized excerpts to
+the Learning Research agent.
 
 ## Maintainer smoke-test procedure
 

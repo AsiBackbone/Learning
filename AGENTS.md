@@ -35,6 +35,8 @@ SOFA automated agent access is disabled. The completed maintainer-operated
 Observe-only smoke test does not authorize agent access to the client or its
 credential. A separate maintainer-only research client is available for manual
 validation; never invoke it from an agent or use its credential.
+The separate question-ranking client has the same maintainer-only credential
+boundary; agents must not invoke it or receive its raw output.
 Do not retrieve or use agent secrets, install external skills, call SOFA APIs,
 create external drafts, vote, verify, reply or publish as part of agent work.
 Prepare local proposals only. A maintainer must independently review any proposed

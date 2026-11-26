@@ -18,6 +18,8 @@ TIMEOUT = 15
 MAX_RESPONSE = 1024 * 1024
 DIGEST = re.compile(r"[0-9a-f]{64}")
 HEADER = re.compile(r"[!-~]{1,512}")
+TAG = re.compile(r"[a-z0-9.+#-]{1,50}")
+RANKING_SORTS = frozenset({"hot", "newest", "trust"})
 DIAGNOSTIC_OPERATIONS = {
     "skill": ("retrieve-skill", "GET /skill.md"),
     "start": ("initialize-session", "POST /api/sessions"),
@@ -25,6 +27,9 @@ DIAGNOSTIC_OPERATIONS = {
     "attention": ("retrieve-attention", "GET /api/me/attention"),
     "search": ("search-posts", "GET /api/posts?search=<term>&page=1&per_page=20"),
     "post": ("retrieve-post", "GET /api/posts/{post_id}"),
+    "rank-hot": ("rank-questions-hot", "GET /api/posts?content_type=question&sort=hot&page=1&per_page=<limit>&tag=<optional>"),
+    "rank-newest": ("rank-questions-newest", "GET /api/posts?content_type=question&sort=newest&page=1&per_page=<limit>&tag=<optional>"),
+    "rank-trust": ("rank-questions-trust", "GET /api/posts?content_type=question&sort=trust&page=1&per_page=<limit>&tag=<optional>"),
     "summary": ("retrieve-session-summary", "GET /api/sessions/current/summary"),
     "close": ("close-session", "DELETE /api/sessions/{session_id}"),
 }
@@ -51,6 +56,14 @@ def identifier(value):
         return value
     except (ValueError, AttributeError):
         raise ResearchError("Invalid resource identifier") from None
+
+
+def validate_public_tag(value):
+    """Return an optional exact lowercase public tag or fail without I/O."""
+    if (value is not None and (not isinstance(value, str) or not TAG.fullmatch(value)
+                               or not any(character.isalnum() for character in value))):
+        raise ResearchError("Invalid public tag")
+    return value
 
 
 def unique(pairs):
@@ -157,6 +170,18 @@ class ResearchClient:
                         or self._key in value or self._session in value):
                     raise ResearchError("Invalid public search term")
                 path = "/api/posts?" + urlencode({"search": value, "page": 1, "per_page": 20})
+            elif operation in {"rank-hot", "rank-newest", "rank-trust"}:
+                ranking = operation.removeprefix("rank-")
+                tag, limit = value
+                parameters = {
+                    "content_type": "question",
+                    "sort": ranking,
+                    "page": 1,
+                    "per_page": limit,
+                }
+                if tag is not None:
+                    parameters["tag"] = tag
+                path = "/api/posts?" + urlencode(parameters)
             elif operation == "post":
                 path = "/api/posts/" + identifier(value)
             elif operation == "close":
@@ -249,6 +274,17 @@ class ResearchClient:
 
     def summary(self):
         return self._call("summary")
+
+    def ranked_questions(self, ranking, limit=10, tag=None):
+        if ranking not in RANKING_SORTS:
+            raise ResearchError("Unsupported question ranking")
+        if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 50:
+            raise ResearchError("Question ranking limit must be from 1 to 50")
+        validate_public_tag(tag)
+        if (tag is not None and (self._key in tag
+                                 or (self._session is not None and self._session in tag))):
+            raise ResearchError("Invalid public tag")
+        return self._call("rank-" + ranking, (tag, limit))
 
     def close(self):
         if self._session is not None:
