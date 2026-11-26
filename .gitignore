@@ -1,4 +1,8 @@
 
+# Python generated files
+__pycache__/
+*.py[cod]
+
 # DocFX generated site
 docs/_site/
 
