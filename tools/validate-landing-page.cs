@@ -19,6 +19,13 @@ static class LandingPageValidator
     private const string DesignPhilosophyStatement =
         "We favor architectures where consequential operations are explicit, constrained, reviewable, and auditable.";
 
+    private static readonly string[] RequiredAuthorityContent =
+    [
+        "<strong>Anything can propose; the host retains authority to act.</strong>",
+        "<strong>Proposal is open. Authority is bounded.</strong>",
+        "maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action.",
+    ];
+
     // Required homepage sections in the order the standard prescribes.
     private static readonly string[] RequiredHomepageMarkers =
     [
@@ -31,6 +38,7 @@ static class LandingPageValidator
 
     private static readonly string[] RequiredHomepageContent =
     [
+        .. RequiredAuthorityContent,
         "class=\"btn btn-primary\" href=\"getting-started/index.md\"",
         "href=\"getting-started/find-your-path.md\"",
         "href=\"articles/index.md\"",
@@ -210,6 +218,14 @@ static class LandingPageValidator
         {
             errors.Add($"'{BuiltHomepageRelativePath}' does not render the Design Philosophy statement.");
         }
+
+        foreach (string requiredText in RequiredAuthorityContent)
+        {
+            if (!html.Contains(requiredText, StringComparison.Ordinal))
+            {
+                errors.Add($"'{BuiltHomepageRelativePath}' does not render required authority content: {requiredText}");
+            }
+        }
     }
 
     private static void RequireInOrder(
@@ -250,7 +266,9 @@ static class LandingPageValidator
             "\n",
             EcosystemNavigation.SelectMany(entry => new[] { $"  - name: {entry.Label}", $"    href: {entry.Href}" }));
         string validFooter = $"\"_appFooter\": \"{string.Join(" · ", RequiredFooterContent)}\",";
-        string validSite = string.Join("\n", RequiredBuiltSectionIds) + "\n" + DesignPhilosophyStatement;
+        string validSite = string.Join(
+            "\n",
+            RequiredBuiltSectionIds.Concat(RequiredAuthorityContent).Append(DesignPhilosophyStatement));
 
         var failures = new List<string>();
 
@@ -281,6 +299,9 @@ static class LandingPageValidator
         Expect("footer without license", errors => ValidateFooter(validFooter.Replace("LICENSING.md", "README.md", StringComparison.Ordinal), errors), shouldPass: false);
         Expect("valid built homepage", errors => ValidateBuiltHomepage(validSite, errors), shouldPass: true);
         Expect("built homepage missing section", errors => ValidateBuiltHomepage(validSite.Replace("id=\"related-projects\"", string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
+        Expect("built homepage missing proposal maxim", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[0], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
+        Expect("built homepage missing bounded-authority maxim", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[1], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
+        Expect("built homepage missing maintainer authority boundary", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[2], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
 
         if (failures.Count > 0)
         {

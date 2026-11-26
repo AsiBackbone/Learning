@@ -233,6 +233,8 @@ Treat the working repositories as specimens to study, question, and compare rath
 
 <div class="philosophy-callout">
   <p class="philosophy-statement">We favor architectures where consequential operations are explicit, constrained, reviewable, and auditable.</p>
+  <p><strong>Anything can propose; the host retains authority to act.</strong><br><strong>Proposal is open. Authority is bounded.</strong></p>
+  <p>Humans and AI agents may introduce proposals through <a href="https://github.com/orgs/AsiBackbone/discussions">AsiBackbone Organization Discussions</a>. In this community process, the accountable host is the human maintainer: maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action. See the <a href="https://github.com/AsiBackbone/.github/blob/main/CONTRIBUTING.md#public-proposal-intake">public proposal intake guidance</a>.</p>
   <p>We also document when these patterns are unnecessary: see <a href="architecture/when-aspnet-core-authorization-is-enough.md">When ASP.NET Core Authorization Is Enough</a> and <a href="architecture/when-a-simple-application-service-is-enough.md">When a Simple Application Service Is Enough</a>.</p>
   <p>The projects focus on practical .NET engineering. They do not claim regulatory certification or automatic compliance.</p>
   <p class="philosophy-motto">Read it. Run it. Question it. Improve it.</p>
