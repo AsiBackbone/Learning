@@ -133,6 +133,17 @@ class RankingTests(unittest.TestCase):
         self.assertNotIn("steering", encoded)
         self.assertNotIn("must not be emitted", encoded)
 
+    def test_malformed_individual_tags_are_omitted_without_disclosing_them(self):
+        malformed = question(tags=[
+            "architecture", None, {"name": "hidden"}, "", "x" * 51,
+            "bad\nline", "architecture",
+        ])
+        result = normalize_listing({"items": [malformed]}, "hot", 1, 1)
+        self.assertEqual(result["items"][0]["tags"], ["architecture"])
+        encoded = json.dumps(result)
+        self.assertNotIn("hidden", encoded)
+        self.assertNotIn("bad\\nline", encoded)
+
     def test_invalid_listing_shapes_fail_closed(self):
         invalid = (
             [], {}, {"items": "wrong"}, {"items": [question(), question()]},
