@@ -7,7 +7,8 @@ import re
 import sys
 import warnings
 
-from research import RANKING_SORTS, TAG, ResearchClient, ResearchError, identifier
+from research import (RANKING_SORTS, ResearchClient, ResearchError, identifier,
+                      validate_public_tag)
 
 MAX_TITLE = 200
 MAX_TAGS = 8
@@ -86,9 +87,7 @@ def normalize_listing(data, ranking, candidate_limit, result_limit=10, tag=None)
     if (isinstance(candidate_limit, bool) or not isinstance(candidate_limit, int)
             or not 1 <= candidate_limit <= MAX_CANDIDATES):
         raise ResearchError("Ranking candidate limit must be from 1 to 50")
-    if (tag is not None and (not isinstance(tag, str) or not TAG.fullmatch(tag)
-                             or not any(character.isalnum() for character in tag))):
-        raise ResearchError("Invalid public tag")
+    validate_public_tag(tag)
     if (isinstance(result_limit, bool) or not isinstance(result_limit, int)
             or not 1 <= result_limit <= MAX_RESULTS
             or result_limit > candidate_limit):
@@ -160,6 +159,11 @@ def main():
     parser.add_argument("--tag", help="Optional exact lowercase public tag")
     parser.add_argument("ranking", choices=["hot", "newest", "trust"])
     args = parser.parse_args()
+    try:
+        validate_public_tag(args.tag)
+    except ResearchError:
+        print("Use a valid exact lowercase public tag.", file=sys.stderr)
+        return 1
     if (not args.confirm_observe_only or not sys.stdin.isatty() or not sys.stderr.isatty()
             or not 1 <= args.limit <= MAX_RESULTS
             or not 1 <= args.candidate_limit <= MAX_CANDIDATES

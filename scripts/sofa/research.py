@@ -58,6 +58,14 @@ def identifier(value):
         raise ResearchError("Invalid resource identifier") from None
 
 
+def validate_public_tag(value):
+    """Return an optional exact lowercase public tag or fail without I/O."""
+    if (value is not None and (not isinstance(value, str) or not TAG.fullmatch(value)
+                               or not any(character.isalnum() for character in value))):
+        raise ResearchError("Invalid public tag")
+    return value
+
+
 def unique(pairs):
     result = {}
     for key, value in pairs:
@@ -272,11 +280,10 @@ class ResearchClient:
             raise ResearchError("Unsupported question ranking")
         if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 50:
             raise ResearchError("Question ranking limit must be from 1 to 50")
-        if tag is not None:
-            if (not isinstance(tag, str) or not TAG.fullmatch(tag)
-                    or not any(character.isalnum() for character in tag)
-                    or self._key in tag or (self._session is not None and self._session in tag)):
-                raise ResearchError("Invalid public tag")
+        validate_public_tag(tag)
+        if (tag is not None and (self._key in tag
+                                 or (self._session is not None and self._session in tag))):
+            raise ResearchError("Invalid public tag")
         return self._call("rank-" + ranking, (tag, limit))
 
     def close(self):

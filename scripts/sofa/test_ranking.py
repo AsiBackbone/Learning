@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 from urllib.parse import parse_qs, urlsplit
 
+import ranking
 from ranking import ORGANIZATION_WEIGHT, normalize_listing
 from research import ResearchClient, ResearchError
 
@@ -92,6 +93,22 @@ class RankingTests(unittest.TestCase):
             with self.subTest(tag=value), self.assertRaises(ResearchError):
                 self.client.ranked_questions("hot", tag=value)
         self.assertEqual(self.conn.request.call_count, initial_calls)
+
+    def test_cli_rejects_invalid_tag_before_prompt_or_client_start(self):
+        terminal = StringIO()
+        terminal.isatty = MagicMock(return_value=True)
+        arguments = [
+            "ranking.py", "--confirm-observe-only", "--skill-digest", DIGEST,
+            "--model-name", "test-model", "--tag", "invalid tag", "hot",
+        ]
+        with (patch.object(ranking.sys, "argv", arguments),
+              patch.object(ranking.sys, "stdin", terminal),
+              patch.object(ranking.sys, "stderr", terminal),
+              patch.object(ranking.getpass, "getpass") as prompt,
+              patch.object(ranking, "ResearchClient") as client):
+            self.assertEqual(ranking.main(), 1)
+        prompt.assert_not_called()
+        client.assert_not_called()
 
     def test_normalization_is_bounded_and_omits_raw_content(self):
         result = normalize_listing({"items": [question()]}, "trust", 10, 10, "architecture")
