@@ -10,6 +10,7 @@ AsiBackbone Learning articles are standalone technical arguments written for dir
 
 | If you are interested in... | Start with |
 | --- | --- |
+| Picking up a newer `dotnet new` template release in a customized application, what `--force` overwrites and leaves behind, changed template defaults, clean old and new scaffolds, `.gitattributes` and CRLF patch failures, merge versus cherry-pick versus patch, lock-file regeneration, and EF Core migrations during a refresh | [How to Update a Scaffolded .NET Application Without Overwriting Your Code](2026/updating-a-dotnet-template-without-overwriting-customizations.md) |
 | Declaring a security advisory remediated after a runtime or SDK update, previously generated or scaffolded source, app-local NuGet packages, self-contained deployments, reading an advisory by affected component, and remediation evidence | [Updating .NET Did Not Fix the Code Your Template Generated](2026/updating-dotnet-does-not-fix-generated-code.md) |
 | Moving `UseExceptionHandler`, `UseAuthentication`, or `UseAuthorization` and an endpoint changing behavior, request and response order, short-circuiting middleware, exceptions that escape the handler, the middleware `WebApplication` adds automatically, and testing pipeline order | [Why Moving ASP.NET Core Middleware Breaks Your Endpoint](2026/moving-aspnet-core-middleware-breaks-endpoint.md) |
 | `new HttpClient()` in every request, port exhaustion, a static client that misses DNS changes, `PooledConnectionLifetime`, `IHttpClientFactory`, named and typed clients, per-request headers, and cookies under pooled handlers | [Stop Creating an HttpClient for Every Request](2026/stop-creating-httpclient-for-every-request.md) |
@@ -63,6 +64,14 @@ Once released, that URL is treated as permanent. Reorganizing tutorials, archite
 The Learning site is the canonical publication host. Cross-posted copies should point back to the Learning article when the external platform supports canonical attribution.
 
 ## 2026 Archive
+
+### [How to Update a Scaffolded .NET Application Without Overwriting Your Code](2026/updating-a-dotnet-template-without-overwriting-customizations.md)
+
+**Christopher D. Cavell** · **November 27, 2026**
+
+A team reruns a newer template over its customized application with `dotnet new --force`, the build stays green, and an endpoint, a configuration section, and OpenAPI support silently disappear while a file the template no longer generates stays behind. This intermediate companion to the LTS migration article covers the file-level mechanics of a template refresh: recording exactly how the application was generated, regenerating the old and new template versions separately with identical explicit options, checking option defaults and determinism, and reviewing the clean upstream delta as added, changed, and deleted files. It shows why a patch can pass `git apply --check` and still fail `git apply --index` under `.gitattributes` line-ending normalization, demonstrates staging by mirroring into a disposable worktree as one solution, compares merge, cherry-pick, patch, and manual reconciliation, and explains lock-file regeneration, EF Core migration cautions, separate baseline and integration validation, and when the procedure costs more than it returns. Every outcome was observed with a small fictional template on .NET SDK 10.0.404.
+
+Permanent URL: `https://asibackbone.github.io/Learning/articles/2026/updating-a-dotnet-template-without-overwriting-customizations.html`
 
 ### [Updating .NET Did Not Fix the Code Your Template Generated](2026/updating-dotnet-does-not-fix-generated-code.md)
 

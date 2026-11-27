@@ -1159,6 +1159,37 @@ Lead to Software Supply-Chain Integrity for .NET Repositories for what dependenc
 
 ---
 
+## Companion Publications
+
+Candidates in this section were opened directly as implementation issues to complete a topic that an existing article introduced but deliberately left out of scope.
+
+### 36. How to Update a Scaffolded .NET Application Without Overwriting Your Code
+
+- **Priority:** P2
+- **Level:** Intermediate
+- **Implementation issue:** [#530](https://github.com/AsiBackbone/Learning/issues/530)
+- **Publication:** [Published November 27, 2026](../docs/articles/2026/updating-a-dotnet-template-without-overwriting-customizations.md)
+- **Permanent slug:** `updating-a-dotnet-template-without-overwriting-customizations`
+
+#### Reader / search problem
+
+An application was generated with `dotnet new` and customized for months or years, and a newer template release changes generated files, defaults, and dependencies, and stops generating some files. Rerunning `dotnet new --force` over the application overwrites intentional changes and leaves no trustworthy record of upstream deletions. How can a team bring the template's changes in safely and reviewably?
+
+#### Existing Learning support
+
+- [You Don't Need to Roll Back What You Never Merged](../docs/articles/2026/you-dont-need-to-roll-back-what-you-never-merged.md)
+- [Updating .NET Did Not Fix the Code Your Template Generated](../docs/articles/2026/updating-dotnet-does-not-fix-generated-code.md)
+
+#### Article / curriculum distinction
+
+The LTS migration article covers the baseline A / application delta / baseline B model, isolated candidates, adoption criteria, and rollback boundaries. This article covers the file-level mechanics of one refresh: provenance, independent old and new generation, option and determinism checks, the added/changed/deleted delta, `.gitattributes` normalization and patch-versus-staging behavior, merge, cherry-pick, patch, and manual integration tradeoffs, lock-file regeneration, EF Core migration cautions, and separate baseline and integration validation, with a small fictional template verified end to end. It must not present one Git technique as universally best, suggest destructive mirroring outside an isolated worktree, claim that normalization proves byte-for-byte determinism, recommend regenerating or discarding historical migrations, or copy the ReferenceApplication runbook.
+
+#### Natural deeper path
+
+Lead to You Don't Need to Roll Back What You Never Merged for platform-generation migrations, Updating .NET Did Not Fix the Code Your Template Generated for security repairs to generated source, and ReferenceApplication's NCAT baseline refresh walkthrough for one complete operational runbook.
+
+---
+
 ## Promotion and Publication Workflow
 
 Keep planning, implementation, and publication as separate states:
