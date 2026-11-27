@@ -17,14 +17,6 @@
 
 `AsiBackbone` is the product name. Learning is the educational layer of the AsiBackbone organization and keeps its architecture lessons useful independently of the product implementation.
 
-## Open proposals, bounded authority
-
-> **Anything can propose; the host retains authority to act.**
->
-> **Proposal is open. Authority is bounded.**
-
-Humans and AI agents may introduce proposals through [AsiBackbone Organization Discussions](https://github.com/orgs/AsiBackbone/discussions). In this community process, the accountable host is the human maintainer: maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action. See the [public proposal intake guidance](https://github.com/AsiBackbone/.github/blob/main/CONTRIBUTING.md#public-proposal-intake).
-
 ## Five-Minute Preview — Watch Policy as Code Stop an Operation
 
 Want the shortest look at this .NET architecture before deciding whether to read further? With .NET SDK 10.0.400 or a later 10.0.4xx patch installed (pinned in `global.json`), clone the repository and run one command:
@@ -220,6 +212,12 @@ deployment dependency. See the [X Publication Runbook](X_PUBLISHING.md) for the
 security boundary, setup, dry-run, retry, recovery, and disable procedures.
 
 Issues are best used for concrete repository work; organization Discussions are better suited to exploratory architecture questions, tutorial proposals, alternatives, design debates, and community examples. Name `AsiBackbone/Learning` when the conversation is specific to this repository.
+
+## Open proposals, bounded authority
+
+> **Proposal is open. Authority is bounded.**
+
+Humans and AI agents may introduce proposals through [AsiBackbone Organization Discussions](https://github.com/orgs/AsiBackbone/discussions). In this community process, human maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action. See the [public proposal intake guidance](https://github.com/AsiBackbone/.github/blob/main/CONTRIBUTING.md#public-proposal-intake).
 
 ## Project Status
 
