@@ -21,7 +21,6 @@ static class LandingPageValidator
 
     private static readonly string[] RequiredAuthorityContent =
     [
-        "<strong>Anything can propose; the host retains authority to act.</strong>",
         "<strong>Proposal is open. Authority is bounded.</strong>",
         "maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action.",
     ];
@@ -299,9 +298,8 @@ static class LandingPageValidator
         Expect("footer without license", errors => ValidateFooter(validFooter.Replace("LICENSING.md", "README.md", StringComparison.Ordinal), errors), shouldPass: false);
         Expect("valid built homepage", errors => ValidateBuiltHomepage(validSite, errors), shouldPass: true);
         Expect("built homepage missing section", errors => ValidateBuiltHomepage(validSite.Replace("id=\"related-projects\"", string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
-        Expect("built homepage missing proposal maxim", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[0], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
-        Expect("built homepage missing bounded-authority maxim", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[1], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
-        Expect("built homepage missing maintainer authority boundary", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[2], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
+        Expect("built homepage missing bounded-authority maxim", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[0], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
+        Expect("built homepage missing maintainer authority boundary", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[1], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
 
         if (failures.Count > 0)
         {
