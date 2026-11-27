@@ -49,13 +49,13 @@ jobs:
           persist-credentials: false
 
       - name: Initialize CodeQL for GitHub Actions
-        uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        uses: github/codeql-action/init@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4
         with:
           languages: actions
           build-mode: none
 
       - name: Perform CodeQL Actions analysis
-        uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        uses: github/codeql-action/analyze@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4
 
   analyze-csharp:
     name: Analyze C# with CodeQL
@@ -73,7 +73,7 @@ jobs:
           persist-credentials: false
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        uses: github/codeql-action/init@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4
         with:
           languages: csharp
           # C# no-build analysis keeps this educational-repository scan modest and
@@ -81,7 +81,7 @@ jobs:
           build-mode: none
 
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        uses: github/codeql-action/analyze@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4
 
 # The workflow reports on every pull request targeting main so the repository
 # ruleset can block new error-or-warning alerts and medium-or-higher security
