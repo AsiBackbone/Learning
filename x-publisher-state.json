@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "account": "jackdaw-patio",
-  "cursorSha": "018b14d4326a9fe9a438d15dca1ead793a3b370a",
+  "cursorSha": "167fc4a7b2e5ee4ca3f6f398fe1dff5419448a9b",
   "receipts": {
     "https://asibackbone.github.io/Learning/articles/2026/validate-ai-tool-call-before-execution.html": {
       "sourceBlobSha": "95c90751f6ee686961e8c82e83f857598838e6a6",
@@ -132,6 +132,11 @@
       "sourceBlobSha": "be027834ed2c65c44a779c2de47d19dddc26b94f",
       "postId": "2125191482168705065",
       "postedAtUtc": "2026-11-24T11:35:08.3093352+00:00"
+    },
+    "https://asibackbone.github.io/Learning/articles/2026/updating-a-dotnet-template-without-overwriting-customizations.html": {
+      "sourceBlobSha": "baa6734013a665f0dfa69e16dfd6c462d35dac9b",
+      "postId": "2126322823803142508",
+      "postedAtUtc": "2026-11-27T14:30:41.1803694+00:00"
     }
   },
   "deferredPublications": {}
