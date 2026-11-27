@@ -168,9 +168,9 @@ The goal is to make the reasoning visible—not to prove that one framework or a
 
 The [2026-11-21 implementation-currentness review](getting-started/implementation-currentness-review-2026-11-21.md) retains the deliberately reviewed **teaching snapshots** AsiBackbone `v7.0.0` and NCAT `v2.11.2`, after examining published releases AsiBackbone `v7.5.4` and NCAT `v2.11.11`. These are **not** recommendations to install older packages in new production applications. For current implementation releases and migration guidance, use the [AsiBackbone releases](https://github.com/AsiBackbone/AsiBackbone/releases/latest) and [NCAT releases](https://github.com/AsiBackbone/NetCoreApplicationTemplate/releases/latest). The [compatibility/API boundary](getting-started/asibackbone-7-api-boundary.md) documents the selected teaching contracts. Recent publications include:
 
+- [How to Update a Scaffolded .NET Application Without Overwriting Your Code](articles/2026/updating-a-dotnet-template-without-overwriting-customizations.md)
 - [Updating .NET Did Not Fix the Code Your Template Generated](articles/2026/updating-dotnet-does-not-fix-generated-code.md)
 - [Why Moving ASP.NET Core Middleware Breaks Your Endpoint](articles/2026/moving-aspnet-core-middleware-breaks-endpoint.md)
-- [Stop Creating an HttpClient for Every Request](articles/2026/stop-creating-httpclient-for-every-request.md)
 
 New publications are announced in the [RSS feed](https://asibackbone.github.io/Learning/feed.xml).
 

@@ -1,5 +1,7 @@
 - name: Articles
   href: index.md
+- name: How to Update a Scaffolded .NET Application Without Overwriting Your Code
+  href: 2026/updating-a-dotnet-template-without-overwriting-customizations.md
 - name: Updating .NET Did Not Fix the Code Your Template Generated
   href: 2026/updating-dotnet-does-not-fix-generated-code.md
 - name: Why Moving ASP.NET Core Middleware Breaks Your Endpoint
