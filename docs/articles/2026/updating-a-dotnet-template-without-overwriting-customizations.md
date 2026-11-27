@@ -153,9 +153,9 @@ Start from a clean checkout of the application repository. The procedure runs in
 
 `$Old` is the version at the tip of the baseline branch, which section 5 verifies. In this first refresh it is also the adopted version; when the two differ, use `$Old` for baseline validation and the adopted tag for integration ([section 6](#6-choose-how-to-integrate)).
 
-> **Support boundary:** the isolated template stores below make the example easy to reproduce, but they depend on an undocumented diagnostic option. A durable team runbook should either pin and test that behavior deliberately or use the documented install-generate-install sequence described next.
+The script uses the documented sequence by default: it installs one release with the [`<package>@<version>` syntax](https://learn.microsoft.com/dotnet/core/tools/dotnet-new-install), reads its options, and generates its scaffold twice before installing the next. In the example, installing 1.5.0 replaced the installed 1.4.0 without a separate uninstall, and the machine was left with 1.5.0 installed.
 
-The example installs each release into its own temporary template store with `--debug:custom-hive`, so the versions do not replace each other and the machine's installed templates are untouched. That option is a template-engine diagnostic switch that does not appear in the `dotnet new` reference; it worked as shown on SDK 10.0.404, but treat it as unsupported. The documented alternative is to run `dotnet new install` for each version in turn, using the [`<package>@<version>` syntax](https://learn.microsoft.com/dotnet/core/tools/dotnet-new-install), and to generate from each before installing the next. In the example, installing 1.5.0 replaced an installed 1.4.0 without a separate uninstall, and the machine was left with 1.5.0 installed.
+> **Support boundary:** setting `$UseIsolatedTemplateStores` to `$true` installs each release into its own temporary template store under the scratch folder instead, so the machine's installed templates are untouched. It relies on `--debug:custom-hive`, a template-engine diagnostic switch that does not appear in the `dotnet new` reference. It worked on SDK 10.0.404, but treat it as an unsupported, optional convenience that an SDK update may remove, not as part of the procedure.
 
 ```powershell
 # The documented default is $false. Reset it in case a profile changed it, because this
@@ -173,11 +173,15 @@ $Sdk = '10.0.404'
 $Arguments = @('--name', 'Orders.Api', '--EnableOpenApi', 'true')
 $ScaffoldMarker = 'Orders.Api.slnx'   # a file every clean scaffold of this application contains
 $SourceArguments = @()                # or @('--add-source', '<feed>') if the feed is not configured
+$UseIsolatedTemplateStores = $false   # $true: optional and unsupported; see the support boundary note
 $Scratch = Join-Path ([IO.Path]::GetTempPath()) "larkspur-refresh-$New-$([Guid]::NewGuid().ToString('N'))"
 
 New-Item -ItemType Directory -Path $Scratch -ErrorAction Stop | Out-Null
 Set-Location -LiteralPath $Scratch -ErrorAction Stop
 "Scratch folder: $Scratch"   # note it; phase 2 needs this path
+# A marker that identifies this run, checked before the scratch folder is ever deleted.
+@{ repository = $RepositoryRoot; old = $Old; new = $New } |
+  ConvertTo-Json | Set-Content refresh-run.json -ErrorAction Stop
 
 @{ sdk = @{ version = $Sdk; rollForward = 'disable' } } |
   ConvertTo-Json -Depth 3 | Set-Content global.json -ErrorAction Stop
@@ -189,26 +193,33 @@ function Assert-ExitCode([string] $Step) {
 }
 
 foreach ($Version in $Old, $New) {
-  $Hive = Join-Path $Scratch "hive-$Version"
-  dotnet new install "Larkspur.Templates@$Version" @SourceArguments --debug:custom-hive $Hive
+  $StoreArguments = @()
+  if ($UseIsolatedTemplateStores) { $StoreArguments = @('--debug:custom-hive', (Join-Path $Scratch "store-$Version")) }
+  $Folder = if ($Version -eq $Old) { 'old' } else { 'new' }
+
+  dotnet new install "Larkspur.Templates@$Version" @SourceArguments @StoreArguments
   Assert-ExitCode "Installing $Version"
-  dotnet new larkspur-api --help --debug:custom-hive $Hive > "options-$Version.txt"
+  dotnet new larkspur-api --help @StoreArguments > "options-$Version.txt"
   Assert-ExitCode "Reading the $Version options"
+  foreach ($Output in $Folder, "$Folder-repeat") {
+    dotnet new larkspur-api @Arguments --output $Output @StoreArguments
+    Assert-ExitCode "Generating $Output"
+  }
 }
 ```
 
-Set `$SourceArguments` when the template comes from a feed that is not already configured. A unique scratch folder per run keeps anything a failed earlier attempt left behind from being reused by accident. Resetting `$PSNativeCommandUseErrorActionPreference` matters when a profile has enabled it, particularly with `$ErrorActionPreference` set to `Stop`; PowerShell would then turn an expected nonzero exit code, such as 1 from `git diff` when differences exist, into an error before the script could interpret it. The assignment stays in effect for the session, so each phase saves the previous value and restores it at its end; if a phase stops early, run `$PSNativeCommandUseErrorActionPreference = $PreviousNativePreference` yourself.
+Each release is generated twice, into `old` and `old-repeat` or `new` and `new-repeat`; the reproducibility check below compares each pair. Set `$SourceArguments` when the template comes from a feed that is not already configured. The `refresh-run.json` marker records which repository and versions this scratch folder belongs to; the cleanup steps refuse to delete a folder whose marker does not match. A unique scratch folder per run keeps anything a failed earlier attempt left behind from being reused by accident. Resetting `$PSNativeCommandUseErrorActionPreference` matters when a profile has enabled it, particularly with `$ErrorActionPreference` set to `Stop`; PowerShell would then turn an expected nonzero exit code, such as 1 from `git diff` when differences exist, into an error before the script could interpret it. The assignment stays in effect for the session, so each phase saves the previous value and restores it at its end; if a phase stops early, run `$PSNativeCommandUseErrorActionPreference = $PreviousNativePreference` yourself.
 
 ### Higher-assurance variant: install from verified files
 
-When the exact package bytes matter, define this function after `Assert-ExitCode` and use it in place of the `dotnet new install` line in the loop above. It reads the release's digest from the manifest, checks the retained `.nupkg` against it, and installs from that file into the same scratch template store, which phase 2 deletes with the scratch folder:
+When the exact package bytes matter, define this function after `Assert-ExitCode` and use it in place of the `dotnet new install` line in the loop above. It reads the release's digest from the manifest, checks the retained `.nupkg` against it, and installs from that file, into the same template store the loop uses:
 
 ```powershell
 function Install-VerifiedTemplate {
   param(
     [Parameter(Mandatory)] [string] $Version,
     [Parameter(Mandatory)] [string] $Package,
-    [Parameter(Mandatory)] [string] $Hive)
+    [string[]] $StoreArguments = @())
 
   $Manifest = Get-Content -LiteralPath (Join-Path $RepositoryRoot 'template-manifest.json') -Raw -ErrorAction Stop |
     ConvertFrom-Json
@@ -222,13 +233,13 @@ function Install-VerifiedTemplate {
   if (-not $ActualDigest.Equals($ExpectedDigest, [StringComparison]::OrdinalIgnoreCase)) {
     throw "$Package does not match its recorded digest."
   }
-  dotnet new install $Package --debug:custom-hive $Hive
+  dotnet new install $Package @StoreArguments
   Assert-ExitCode "Installing the verified $Version package"
 }
 
 $PackageStore = '<folder holding the retained .nupkg files>'
 # In the loop, instead of the feed install and its Assert-ExitCode:
-#   Install-VerifiedTemplate $Version (Join-Path $PackageStore "Larkspur.Templates.$Version.nupkg") $Hive
+#   Install-VerifiedTemplate $Version (Join-Path $PackageStore "Larkspur.Templates.$Version.nupkg") $StoreArguments
 ```
 
 In the example, this variant verified and installed both releases from their files, with the manifest's two digests as the reference.
@@ -255,15 +266,9 @@ Had both scaffolds been generated with defaults, the delta would have "removed O
 
 The help comparison detects options that were added, removed, or given a different displayed default. It does not prove that an unchanged option still has the same effect, which is one more reason to review the scaffold delta itself.
 
-### Generate each version twice
+### Check that each version reproduces
 
 ```powershell
-# Each entry is (template version, output folder).
-foreach ($Run in @($Old, 'old'), @($Old, 'old-repeat'), @($New, 'new'), @($New, 'new-repeat')) {
-  dotnet new larkspur-api @Arguments --output $Run[1] --debug:custom-hive (Join-Path $Scratch "hive-$($Run[0])")
-  Assert-ExitCode "Generating $($Run[1])"
-}
-
 foreach ($Pair in @('old', 'old-repeat'), @('new', 'new-repeat')) {
   git -c core.autocrlf=false diff --no-index --quiet -- $Pair[0] $Pair[1]
   $DiffExit = $LASTEXITCODE
@@ -388,7 +393,7 @@ Set-Location -LiteralPath $Worktree -ErrorAction Stop
 
 #### Mirror and stage the scaffolds
 
-The function below enforces the destructive-command boundary rather than trusting the reader to. It refuses unless the source is a folder inside the scratch folder that contains the scaffold's marker file (`Orders.Api.slnx` here), the current directory is the root of the refresh worktree, the branch is the refresh branch, and `git status --porcelain=v1 --ignored` reports nothing, not even ignored files. It takes all of these as parameters, resolves every path itself, and compares paths case-insensitively, as ordinary Windows file systems do, so it does not depend on script variables. It excludes `.git`, which in a linked worktree is a file pointing at the repository, and junction points, and it checks the exit status of the Git and `robocopy` operations its safety depends on. The source checks reject an obviously wrong path, such as the application checkout, a template store, or a subfolder of a scaffold; they do not prove that a folder is the *expected* scaffold. That is what the reproducibility and old-baseline comparisons are for.
+The function below enforces the destructive-command boundary rather than trusting the reader to. It refuses unless the source is a folder inside the scratch folder that contains the scaffold's marker file (`Orders.Api.slnx` here), the current directory is the root of the refresh worktree, that root is one of the repository's linked worktrees and never its primary checkout, the branch is the refresh branch, and `git status --porcelain=v1 --ignored` reports nothing, not even ignored files. It takes all of these as parameters, resolves every path itself, and compares paths case-insensitively, as ordinary Windows file systems do, so it does not depend on script variables. It excludes `.git`, which in a linked worktree is a file pointing at the repository, and junction points, and it checks the exit status of the Git and `robocopy` operations its safety depends on. The source checks reject an obviously wrong path, such as the application checkout, a template store, or a subfolder of a scaffold; they do not prove that a folder is the *expected* scaffold. That is what the reproducibility and old-baseline comparisons are for.
 
 ```powershell
 function Update-IndexFromScaffold {
@@ -420,6 +425,14 @@ function Update-IndexFromScaffold {
       -not $Here.Equals($Worktree, [StringComparison]::OrdinalIgnoreCase) -or
       $Branch -ne $RefreshBranch -or $Status) {
     throw 'Refusing to mirror: not at the root of the clean refresh worktree.'
+  }
+  # The first entry `git worktree list` prints is the primary worktree; the target must be a linked one.
+  $Listing = git worktree list --porcelain
+  Assert-ExitCode 'Listing worktrees'
+  $WorktreePaths = @($Listing | Where-Object { $_ -like 'worktree *' } |
+    ForEach-Object { [IO.Path]::GetFullPath($_.Substring('worktree '.Length)) })
+  if (-not (@($WorktreePaths | Select-Object -Skip 1) -contains $Worktree)) {
+    throw 'Refusing to mirror: the target is not a linked worktree of this repository.'
   }
 
   $CopyLog = robocopy $Source $Worktree /MIR /IS /IT /XD .git /XF .git /XJ /R:2 /W:1 /NJH /NP
@@ -486,8 +499,14 @@ Assert-ExitCode 'Removing the refresh worktree'
 git branch -D $RefreshBranch
 Assert-ExitCode 'Deleting the local refresh branch'
 $ScratchPrefix = Join-Path ([IO.Path]::GetTempPath()) 'larkspur-refresh-'
+$MarkerPath = Join-Path $Scratch 'refresh-run.json'
+$Marker = $null
+if (Test-Path -LiteralPath $MarkerPath -PathType Leaf) {
+  $Marker = Get-Content -LiteralPath $MarkerPath -Raw -ErrorAction Stop | ConvertFrom-Json
+}
 $ScratchLooksRight = $Scratch.StartsWith($ScratchPrefix, [StringComparison]::OrdinalIgnoreCase) -and
-  (Test-Path -LiteralPath (Join-Path $Scratch 'global.json') -PathType Leaf) -and
+  $null -ne $Marker -and $Marker.new -eq $New -and
+  ([string] $Marker.repository).Equals($RepositoryRoot, [StringComparison]::OrdinalIgnoreCase) -and
   (Test-Path -LiteralPath (Join-Path $Scratch 'old') -PathType Container) -and
   (Test-Path -LiteralPath (Join-Path $Scratch 'new') -PathType Container)
 if (-not $ScratchLooksRight) { throw "Refusing to delete $Scratch." }
@@ -572,13 +591,37 @@ Assert-ExitCode 'Tagging the new baseline'
 git push origin $Tag
 Assert-ExitCode 'Pushing the tag'
 
+# Confirm that $Worktree is the clean, linked refresh worktree before removing anything.
+$WorktreeTop = git -C $Worktree rev-parse --show-toplevel
+Assert-ExitCode 'Locating the refresh worktree'
+$WorktreeBranch = git -C $Worktree branch --show-current
+Assert-ExitCode 'Reading the refresh worktree branch'
+$WorktreeStatus = git -C $Worktree status --porcelain=v1
+Assert-ExitCode 'Reading the refresh worktree status'
+$Listing = git worktree list --porcelain
+Assert-ExitCode 'Listing worktrees'
+$LinkedPaths = @($Listing | Where-Object { $_ -like 'worktree *' } |
+  ForEach-Object { [IO.Path]::GetFullPath($_.Substring('worktree '.Length)) } | Select-Object -Skip 1)
+if (-not ([IO.Path]::GetFullPath($WorktreeTop)).Equals($Worktree, [StringComparison]::OrdinalIgnoreCase) -or
+    $WorktreeBranch -ne $RefreshBranch -or $WorktreeStatus -or -not ($LinkedPaths -contains $Worktree)) {
+  throw "Refusing to clean up: $Worktree is not the clean, linked refresh worktree on $RefreshBranch."
+}
+
 git worktree remove $Worktree
 Assert-ExitCode 'Removing the refresh worktree'
-git branch -D $RefreshBranch   # -D: after a squash or rebase merge the branch is not an ancestor
+# -D: the branch was verified above to point at the reviewed commit,
+# and after a squash or rebase merge it is not an ancestor of the baseline.
+git branch -D $RefreshBranch
 Assert-ExitCode 'Deleting the local refresh branch'
 $ScratchPrefix = Join-Path ([IO.Path]::GetTempPath()) 'larkspur-refresh-'
+$MarkerPath = Join-Path $Scratch 'refresh-run.json'
+$Marker = $null
+if (Test-Path -LiteralPath $MarkerPath -PathType Leaf) {
+  $Marker = Get-Content -LiteralPath $MarkerPath -Raw -ErrorAction Stop | ConvertFrom-Json
+}
 $ScratchLooksRight = $Scratch.StartsWith($ScratchPrefix, [StringComparison]::OrdinalIgnoreCase) -and
-  (Test-Path -LiteralPath (Join-Path $Scratch 'global.json') -PathType Leaf) -and
+  $null -ne $Marker -and $Marker.new -eq $New -and
+  ([string] $Marker.repository).Equals($RepositoryRoot, [StringComparison]::OrdinalIgnoreCase) -and
   (Test-Path -LiteralPath (Join-Path $Scratch 'old') -PathType Container) -and
   (Test-Path -LiteralPath (Join-Path $Scratch 'new') -PathType Container)
 if (-not $ScratchLooksRight) { throw "Refusing to delete $Scratch." }
@@ -756,7 +799,7 @@ Templates that include EF Core may generate a `DbContext`, configuration, and so
 - **Add a migration only for a change the refresh actually introduces**, whether a model change or a deliberate data or schema operation, review its SQL, and test it from an empty database and against a representative existing one.
 - **Know what an empty migration proves.** It shows that EF Core detects no difference between the reconciled model and its current snapshot. [`dotnet ef migrations has-pending-model-changes`](https://learn.microsoft.com/ef/core/managing-schemas/migrations/managing) checks whether the model differs from the migrations snapshot without creating a migration, and can serve as a CI guard. Neither compares the model with a deployed database, so keep testing the migration chain against a new database and a representative existing one.
 
-Version matters for one detail. Microsoft's team-environments page says the change arrived in EF Core 11 preview 3 and applies starting with EF Core 11, whose 11.0.0 packages are now published on NuGet: the model snapshot records the latest migration ID, so parallel migrations produce a visible snapshot conflict. EF Core 10 and earlier do not record it, so diverged migrations can merge without any conflict. The distinction depends on the EF Core package version the application references, not on its target framework or installed SDK; check that version before relying on conflict visibility. Larkspur itself contains no EF Core; this guidance applies when the procedure is extended to applications that do.
+Version matters for one detail. Microsoft's team-environments page says the change arrived in EF Core 11 preview 3 and applies starting with EF Core 11, whose 11.0.0 packages are now published on NuGet: the model snapshot records the latest migration ID, so parallel migrations produce a visible snapshot conflict. EF Core 10 and earlier do not record it, so the snapshot itself can merge without signaling that the migration histories diverged. That is the absence of one automatic signal, not evidence that the merge is safe: migration files and other changes can still conflict, and a clean textual merge does not make two histories coherent. Review the migration history explicitly and follow the same resolution workflow on every EF Core version. The distinction depends on the EF Core package version the application references, not on its target framework or installed SDK. Larkspur itself contains no EF Core; this guidance applies when the procedure is extended to applications that do.
 
 ---
 
