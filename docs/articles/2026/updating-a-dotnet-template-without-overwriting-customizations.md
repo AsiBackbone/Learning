@@ -26,7 +26,7 @@ x_question: How do you adopt a newer project template?
 
 **Verification:** The outcomes reported in this article (the refusal and the overwrite from `dotnet new`, the option and reproducibility checks, the patch failure, the staged delta, the merge and cherry-pick conflicts, the `git apply --3way` refusal, the lock-file error, the build errors, and the passing endpoints) were observed by running the example with .NET SDK 10.0.404, Git 2.56.1 for Windows, and PowerShell 7.7.0 on November 27, 2026. The PowerShell commands were run as shown, phase 1 in one session and phase 2 in a new one, against a clone of a local bare repository standing in for the hosting service, with `$SourceArguments` pointing at a local folder feed and the placeholders filled in; the baseline pull request's squash merge was simulated on that bare repository. They are observations of this example in that environment, not guarantees about other templates or configurations. The [appendix](#appendix-reproducing-the-example) lists the template files and environment. Line-ending behavior depends on Git configuration, so the article states which setting produced each result. External sources were last verified on November 27, 2026.
 
-**License:** Original prose is licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/), and original code examples are additionally offered under the [MIT License](https://opensource.org/license/mit), as described in the repository's [licensing terms](https://github.com/AsiBackbone/Learning/blob/main/LICENSING.md). Third-party material, where identified, remains under its original license. Quoted tool output, short documentation quotations, and product names are included for technical explanation and identification and remain subject to their respective owners' rights. The appendix's template package project is adapted from Microsoft's [Create a template package for dotnet new](https://learn.microsoft.com/dotnet/core/tutorials/cli-templates-create-template-package) tutorial and is not claimed as original code. It remains under the [MIT License](https://github.com/dotnet/docs/blob/main/LICENSE-CODE) of Microsoft's .NET documentation code, whose full notice appears in the [appendix](#third-party-notice).
+**License:** Original prose is licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/), and original code examples are additionally offered under the [MIT License](https://opensource.org/license/mit), as described in the repository's [licensing terms](https://github.com/AsiBackbone/Learning/blob/main/LICENSING.md). Third-party material, where identified, remains under its original license. Quoted tool output, short documentation quotations, and product names are included for technical explanation and identification and remain subject to their respective owners' rights. The appendix's template package project is adapted from Microsoft's [Create a template package for dotnet new](https://learn.microsoft.com/dotnet/core/tutorials/cli-templates-create-template-package) tutorial and is not claimed as original code. It remains under the [MIT License](https://github.com/dotnet/docs/blob/main/LICENSE-CODE) of Microsoft's .NET documentation code, whose full notice appears in the [appendix](#third-party-notice-for-the-adapted-template-package-project).
 
 **What this article covers:** what rerunning `dotnet new` over an existing application did in a small example, and why a green build afterward proves little; recording template provenance and the adopted template version before anything is regenerated; generating old and new scaffolds separately and checking options and reproducibility; reading the clean scaffold delta as added, changed, and deleted files; why a patch that passes `git apply --check` can still fail `git apply --index` under `.gitattributes` normalization, and staging by mirroring into a guarded, disposable worktree as one way around it; choosing between merge, cherry-pick, patch, and manual reconciliation; regenerating lock files and following EF Core's migration workflow; validating the raw baseline and the integrated application separately, with a stop boundary; and when the whole procedure costs more than it returns.
 
@@ -93,7 +93,7 @@ Read that list against what Larkspur actually changed (the clean delta appears i
 
 Identical files, such as `.gitattributes` here, were overwritten with the same bytes and show no diff, which makes the change look smaller than the command's reach. A subsequent ordinary build passed and also rewrote `packages.lock.json`, so a build-only CI gate would have been green.
 
-This is one template on one SDK. Templates can contain conditional content and post-actions that run scripts or restore packages, so the exact effect of `--force` varies from template to template. What does not vary is that it is a generation option, not a reconciliation mechanism.
+This is one template on one SDK. Templates can contain conditional content and post-actions that run scripts or restore packages, so the exact effect of `--force` varies from template to template. The relevant point is that `--force` is a generation option, not an application-aware reconciliation mechanism.
 
 ---
 
@@ -131,30 +131,9 @@ A small manifest committed beside the application is the core record; this artic
 }
 ```
 
-This is a schema example, and the angle-bracket values are placeholders; replace them with real values before relying on the checks in [section 6](#6-choose-how-to-integrate). The manifest is the reviewed, human-readable record. The commands in this article read only its `adopted*` fields and, in the higher-assurance check below, its digests; section 3 sets the other values in the script itself. Copying them is manual, so review that the script values match the manifest as part of the pull request. `initialTemplateVersion` records the release that first created the application and stays historical. `adoptedVersion` and the two fields after it record the latest template baseline whose delta the application has actually integrated, and they advance with each successful refresh. Add a digest for each release you refresh to.
+This is a schema example, and the angle-bracket values are placeholders; replace them with real values before relying on the checks in [section 6](#6-choose-how-to-integrate). The manifest is the reviewed, human-readable record. The commands in this article read only its `adopted*` fields and, in the verified-install variant in section 3, its digests; section 3 sets the other values in the script itself. Copying them is manual, so review that the script values match the manifest as part of the pull request. `initialTemplateVersion` records the release that first created the application and stays historical. `adoptedVersion` and the two fields after it record the latest template baseline whose delta the application has actually integrated, and they advance with each successful refresh. Add a digest for each release you refresh to.
 
-The article's script installs releases by ID and version from a feed, because that is how the example was run, and it does not check digests. A higher-assurance runbook verifies the retained file first and installs from that file, so no fresh package lookup happens after verification:
-
-```powershell
-$Manifest = Get-Content -LiteralPath (Join-Path $RepositoryRoot 'template-manifest.json') -Raw -ErrorAction Stop |
-  ConvertFrom-Json
-$Version = '1.5.0'
-$Package = '<path to the retained Larkspur.Templates.1.5.0.nupkg>'
-$Hive = Join-Path ([IO.Path]::GetTempPath()) "larkspur-verified-$([Guid]::NewGuid().ToString('N'))"
-
-$RecordedDigest = [string] $Manifest.templatePackageDigests.$Version
-if ($RecordedDigest -notmatch '^sha256:([0-9a-fA-F]{64})$') {
-  throw "template-manifest.json records no valid SHA-256 digest for $Version."
-}
-$Actual = (Get-FileHash -LiteralPath $Package -Algorithm SHA256 -ErrorAction Stop).Hash
-if (-not $Actual.Equals($Matches[1], [StringComparison]::OrdinalIgnoreCase)) {
-  throw "$Package does not match its recorded digest."
-}
-dotnet new install $Package --debug:custom-hive $Hive
-Assert-ExitCode "Installing the verified $Version package"
-```
-
-It uses `$RepositoryRoot` and `Assert-ExitCode` from section 3. In the example, reading the digest from the manifest, the check, and an install from the `.nupkg` file into a separate template store all succeeded.
+The main script in section 3 installs releases by ID and version from a feed and does not check digests. Section 3 also shows a higher-assurance variant that verifies each retained `.nupkg` against its recorded digest and installs from that file, so no fresh package lookup happens after verification.
 
 Then keep the raw scaffold itself where it cannot drift: the example stores it on a `template-baseline` branch whose only commits are unmodified generator output, and marks each one with an annotated tag such as `template-v1.4.0`. Protect the baseline branch, require linear history on it, and, where the hosting service supports it, restrict creating, moving, and deleting the tags. Recording the full commit ID beside the tag keeps the reference verifiable even if a tag is moved. A generator that can always reproduce the output on demand works too; the [LTS article's mechanism table](you-dont-need-to-roll-back-what-you-never-merged.md#choosing-the-baseline-mechanism) compares the options. In the example, `main` was created from the baseline commit, so the two branches share real Git ancestry.
 
@@ -216,7 +195,40 @@ foreach ($Version in $Old, $New) {
 }
 ```
 
-Set `$SourceArguments` when the template comes from a feed that is not already configured. A unique scratch folder per run means a failed earlier attempt cannot leave stale template stores or scaffolds behind. Resetting `$PSNativeCommandUseErrorActionPreference` matters when a profile has enabled it, particularly with `$ErrorActionPreference` set to `Stop`; PowerShell would then turn an expected nonzero exit code, such as 1 from `git diff` when differences exist, into an error before the script could interpret it. The assignment stays in effect for the session, so each phase saves the previous value and restores it at its end; if a phase stops early, run `$PSNativeCommandUseErrorActionPreference = $PreviousNativePreference` yourself.
+Set `$SourceArguments` when the template comes from a feed that is not already configured. A unique scratch folder per run keeps anything a failed earlier attempt left behind from being reused by accident. Resetting `$PSNativeCommandUseErrorActionPreference` matters when a profile has enabled it, particularly with `$ErrorActionPreference` set to `Stop`; PowerShell would then turn an expected nonzero exit code, such as 1 from `git diff` when differences exist, into an error before the script could interpret it. The assignment stays in effect for the session, so each phase saves the previous value and restores it at its end; if a phase stops early, run `$PSNativeCommandUseErrorActionPreference = $PreviousNativePreference` yourself.
+
+### Higher-assurance variant: install from verified files
+
+When the exact package bytes matter, define this function after `Assert-ExitCode` and use it in place of the `dotnet new install` line in the loop above. It reads the release's digest from the manifest, checks the retained `.nupkg` against it, and installs from that file into the same scratch template store, which phase 2 deletes with the scratch folder:
+
+```powershell
+function Install-VerifiedTemplate {
+  param(
+    [Parameter(Mandatory)] [string] $Version,
+    [Parameter(Mandatory)] [string] $Package,
+    [Parameter(Mandatory)] [string] $Hive)
+
+  $Manifest = Get-Content -LiteralPath (Join-Path $RepositoryRoot 'template-manifest.json') -Raw -ErrorAction Stop |
+    ConvertFrom-Json
+  $RecordedDigest = [string] $Manifest.templatePackageDigests.$Version
+  if ($RecordedDigest -notmatch '^sha256:([0-9a-fA-F]{64})$') {
+    throw "template-manifest.json records no valid SHA-256 digest for $Version."
+  }
+  $ExpectedDigest = $Matches[1]
+  $ActualDigest = (Get-FileHash -LiteralPath $Package -Algorithm SHA256 -ErrorAction Stop).Hash
+  if (-not $ActualDigest.Equals($ExpectedDigest, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "$Package does not match its recorded digest."
+  }
+  dotnet new install $Package --debug:custom-hive $Hive
+  Assert-ExitCode "Installing the verified $Version package"
+}
+
+$PackageStore = '<folder holding the retained .nupkg files>'
+# In the loop, instead of the feed install and its Assert-ExitCode:
+#   Install-VerifiedTemplate $Version (Join-Path $PackageStore "Larkspur.Templates.$Version.nupkg") $Hive
+```
+
+In the example, this variant verified and installed both releases from their files, with the manifest's two digests as the reference.
 
 ### Compare the options before trusting the defaults
 
@@ -224,7 +236,7 @@ Set `$SourceArguments` when the template comes from a feed that is not already c
 git -c core.autocrlf=false diff --no-index -- "options-$Old.txt" "options-$New.txt"
 ```
 
-This is a review step, so its exit code of 1 when the lists differ is expected. For Larkspur it printed one change. (The `-E` alias is generated by the template engine; the template declares only `EnableOpenApi`.)
+This is a review step, so its exit code of 1 when the lists differ is expected; any higher exit code is a failure, and the procedure should stop. For Larkspur it printed one change. (The `-E` alias is generated by the template engine; the template declares only `EnableOpenApi`.)
 
 ```text
  Template options:
@@ -286,7 +298,7 @@ git -c core.autocrlf=false diff --no-index --stat -- old new
  4 files changed, 9 insertions(+), 14 deletions(-)
 ```
 
-That is the complete observed file delta between the two clean scaffolds for these inputs (again a review step, where exit code 1 means differences were found), with the customized application nowhere in the comparison. Read each entry against the application before touching it:
+That is the complete observed file delta between the two clean scaffolds for these inputs (again a review step, where exit code 1 means differences were found and anything higher is a failure), with the customized application nowhere in the comparison. Read each entry against the application before touching it:
 
 | Template change | Application state | Defensible resolution |
 | --- | --- | --- |
@@ -403,7 +415,7 @@ function Update-IndexFromScaffold {
     throw 'Refusing to mirror: not at the root of the clean refresh worktree.'
   }
 
-  robocopy $Source $Worktree /MIR /XD .git /XF .git /XJ /R:2 /W:1 /NFL /NDL /NJH /NJS /NP *> $null
+  robocopy $Source $Worktree /MIR /IS /IT /XD .git /XF .git /XJ /R:2 /W:1 /NFL /NDL /NJH /NJS /NP *> $null
   $RobocopyExit = $LASTEXITCODE
   if ($RobocopyExit -ge 8) { throw "robocopy reported a failure (exit code $RobocopyExit)." }
   git add --all
@@ -413,7 +425,7 @@ function Update-IndexFromScaffold {
 }
 ```
 
-`robocopy /MIR` is the Windows tool for mirroring a folder. Its exit codes below 8 mean that no copy failure was reported, while still describing which differences it found; mirroring the new scaffold returned 3 in the example, meaning files were copied and extra files removed. Its output is redirected rather than piped, and the exit code is captured on the next line, so nothing can replace `$LASTEXITCODE` before it is read. On Linux or macOS, `rsync --archive --delete --exclude=.git <source>/ ./` serves the same mirroring purpose, but the guards above are PowerShell and would need equivalent checks written around it; neither was run for this article. [`git add --renormalize`](https://git-scm.com/docs/git-add) reapplies Git's clean conversion to tracked files under the current attributes, so the staged comparison reflects the active `.gitattributes` policy. Git may print "LF will be replaced by CRLF" warnings; they are expected. In the example, the guard refused to run in a worktree with staged changes, in one holding an ignored `bin/` file, from a subdirectory, from the application checkout, and with a source that was missing, was the application checkout, was the scratch folder itself, was a template store, or was a subfolder of a scaffold.
+`robocopy /MIR` is the Windows tool for mirroring a folder. By default it skips a file whose size and timestamps match the destination's, without comparing contents; `/IS` and `/IT` make it copy those files too, so every file is copied and Git alone decides what changed. In a disposable worktree, complete copying is worth more than incremental speed. Its exit codes below 8 mean that no copy failure was reported, while still describing which differences it found; mirroring the new scaffold returned 3 in the example, meaning files were copied and extra files removed. Its output is redirected rather than piped, and the exit code is captured on the next line, so nothing can replace `$LASTEXITCODE` before it is read. On Linux or macOS, `rsync --archive --delete --exclude=.git <source>/ ./` serves the same mirroring purpose, but the guards above are PowerShell and would need equivalent checks written around it; neither was run for this article. [`git add --renormalize`](https://git-scm.com/docs/git-add) reapplies Git's clean conversion to tracked files under the current attributes, so the staged comparison reflects the active `.gitattributes` policy. Git may print "LF will be replaced by CRLF" warnings; they are expected. In the example, the guard refused to run in a worktree with staged changes, in one holding an ignored `bin/` file, from a subdirectory, from the application checkout, and with a source that was missing, was the application checkout, was the scratch folder itself, was a template store, or was a subfolder of a scaffold.
 
 This sample assumes a template that emits ordinary files and folders. A template that generates symbolic links, junctions, or nested repositories needs its own review before anything is mirrored.
 
@@ -445,13 +457,29 @@ In the example, mirroring the old scaffold staged nothing and left the worktree 
 
 Normalization is a feature here and also a limit. With the repository's current attributes and clean filters, "nothing staged" shows that the stored baseline and the fresh scaffold normalize to the same index content. It is not a complete filesystem comparison: `git add --all` does not stage ignored files, so a generated file matching `.gitignore` is outside the check, and it does not establish byte-for-byte identity on disk. If a template intentionally generates ignored files that matter, validate those separately. Reproducibility of the generator is what the repeated generations in [section 3](#3-regenerate-both-versions-independently) are for.
 
+If the new scaffold stages nothing at all, the release changed nothing this application's scaffold contains, for example only package metadata or an option the application does not use. Do not manufacture a change to open a pull request. Record the new version and its provenance, point a new tag at the existing baseline commit if your governance process calls for one, and expect no application reconciliation; an empty adopted-to-new commit list in [section 6](#6-choose-how-to-integrate) is then a legitimate no-op.
+
 #### Merge, tag, and clean up
 
-Commit the staged scaffold, push the refresh branch, and open a pull request into `template-baseline` that contains nothing else. That ends phase 1; restore the saved preference with `$PSNativeCommandUseErrorActionPreference = $PreviousNativePreference`. Merge the pull request without a merge commit (squash, rebase, or fast-forward) so the baseline history stays linear. With a squash merge, most hosting services take the resulting commit message from the pull request by default, so name the release in the pull request title.
+Commit the staged scaffold, record the commit's ID, and push the refresh branch. The commit contains only the staged scaffold delta:
+
+```powershell
+git commit -m "Refresh Larkspur.Templates baseline to $New"
+Assert-ExitCode 'Committing the baseline refresh'
+$ReviewedCommit = git rev-parse --verify --quiet "$RefreshBranch^{commit}"
+Assert-ExitCode 'Recording the refresh commit'
+git push -u origin $RefreshBranch
+Assert-ExitCode 'Pushing the refresh branch'
+"Scratch folder: $Scratch"
+"Refresh commit pushed for review: $ReviewedCommit"
+$PSNativeCommandUseErrorActionPreference = $PreviousNativePreference
+```
+
+That ends phase 1. Open a pull request into `template-baseline` that contains nothing else, and merge it without a merge commit (squash, rebase, or fast-forward) so the baseline history stays linear. With a squash merge, the resulting commit message depends on the hosting service's configuration, which by default usually takes it from the pull request, so name the release in the pull request title.
 
 > **Stop here** until the baseline pull request has merged. Phase 2 deletes the refresh branch and the scratch folder.
 
-Phase 2 must run in the same clone as phase 1, while the local refresh branch and its worktree folder still exist, because it compares against that branch and removes that worktree. It may run in a new PowerShell session. If it does, re-create the values it needs first; the scratch folder path is the one phase 1 printed:
+Phase 2 must run in the same clone as phase 1, while the local refresh branch and its worktree folder still exist, because it compares against that branch and removes that worktree. It may run in a new PowerShell session. If it does, re-create the values it needs first; the scratch folder path and the refresh commit ID are the ones phase 1 printed:
 
 ```powershell
 $PreviousNativePreference = $PSNativeCommandUseErrorActionPreference
@@ -462,11 +490,12 @@ function Assert-ExitCode([string] $Step) {
 $New = '1.5.0'
 $RepositoryRoot = (Resolve-Path -LiteralPath '<path to the application checkout>' -ErrorAction Stop).Path
 $RefreshBranch = "template-refresh-$New"
-$Worktree = (Resolve-Path -LiteralPath (Join-Path (Split-Path $RepositoryRoot) "orders-template-$New") -ErrorAction Stop).Path
+$Worktree = (Resolve-Path -LiteralPath (Join-Path (Split-Path $RepositoryRoot) "orders-template-$New") -ErrorAction Stop).Path   # must still exist
 $Scratch = '<the scratch folder path that phase 1 printed>'
+$ReviewedCommit = '<the refresh commit ID that phase 1 printed>'
 ```
 
-Then check again that the application checkout is clean, update the local baseline branch, and confirm that the merged commit has the same Git tree as the local refresh-branch head that was pushed for review, by comparing the two tree object IDs; a squash merge changes the commit ID but not the tree. This proves local tree equality only. The hosting service's rules must separately ensure that the pull request's head did not change after approval. Make sure the new tag exists neither locally nor on the remote, because a baseline tag must never be replaced automatically. Tag the merged commit and push the tag. Only then remove the disposable worktree through Git rather than deleting its folder, delete the local refresh branch, and delete the scratch folder after checking that its path and contents have the structure phase 1 created. In a repository without a remote, adapt the fetch, `ls-remote`, and push steps as in phase 1.
+Then check again that the application checkout is clean, update the local baseline branch, confirm that the local refresh branch still points at the commit phase 1 pushed, and confirm that the merged commit has the same Git tree as that commit, by comparing the two tree object IDs; a squash merge changes the commit ID but not the tree. Tree equality verifies content, not approval or merge provenance: confirm in the hosting service that the merged commit is the one its pull request produced, and rely on its rules to ensure that the pull request's head did not change after approval. Make sure the new tag exists neither locally nor on the remote, because a baseline tag must never be replaced automatically. Tag the merged commit and push the tag. Only then remove the disposable worktree through Git rather than deleting its folder, delete the local refresh branch, and delete the scratch folder after checking that its path and contents have the structure phase 1 created. In a repository without a remote, adapt the fetch, `ls-remote`, and push steps as in phase 1.
 
 ```powershell
 # Phase 2: run only after the baseline pull request has merged.
@@ -477,7 +506,10 @@ if ($CheckoutStatus) { throw 'The application checkout has uncommitted changes.'
 git fetch origin template-baseline:template-baseline
 Assert-ExitCode 'Updating the local baseline branch'
 
-$ReviewedTree = git rev-parse --verify --quiet "$RefreshBranch^{tree}"
+$BranchCommit = git rev-parse --verify --quiet "$RefreshBranch^{commit}"
+Assert-ExitCode 'Resolving the refresh branch'
+if ($BranchCommit -ne $ReviewedCommit) { throw "$RefreshBranch no longer points at the commit pushed for review." }
+$ReviewedTree = git rev-parse --verify --quiet "$ReviewedCommit^{tree}"
 Assert-ExitCode 'Resolving the reviewed tree'
 $MergedTree = git rev-parse --verify --quiet 'template-baseline^{tree}'
 Assert-ExitCode 'Resolving the merged baseline tree'
@@ -488,7 +520,7 @@ git show-ref --verify --quiet "refs/tags/$Tag"
 $TagExit = $LASTEXITCODE
 if ($TagExit -eq 0) { throw "Tag $Tag already exists locally. Verify it rather than replacing it." }
 if ($TagExit -ne 1) { throw "git show-ref failed with exit code $TagExit." }
-git ls-remote --exit-code --refs --tags origin "refs/tags/$Tag" *> $null
+git ls-remote --exit-code --refs --tags origin "refs/tags/$Tag" > $null   # errors stay visible
 $RemoteTagExit = $LASTEXITCODE
 if ($RemoteTagExit -eq 0) { throw "Tag $Tag already exists on origin. Verify it rather than replacing it." }
 if ($RemoteTagExit -ne 2) { throw "git ls-remote failed with exit code $RemoteTagExit." }
@@ -533,9 +565,13 @@ All four rest on the same three-way comparison: old scaffold, new scaffold, and 
 
 If an earlier refresh's baseline merged but its integration was abandoned, the adopted version from [section 2](#the-latest-raw-baseline-is-not-necessarily-the-adopted-one) is older than the previous baseline tag, and a single-commit cherry-pick would skip a release. Integrate the cumulative baseline delta from the adopted tag through the new one instead.
 
-Whichever path applies, first confirm that the adopted tag still points at the commit the manifest recorded, and inspect exactly which baseline commits the integration will bring in:
+Whichever path applies, create the integration branch, confirm that the adopted tag still points at the commit the manifest recorded, and resolve exactly which baseline commits the integration will bring in. Run this in the phase 2 session, or re-create `$RepositoryRoot`, `$New`, and `Assert-ExitCode` as phase 2 does:
 
 ```powershell
+Set-Location -LiteralPath $RepositoryRoot -ErrorAction Stop
+git switch --create "integrate-template-$New" main
+Assert-ExitCode 'Creating the integration branch'
+
 $Manifest = Get-Content -LiteralPath (Join-Path $RepositoryRoot 'template-manifest.json') -Raw -ErrorAction Stop |
   ConvertFrom-Json
 $RecordedCommit = [string] $Manifest.adoptedBaselineCommit
@@ -554,9 +590,11 @@ if ($AncestorExit -eq 1) { throw "$($Manifest.adoptedBaselineTag) is not an ance
 if ($AncestorExit -ne 0) { throw "git merge-base failed with exit code $AncestorExit." }
 git log --oneline --reverse "$($Manifest.adoptedBaselineTag)..template-v$New"
 Assert-ExitCode 'Listing the baseline commits to integrate'
+$Commits = @(git rev-list --reverse "$($Manifest.adoptedBaselineTag)..template-v$New")
+Assert-ExitCode 'Resolving the baseline commits to integrate'
 ```
 
-The commit IDs are compared case-insensitively, and a SHA-256 repository's 64-character IDs are accepted as well as SHA-1's 40. In the example, the checks passed and the list held the single 1.5.0 refresh commit. On the required linear baseline, that list is the sequence to integrate; confirm it contains only the intended refreshes before running `git cherry-pick -x "$($Manifest.adoptedBaselineTag)..template-v$New"`. If the list contains merge commits or anything other than the intended template refreshes, stop and investigate; then select the commits explicitly, or merge the selected baseline tag if the application's preserved ancestry supports it and the complete delta has been reviewed. A multi-commit range was not exercised in the example.
+The commit IDs are compared case-insensitively, and a SHA-256 repository's 64-character IDs are accepted as well as SHA-1's 40. In the example, the checks passed and the list held the single 1.5.0 refresh commit. On the required linear baseline, that list is the sequence to integrate. Confirm it contains only the intended refreshes, then pass the same reviewed list to the cherry-pick, so the commits applied are exactly the ones inspected, oldest first: `git cherry-pick -x @Commits`. In the example, that produced the same two conflicts as the single-commit pick. If the list contains merge commits or anything other than the intended template refreshes, stop and investigate; then select the commits explicitly, or merge the selected baseline tag if the application's preserved ancestry supports it and the complete delta has been reviewed. A multi-commit range was not exercised in the example.
 
 The patch variant also starts from the verified adopted commit, never from `$Old`, so it carries the whole cumulative delta. It writes the patch to the temporary folder rather than the checkout, stops on a failed application, and keeps the patch for diagnosis in that case:
 
@@ -564,6 +602,9 @@ The patch variant also starts from the verified adopted commit, never from `$Old
 $Patch = Join-Path ([IO.Path]::GetTempPath()) "baseline-$($Manifest.adoptedVersion)-to-$New-$([Guid]::NewGuid().ToString('N')).patch"
 git diff --binary "--output=$Patch" $RecordedCommit "template-v$New"
 Assert-ExitCode 'Writing the cumulative baseline patch'
+if (-not (Test-Path -LiteralPath $Patch -PathType Leaf) -or (Get-Item -LiteralPath $Patch).Length -eq 0) {
+  throw "The cumulative baseline patch is missing or empty: $Patch"
+}
 git apply --3way $Patch
 $ApplyExit = $LASTEXITCODE
 git status --short
@@ -680,7 +721,7 @@ Two different things need evidence, and passing one says little about the other.
 
 **Stop rules.** Stop and investigate, rather than pressing on, when the old scaffold does not match the baseline, the generator does not reproduce its output, the staged baseline delta contains anything neither scaffold generation produced, `.gitattributes` changed in a way you do not understand, or a conflict cannot be resolved without changing application behavior nobody has agreed to change.
 
-**Recovery boundary.** Everything above happens away from `main`: the scaffolds are in a scratch folder, the baseline change is on a refresh branch in its own worktree, and the integration is on a short-lived branch. What stopping costs depends on how far the work got, but before either pull request merges it is limited to aborting any cherry-pick or merge still in progress, deleting whichever temporary branches were created, removing the disposable worktree with `git worktree remove`, and deleting the scratch folder. No revert of `main` is needed, because `main` changes only when the integration pull request is merged.
+**Recovery boundary.** Everything above happens away from `main`: the scaffolds are in a scratch folder, the baseline change is on a refresh branch in its own worktree, and the integration is on a short-lived branch. What stopping costs depends on how far the work got, but before either pull request merges it is limited to aborting any cherry-pick or merge still in progress, keeping a failed patch only as long as it is needed for diagnosis, deleting whichever temporary branches were created, including the integration branch, removing the disposable worktree with `git worktree remove`, and deleting the scratch folder. No revert of `main` is needed, because `main` changes only when the integration pull request is merged.
 
 If integration is abandoned after the baseline pull request has merged, keep the validated raw baseline and its tag as a record of the template's history. The application stays on its previously adopted version, and its manifest still says so. Record why the integration was abandoned, and bring in the cumulative baseline delta from the adopted tag when the next attempt is made.
 
@@ -916,7 +957,7 @@ internal static class BuildInfo
 }
 ```
 
-### Third-party notice
+### Third-party notice for the adapted template package project
 
 The template package project in this appendix is adapted from Microsoft's documentation code, which is distributed under the following license:
 
