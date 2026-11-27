@@ -300,6 +300,8 @@ static class LandingPageValidator
         Expect("built homepage missing section", errors => ValidateBuiltHomepage(validSite.Replace("id=\"related-projects\"", string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
         Expect("built homepage missing bounded-authority maxim", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[0], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
         Expect("built homepage missing proposal intake link", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[1], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
+        Expect("homepage missing bounded-authority maxim", errors => ValidateHomepage(validHomepage.Replace(RequiredAuthorityContent[0], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
+        Expect("homepage missing proposal intake link", errors => ValidateHomepage(validHomepage.Replace(RequiredAuthorityContent[1], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
 
         if (failures.Count > 0)
         {
