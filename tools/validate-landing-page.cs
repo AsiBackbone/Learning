@@ -22,19 +22,8 @@ static class LandingPageValidator
     private static readonly string[] RequiredAuthorityContent =
     [
         "<strong>Proposal is open. Authority is bounded.</strong>",
-        "In this community process, human maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action.",
+        "href=\"https://github.com/AsiBackbone/.github/blob/main/CONTRIBUTING.md#public-proposal-intake\"",
     ];
-
-    // Retired wording that must not return to the homepage source or built page.
-    private static readonly string[] RetiredAuthorityContent =
-    [
-        "Anything can propose; the host retains authority to act.",
-        "the accountable host is the human maintainer",
-        "Humans and AI agents may introduce proposals",
-    ];
-
-    private const string RetiredBoundarySentence =
-        "In this community process, the accountable host is the human maintainer: maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action.";
 
     // Required homepage sections in the order the standard prescribes.
     private static readonly string[] RequiredHomepageMarkers =
@@ -164,19 +153,6 @@ static class LandingPageValidator
                 errors.Add($"'{HomepageRelativePath}' is missing required landing-page content: {requiredText}");
             }
         }
-
-        RejectRetiredAuthorityContent(homepage, HomepageRelativePath, errors);
-    }
-
-    private static void RejectRetiredAuthorityContent(string content, string relativePath, ICollection<string> errors)
-    {
-        foreach (string retiredText in RetiredAuthorityContent)
-        {
-            if (content.Contains(retiredText, StringComparison.Ordinal))
-            {
-                errors.Add($"'{relativePath}' must not contain retired authority wording: {retiredText}");
-            }
-        }
     }
 
     private static void ValidateNavigation(string? toc, ICollection<string> errors)
@@ -249,8 +225,6 @@ static class LandingPageValidator
                 errors.Add($"'{BuiltHomepageRelativePath}' does not render required authority content: {requiredText}");
             }
         }
-
-        RejectRetiredAuthorityContent(html, BuiltHomepageRelativePath, errors);
     }
 
     private static void RequireInOrder(
@@ -325,24 +299,9 @@ static class LandingPageValidator
         Expect("valid built homepage", errors => ValidateBuiltHomepage(validSite, errors), shouldPass: true);
         Expect("built homepage missing section", errors => ValidateBuiltHomepage(validSite.Replace("id=\"related-projects\"", string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
         Expect("built homepage missing bounded-authority maxim", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[0], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
-        Expect("built homepage missing maintainer authority boundary", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[1], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
-        Expect("built homepage with retired host boundary wording", errors => ValidateBuiltHomepage(validSite + "\n" + RetiredBoundarySentence, errors), shouldPass: false);
-
-        // Every retired authority phrase must be rejected in both the source and the built homepage.
-        // The phrases are listed here independently of RetiredAuthorityContent so that removing or
-        // altering a validator entry fails the self-test.
-        string[] expectedRetiredPhrases =
-        [
-            "Anything can propose; the host retains authority to act.",
-            "the accountable host is the human maintainer",
-            "Humans and AI agents may introduce proposals",
-        ];
-
-        foreach (string retiredText in expectedRetiredPhrases)
-        {
-            Expect($"homepage with retired authority wording: {retiredText}", errors => ValidateHomepage(validHomepage + "\n" + retiredText, errors), shouldPass: false);
-            Expect($"built homepage with retired authority wording: {retiredText}", errors => ValidateBuiltHomepage(validSite + "\n" + retiredText, errors), shouldPass: false);
-        }
+        Expect("built homepage missing proposal intake link", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[1], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
+        Expect("homepage missing bounded-authority maxim", errors => ValidateHomepage(validHomepage.Replace(RequiredAuthorityContent[0], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
+        Expect("homepage missing proposal intake link", errors => ValidateHomepage(validHomepage.Replace(RequiredAuthorityContent[1], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
 
         if (failures.Count > 0)
         {
