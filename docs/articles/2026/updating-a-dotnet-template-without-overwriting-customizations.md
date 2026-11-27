@@ -22,7 +22,7 @@ x_question: How do you adopt a newer project template?
 
 **Prerequisites:** Working familiarity with `dotnet new`, Git branches and conflict resolution, and NuGet package references. Git worktrees, `.gitattributes`, lock files, and EF Core migrations are introduced where they are needed. No AsiBackbone package, NetCoreApplicationTemplate, or prior Learning material is required.
 
-**Sample scope:** The Larkspur template, its two releases, and the Orders application are fictional and deliberately small: one web project with an `.editorconfig`, central package versions, a lock file, and four relevant source and configuration files. Its `.gitignore` and `.editorconfig` are minimal illustrations, not files to copy into a real project. The commands are PowerShell examples for Windows; Git and .NET CLI commands are the same on other platforms, and the one Windows-specific tool (`robocopy`) is called out where it appears. Branch and tag names are this article's choices, not requirements. ReferenceApplication appears near the end as a bounded pointer to one complete runbook, not as proof that its arrangement suits every repository.
+**Sample scope:** The Larkspur template, its two principal releases (plus a 1.4.1 release whose scaffold matches 1.4.0), and the Orders application are fictional and deliberately small: one web project with an `.editorconfig`, central package versions, a lock file, and four relevant source and configuration files. Its `.gitignore` and `.editorconfig` are minimal illustrations, not files to copy into a real project. The commands are PowerShell examples for Windows; Git and .NET CLI commands are the same on other platforms, and the one Windows-specific tool (`robocopy`) is called out where it appears. Branch and tag names are this article's choices, not requirements. ReferenceApplication appears near the end as a bounded pointer to one complete runbook, not as proof that its arrangement suits every repository.
 
 **Verification:** The outcomes reported in this article (the refusal and the overwrite from `dotnet new`, the option and reproducibility checks, the patch failure, the staged delta, the merge and cherry-pick conflicts, the `git apply --3way` refusal, the lock-file error, the build errors, and the passing endpoints) were observed by running the example with .NET SDK 10.0.404, Git 2.56.1 for Windows, and PowerShell 7.7.0 on November 27, 2026. The PowerShell commands were run as shown, phase 1 in one session and phase 2 in a new one, against a clone of a local bare repository standing in for the hosting service, with `$SourceArguments` pointing at a local folder feed and the placeholders filled in; the baseline pull request's squash merge was simulated on that bare repository. They are observations of this example in that environment, not guarantees about other templates or configurations. The [appendix](#appendix-reproducing-the-example) lists the template files and environment. Line-ending behavior depends on Git configuration, so the article states which setting produced each result. External sources were last verified on November 27, 2026.
 
@@ -141,7 +141,7 @@ Then keep the raw scaffold itself where it cannot drift: the example stores it o
 
 Two states are easy to conflate. The newest commit on the baseline branch records what the template most recently generated. The adopted version records what the application has actually integrated. They differ whenever a baseline refresh has merged but its integration into the application has not, or was abandoned. Advance `adoptedVersion`, `adoptedBaselineTag`, and `adoptedBaselineCommit` in the same pull request that integrates the refresh into the application, never before it. The next integration must then bring in everything from the adopted tag to the new one, not only the newest baseline commit, or the application silently skips a release.
 
-A release whose scaffold is identical to the adopted baseline ([section 5](#mirror-and-stage-the-scaffolds) shows how to detect one) has no integration pull request, because there is nothing to integrate. If the team adopts it anyway, record that in a small, reviewed, manifest-only pull request to the application: advance `adoptedVersion` and `adoptedBaselineTag` to the new release and add its digest, and leave `adoptedBaselineCommit` unchanged. Adopting such a release means its package, options, SDK, and generated output were reviewed and found equivalent to the stored baseline. Two version tags on one baseline commit say that the scaffolds matched, not that the packages did; their digests can still differ.
+A release whose scaffold is identical to the adopted baseline has no integration pull request, because there is nothing to integrate. [Section 5](#mirror-and-stage-the-scaffolds) detects a release identical to the previous raw baseline, and [section 6](#6-choose-how-to-integrate) decides whether it is also identical to what the application adopted. If the team adopts it anyway, record that in a small, reviewed, manifest-only pull request to the application: advance `adoptedVersion` and `adoptedBaselineTag` to the new release and add its digest, and leave `adoptedBaselineCommit` unchanged. Adopting such a release means its package, options, SDK, and generated output were reviewed and found equivalent to the stored baseline. Two version tags on one baseline commit say that the scaffolds matched, not that the packages did; their digests can still differ.
 
 ---
 
@@ -251,7 +251,7 @@ This is a review step, so its exit code of 1 when the lists differ is expected; 
 +                       Default: false
 ```
 
-Had both scaffolds been generated with defaults, the delta would have "removed OpenAPI": an artifact of changed inputs, not a template change anyone decided to adopt. Decide the value the application uses, pass it explicitly to both generations, and record it in the manifest. A new option deserves the same decision.
+Had both scaffolds been generated with defaults, the delta would have "removed OpenAPI": an artifact of changed inputs, not a template change anyone decided to adopt. Decide the value the application uses, pass it explicitly to both generations, and record it in the manifest. A new option deserves the same decision, and an option that was renamed or removed needs the equivalent, version-specific argument for each release.
 
 The help comparison detects options that were added, removed, or given a different displayed default. It does not prove that an unchanged option still has the same effect, which is one more reason to review the scaffold delta itself.
 
@@ -495,7 +495,7 @@ Remove-Item -LiteralPath $Scratch -Recurse -Force -ErrorAction Stop
 $PSNativeCommandUseErrorActionPreference = $PreviousNativePreference
 ```
 
-If your governance gives each reviewed release its own tag, tag the existing baseline commit `template-v$New`, applying the same local and remote tag checks that phase 2 uses below. Record the release's provenance, and if the application adopts it, do so in the manifest-only pull request described in [section 2](#the-latest-raw-baseline-is-not-necessarily-the-adopted-one). The adopted-to-new commit list in [section 6](#6-choose-how-to-integrate) is then empty, and there is nothing to integrate. In the example, a 1.4.1 package whose scaffold matched 1.4.0 took this path: the option and scaffold comparisons in sections 3 and 4 both exited with 0, nothing was staged, the cleanup completed, and with `template-v1.4.1` on the existing baseline commit, section 6 found no commits to integrate.
+If your governance gives each reviewed release its own tag, tag the existing baseline commit `template-v$New`, applying the same local and remote tag checks that phase 2 uses below. Record the release's provenance. This stage compared the new release with the previous raw baseline, not with what the application adopted, so it does not by itself mean the application has nothing to integrate. [Section 6](#6-choose-how-to-integrate) decides that: if the application's adopted baseline commit is the commit the new release tag points at, its commit list is empty and adoption is the manifest-only pull request described in [section 2](#the-latest-raw-baseline-is-not-necessarily-the-adopted-one). If an earlier refresh was never integrated, the list still holds that refresh, and it must be integrated as usual. In the example, a 1.4.1 package whose scaffold matched 1.4.0 took this path: the option and scaffold comparisons in sections 3 and 4 both exited with 0, nothing was staged, the cleanup completed, and with `template-v1.4.1` on the existing baseline commit, section 6 found no commits to integrate.
 
 #### Merge, tag, and clean up
 
@@ -607,7 +607,7 @@ All four rest on the same three-way comparison: old scaffold, new scaffold, and 
 
 If an earlier refresh's baseline merged but its integration was abandoned, the adopted version from [section 2](#the-latest-raw-baseline-is-not-necessarily-the-adopted-one) is older than the previous baseline tag, and a single-commit cherry-pick would skip a release. Integrate the cumulative baseline delta from the adopted tag through the new one instead.
 
-Whichever path applies, first confirm that the adopted tag still points at the commit the manifest recorded, and resolve exactly which baseline commits the integration would bring in. Run this in the phase 2 session, or re-create `$RepositoryRoot`, `$New`, and `Assert-ExitCode` as phase 2 does:
+Whichever path applies, start from the application as it is now. Create the integration branch from the current `main` on the remote, refusing a branch left over from an earlier attempt, and only then read the manifest, from that branch. Reading it from a local `main` that has fallen behind could select changes a later refresh already adopted. Run this in the phase 2 session, or re-create `$RepositoryRoot`, `$New`, and `Assert-ExitCode` as phase 2 does. `--no-track` keeps the new branch from tracking `origin/main`; in a repository without a remote, create it from the local `main` instead:
 
 ```powershell
 Set-Location -LiteralPath $RepositoryRoot -ErrorAction Stop
@@ -615,6 +615,20 @@ $CheckoutStatus = git status --porcelain=v1
 Assert-ExitCode 'Reading the application checkout status'
 if ($CheckoutStatus) { throw 'The application checkout has uncommitted changes.' }
 
+$IntegrationBranch = "integrate-template-$New"
+git show-ref --verify --quiet "refs/heads/$IntegrationBranch"
+$RefExit = $LASTEXITCODE
+if ($RefExit -eq 0) { throw "Branch $IntegrationBranch already exists from an earlier attempt." }
+if ($RefExit -ne 1) { throw "git show-ref failed with exit code $RefExit." }
+git fetch origin main
+Assert-ExitCode 'Fetching the current main branch'
+git switch --no-track --create $IntegrationBranch origin/main
+Assert-ExitCode 'Creating the integration branch'
+```
+
+Then confirm, from the manifest on that branch, that the adopted tag still points at the commit the manifest recorded, and resolve exactly which baseline commits the integration would bring in:
+
+```powershell
 $Manifest = Get-Content -LiteralPath (Join-Path $RepositoryRoot 'template-manifest.json') -Raw -ErrorAction Stop |
   ConvertFrom-Json
 $RecordedCommit = [string] $Manifest.adoptedBaselineCommit
@@ -638,25 +652,11 @@ Assert-ExitCode 'Resolving the baseline commits to integrate'
 "Baseline commits to integrate: $($Commits.Count)"
 ```
 
-The commit IDs are compared case-insensitively, and a SHA-256 repository's 64-character IDs are accepted as well as SHA-1's 40. If the list is empty, the release changed nothing in the scaffold: skip the rest of this section, because there is nothing to merge, cherry-pick, or patch, and record any adoption in a manifest-only pull request.
+The commit IDs are compared case-insensitively, and a SHA-256 repository's 64-character IDs are accepted as well as SHA-1's 40. If the list is empty, the application's adopted baseline already holds everything up to the new release: there is nothing to merge, cherry-pick, or patch. Use the new branch for the manifest-only pull request if the application adopts the release, or delete it if not. In the example, the ordering mattered: with the local `main` still recording 1.4.0 as adopted but the remote `main` already recording 1.5.0, the manifest read from the new branch produced an empty list, where the stale local manifest would have selected the 1.5.0 commit a second time.
 
-Otherwise, create the integration branch from the current `main` on the remote, refusing a branch left over from an earlier attempt. `--no-track` keeps the new branch from tracking `origin/main`. In a repository without a remote, create it from the local `main` instead:
+In the ordinary 1.4.0 to 1.5.0 example, the checks passed, the list held the single 1.5.0 refresh commit, and the integration branch started at the fetched `origin/main`. On the required linear baseline, that list is the sequence to integrate. Confirm it contains only the intended refreshes, then pass the same reviewed list to the cherry-pick, so the commits applied are exactly the ones inspected, oldest first: `git cherry-pick -x @Commits`. In the example, that produced the same two conflicts as the single-commit pick. If the list contains merge commits or anything other than the intended template refreshes, stop and investigate; then select the commits explicitly, or merge the selected baseline tag if the application's preserved ancestry supports it and the complete delta has been reviewed. A multi-commit range was not exercised in the example.
 
-```powershell
-$IntegrationBranch = "integrate-template-$New"
-git show-ref --verify --quiet "refs/heads/$IntegrationBranch"
-$RefExit = $LASTEXITCODE
-if ($RefExit -eq 0) { throw "Branch $IntegrationBranch already exists from an earlier attempt." }
-if ($RefExit -ne 1) { throw "git show-ref failed with exit code $RefExit." }
-git fetch origin main
-Assert-ExitCode 'Fetching the current main branch'
-git switch --no-track --create $IntegrationBranch origin/main
-Assert-ExitCode 'Creating the integration branch'
-```
-
-In the example, the checks passed, the list held the single 1.5.0 refresh commit, and the integration branch started at the fetched `origin/main`. On the required linear baseline, that list is the sequence to integrate. Confirm it contains only the intended refreshes, then pass the same reviewed list to the cherry-pick, so the commits applied are exactly the ones inspected, oldest first: `git cherry-pick -x @Commits`. In the example, that produced the same two conflicts as the single-commit pick. If the list contains merge commits or anything other than the intended template refreshes, stop and investigate; then select the commits explicitly, or merge the selected baseline tag if the application's preserved ancestry supports it and the complete delta has been reviewed. A multi-commit range was not exercised in the example.
-
-The patch variant also starts from the verified adopted commit, never from `$Old`, so it carries the whole cumulative delta. It writes the patch to the temporary folder rather than the checkout, stops on a failed application, and keeps the patch for diagnosis in that case. It runs only when the commit list is not empty, so an empty patch there means something went wrong:
+The patch variant also starts from the verified adopted commit, never from `$Old`, so it carries the whole cumulative delta. It writes the patch to the temporary folder rather than the checkout, stops on a failed application, and keeps the patch for diagnosis in that case. It runs only when the commit list is not empty, but the patch compares only the two endpoints, so intermediate template changes that cancel each other out can still produce an empty patch. The script stops on an empty patch so that someone investigates; if the endpoint trees really are identical, no code reconciliation is needed:
 
 ```powershell
 $Patch = Join-Path ([IO.Path]::GetTempPath()) "baseline-$($Manifest.adoptedVersion)-to-$New-$([Guid]::NewGuid().ToString('N')).patch"
@@ -789,7 +789,7 @@ If integration is abandoned after the baseline pull request has merged, keep the
 
 ## When This Workflow Is Not Worth It
 
-In the demonstrated arrangement, the procedure costs a protected baseline branch and tags, a recorded manifest, two pull requests per refresh, and continuing discipline. It is likely more than you need when:
+In the demonstrated arrangement, the procedure costs a protected baseline branch and tags, a recorded manifest, normally two pull requests per refresh that changes the scaffold, and continuing discipline. It is likely more than you need when:
 
 - **The project is small or young.** If generating a fresh project from the new template and moving a handful of files into it takes an hour, do that.
 - **The application has diverged so far that the template is a memory.** If little of the original structure remains, the delta will conflict everywhere, and reading the template's release notes and porting specific changes by hand may be cheaper and clearer.
@@ -817,7 +817,7 @@ ReferenceApplication, an AsiBackbone organization repository built from NetCoreA
 7. Are the conflict rules written down, including what is regenerated rather than merged, and does the integration cover the complete baseline delta from the adopted baseline tag through the new one?
 8. Was every automatically merged hunk in a customized file reviewed, as well as built and tested?
 9. Were lock files regenerated with `--force-evaluate` and verified with `--locked-mode`, and were EF Core migrations handled with EF Core's own workflow?
-10. Were the raw baseline and the integrated application validated separately, and was the adopted version advanced only when the integration pull request merged?
+10. Were the raw baseline and the integrated application validated separately, and was the adopted version advanced only when the integration pull request, or for a release with no scaffold changes the manifest-only pull request, merged?
 
 ---
 
