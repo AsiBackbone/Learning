@@ -30,6 +30,7 @@ static class LandingPageValidator
     [
         "Anything can propose; the host retains authority to act.",
         "the accountable host is the human maintainer",
+        "Humans and AI agents may introduce proposals",
     ];
 
     private const string RetiredBoundarySentence =
