@@ -326,10 +326,23 @@ static class LandingPageValidator
         Expect("built homepage missing section", errors => ValidateBuiltHomepage(validSite.Replace("id=\"related-projects\"", string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
         Expect("built homepage missing bounded-authority maxim", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[0], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
         Expect("built homepage missing maintainer authority boundary", errors => ValidateBuiltHomepage(validSite.Replace(RequiredAuthorityContent[1], string.Empty, StringComparison.Ordinal), errors), shouldPass: false);
-        Expect("homepage with retired proposal maxim", errors => ValidateHomepage(validHomepage + "\n" + RetiredAuthorityContent[0], errors), shouldPass: false);
-        Expect("homepage with retired host boundary wording", errors => ValidateHomepage(validHomepage + "\n" + RetiredAuthorityContent[1], errors), shouldPass: false);
-        Expect("built homepage with retired proposal maxim", errors => ValidateBuiltHomepage(validSite + "\n" + RetiredAuthorityContent[0], errors), shouldPass: false);
         Expect("built homepage with retired host boundary wording", errors => ValidateBuiltHomepage(validSite + "\n" + RetiredBoundarySentence, errors), shouldPass: false);
+
+        // Every retired authority phrase must be rejected in both the source and the built homepage.
+        // The phrases are listed here independently of RetiredAuthorityContent so that removing or
+        // altering a validator entry fails the self-test.
+        string[] expectedRetiredPhrases =
+        [
+            "Anything can propose; the host retains authority to act.",
+            "the accountable host is the human maintainer",
+            "Humans and AI agents may introduce proposals",
+        ];
+
+        foreach (string retiredText in expectedRetiredPhrases)
+        {
+            Expect($"homepage with retired authority wording: {retiredText}", errors => ValidateHomepage(validHomepage + "\n" + retiredText, errors), shouldPass: false);
+            Expect($"built homepage with retired authority wording: {retiredText}", errors => ValidateBuiltHomepage(validSite + "\n" + retiredText, errors), shouldPass: false);
+        }
 
         if (failures.Count > 0)
         {
